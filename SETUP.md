@@ -103,6 +103,6 @@ Si l'inscription ou la connexion affiche **Failed to fetch** :
    - Exécutez `supabase/schema.sql` si ce n'est pas déjà fait
 
 4. **Test rapide** : ouvrez dans le navigateur  
-   `https://mgwshdptwloykxvviipaa.supabase.co/auth/v1/health`  
+   `https://mgwshdptwloykxvvipaa.supabase.co/auth/v1/health`  
    Vous devez voir `{"version":"..."}` — pas une erreur 502.
 
