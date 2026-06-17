@@ -26,3 +26,11 @@ function getSupabase() {
 function configErrorMessage() {
   return 'Supabase n\'est pas configuré. Copiez js/config.example.js vers js/config.js et ajoutez vos clés.';
 }
+
+function mapAuthError(err) {
+  const msg = err?.message || '';
+  if (msg === 'Failed to fetch' || msg.includes('NetworkError') || msg.includes('fetch')) {
+    return 'Impossible de joindre Supabase. Vérifiez que le projet hb-commerce est actif dans le dashboard Supabase (réactiver si en pause), puis réessayez dans 1–2 minutes.';
+  }
+  return msg || 'Erreur inconnue.';
+}

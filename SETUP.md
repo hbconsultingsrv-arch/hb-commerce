@@ -85,10 +85,24 @@ Connectez-vous → accédez à **`admin.html`**
 | Passer commande | `checkout.html` (connexion requise) |
 | Suivre les commandes | `compte.html` |
 
-## Mettre en ligne
+## Dépannage — « Failed to fetch » à l'inscription
 
-```bash
-git add .
-git commit -m "Site HB Commerce — commerce alimentaire en gros"
-git push
-```
+Si l'inscription ou la connexion affiche **Failed to fetch** :
+
+1. **Réactiver le projet Supabase** (cause la plus fréquente)
+   - Dashboard Supabase → projet `hb-commerce`
+   - Si le projet est **Paused**, cliquez **Restore project**
+   - Attendez 1–2 minutes que le projet redémarre
+
+2. **URLs d'authentification**
+   - **Authentication** → **URL Configuration**
+   - **Site URL** : `https://hbconsultingsrv-arch.github.io/hb-commerce/`
+   - **Redirect URLs** : ajoutez aussi `http://localhost:8080/**`
+
+3. **Schéma SQL**
+   - Exécutez `supabase/schema.sql` si ce n'est pas déjà fait
+
+4. **Test rapide** : ouvrez dans le navigateur  
+   `https://mgwshdptwloykxvviipaa.supabase.co/auth/v1/health`  
+   Vous devez voir `{"version":"..."}` — pas une erreur 502.
+

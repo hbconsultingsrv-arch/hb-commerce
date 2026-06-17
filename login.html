@@ -57,7 +57,7 @@
         await signIn(fd.get('email'), fd.get('password'));
         window.location.href = redirect;
       } catch (err) {
-        showAlert(note, err.message || 'Erreur de connexion.');
+        showAlert(note, mapAuthError(err));
       }
     });
 

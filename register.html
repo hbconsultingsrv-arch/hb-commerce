@@ -97,7 +97,7 @@
           window.location.href = 'compte.html';
         }
       } catch (err) {
-        showAlert(note, err.message || 'Erreur lors de l\'inscription.');
+        showAlert(note, mapAuthError(err));
       }
     });
   </script>
