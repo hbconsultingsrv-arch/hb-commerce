@@ -33,6 +33,9 @@ window.HB_BRANDING = {
 };
 
 function getFayafiImageUrl(size = 1200) {
+  if (typeof resolveMarketImage === 'function') {
+    return resolveMarketImage(getMarket(), 'product', size).primary;
+  }
   return window.HB_BRANDING?.images?.product || googleDriveImage(FAYAFI_DRIVE_ID, size);
 }
 

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1100" fill="none">
+  <rect width="800" height="1100" fill="#2a4228"/>
+  <rect y="0" width="800" height="8" fill="#00a1de"/>
+  <rect y="8" width="800" height="8" fill="#ffffff"/>
+  <rect y="16" width="800" height="8" fill="#ed2939"/>
+  <text x="400" y="100" text-anchor="middle" font-family="Georgia,serif" font-size="52" font-weight="700" fill="#e8c547">FAYAFI</text>
+  <text x="400" y="140" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" fill="#f5f0e6">Huile d'olive extra vierge</text>
+  <text x="400" y="168" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" fill="#f5f0e6">Natives Olivenöl extra</text>
+  <text x="400" y="200" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" fill="#c9a227"><ñ<ú LUXEMBOURG / LUXEMBURG</text>
+  <rect x="100" y="230" width="600" height="480" rx="16" fill="#f5f0e6"/>
+  <text x="400" y="500" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" fill="#3d5c3a">Photo produit FAYAFI</text>
+  <text x="400" y="720" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" fill="#f5f0e6">Tunesien · Kaltpressung / Tunisie · Première pression</text>
+  <text x="400" y="780" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#a8c4a4">contact@hbconsulting.fr</text>
+</svg>

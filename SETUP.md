@@ -85,7 +85,27 @@ Connectez-vous → accédez à **`admin.html`**
 | Passer commande | `checkout.html` (connexion requise) |
 | Suivre les commandes | `compte.html` |
 
-## Images produit FAYAFI (Google Drive)
+## Brochures par marché (France & Luxembourg)
+
+La brochure originale (Arabie saoudite, arabe/anglais) a été remplacée par :
+
+| Marché | Page | Langues |
+|--------|------|---------|
+| **France** | `brochure-france.html` | Français |
+| **Luxembourg** | `brochure-luxembourg.html` | Français + Allemand |
+
+Sur le site : sélecteur **🇫🇷 France** / **🇱🇺 Luxembourg** dans la navigation.
+
+### Images produit par marché
+
+Fichiers locaux (secours) :
+- `assets/markets/france/` — visuels France
+- `assets/markets/luxembourg/` — visuels Luxembourg
+
+Pour utiliser la photo Google Drive de la brochure : rendez le fichier public, puis les images Drive s'affichent automatiquement (voir `js/markets.js` → `driveId`).
+
+Pour vos propres photos : remplacez `product.svg` par `product.jpg` dans chaque dossier marché et mettez à jour `js/markets.js` si besoin.
+
 
 Les photos FAYAFI sont hébergées sur Google Drive :
 `https://drive.google.com/file/d/1SshjBp8ibdt14PwxdtdNscuBQM5iLRkp/view`

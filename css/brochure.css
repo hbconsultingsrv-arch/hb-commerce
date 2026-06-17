@@ -1,0 +1,204 @@
+/* Brochures FAYAFI + sélecteur marché */
+
+.market-switcher {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.market-btn {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: 0.2s;
+}
+
+.market-btn:hover,
+.market-btn.active {
+  background: var(--fayafi-gold);
+  color: var(--fayafi-olive-dark);
+  border-color: var(--fayafi-gold);
+}
+
+.nav-simple .market-btn {
+  border-color: rgba(61, 92, 58, 0.3);
+  color: var(--fayafi-olive-dark);
+  background: var(--fayafi-cream);
+}
+
+/* Brochure pages */
+.brochure-page {
+  background: #e8e4dc;
+  min-height: 100vh;
+}
+
+.brochure-toolbar {
+  background: var(--fayafi-olive-dark);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.brochure-toolbar a {
+  color: var(--fayafi-gold-light);
+}
+
+.brochure-sheet {
+  max-width: 820px;
+  margin: 2rem auto;
+  background: white;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+}
+
+.brochure-cover {
+  background: linear-gradient(160deg, var(--fayafi-olive-dark), #1e3d1c);
+  color: white;
+  padding: 3rem 2.5rem;
+  text-align: center;
+  position: relative;
+}
+
+.brochure-cover.market-fr::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #002395 33%, #fff 33%, #fff 66%, #ed2939 66%);
+}
+
+.brochure-cover.market-lu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: linear-gradient(180deg, #00a1de 4px, #fff 4px, #fff 8px, #ed2939 8px);
+}
+
+.brochure-cover h1 {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  color: var(--fayafi-gold-light);
+  margin: 1rem 0 0.5rem;
+}
+
+.brochure-cover .market-label {
+  display: inline-block;
+  background: var(--fayafi-gold);
+  color: var(--fayafi-olive-dark);
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.brochure-cover img {
+  max-width: 280px;
+  max-height: 320px;
+  object-fit: contain;
+  margin: 1.5rem auto;
+  display: block;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.brochure-body {
+  padding: 2rem 2.5rem;
+}
+
+.brochure-body h2 {
+  font-family: var(--font-display);
+  color: var(--fayafi-olive-dark);
+  font-size: 1.5rem;
+  margin: 1.5rem 0 0.75rem;
+  border-bottom: 2px solid var(--fayafi-gold);
+  padding-bottom: 0.35rem;
+}
+
+.brochure-body h2:first-child {
+  margin-top: 0;
+}
+
+.brochure-specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1.5rem;
+  margin: 1rem 0;
+}
+
+.brochure-specs dt {
+  font-weight: 700;
+  color: var(--fayafi-olive);
+  font-size: 0.85rem;
+}
+
+.brochure-specs dd {
+  margin: 0;
+  color: var(--text);
+}
+
+.brochure-bilingual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.brochure-bilingual .col-de {
+  border-left: 2px solid var(--fayafi-cream);
+  padding-left: 1.5rem;
+}
+
+.brochure-bilingual h3 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fayafi-gold);
+  margin-bottom: 0.5rem;
+}
+
+.brochure-cta {
+  background: var(--fayafi-cream);
+  padding: 1.5rem 2.5rem;
+  text-align: center;
+  border-top: 3px solid var(--fayafi-gold);
+}
+
+.brochure-cta .btn {
+  margin: 0.5rem;
+}
+
+@media print {
+  .brochure-toolbar { display: none; }
+  .brochure-page { background: white; }
+  .brochure-sheet { box-shadow: none; margin: 0; max-width: none; }
+}
+
+@media (max-width: 700px) {
+  .brochure-specs,
+  .brochure-bilingual {
+    grid-template-columns: 1fr;
+  }
+  .brochure-bilingual .col-de {
+    border-left: none;
+    padding-left: 0;
+    border-top: 2px solid var(--fayafi-cream);
+    padding-top: 1rem;
+  }
+}

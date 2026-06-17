@@ -22,7 +22,12 @@ async function fetchProductBySlug(slug) {
 }
 
 function getFallbackProducts() {
-  const img = typeof getFayafiImageUrl === 'function' ? getFayafiImageUrl(1200) : '';
+  let img = '';
+  if (typeof resolveMarketImage === 'function') {
+    img = resolveMarketImage(getMarket(), 'product', 1200).primary;
+  } else if (typeof getFayafiImageUrl === 'function') {
+    img = getFayafiImageUrl(1200);
+  }
   return [
     {
       id: 'fayafi-olive-oil',
@@ -49,8 +54,12 @@ function isFayafiProduct(product) {
 }
 
 function resolveProductImage(product) {
-  if (isFayafiProduct(product) && typeof getFayafiImageUrl === 'function') {
-    return getFayafiImageUrl(1200);
+  if (isFayafiProduct(product)) {
+    if (typeof resolveMarketImage === 'function') {
+      const r = resolveMarketImage(getMarket(), 'product', 1200);
+      return r.primary;
+    }
+    if (typeof getFayafiImageUrl === 'function') return getFayafiImageUrl(1200);
   }
   return product.image_url;
 }
