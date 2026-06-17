@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <rect width="200" height="200" rx="16" fill="#f5f0e6"/>
+  <rect x="70" y="40" width="60" height="18" rx="4" fill="#3d5c3a"/>
+  <path d="M55 62h90c8 0 14 6 14 14v90c0 16-13 28-28 28H83c-15 0-28-12-28-28V76c0-8 6-14 14-14z" fill="#faf8f4" stroke="#3d5c3a" stroke-width="2"/>
+  <rect x="78" y="95" width="44" height="55" rx="3" fill="#c9a227" opacity="0.85"/>
+  <text x="100" y="175" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#2a4228" font-weight="700">BOUTEILLES</text>
+</svg>

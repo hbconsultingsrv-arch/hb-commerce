@@ -187,10 +187,46 @@
   margin: 0.5rem;
 }
 
+.brochure-page-break {
+  margin-bottom: 2rem;
+}
+
 @media print {
-  .brochure-toolbar { display: none; }
-  .brochure-page { background: white; }
-  .brochure-sheet { box-shadow: none; margin: 0; max-width: none; }
+  .brochure-page-break {
+    page-break-after: always;
+    margin-bottom: 0;
+  }
+}
+
+.brochure-price-table {
+  margin-bottom: 1.5rem;
+}
+
+.brochure-product-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.brochure-thumb {
+  text-align: center;
+  background: var(--fayafi-cream);
+  border-radius: 12px;
+  padding: 0.75rem;
+}
+
+.brochure-thumb img {
+  max-height: 120px;
+  width: auto;
+  margin: 0 auto;
+}
+
+.brochure-thumb figcaption {
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  color: var(--fayafi-olive-dark);
+  font-weight: 600;
 }
 
 @media (max-width: 700px) {
