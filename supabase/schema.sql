@@ -178,7 +178,7 @@ insert into public.products (name, slug, description, origin, category, price, u
     4.50,
     'litre',
     12,
-    'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=85&auto=format&fit=crop',
+    'https://drive.google.com/thumbnail?id=1SshjBp8ibdt14PwxdtdNscuBQM5iLRkp&sz=w1200',
     'Produit phare',
     1
   )

@@ -85,7 +85,21 @@ Connectez-vous → accédez à **`admin.html`**
 | Passer commande | `checkout.html` (connexion requise) |
 | Suivre les commandes | `compte.html` |
 
-## Dépannage — « Failed to fetch » à l'inscription
+## Images produit FAYAFI (Google Drive)
+
+Les photos FAYAFI sont hébergées sur Google Drive :
+`https://drive.google.com/file/d/1SshjBp8ibdt14PwxdtdNscuBQM5iLRkp/view`
+
+**Pour que les images s'affichent sur le site**, le fichier doit être public :
+
+1. Google Drive → ouvrir le fichier → **Partager**
+2. **Accès général** → **Tous les utilisateurs disposant du lien** → **Lecteur**
+3. Enregistrer
+
+Puis exécutez dans SQL Editor : `supabase/update-fayafi-image.sql`
+
+Pour changer l'image, modifiez l'ID dans `js/branding.js` (`FAYAFI_DRIVE_ID`).
+
 
 Si l'inscription ou la connexion affiche **Failed to fetch** :
 

@@ -1,33 +1,48 @@
-/* HB Commerce — produits, panier, checkout */
+/* HB Commerce — design FAYAFI / huile d'olive Tunisie */
 
+:root {
+  --fayafi-olive: #3d5c3a;
+  --fayafi-olive-dark: #2a4228;
+  --fayafi-olive-light: #5a7d52;
+  --fayafi-gold: #c9a227;
+  --fayafi-gold-light: #e8c547;
+  --fayafi-cream: #f5f0e6;
+  --fayafi-bottle: #faf8f4;
+}
+
+/* Hero FAYAFI */
 .hero-commerce {
   position: relative;
-  min-height: 85vh;
+  min-height: 92vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, var(--green-dark) 0%, var(--navy) 55%, #1a3a2a 100%);
+  background: linear-gradient(145deg, var(--fayafi-olive-dark) 0%, #1e3d1c 45%, #152a14 100%);
   color: var(--white);
 }
 
 .hero-commerce .hero-bg {
   position: absolute;
   inset: 0;
-  background-image: url('https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=1600&q=85&auto=format&fit=crop');
   background-size: cover;
-  background-position: center;
-  opacity: 0.25;
+  background-position: center right;
+  opacity: 0.35;
+  filter: saturate(1.1);
 }
 
 .hero-commerce .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(15,61,50,0.7) 0%, rgba(11,29,58,0.85) 100%);
+  background:
+    linear-gradient(105deg, rgba(42, 66, 40, 0.92) 0%, rgba(42, 66, 40, 0.75) 42%, rgba(42, 66, 40, 0.35) 100%),
+    radial-gradient(ellipse at 80% 50%, rgba(201, 162, 39, 0.15) 0%, transparent 55%);
 }
 
 .hero-commerce .nav {
   position: relative;
   z-index: 2;
-  background: transparent;
+  background: rgba(42, 66, 40, 0.88);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(201, 162, 39, 0.2);
 }
 
 .hero-commerce-inner {
@@ -35,26 +50,60 @@
   z-index: 2;
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 2.5rem;
   align-items: center;
-  padding: 6rem 1.5rem 3rem;
-  max-width: 1140px;
+  padding: 6.5rem 1.5rem 3.5rem;
+  max-width: 1180px;
   margin: 0 auto;
   width: 100%;
 }
 
-.hero-commerce h1 {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1.15;
+.hero-brand-line {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
-.hero-commerce .hero-lead {
+.hero-brand-line .fayafi-mark {
+  font-family: var(--font-display);
   font-size: 1.1rem;
-  opacity: 0.9;
+  font-weight: 700;
+  color: var(--fayafi-gold-light);
+  letter-spacing: 0.12em;
+}
+
+.hero-brand-line .origin-ribbon {
+  background: var(--fayafi-gold);
+  color: var(--fayafi-olive-dark);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 4px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.hero-commerce h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.2vw, 3.15rem);
+  line-height: 1.12;
+  margin-bottom: 1rem;
+}
+
+.hero-commerce h1 .fayafi-title {
+  color: var(--fayafi-gold-light);
+  display: block;
+  font-size: clamp(2.5rem, 5vw, 3.75rem);
+  margin-bottom: 0.25rem;
+}
+
+.hero-commerce .hero-lead {
+  font-size: 1.05rem;
+  opacity: 0.92;
   margin-bottom: 1.5rem;
+  max-width: 520px;
 }
 
 .hero-pills {
@@ -62,48 +111,93 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   list-style: none;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 
 .hero-pills li {
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(201,162,39,0.4);
-  padding: 0.35rem 0.85rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  padding: 0.4rem 0.9rem;
   border-radius: 999px;
   font-size: 0.85rem;
 }
 
-.hero-feature-card {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  backdrop-filter: blur(8px);
+/* Carte produit hero */
+.hero-product-showcase {
+  position: relative;
+  background: linear-gradient(180deg, var(--fayafi-cream) 0%, #ebe4d6 100%);
+  border-radius: 20px;
+  padding: 1.25rem;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(201, 162, 39, 0.35);
+  text-align: center;
+  color: var(--fayafi-olive-dark);
 }
 
-.hero-feature-card img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  border-radius: 8px;
+.hero-product-showcase::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--fayafi-gold), transparent);
+  border-radius: 2px;
+}
+
+.hero-product-showcase .product-img-wrap {
+  background: radial-gradient(circle at 50% 60%, rgba(201, 162, 39, 0.12) 0%, transparent 65%);
+  border-radius: 12px;
+  padding: 0.5rem;
   margin-bottom: 1rem;
 }
 
-.hero-feature-card h3 {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  color: var(--gold-light);
+.hero-product-showcase img {
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  border-radius: 8px;
 }
 
-.hero-feature-card .price {
-  font-size: 1.25rem;
+.hero-product-showcase .tag-fayafi {
+  display: inline-block;
+  background: var(--fayafi-olive);
+  color: var(--white);
+  font-size: 0.72rem;
   font-weight: 700;
-  margin: 0.5rem 0;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.hero-product-showcase h3 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  color: var(--fayafi-olive-dark);
+  margin-bottom: 0.35rem;
+}
+
+.hero-product-showcase .product-sub {
+  font-size: 0.9rem;
+  color: var(--fayafi-olive);
+  margin-bottom: 0.75rem;
+}
+
+.hero-product-showcase .price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--fayafi-olive-dark);
+  margin-bottom: 1rem;
+}
+
+.hero-feature-card {
+  /* legacy alias */
 }
 
 .cart-badge {
-  background: var(--gold);
-  color: var(--navy);
+  background: var(--fayafi-gold);
+  color: var(--fayafi-olive-dark);
   font-size: 0.7rem;
   font-weight: 700;
   padding: 0.1rem 0.45rem;
@@ -111,55 +205,107 @@
   margin-left: 0.25rem;
 }
 
+/* Section produits */
+.section-commerce {
+  padding: 4.5rem 0;
+}
+
+.section-commerce.fayafi-section {
+  background: linear-gradient(180deg, var(--fayafi-cream) 0%, var(--white) 100%);
+}
+
+.section-commerce h2 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: var(--fayafi-olive-dark);
+}
+
+.section-sub {
+  text-align: center;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.75rem;
   margin-top: 2rem;
 }
 
 .product-card {
   background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(42, 66, 40, 0.08);
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.25s, box-shadow 0.25s;
+  border: 1px solid rgba(61, 92, 58, 0.08);
 }
 
 .product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(42, 66, 40, 0.14);
+}
+
+.product-card.fayafi-card {
+  border: 2px solid rgba(201, 162, 39, 0.35);
+}
+
+.product-card .product-img-area {
+  background: linear-gradient(180deg, var(--fayafi-cream) 0%, #ebe4d6 100%);
+  padding: 1rem;
+  position: relative;
+}
+
+.product-card .product-img-area .origin-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--fayafi-gold);
+  color: var(--fayafi-olive-dark);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
 }
 
 .product-card img {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
+  height: 220px;
+  object-fit: contain;
+  display: block;
 }
 
 .product-card-body {
-  padding: 1.25rem;
+  padding: 1.35rem;
 }
 
 .product-card .tag {
   display: inline-block;
-  background: var(--green);
+  background: var(--fayafi-olive);
   color: var(--white);
-  font-size: 0.75rem;
-  padding: 0.2rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
   border-radius: 4px;
   margin-bottom: 0.5rem;
+  letter-spacing: 0.04em;
 }
 
 .product-card h3 {
   font-family: var(--font-display);
   font-size: 1.2rem;
   margin-bottom: 0.35rem;
+  color: var(--fayafi-olive-dark);
 }
 
 .product-card .origin {
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  color: var(--fayafi-olive);
+  font-size: 0.88rem;
+  font-weight: 600;
   margin-bottom: 0.5rem;
 }
 
@@ -171,9 +317,9 @@
 }
 
 .product-card .price {
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: var(--green-dark);
+  color: var(--fayafi-olive-dark);
 }
 
 .product-card .unit {
@@ -185,6 +331,7 @@
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .qty-control {
@@ -194,36 +341,48 @@
 }
 
 .qty-control button {
-  width: 32px;
-  height: 32px;
-  border: 1px solid #ddd;
-  background: var(--cream);
-  border-radius: 6px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(61, 92, 58, 0.25);
+  background: var(--fayafi-cream);
+  border-radius: 8px;
   cursor: pointer;
   font-size: 1.1rem;
+  color: var(--fayafi-olive-dark);
 }
 
 .qty-control input {
-  width: 48px;
+  width: 52px;
   text-align: center;
-  padding: 0.35rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  padding: 0.4rem;
+  border: 1px solid rgba(61, 92, 58, 0.25);
+  border-radius: 8px;
+}
+
+.btn-fayafi {
+  background: var(--fayafi-olive) !important;
+  color: var(--white) !important;
+}
+
+.btn-fayafi:hover {
+  background: var(--fayafi-olive-light) !important;
 }
 
 .cart-table img {
-  width: 64px;
-  height: 64px;
-  object-fit: cover;
-  border-radius: 6px;
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: var(--fayafi-cream);
+  padding: 4px;
 }
 
 .cart-summary {
-  background: var(--white);
+  background: var(--fayafi-cream);
   border-radius: var(--radius);
   padding: 1.5rem;
-  box-shadow: var(--shadow);
   margin-top: 1.5rem;
+  border: 1px solid rgba(201, 162, 39, 0.25);
 }
 
 .cart-summary .total-line {
@@ -232,8 +391,9 @@
   font-size: 1.25rem;
   font-weight: 700;
   padding-top: 1rem;
-  border-top: 2px solid var(--cream);
+  border-top: 2px solid rgba(61, 92, 58, 0.15);
   margin-top: 1rem;
+  color: var(--fayafi-olive-dark);
 }
 
 .checkout-grid {
@@ -262,12 +422,12 @@
 }
 
 .payment-option.selected {
-  border-color: var(--green);
-  background: rgba(26,92,74,0.05);
+  border-color: var(--fayafi-olive);
+  background: rgba(61, 92, 58, 0.06);
 }
 
 .payment-option input {
-  accent-color: var(--green);
+  accent-color: var(--fayafi-olive);
 }
 
 .order-status {
@@ -282,26 +442,9 @@
 .order-status.en_attente_paiement { background: #ffe0b2; color: #e65100; }
 .order-status.payee { background: #d4edda; color: #155724; }
 .order-status.en_preparation { background: #cce5ff; color: #004085; }
-.order-status.expédiee, .order-status.expediee { background: #d1ecf1; color: #0c5460; }
+.order-status.expediee { background: #d1ecf1; color: #0c5460; }
 .order-status.livree { background: #d4edda; color: #155724; }
 .order-status.annulee { background: #f8d7da; color: #721c24; }
-
-.section-commerce {
-  padding: 4rem 0;
-}
-
-.section-commerce h2 {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  text-align: center;
-  margin-bottom: 0.5rem;
-}
-
-.section-sub {
-  text-align: center;
-  color: var(--text-muted);
-  margin-bottom: 2rem;
-}
 
 .about-grid {
   display: grid;
@@ -311,10 +454,11 @@
 
 .about-card {
   background: var(--white);
-  padding: 1.5rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  padding: 1.75rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(42, 66, 40, 0.06);
   text-align: center;
+  border: 1px solid rgba(61, 92, 58, 0.08);
 }
 
 .about-card .icon {
@@ -322,9 +466,14 @@
   margin-bottom: 0.75rem;
 }
 
+.about-card h3 {
+  color: var(--fayafi-olive-dark);
+  font-family: var(--font-display);
+}
+
 .footer-commerce {
-  background: var(--navy);
-  color: rgba(255,255,255,0.85);
+  background: var(--fayafi-olive-dark);
+  color: rgba(255, 255, 255, 0.88);
   padding: 3rem 0 1.5rem;
 }
 
@@ -336,22 +485,43 @@
 }
 
 .footer-commerce a {
-  color: var(--gold-light);
+  color: var(--fayafi-gold-light);
   text-decoration: none;
 }
 
+.footer-commerce h4 {
+  color: var(--fayafi-gold-light);
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .footer-bottom {
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 1rem;
   text-align: center;
   font-size: 0.85rem;
   opacity: 0.7;
 }
 
+/* Pages internes */
+.page-hero-strip {
+  background: linear-gradient(135deg, var(--fayafi-olive-dark), var(--fayafi-olive));
+  color: var(--white);
+  padding: 2.5rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.page-hero-strip h1 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+}
+
 @media (max-width: 900px) {
   .hero-commerce-inner {
     grid-template-columns: 1fr;
-    padding-top: 5rem;
+    padding-top: 5.5rem;
   }
   .checkout-grid {
     grid-template-columns: 1fr;

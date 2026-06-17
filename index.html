@@ -14,12 +14,12 @@
 </head>
 <body>
   <header class="hero-commerce" id="accueil">
-    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-bg" id="heroBg" aria-hidden="true"></div>
     <div class="hero-overlay" aria-hidden="true"></div>
 
     <nav class="nav container">
       <a href="index.html" class="logo">
-        <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="210" height="44">
+        <img src="assets/logo.svg" alt="FAYAFI — HB Commerce" class="logo-img" width="220" height="48">
       </a>
       <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
         <span></span><span></span><span></span>
@@ -39,34 +39,43 @@
 
     <div class="hero-commerce-inner">
       <div>
-        <p class="hero-badge">HB Consulting &amp; Services</p>
-        <h1>Commerce en gros de produits alimentaires d'exception</h1>
+        <div class="hero-brand-line">
+          <span class="fayafi-mark">FAYAFI</span>
+          <span class="origin-ribbon">Origine Tunisie</span>
+        </div>
+        <h1>
+          <span class="fayafi-title">FAYAFI</span>
+          Huile d'olive extra vierge en gros
+        </h1>
         <p class="hero-lead">
-          HB Commerce accompagne les professionnels avec des produits sélectionnés,
-          une logistique fiable et un service client dédié.
+          HB Commerce, filiale de HB Consulting &amp; Services, distribue l'huile d'olive
+          <strong>FAYAFI</strong> — première pression à froid, directement depuis la Tunisie,
+          pour restaurateurs et professionnels.
         </p>
         <ul class="hero-pills">
-          <li>🫒 Huiles &amp; condiments</li>
+          <li>🫒 Extra vierge</li>
+          <li>🇹🇳 Tunisie</li>
           <li>📦 Vente en gros</li>
-          <li>🌍 Import direct</li>
         </ul>
         <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
-          <a href="produits.html" class="btn btn-primary">Voir nos produits</a>
-          <a href="register.html" class="btn btn-outline-light">Créer un compte pro</a>
+          <a href="produits.html" class="btn btn-primary">Commander FAYAFI</a>
+          <a href="register.html" class="btn btn-outline-light">Compte professionnel</a>
         </div>
       </div>
-      <div class="hero-feature-card">
-        <img src="https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=85&auto=format&fit=crop" alt="FAYAFI Huile d'olive">
-        <span class="tag" style="background:var(--gold);color:var(--navy);padding:0.25rem 0.6rem;border-radius:4px;font-size:0.8rem">Produit phare</span>
+      <div class="hero-product-showcase">
+        <div class="product-img-wrap">
+          <img id="heroProductImg" src="" alt="FAYAFI — Huile d'olive extra vierge" data-fayafi width="400" height="320">
+        </div>
+        <span class="tag-fayafi">Produit phare</span>
         <h3>FAYAFI — Huile d'olive extra vierge</h3>
-        <p>Origine Tunisie · Première pression à froid · Idéale pour la restauration</p>
-        <p class="price">4,50 € / litre</p>
-        <a href="produits.html" class="btn btn-primary">Commander</a>
+        <p class="product-sub">Première pression à froid · Tunisie</p>
+        <p class="price">4,50 € / litre · min. 12 L</p>
+        <a href="produits.html" class="btn btn-primary btn-fayafi">Ajouter au panier</a>
       </div>
     </div>
   </header>
 
-  <section class="section-commerce container" id="produits">
+  <section class="section-commerce fayafi-section container" id="produits">
     <h2>Nos produits</h2>
     <p class="section-sub">Sélection professionnelle — commandes en gros</p>
     <div id="homeProductsGrid" class="products-grid"></div>
@@ -135,6 +144,7 @@
     </div>
   </footer>
 
+  <script src="js/branding.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
@@ -143,9 +153,17 @@
   <script src="js/products.js"></script>
   <script src="js/main.js"></script>
   <script>
-    document.querySelector('.nav-toggle')?.addEventListener('click', () => {
-      document.querySelector('.nav-links').classList.toggle('open');
-    });
+    (function () {
+      const img = document.getElementById('heroProductImg');
+      const bg = document.getElementById('heroBg');
+      if (window.HB_BRANDING) {
+        if (img) img.src = HB_BRANDING.images.hero;
+        if (bg) bg.style.backgroundImage = `url('${HB_BRANDING.images.hero}')`;
+      }
+      document.querySelector('.nav-toggle')?.addEventListener('click', () => {
+        document.querySelector('.nav-links').classList.toggle('open');
+      });
+    })();
   </script>
 </body>
 </html>

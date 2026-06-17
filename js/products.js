@@ -22,6 +22,7 @@ async function fetchProductBySlug(slug) {
 }
 
 function getFallbackProducts() {
+  const img = typeof getFayafiImageUrl === 'function' ? getFayafiImageUrl(1200) : '';
   return [
     {
       id: 'fayafi-olive-oil',
@@ -33,7 +34,7 @@ function getFallbackProducts() {
       price: 4.50,
       unit: 'litre',
       min_quantity: 12,
-      image_url: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=85&auto=format&fit=crop',
+      image_url: img,
       tag: 'Produit phare',
       active: true,
       sort_order: 1
@@ -41,11 +42,32 @@ function getFallbackProducts() {
   ];
 }
 
+function isFayafiProduct(product) {
+  const slug = (product.slug || '').toLowerCase();
+  const name = (product.name || '').toLowerCase();
+  return slug.includes('fayafi') || name.includes('fayafi');
+}
+
+function resolveProductImage(product) {
+  if (isFayafiProduct(product) && typeof getFayafiImageUrl === 'function') {
+    return getFayafiImageUrl(1200);
+  }
+  return product.image_url;
+}
+
 function renderProductCard(product) {
   const minQty = product.min_quantity || 1;
+  const imgUrl = resolveProductImage(product);
+  const fayafi = isFayafiProduct(product);
+  const fayafiAttr = fayafi ? ' data-fayafi' : '';
+  const cardClass = fayafi ? 'product-card fayafi-card' : 'product-card';
+
   return `
-    <article class="product-card" data-product-id="${product.id}">
-      <img src="${product.image_url}" alt="${product.name}" loading="lazy">
+    <article class="${cardClass}" data-product-id="${product.id}">
+      <div class="product-img-area">
+        ${fayafi ? '<span class="origin-badge">TUNISIE</span>' : ''}
+        <img src="${imgUrl}" alt="${product.name}" loading="lazy"${fayafiAttr}>
+      </div>
       <div class="product-card-body">
         ${product.tag ? `<span class="tag">${product.tag}</span>` : ''}
         <h3>${product.name}</h3>
@@ -62,7 +84,7 @@ function renderProductCard(product) {
             <input type="number" class="qty-input" value="${minQty}" min="${minQty}" step="1">
             <button type="button" class="qty-plus" aria-label="Plus">+</button>
           </div>
-          <button type="button" class="btn btn-primary btn-add-cart">Ajouter au panier</button>
+          <button type="button" class="btn btn-primary btn-add-cart${fayafi ? ' btn-fayafi' : ''}">Ajouter au panier</button>
         </div>
       </div>
     </article>

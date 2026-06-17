@@ -4,6 +4,7 @@ async function initProductsPage() {
 
   const products = await fetchProducts();
   grid.innerHTML = products.map(renderProductCard).join('');
+  grid.querySelectorAll('img[data-fayafi]').forEach(applyFayafiImageFallback);
   bindProductCardEvents(grid, (product, qty) => {
     const toast = document.getElementById('cartToast');
     if (toast) {
@@ -20,6 +21,7 @@ async function initHomeProducts() {
   const products = await fetchProducts();
   const featured = products.slice(0, 3);
   grid.innerHTML = featured.map(renderProductCard).join('');
+  grid.querySelectorAll('img[data-fayafi]').forEach(applyFayafiImageFallback);
   bindProductCardEvents(grid);
 }
 
