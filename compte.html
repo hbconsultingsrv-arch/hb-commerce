@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon compte | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commerce.css">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo">
+      <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="210" height="44">
+    </a>
+    <div class="nav-actions">
+      <a href="admin.html" id="compteAdminLink" class="btn btn-sm btn-primary" style="display:none">Administration</a>
+      <a href="produits.html" class="btn btn-sm btn-primary">Nouvelle commande</a>
+      <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="dashboard-main container">
+    <header class="dashboard-header">
+      <div>
+        <span class="section-tag">Espace client</span>
+        <h1>Bonjour, <span id="welcomeName">—</span></h1>
+        <p class="auth-sub">Gérez vos informations et consultez l'historique de vos commandes.</p>
+      </div>
+    </header>
+
+    <div class="dashboard-grid">
+      <section class="dashboard-card">
+        <h2>Mes informations</h2>
+        <form id="profileForm" class="auth-form">
+          <label>
+            Prénom &amp; Nom
+            <input type="text" name="full_name" required>
+          </label>
+          <label>
+            Société
+            <input type="text" name="company">
+          </label>
+          <label>
+            E-mail
+            <input type="email" name="email" disabled>
+          </label>
+          <label>
+            Téléphone
+            <input type="tel" name="phone" required>
+          </label>
+          <label>
+            Adresse
+            <input type="text" name="address">
+          </label>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <p class="form-note" id="profileNote"></p>
+        </form>
+      </section>
+
+      <section class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Mes commandes</h2>
+          <a href="produits.html" class="btn btn-sm btn-primary">+ Commander</a>
+        </div>
+        <div id="ordersEmpty" class="empty-state" hidden>
+          <p>Aucune commande pour le moment.</p>
+          <a href="produits.html" class="btn btn-sm btn-outline-dark">Voir les produits</a>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table" id="ordersTable" hidden>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>N°</th>
+                <th>Produits</th>
+                <th>Total</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin-api.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

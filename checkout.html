@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commande | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commerce.css">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo">
+      <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="210" height="44">
+    </a>
+    <a href="panier.html" class="btn btn-sm btn-outline-light">Retour au panier</a>
+  </nav>
+
+  <main class="dashboard-main container">
+    <header class="dashboard-header">
+      <span class="section-tag">Finalisation</span>
+      <h1>Passer commande</h1>
+      <p class="auth-sub">Vérifiez vos informations et choisissez votre mode de paiement.</p>
+    </header>
+
+    <div class="checkout-grid">
+      <section class="dashboard-card">
+        <h2>Informations de livraison</h2>
+        <form id="checkoutForm" class="auth-form">
+          <label>
+            Prénom &amp; Nom
+            <input type="text" name="full_name" required>
+          </label>
+          <label>
+            Société
+            <input type="text" name="company" placeholder="Nom de votre entreprise">
+          </label>
+          <label>
+            Téléphone
+            <input type="tel" name="phone" required>
+          </label>
+          <label>
+            Adresse de livraison
+            <textarea name="shipping_address" rows="3" required placeholder="Adresse complète"></textarea>
+          </label>
+          <label>
+            Notes (optionnel)
+            <textarea name="notes" rows="2" placeholder="Instructions de livraison…"></textarea>
+          </label>
+
+          <h2 style="margin-top:1rem">Mode de paiement</h2>
+          <div class="payment-options">
+            <label class="payment-option selected">
+              <input type="radio" name="payment_method" value="virement" checked>
+              <span><strong>Virement bancaire</strong><br><small>Paiement après confirmation de commande</small></span>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="payment_method" value="stripe">
+              <span><strong>Paiement en ligne (Stripe)</strong><br><small>Carte bancaire sécurisée</small></span>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="payment_method" value="cheque">
+              <span><strong>Chèque</strong><br><small>À l'ordre de HB Consulting &amp; Services</small></span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full">Confirmer la commande</button>
+          <p class="form-note" id="checkoutNote"></p>
+        </form>
+      </section>
+
+      <aside class="dashboard-card">
+        <h2>Récapitulatif</h2>
+        <div id="checkoutSummary"></div>
+        <div class="cart-summary" style="box-shadow:none;padding:0;margin-top:1rem">
+          <div class="total-line">
+            <span>Total</span>
+            <span id="checkoutTotal">0,00 €</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/admin-api.js"></script>
+  <script src="js/checkout.js"></script>
+</body>
+</html>

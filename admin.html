@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commerce.css">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo">
+      <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="210" height="44">
+    </a>
+    <div class="nav-actions">
+      <a href="index.html" class="btn btn-sm btn-outline-light">Voir le site</a>
+      <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="dashboard-main container">
+    <header class="dashboard-header">
+      <span class="section-tag">Administration</span>
+      <h1>Dashboard HB Commerce</h1>
+      <p class="auth-sub">Gérez le catalogue produits et traitez les commandes clients.</p>
+    </header>
+
+    <div class="admin-tabs">
+      <button type="button" class="admin-tab active" data-tab="produits">Produits</button>
+      <button type="button" class="admin-tab" data-tab="commandes">Commandes</button>
+    </div>
+
+    <section id="panel-produits" class="admin-panel">
+      <div class="dashboard-card">
+        <h2 id="productFormTitle">Ajouter un produit</h2>
+        <form id="productForm" class="auth-form">
+          <div class="form-row">
+            <label>
+              Nom du produit
+              <input type="text" name="name" required placeholder="FAYAFI — Huile d'olive">
+            </label>
+            <label>
+              Slug
+              <input type="text" name="slug" placeholder="fayafi-huile-olive">
+            </label>
+          </div>
+          <label>
+            Description
+            <textarea name="description" rows="2" required></textarea>
+          </label>
+          <div class="form-row">
+            <label>
+              Origine
+              <input type="text" name="origin" placeholder="Tunisie">
+            </label>
+            <label>
+              Catégorie
+              <input type="text" name="category" placeholder="huiles">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Prix (€)
+              <input type="number" name="price" required min="0" step="0.01">
+            </label>
+            <label>
+              Unité
+              <input type="text" name="unit" value="litre">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Quantité minimum
+              <input type="number" name="min_quantity" value="12" min="1">
+            </label>
+            <label>
+              Badge
+              <input type="text" name="tag" placeholder="Produit phare">
+            </label>
+          </div>
+          <label>
+            URL de l'image
+            <input type="url" name="image_url" required placeholder="https://...">
+          </label>
+          <div class="form-row">
+            <label>
+              Ordre d'affichage
+              <input type="number" name="sort_order" value="0" min="0">
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="active" checked> Produit visible
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="saveProductBtn">Ajouter</button>
+            <button type="button" class="btn btn-outline-dark" id="cancelProductBtn">Annuler</button>
+          </div>
+          <p class="form-note" id="productNote"></p>
+        </form>
+      </div>
+
+      <div class="dashboard-card dashboard-card-wide">
+        <h2>Produits enregistrés</h2>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Produit</th>
+                <th>Prix</th>
+                <th>Badge</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-commandes" class="admin-panel" hidden>
+      <div class="dashboard-card dashboard-card-wide">
+        <h2>Commandes clients</h2>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>N°</th>
+                <th>Produits</th>
+                <th>Total</th>
+                <th>Paiement</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody id="ordersAdminBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin-api.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

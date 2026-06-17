@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 48" fill="none">
+  <rect width="280" height="48" rx="6" fill="#0f3d32"/>
+  <circle cx="24" cy="24" r="14" fill="#c9a227"/>
+  <path d="M24 14c-2 4-6 6-10 6 2 3 5 5 10 5s8-2 10-5c-4 0-8-2-10-6z" fill="#1a5c4a"/>
+  <text x="48" y="20" font-family="Georgia, serif" font-size="14" font-weight="700" fill="#faf8f4">HB Commerce</text>
+  <text x="48" y="36" font-family="Arial, sans-serif" font-size="10" fill="#c9a227">HB Consulting &amp; Services</text>
+</svg>

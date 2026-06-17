@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HB Commerce — Commerce en gros de produits alimentaires. Huile d'olive FAYAFI de Tunisie.">
+  <title>HB Commerce | Produits alimentaires en gros</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commerce.css">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body>
+  <header class="hero-commerce" id="accueil">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <nav class="nav container">
+      <a href="index.html" class="logo">
+        <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="210" height="44">
+      </a>
+      <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="#accueil">Accueil</a></li>
+        <li><a href="produits.html">Produits</a></li>
+        <li><a href="#apropos">À propos</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li id="navAccount" style="display:none"><a href="compte.html">Mon compte</a></li>
+        <li id="navAdmin" style="display:none"><a href="admin.html">Admin</a></li>
+        <li id="navLogin"><a href="login.html">Connexion</a></li>
+        <li id="navLogout" style="display:none"><a href="#">Déconnexion</a></li>
+        <li><a href="panier.html" class="btn btn-sm btn-primary">Panier <span id="cartBadge" class="cart-badge" style="display:none">0</span></a></li>
+      </ul>
+    </nav>
+
+    <div class="hero-commerce-inner">
+      <div>
+        <p class="hero-badge">HB Consulting &amp; Services</p>
+        <h1>Commerce en gros de produits alimentaires d'exception</h1>
+        <p class="hero-lead">
+          HB Commerce accompagne les professionnels avec des produits sélectionnés,
+          une logistique fiable et un service client dédié.
+        </p>
+        <ul class="hero-pills">
+          <li>🫒 Huiles &amp; condiments</li>
+          <li>📦 Vente en gros</li>
+          <li>🌍 Import direct</li>
+        </ul>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+          <a href="produits.html" class="btn btn-primary">Voir nos produits</a>
+          <a href="register.html" class="btn btn-outline-light">Créer un compte pro</a>
+        </div>
+      </div>
+      <div class="hero-feature-card">
+        <img src="https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=85&auto=format&fit=crop" alt="FAYAFI Huile d'olive">
+        <span class="tag" style="background:var(--gold);color:var(--navy);padding:0.25rem 0.6rem;border-radius:4px;font-size:0.8rem">Produit phare</span>
+        <h3>FAYAFI — Huile d'olive extra vierge</h3>
+        <p>Origine Tunisie · Première pression à froid · Idéale pour la restauration</p>
+        <p class="price">4,50 € / litre</p>
+        <a href="produits.html" class="btn btn-primary">Commander</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="section-commerce container" id="produits">
+    <h2>Nos produits</h2>
+    <p class="section-sub">Sélection professionnelle — commandes en gros</p>
+    <div id="homeProductsGrid" class="products-grid"></div>
+    <p style="text-align:center;margin-top:2rem">
+      <a href="produits.html" class="btn btn-primary">Voir tous les produits</a>
+    </p>
+  </section>
+
+  <section class="section-commerce" id="apropos" style="background:var(--white)">
+    <div class="container">
+      <h2>Pourquoi HB Commerce ?</h2>
+      <p class="section-sub">Une filiale de HB Consulting &amp; Services dédiée au commerce alimentaire</p>
+      <div class="about-grid">
+        <div class="about-card">
+          <div class="icon">🌍</div>
+          <h3>Import direct</h3>
+          <p>Produits sourcés directement auprès de producteurs, comme FAYAFI en Tunisie.</p>
+        </div>
+        <div class="about-card">
+          <div class="icon">📦</div>
+          <h3>Vente en gros</h3>
+          <p>Quantités adaptées aux professionnels : restaurateurs, distributeurs et grossistes.</p>
+        </div>
+        <div class="about-card">
+          <div class="icon">💳</div>
+          <h3>Commande en ligne</h3>
+          <p>Espace client, suivi des commandes et paiement sécurisé sur le site.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-commerce container" id="contact">
+    <h2>Contact</h2>
+    <p class="section-sub">Une question sur nos produits ou une commande spéciale ?</p>
+    <div class="dashboard-card" style="max-width:600px;margin:0 auto">
+      <p><strong>HB Commerce</strong> — HB Consulting &amp; Services</p>
+      <p>E-mail : <a href="mailto:contact@hbconsulting.fr">contact@hbconsulting.fr</a></p>
+      <p>Téléphone : 07 52 56 51 23</p>
+      <p style="margin-top:1rem">
+        <a href="register.html" class="btn btn-primary">Créer un compte professionnel</a>
+      </p>
+    </div>
+  </section>
+
+  <footer class="footer-commerce">
+    <div class="container footer-grid">
+      <div>
+        <img src="assets/logo.svg" alt="HB Commerce" width="180" height="38" style="margin-bottom:1rem">
+        <p>Commerce en gros de produits alimentaires — filiale HB Consulting &amp; Services.</p>
+      </div>
+      <div>
+        <h4>Navigation</h4>
+        <p><a href="produits.html">Produits</a></p>
+        <p><a href="panier.html">Panier</a></p>
+        <p><a href="compte.html">Mon compte</a></p>
+      </div>
+      <div>
+        <h4>Produit phare</h4>
+        <p><a href="produits.html">FAYAFI — Huile d'olive</a></p>
+        <p>Origine Tunisie</p>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      © 2026 HB Commerce — HB Consulting &amp; Services. Tous droits réservés.
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.querySelector('.nav-toggle')?.addEventListener('click', () => {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+</body>
+</html>
