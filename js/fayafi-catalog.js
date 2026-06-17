@@ -7,54 +7,55 @@ const FAYAFI_CATEGORIES = {
     label: 'Bouteilles',
     icon: '??',
     description: 'Verre Marasca et formats premium pour restauration et cavistes.',
-    image: 'assets/categories/bouteille.svg'
+    image: FAYAFI_IMAGES?.marasca || 'images/marasca.PNG'
   },
   metallique: {
     id: 'metallique',
     label: 'Métallique',
     icon: '??',
     description: 'Bidons métalliques 1L, 3L et 5L — idéal grossistes et cuisine pro.',
-    image: 'assets/categories/metallique.svg'
+    image: FAYAFI_IMAGES?.metallic || 'images/metallic.PNG'
   },
   premium: {
     id: 'premium',
     label: 'Premium extra vierge',
     icon: '?',
     description: 'Sélection premium, première pression à froid, acidité contrôlée.',
-    image: 'assets/categories/premium.svg'
+    image: FAYAFI_IMAGES?.premium || 'images/prenium.PNG'
   }
 };
 
 const FAYAFI_QUALITY = {
   title: 'Qualité & acidité',
-  intro: 'Huile d\'olive extra vierge FAYAFI — contrôles qualité conformes aux normes internationales.',
+  intro: 'Huile d\'olive extra vierge FAYAFI — olives Koroneiki et Arbosana, pression à froid en Tunisie du Nord.',
   specs: [
     { label: 'Catégorie', value: 'Huile d\'olive extra vierge' },
     { label: 'Acidité libre', value: '? 0,8 % (extra vierge)' },
     { label: 'Premium FAYAFI', value: '? 0,5 % — sélection haute qualité' },
+    { label: 'Sélection premium', value: '0,2 % à 0,4 % (Koroneiki & Arbosana)' },
     { label: 'Pression', value: 'Première pression à froid' },
-    { label: 'Origine', value: 'Tunisie' },
+    { label: 'Origine', value: 'Tunisie — Mornag, Ben Arous' },
     { label: 'Indice de peroxyde', value: '? 20 meq O?/kg' },
     { label: 'Humidité', value: '? 0,2 %' }
-  ]
+  ],
+  image: FAYAFI_IMAGES?.acidity || 'images/acidity.PNG'
 };
 
 function catalogImage(packaging, format) {
+  const img = FAYAFI_IMAGES || {};
   const map = {
-    'bouteille-marasca': 'assets/products/marasca-250.svg',
-    'bouteille-1l': 'assets/products/bouteille-1l.svg',
-    'bouteille-premium': 'assets/products/premium-1l.svg',
-    'metallique-1l': 'assets/products/metallique-1l.svg',
-    'metallique-3l': 'assets/products/metallique-3l.svg',
-    'metallique-5l': 'assets/products/metallique-5l.svg'
+    'bouteille-marasca': img.marasca || 'images/marasca.PNG',
+    'bouteille-1l': img.marasca || 'images/marasca.PNG',
+    'bouteille-premium': img.premium || 'images/prenium.PNG',
+    'metallique-1l': img.metallic || 'images/metallic.PNG',
+    'metallique-3l': img.metallic || 'images/metallic.PNG',
+    'metallique-5l': img.metallic || 'images/metallic.PNG'
   };
   const key = `${packaging}-${format}`;
-  return map[key] || 'assets/markets/france/product.svg';
+  return map[key] || img.product || 'images/prenium.PNG';
 }
 
 function buildFayafiCatalog() {
-  const driveThumb = 'https://drive.google.com/thumbnail?id=1SshjBp8ibdt14PwxdtdNscuBQM5iLRkp&sz=w1200';
-
   return [
     {
       id: 'fayafi-premium-1l',
@@ -170,10 +171,7 @@ function buildFayafiCatalog() {
       active: true,
       sort_order: 6
     }
-  ].map((p) => ({
-    ...p,
-    image_url: p.image_url || driveThumb
-  }));
+  ];
 }
 
 window.FAYAFI_CATEGORIES = FAYAFI_CATEGORIES;

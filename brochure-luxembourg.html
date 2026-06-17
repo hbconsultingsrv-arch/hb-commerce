@@ -12,93 +12,126 @@
   <link rel="stylesheet" href="css/brochure.css">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
   <script>localStorage.setItem('hb_market','lu');</script>
-  <script src="js/markets.js"></script>
+  <script src="js/fayafi-images.js"></script>
+  <script src="js/fayafi-catalog.js"></script>
 </head>
 <body class="brochure-page">
   <div class="brochure-toolbar">
-    <span><strong>Brochure Luxembourg</strong> - FAYAFI (FR / DE)</span>
+    <span><strong>Brochure Luxembourg</strong> &mdash; FAYAFI (FR / DE)</span>
     <div>
-      <a href="brochure-france.html">Version France</a>
-      <span aria-hidden="true"> | </span>
-      <a href="index.html?market=lu">Retour au site</a>
-      <span aria-hidden="true"> | </span>
-      <button type="button" class="btn btn-sm btn-primary" onclick="window.print()">Imprimer / PDF</button>
+      <a href="brochure-france.html">Version France</a> |
+      <a href="index.html?market=lu">Site</a> |
+      <a href="produits.html?market=lu">Catalogue en ligne</a> |
+      <button type="button" class="btn btn-sm btn-primary" onclick="window.print()">PDF / Imprimer</button>
     </div>
   </div>
 
-  <article class="brochure-sheet">
-    <header class="brochure-cover market-lu">
-      <span class="market-label">LU - LUXEMBOURG / LUXEMBURG</span>
-      <h1>FAYAFI</h1>
-      <p>Huile d'olive extra vierge / Natives Oliven&ouml;l extra</p>
-      <p style="font-size:0.95rem">Origine Tunisie / Herkunft Tunesien</p>
-      <img id="brochureProductImg" src="assets/markets/luxembourg/product.svg" alt="FAYAFI" width="320" height="400">
-      <p style="margin-top:1rem;opacity:0.9">Kaltpressung / Premi&egrave;re pression &agrave; froid &middot; Grosshandel</p>
-      <p style="font-size:0.9rem;opacity:0.8">HB Commerce &middot; HB Consulting &amp; Services</p>
-    </header>
-
-    <div class="brochure-body">
-      <div class="brochure-bilingual">
-        <div class="col-fr">
-          <h3>Fran&ccedil;ais</h3>
-          <h2>Le produit</h2>
-          <p><strong>FAYAFI</strong> &mdash; huile d'olive extra vierge, premi&egrave;re pression &agrave; froid, origine Tunisie. Distribution au Luxembourg et Grande R&eacute;gion.</p>
-        </div>
-        <div class="col-de">
-          <h3>Deutsch</h3>
-          <h2>Das Produkt</h2>
-          <p><strong>FAYAFI</strong> &mdash; natives Oliven&ouml;l extra, Kaltpressung, Herkunft Tunesien. Distribution in Luxemburg und der Gro&szlig;region.</p>
-        </div>
-      </div>
-
-      <h2>Caract&eacute;ristiques / Eigenschaften</h2>
-      <dl class="brochure-specs">
-        <dt>Cat&eacute;gorie / Kategorie</dt><dd>Extra vierge / Nativ extra</dd>
-        <dt>Origine / Herkunft</dt><dd>Tunisie / Tunesien</dd>
-        <dt>Format</dt><dd>1 litre / 1 Liter</dd>
-        <dt>Minimum</dt><dd>12 litres / 12 Liter</dd>
-        <dt>Prix</dt><dd>4,50 &euro; / litre</dd>
-        <dt>March&eacute; / Markt</dt><dd>Luxembourg &amp; Grande R&eacute;gion</dd>
-      </dl>
-
-      <div class="brochure-bilingual">
-        <div class="col-fr">
-          <h2>Clients cibles</h2>
-          <ul>
-            <li>Restaurants et h&ocirc;tels</li>
-            <li>Catering &amp; traiteurs</li>
-            <li>Grossistes alimentaires</li>
-          </ul>
-        </div>
-        <div class="col-de">
-          <h2>Zielkunden</h2>
-          <ul>
-            <li>Restaurants und Hotels</li>
-            <li>Catering &amp; Gastronomie</li>
-            <li>Lebensmittel-Grossh&auml;ndler</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="brochure-bilingual">
-        <div class="col-fr">
-          <h2>Commander</h2>
-          <p>Compte professionnel en ligne, suivi des commandes, paiement s&eacute;curis&eacute; (virement, ch&egrave;que, carte).</p>
-        </div>
-        <div class="col-de">
-          <h2>Bestellen</h2>
-          <p>Gesch&auml;ftskonto online, Auftragsverfolgung, sichere Zahlung (&Uuml;berweisung, Scheck, Karte).</p>
-        </div>
-      </div>
-    </div>
-
-    <footer class="brochure-cta">
-      <p><strong>HB Commerce</strong> &middot; contact@hbconsulting.fr &middot; 07 52 56 51 23</p>
-      <a href="register.html?market=lu" class="btn btn-primary">Compte pro / Gesch&auml;ftskonto</a>
-      <a href="produits.html?market=lu" class="btn btn-outline-dark">Catalogue / Katalog</a>
-    </footer>
+  <!-- Page 1 — Couverture -->
+  <article class="brochure-sheet brochure-full-image brochure-page-break">
+    <img src="images/image1.PNG" alt="FAYAFI Oliviers — couverture" class="brochure-full-bleed">
+    <span class="brochure-market-stamp market-lu">LU &mdash; LUXEMBOURG / LUXEMBURG</span>
   </article>
 
-  <script src="js/market-ui.js"></script>
+  <!-- Page 2 — Presentation -->
+  <article class="brochure-sheet brochure-full-image brochure-page-break">
+    <img src="images/image2.PNG" alt="FAYAFI Oliviers — Tunisie" class="brochure-full-bleed">
+  </article>
+
+  <!-- Page 3 — Premium -->
+  <article class="brochure-sheet brochure-full-image brochure-page-break">
+    <img src="images/prenium.PNG" alt="FAYAFI Premium Extra Virgin Olive Oil 1L" class="brochure-full-bleed">
+  </article>
+
+  <!-- Page 4 — Marasca -->
+  <article class="brochure-sheet brochure-full-image brochure-page-break">
+    <img src="images/marasca.PNG" alt="FAYAFI Marasca — bouteilles verre" class="brochure-full-bleed">
+  </article>
+
+  <!-- Page 5 — Metallique -->
+  <article class="brochure-sheet brochure-full-image brochure-page-break">
+    <img src="images/metallic.PNG" alt="FAYAFI Metallic Tin — 1L, 3L, 5L" class="brochure-full-bleed">
+  </article>
+
+  <!-- Page 6 — Acidite -->
+  <article class="brochure-sheet brochure-full-image brochure-page-break">
+    <img src="images/acidity.PNG" alt="FAYAFI — qualite et acidite" class="brochure-full-bleed">
+  </article>
+
+  <!-- Page 7 — Technologie -->
+  <article class="brochure-sheet brochure-full-image brochure-page-break">
+    <img src="images/technology.PNG" alt="FAYAFI — technologie et fraicheur" class="brochure-full-bleed">
+  </article>
+
+  <!-- Page 8 — Tarifs professionnels -->
+  <article class="brochure-sheet brochure-page-break">
+    <div class="brochure-body">
+      <h2>Formats &amp; tarifs / Formate &amp; Preise</h2>
+      <p class="section-sub" style="text-align:left;margin-bottom:1rem">
+        Prix indicatifs HT &mdash; Luxembourg &amp; Grande R&eacute;gion /
+        Indikative Preise &mdash; Luxemburg &amp; Gro&szlig;region
+      </p>
+      <table class="requests-table brochure-price-table">
+        <thead>
+          <tr>
+            <th>Format</th>
+            <th>Cat&eacute;gorie</th>
+            <th>Acidit&eacute;</th>
+            <th>Prix</th>
+            <th>Min.</th>
+          </tr>
+        </thead>
+        <tbody id="brochurePriceBody"></tbody>
+      </table>
+      <div class="brochure-product-gallery" id="brochureGallery"></div>
+    </div>
+  </article>
+
+  <!-- Page 9 — Contact -->
+  <article class="brochure-sheet brochure-full-image brochure-contact-sheet">
+    <img src="images/contact.PNG" alt="" class="brochure-full-bleed" aria-hidden="true">
+    <div class="brochure-contact-overlay">
+      <h2>Commander / Bestellen</h2>
+      <p class="brochure-contact-lead">
+        Distribution HB Commerce &mdash; Luxembourg &amp; Grande R&eacute;gion /
+        Distribution in Luxemburg &amp; Gro&szlig;region
+      </p>
+      <ul class="brochure-contact-list">
+        <li><strong>T&eacute;l. / Tel.</strong> 07 52 56 51 23</li>
+        <li><strong>Email</strong> contact@hbconsulting.fr</li>
+        <li><strong>Origine / Herkunft</strong> Mornag, Tunesien</li>
+      </ul>
+      <div class="brochure-contact-actions">
+        <a href="register.html?market=lu" class="btn btn-primary">Compte pro / Gesch&auml;ftskonto</a>
+        <a href="produits.html?market=lu" class="btn btn-outline-dark">Catalogue / Katalog</a>
+      </div>
+    </div>
+  </article>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const products = buildFayafiCatalog();
+      const tbody = document.getElementById('brochurePriceBody');
+      if (tbody) {
+        tbody.innerHTML = products.map((p) => `
+          <tr>
+            <td><strong>${p.format_label || p.name}</strong></td>
+            <td>${FAYAFI_CATEGORIES[p.category]?.label || p.category}</td>
+            <td>${p.acidity || '—'}</td>
+            <td>${p.price.toFixed(2).replace('.', ',')} &euro; / ${p.unit}</td>
+            <td>${p.min_quantity} ${p.unit}(s)</td>
+          </tr>
+        `).join('');
+      }
+      const gallery = document.getElementById('brochureGallery');
+      if (gallery) {
+        gallery.innerHTML = products.map((p) => `
+          <figure class="brochure-thumb">
+            <img src="${p.image_url}" alt="${p.format_label}">
+            <figcaption>${p.format_label}</figcaption>
+          </figure>
+        `).join('');
+      }
+    });
+  </script>
 </body>
 </html>

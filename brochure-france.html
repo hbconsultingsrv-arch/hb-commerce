@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brochure FAYAFI - France (3 pages) | HB Commerce</title>
+  <title>Brochure FAYAFI - France | HB Commerce</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -12,11 +12,12 @@
   <link rel="stylesheet" href="css/brochure.css">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
   <script>localStorage.setItem('hb_market','fr');</script>
+  <script src="js/fayafi-images.js"></script>
   <script src="js/fayafi-catalog.js"></script>
 </head>
 <body class="brochure-page">
   <div class="brochure-toolbar">
-    <span><strong>Brochure France</strong> &mdash; 3 pages</span>
+    <span><strong>Brochure France</strong> &mdash; FAYAFI</span>
     <div>
       <a href="brochure-luxembourg.html">Luxembourg</a> |
       <a href="index.html?market=fr">Site</a> |
@@ -25,38 +26,43 @@
     </div>
   </div>
 
-  <!-- PAGE 1 — Couverture -->
-  <article class="brochure-sheet brochure-page-break">
-    <header class="brochure-cover market-fr">
-      <span class="market-label">FR &mdash; MARCHE FRANCE</span>
-      <h1>FAYAFI</h1>
-      <p>Huile d'olive extra vierge &middot; Origine Tunisie</p>
-      <img src="assets/products/premium-1l.svg" alt="FAYAFI Premium" width="280" height="320">
-      <p style="margin-top:1rem;opacity:0.9">Premi&egrave;re pression &agrave; froid &middot; Commerce en gros</p>
-      <p style="font-size:0.9rem;opacity:0.8">HB Commerce &middot; HB Consulting &amp; Services</p>
-    </header>
-    <div class="brochure-body">
-      <div class="category-showcase" style="margin-top:0">
-        <div class="category-card">
-          <img src="assets/categories/bouteille.svg" alt="Bouteilles" width="100">
-          <h3>Bouteilles</h3>
-          <p>Marasca 250 ml, formats 1L verre</p>
-        </div>
-        <div class="category-card">
-          <img src="assets/categories/metallique.svg" alt="Metallique" width="100">
-          <h3>M&eacute;tallique</h3>
-          <p>Bidons 1L, 3L et 5L</p>
-        </div>
-        <div class="category-card">
-          <img src="assets/categories/premium.svg" alt="Premium" width="100">
-          <h3>Premium</h3>
-          <p>Extra vierge s&eacute;lection &mdash; acidit&eacute; &le; 0,5 %</p>
-        </div>
-      </div>
-    </div>
+  <!-- Page 1 — Couverture -->
+  <article class="brochure-sheet brochure-full-image brochure-page-break">
+    <img src="images/image1.PNG" alt="FAYAFI Oliviers — couverture" class="brochure-full-bleed">
+    <span class="brochure-market-stamp market-fr">FR &mdash; MARCHE FRANCE</span>
   </article>
 
-  <!-- PAGE 2 — Formats & prix -->
+  <!-- Page 2 — Presentation -->
+  <article class="brochure-sheet brochure-full-image brochure-page-break">
+    <img src="images/image2.PNG" alt="FAYAFI Oliviers — Tunisie" class="brochure-full-bleed">
+  </article>
+
+  <!-- Page 3 — Premium -->
+  <article class="brochure-sheet brochure-full-image brochure-page-break">
+    <img src="images/prenium.PNG" alt="FAYAFI Premium Extra Virgin Olive Oil 1L" class="brochure-full-bleed">
+  </article>
+
+  <!-- Page 4 — Marasca -->
+  <article class="brochure-sheet brochure-full-image brochure-page-break">
+    <img src="images/marasca.PNG" alt="FAYAFI Marasca — bouteilles verre" class="brochure-full-bleed">
+  </article>
+
+  <!-- Page 5 — Metallique -->
+  <article class="brochure-sheet brochure-full-image brochure-page-break">
+    <img src="images/metallic.PNG" alt="FAYAFI Metallic Tin — 1L, 3L, 5L" class="brochure-full-bleed">
+  </article>
+
+  <!-- Page 6 — Acidite -->
+  <article class="brochure-sheet brochure-full-image brochure-page-break">
+    <img src="images/acidity.PNG" alt="FAYAFI — qualite et acidite" class="brochure-full-bleed">
+  </article>
+
+  <!-- Page 7 — Technologie -->
+  <article class="brochure-sheet brochure-full-image brochure-page-break">
+    <img src="images/technology.PNG" alt="FAYAFI — technologie et fraicheur" class="brochure-full-bleed">
+  </article>
+
+  <!-- Page 8 — Tarifs professionnels -->
   <article class="brochure-sheet brochure-page-break">
     <div class="brochure-body">
       <h2>Formats &amp; tarifs professionnels</h2>
@@ -77,18 +83,22 @@
     </div>
   </article>
 
-  <!-- PAGE 3 — Qualite & acidite -->
-  <article class="brochure-sheet">
-    <div class="brochure-body">
-      <div id="brochureQuality"></div>
-      <h2 style="margin-top:2rem">Commander en France</h2>
-      <p>Compte professionnel en ligne sur hb-commerce. Paiement : virement, ch&egrave;que ou carte.</p>
+  <!-- Page 9 — Contact -->
+  <article class="brochure-sheet brochure-full-image brochure-contact-sheet">
+    <img src="images/contact.PNG" alt="" class="brochure-full-bleed" aria-hidden="true">
+    <div class="brochure-contact-overlay">
+      <h2>Commander en France</h2>
+      <p class="brochure-contact-lead">Distribution HB Commerce &mdash; HB Consulting &amp; Services</p>
+      <ul class="brochure-contact-list">
+        <li><strong>T&eacute;l.</strong> 07 52 56 51 23</li>
+        <li><strong>Email</strong> contact@hbconsulting.fr</li>
+        <li><strong>Origine</strong> Mornag, Tunisie</li>
+      </ul>
+      <div class="brochure-contact-actions">
+        <a href="register.html?market=fr" class="btn btn-primary">Cr&eacute;er un compte pro</a>
+        <a href="produits.html?market=fr" class="btn btn-outline-dark">Catalogue complet</a>
+      </div>
     </div>
-    <footer class="brochure-cta">
-      <p><strong>HB Commerce</strong> &middot; contact@hbconsulting.fr &middot; 07 52 56 51 23</p>
-      <a href="register.html?market=fr" class="btn btn-primary">Cr&eacute;er un compte pro</a>
-      <a href="produits.html?market=fr" class="btn btn-outline-dark">Catalogue complet</a>
-    </footer>
   </article>
 
   <script>
@@ -114,16 +124,6 @@
             <figcaption>${p.format_label}</figcaption>
           </figure>
         `).join('');
-      }
-      const qHost = document.getElementById('brochureQuality');
-      if (qHost && FAYAFI_QUALITY) {
-        qHost.innerHTML = `
-          <h2>${FAYAFI_QUALITY.title}</h2>
-          <p>${FAYAFI_QUALITY.intro}</p>
-          <dl class="quality-specs">
-            ${FAYAFI_QUALITY.specs.map((s) => `<dt>${s.label}</dt><dd>${s.value}</dd>`).join('')}
-          </dl>
-        `;
       }
     });
   </script>

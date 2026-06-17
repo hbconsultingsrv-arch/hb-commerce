@@ -229,6 +229,101 @@
   font-weight: 600;
 }
 
+/* Pages image plein format (photos brochure) */
+.brochure-full-image {
+  position: relative;
+  overflow: hidden;
+  line-height: 0;
+  background: #1a1a1a;
+}
+
+.brochure-full-bleed {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  object-fit: contain;
+}
+
+.brochure-market-stamp {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: var(--fayafi-gold);
+  color: var(--fayafi-olive-dark);
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4;
+  z-index: 2;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.brochure-contact-sheet .brochure-full-bleed {
+  opacity: 0.35;
+}
+
+.brochure-contact-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  color: white;
+  background: linear-gradient(180deg, rgba(26, 42, 28, 0.55), rgba(26, 42, 28, 0.85));
+  line-height: 1.5;
+}
+
+.brochure-contact-overlay h2 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--fayafi-gold-light);
+  margin: 0 0 0.5rem;
+  border: none;
+  padding: 0;
+}
+
+.brochure-contact-lead {
+  margin: 0 0 1.25rem;
+  opacity: 0.9;
+  max-width: 520px;
+}
+
+.brochure-contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  font-size: 1.05rem;
+}
+
+.brochure-contact-list li {
+  margin: 0.35rem 0;
+}
+
+.brochure-contact-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media print {
+  .brochure-full-image {
+    page-break-inside: avoid;
+  }
+  .brochure-contact-overlay {
+    background: rgba(26, 42, 28, 0.75);
+  }
+}
+
 @media (max-width: 700px) {
   .brochure-specs,
   .brochure-bilingual {
@@ -239,5 +334,10 @@
     padding-left: 0;
     border-top: 2px solid var(--fayafi-cream);
     padding-top: 1rem;
+  }
+  .brochure-market-stamp {
+    font-size: 0.65rem;
+    top: 0.5rem;
+    left: 0.5rem;
   }
 }

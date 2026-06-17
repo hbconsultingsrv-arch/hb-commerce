@@ -647,6 +647,26 @@
   margin-bottom: 0.5rem;
 }
 
+.quality-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.quality-visuals {
+  display: grid;
+  gap: 1rem;
+}
+
+.quality-photo {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  display: block;
+}
+
 .quality-specs {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -666,6 +686,9 @@
 }
 
 @media (max-width: 600px) {
+  .quality-grid {
+    grid-template-columns: 1fr;
+  }
   .quality-specs {
     grid-template-columns: 1fr;
   }

@@ -123,13 +123,23 @@ function renderCategoryShowcase() {
 function renderQualitySection() {
   const q = FAYAFI_QUALITY || {};
   if (!q.specs) return '';
+  const qualityImg = q.image || FAYAFI_IMAGES?.acidity || 'images/acidity.PNG';
+  const techImg = FAYAFI_IMAGES?.technology || 'images/technology.PNG';
   return `
     <section class="quality-section" id="qualite">
-      <h2>${q.title || 'Qualité'}</h2>
-      <p class="section-sub">${q.intro || ''}</p>
-      <dl class="quality-specs">
-        ${q.specs.map((s) => `<dt>${s.label}</dt><dd>${s.value}</dd>`).join('')}
-      </dl>
+      <div class="quality-grid">
+        <div>
+          <h2>${q.title || 'Qualité'}</h2>
+          <p class="section-sub">${q.intro || ''}</p>
+          <dl class="quality-specs">
+            ${q.specs.map((s) => `<dt>${s.label}</dt><dd>${s.value}</dd>`).join('')}
+          </dl>
+        </div>
+        <div class="quality-visuals">
+          <img src="${qualityImg}" alt="Qualité FAYAFI — acidité" class="quality-photo">
+          <img src="${techImg}" alt="Technologie FAYAFI — fraîcheur" class="quality-photo">
+        </div>
+      </div>
     </section>
   `;
 }
