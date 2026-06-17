@@ -78,25 +78,43 @@ alter table public.products enable row level security;
 alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
 
--- Profils
+-- Profils (DROP IF EXISTS pour réexécution sans erreur)
+drop policy if exists "Users read own profile" on public.profiles;
+drop policy if exists "Users update own profile" on public.profiles;
+drop policy if exists "Users insert own profile" on public.profiles;
+drop policy if exists "Admin read all profiles" on public.profiles;
+
 create policy "Users read own profile" on public.profiles for select using (auth.uid() = id);
 create policy "Users update own profile" on public.profiles for update using (auth.uid() = id);
 create policy "Users insert own profile" on public.profiles for insert with check (auth.uid() = id);
 create policy "Admin read all profiles" on public.profiles for select using (public.is_admin());
 
--- Produits : lecture publique (actifs) ou admin (tous)
+-- Produits
+drop policy if exists "Public read active products" on public.products;
+drop policy if exists "Admin manage products" on public.products;
+
 create policy "Public read active products" on public.products for select
   using (active = true or public.is_admin());
 create policy "Admin manage products" on public.products for all
   using (public.is_admin()) with check (public.is_admin());
 
--- Commandes : client lit/crée ses commandes, admin lit/modifie toutes
+-- Commandes
+drop policy if exists "Users read own orders" on public.orders;
+drop policy if exists "Users insert own orders" on public.orders;
+drop policy if exists "Admin read all orders" on public.orders;
+drop policy if exists "Admin update all orders" on public.orders;
+
 create policy "Users read own orders" on public.orders for select using (auth.uid() = user_id);
 create policy "Users insert own orders" on public.orders for insert with check (auth.uid() = user_id);
 create policy "Admin read all orders" on public.orders for select using (public.is_admin());
 create policy "Admin update all orders" on public.orders for update using (public.is_admin());
 
 -- Lignes commande
+drop policy if exists "Users read own order items" on public.order_items;
+drop policy if exists "Users insert own order items" on public.order_items;
+drop policy if exists "Admin read all order items" on public.order_items;
+drop policy if exists "Admin insert order items" on public.order_items;
+
 create policy "Users read own order items" on public.order_items for select
   using (exists (select 1 from public.orders o where o.id = order_id and o.user_id = auth.uid()));
 create policy "Users insert own order items" on public.order_items for insert
