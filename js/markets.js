@@ -6,7 +6,7 @@ const HB_MARKETS = {
   fr: {
     id: 'fr',
     label: 'France',
-    flag: '🇫🇷',
+    flag: 'FR',
     lang: 'fr',
     currency: 'EUR',
     brochurePage: 'brochure-france.html',
@@ -25,7 +25,7 @@ const HB_MARKETS = {
   lu: {
     id: 'lu',
     label: 'Luxembourg',
-    flag: '🇱🇺',
+    flag: 'LU',
     lang: 'lu',
     currency: 'EUR',
     brochurePage: 'brochure-luxembourg.html',
@@ -77,13 +77,17 @@ function marketImageUrl(market, type = 'product', width = 1200) {
 
 function resolveMarketImage(market, type = 'product', width = 1200) {
   const m = market || getMarket();
-  const local = m.images?.[type];
+  const local = m.images?.[type] || m.images?.product;
   const drive = m.images?.driveId
     ? `https://drive.google.com/thumbnail?id=${m.images.driveId}&sz=w${width}`
     : null;
-  return { primary: drive || local, fallback: local, driveAlt: drive
-    ? `https://drive.google.com/uc?export=view&id=${m.images.driveId}`
-    : local
+  // Local en priorite : Drive renvoie souvent du HTML (image cassee) si fichier prive
+  return {
+    primary: local,
+    fallback: drive,
+    driveAlt: drive
+      ? `https://drive.google.com/uc?export=view&id=${m.images.driveId}`
+      : local
   };
 }
 
