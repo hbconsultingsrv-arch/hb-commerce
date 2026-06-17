@@ -1,15 +1,23 @@
 async function fetchProducts(activeOnly = true) {
+  const catalog = getFallbackProducts();
   const sb = getSupabase();
-  if (!sb) return getFallbackProducts();
+  if (!sb) return catalog;
+
   let query = sb.from('products').select('*').order('sort_order', { ascending: true });
   if (activeOnly) query = query.eq('active', true);
   const { data, error } = await query;
   if (error) {
     console.warn('fetchProducts:', error.message);
-    return getFallbackProducts();
+    return catalog;
   }
-  const list = data?.length ? data : getFallbackProducts();
-  return list.filter((p) => p.slug !== 'fayafi-huile-olive');
+
+  const dbList = (data || []).filter((p) => p.slug !== 'fayafi-huile-olive');
+  const merged = typeof mergeProductsWithCatalog === 'function'
+    ? mergeProductsWithCatalog(dbList.length ? dbList : catalog)
+    : (dbList.length ? dbList : catalog);
+
+  if (activeOnly) return merged.filter((p) => p.active);
+  return merged;
 }
 
 async function fetchProductBySlug(slug) {
@@ -44,23 +52,36 @@ function isFayafiProduct(product) {
   return slug.includes('fayafi') || name.includes('fayafi');
 }
 
+function isStaleFayafiImage(url) {
+  if (!url) return true;
+  return url.includes('drive.google.com')
+    || url.includes('assets/products/')
+    || url.includes('assets/markets/')
+    || url.endsWith('.svg');
+}
+
 function resolveProductImage(product) {
-  if (product.image_url && !product.image_url.includes('unsplash')) {
+  if (isFayafiProduct(product) && typeof getFayafiProductImage === 'function') {
+    return getFayafiProductImage(product);
+  }
+  if (product.image_url && !isStaleFayafiImage(product.image_url)) {
     return product.image_url;
   }
-  if (isFayafiProduct(product) && typeof resolveMarketImage === 'function') {
-    return resolveMarketImage(getMarket(), 'product', 1200).primary;
+  if (typeof getFayafiProductImage === 'function') {
+    return getFayafiProductImage(product);
   }
-  return product.image_url || 'assets/markets/france/product.svg';
+  return FAYAFI_IMAGES?.product || 'images/prenium.PNG';
 }
 
 function renderProductCard(product) {
   const minQty = product.min_quantity || 1;
   const imgUrl = resolveProductImage(product);
+  const imgFallback = FAYAFI_IMAGES?.product || 'images/prenium.PNG';
   const fayafi = isFayafiProduct(product);
   const cardClass = fayafi ? 'product-card fayafi-card' : 'product-card';
   const formatLabel = product.format_label || '';
   const acidity = product.acidity || '';
+  const acidityDisplay = typeof formatAcidity === 'function' ? formatAcidity(acidity) : acidity;
   const packaging = getPackagingLabel(product.packaging_type);
 
   return `
@@ -68,14 +89,14 @@ function renderProductCard(product) {
       <div class="product-img-area">
         <span class="origin-badge">TUNISIE</span>
         ${packaging ? `<span class="packaging-badge">${packaging}</span>` : ''}
-        <img src="${imgUrl}" alt="${product.name}" loading="lazy">
+        <img src="${imgUrl}" alt="${product.name}" loading="lazy" onerror="this.onerror=null;this.src='${imgFallback}'">
       </div>
       <div class="product-card-body">
         ${product.tag ? `<span class="tag">${product.tag}</span>` : ''}
         ${formatLabel ? `<span class="format-label">${formatLabel}</span>` : ''}
         <h3>${product.name}</h3>
         <p class="origin">Origine : ${product.origin || '—'}</p>
-        ${acidity ? `<p class="acidity-line">Acidité : <strong>${acidity}</strong></p>` : ''}
+        ${acidity ? `<p class="acidity-line">Acidit&eacute; : <strong>${acidityDisplay}</strong></p>` : ''}
         <p class="product-desc">${product.description || ''}</p>
         <div class="price-row">
           <span class="price">${formatPrice(product.price)}</span>
@@ -111,9 +132,10 @@ function renderCategoryNav(activeId = 'all') {
 
 function renderCategoryShowcase() {
   const cats = Object.values(FAYAFI_CATEGORIES || {});
+  const fallback = FAYAFI_IMAGES?.product || 'images/prenium.PNG';
   return cats.map((c) => `
     <a href="produits.html#cat-${c.id}" class="category-card" id="cat-${c.id}">
-      <img src="${c.image}" alt="${c.label}" width="120" height="120">
+      <img src="${c.image}" alt="${c.label}" width="200" height="140" onerror="this.onerror=null;this.src='${fallback}'">
       <h3>${c.label}</h3>
       <p>${c.description}</p>
     </a>
@@ -129,15 +151,15 @@ function renderQualitySection() {
     <section class="quality-section" id="qualite">
       <div class="quality-grid">
         <div>
-          <h2>${q.title || 'Qualité'}</h2>
+          <h2>Qualit&eacute; &amp; acidit&eacute;</h2>
           <p class="section-sub">${q.intro || ''}</p>
           <dl class="quality-specs">
             ${q.specs.map((s) => `<dt>${s.label}</dt><dd>${s.value}</dd>`).join('')}
           </dl>
         </div>
         <div class="quality-visuals">
-          <img src="${qualityImg}" alt="Qualité FAYAFI — acidité" class="quality-photo">
-          <img src="${techImg}" alt="Technologie FAYAFI — fraîcheur" class="quality-photo">
+          <img src="${qualityImg}" alt="Qualite FAYAFI - acidite" class="quality-photo">
+          <img src="${techImg}" alt="Technologie FAYAFI - fraicheur" class="quality-photo">
         </div>
       </div>
     </section>
