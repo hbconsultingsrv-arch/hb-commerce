@@ -291,6 +291,19 @@ async function updateOrderStatus(id, status) {
   return data;
 }
 
+async function updateOrderTracking(id, fields) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { data, error } = await sb
+    .from('orders')
+    .update(fields)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
 async function fetchChatMessages(companyId = null) {
   const sb = getSupabase();
   if (!sb) return [];

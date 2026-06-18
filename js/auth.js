@@ -1,12 +1,23 @@
 const ORDER_STATUS_LABELS = {
-  en_attente: 'En attente',
+  en_attente: 'En cours de validation',
   validee: 'Validée',
-  en_attente_paiement: 'En attente de paiement',
+  en_attente_paiement: 'Validée — paiement à finaliser',
   payee: 'Payée',
   en_preparation: 'En préparation',
   expediee: 'Expédiée',
   livree: 'Livrée',
   annulee: 'Annulée'
+};
+
+const DELIVERY_STATUS_LABELS = {
+  non_preparee: 'Non préparée',
+  preparation: 'Préparation',
+  prete: 'Prête à expédier',
+  expediee: 'Expédiée',
+  en_transit: 'En transit',
+  livree: 'Livrée',
+  incident: 'Incident livraison',
+  retour: 'Retour'
 };
 
 async function getSession() {

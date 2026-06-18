@@ -69,6 +69,12 @@ Puis exécutez la migration des agents commerciaux :
 -- Copier-coller le contenu de supabase/migration-commercial-agents.sql
 ```
 
+Enfin, exécutez la migration du suivi livraison et des factures :
+
+```sql
+-- Copier-coller le contenu de supabase/migration-order-delivery-tracking.sql
+```
+
 Promouvez ensuite votre compte principal en super root (remplacez l'e-mail) :
 
 ```sql

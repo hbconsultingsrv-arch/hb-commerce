@@ -163,6 +163,22 @@ async function loadOrdersTable() {
             ).join('')}
           </select>
         </td>
+        <td>
+          <div class="tracking-editor" data-tracking-order="${order.id}">
+            <select name="delivery_status">
+              ${Object.entries(DELIVERY_STATUS_LABELS).map(([k, v]) =>
+                `<option value="${k}" ${order.delivery_status === k ? 'selected' : ''}>${v}</option>`
+              ).join('')}
+            </select>
+            <input type="text" name="carrier" value="${escapeHtml(order.carrier || '')}" placeholder="Transporteur">
+            <input type="text" name="tracking_number" value="${escapeHtml(order.tracking_number || '')}" placeholder="N° suivi">
+            <input type="url" name="tracking_url" value="${escapeHtml(order.tracking_url || '')}" placeholder="Lien suivi">
+            <input type="date" name="estimated_delivery_date" value="${order.estimated_delivery_date || ''}">
+            <input type="datetime-local" name="delivered_at" value="${toDatetimeLocal(order.delivered_at)}">
+            <textarea name="delivery_notes" rows="2" placeholder="Notes livraison">${escapeHtml(order.delivery_notes || '')}</textarea>
+            <button type="button" class="btn btn-sm btn-primary" data-save-tracking="${order.id}">Enregistrer</button>
+          </div>
+        </td>
       </tr>
     `;
   }).join('');
@@ -172,6 +188,32 @@ async function loadOrdersTable() {
       await updateOrderStatus(select.dataset.order, select.value);
     });
   });
+  body.querySelectorAll('[data-save-tracking]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const box = body.querySelector(`[data-tracking-order="${btn.dataset.saveTracking}"]`);
+      await updateOrderTracking(btn.dataset.saveTracking, {
+        delivery_status: box.querySelector('[name="delivery_status"]').value,
+        carrier: box.querySelector('[name="carrier"]').value || null,
+        tracking_number: box.querySelector('[name="tracking_number"]').value || null,
+        tracking_url: box.querySelector('[name="tracking_url"]').value || null,
+        estimated_delivery_date: box.querySelector('[name="estimated_delivery_date"]').value || null,
+        delivered_at: toIsoOrNull(box.querySelector('[name="delivered_at"]').value),
+        delivery_notes: box.querySelector('[name="delivery_notes"]').value || null
+      });
+      await loadOrdersTable();
+    });
+  });
+}
+
+function toDatetimeLocal(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toISOString().slice(0, 16);
+}
+
+function toIsoOrNull(value) {
+  return value ? new Date(value).toISOString() : null;
 }
 
 function profileLabel(profile) {

@@ -60,9 +60,12 @@ async function initDashboard() {
           <td>${items}</td>
           <td><strong>${formatPrice(order.total)}</strong></td>
           <td><span class="order-status ${order.status}">${statusLabel}</span></td>
+          <td>${renderTrackingSummary(order)}</td>
+          <td><button type="button" class="btn btn-sm btn-outline-dark" data-invoice="${order.id}">Télécharger</button></td>
         </tr>
       `;
     }).join('');
+    bindInvoiceButtons(orders, profile);
   }
 
   const adminLink = document.getElementById('compteAdminLink');
@@ -75,6 +78,104 @@ async function initDashboard() {
   }
 
   document.getElementById('logoutBtn')?.addEventListener('click', signOut);
+}
+
+function renderTrackingSummary(order) {
+  const deliveryLabel = DELIVERY_STATUS_LABELS[order.delivery_status || 'non_preparee'] || 'Non préparée';
+  const tracking = order.tracking_url && order.tracking_number
+    ? `<a href="${escapeHtml(order.tracking_url)}" target="_blank" rel="noopener">${escapeHtml(order.tracking_number)}</a>`
+    : escapeHtml(order.tracking_number || '—');
+  return `
+    <div class="tracking-summary">
+      <strong>${deliveryLabel}</strong>
+      <small>Transporteur : ${escapeHtml(order.carrier || '—')}</small>
+      <small>Suivi : ${tracking}</small>
+      <small>Livraison estimée : ${formatDate(order.estimated_delivery_date)}</small>
+      <small>Livrée le : ${formatDate(order.delivered_at)}</small>
+      ${order.delivery_notes ? `<small>${escapeHtml(order.delivery_notes)}</small>` : ''}
+    </div>
+  `;
+}
+
+function bindInvoiceButtons(orders, profile) {
+  document.querySelectorAll('[data-invoice]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const order = orders.find((o) => o.id === btn.dataset.invoice);
+      if (order) downloadInvoice(order, profile);
+    });
+  });
+}
+
+function downloadInvoice(order, profile) {
+  const invoiceNumber = `FAC-${new Date(order.created_at).getFullYear()}-${order.id.slice(0, 8).toUpperCase()}`;
+  const rows = (order.order_items || []).map((item) => {
+    const lineTotal = Number(item.unit_price) * Number(item.quantity);
+    return `
+      <tr>
+        <td>${escapeHtml(item.product_name)}</td>
+        <td>${item.quantity}</td>
+        <td>${escapeHtml(item.unit || '')}</td>
+        <td>${formatPrice(item.unit_price)}</td>
+        <td>${formatPrice(lineTotal)}</td>
+      </tr>
+    `;
+  }).join('');
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Facture ${invoiceNumber}</title>
+  <style>
+    body { font-family: Arial, sans-serif; color: #222; margin: 32px; }
+    h1 { color: #0f3d32; }
+    table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+    th, td { border-bottom: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background: #f5f0e6; }
+    .total { text-align: right; font-size: 1.2rem; font-weight: bold; margin-top: 24px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    small { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Facture ${invoiceNumber}</h1>
+  <div class="grid">
+    <section>
+      <h2>HB Commerce</h2>
+      <p>HB Consulting &amp; Services<br>France</p>
+    </section>
+    <section>
+      <h2>Client</h2>
+      <p>
+        ${escapeHtml(profile.company || '')}<br>
+        ${escapeHtml(profile.full_name || '')}<br>
+        ${escapeHtml(profile.address || '')}<br>
+        SIREN : ${escapeHtml(profile.siren || '—')}<br>
+        TVA : ${escapeHtml(profile.vat_number || '—')}
+      </p>
+    </section>
+  </div>
+  <p><strong>Commande :</strong> #${order.id.slice(0, 8)}<br>
+  <strong>Date :</strong> ${formatDate(order.created_at)}<br>
+  <strong>Statut :</strong> ${ORDER_STATUS_LABELS[order.status] || order.status}</p>
+  <table>
+    <thead>
+      <tr><th>Produit</th><th>Quantité</th><th>Unité</th><th>Prix unitaire</th><th>Total</th></tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <p class="total">Total : ${formatPrice(order.total)}</p>
+  <small>Document généré depuis l'espace client HB Commerce.</small>
+</body>
+</html>`;
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${invoiceNumber}.html`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 function chatStatusLabel(status) {
