@@ -44,11 +44,20 @@ async function loadSuperRootData() {
 
     renderProfilesTable();
     renderPriceSelectors();
+    renderSuperRootAgentSelectors();
     renderCustomerPricesTable();
   } catch (err) {
     showAlert(document.getElementById('profilesNote'), err.message);
     showAlert(document.getElementById('customerPriceNote'), err.message);
   }
+}
+
+function renderSuperRootAgentSelectors() {
+  const select = document.getElementById('profileCreateAgentSelect');
+  if (!select) return;
+  const agents = superRootProfiles.filter((profile) => profile.role === 'agent_commercial');
+  select.innerHTML = '<option value="">Aucun agent assigné</option>'
+    + agents.map((agent) => `<option value="${agent.id}">${escapeHtml(profileLabel(agent))}</option>`).join('');
 }
 
 function renderProfilesTable() {
@@ -64,7 +73,7 @@ function renderProfilesTable() {
       <td>${escapeHtml(profile.email || '—')}</td>
       <td>
         <select data-role-profile="${profile.id}">
-          ${['client', 'admin', 'super_root'].map((role) => `
+          ${['client', 'agent_commercial', 'admin', 'super_root'].map((role) => `
             <option value="${role}" ${profile.role === role ? 'selected' : ''}>${role}</option>
           `).join('')}
         </select>
@@ -113,7 +122,8 @@ async function handleProfileCreateSubmit(e) {
       address: fd.get('address'),
       company: fd.get('company'),
       siren: fd.get('siren'),
-      vatNumber: fd.get('vat_number')
+      vatNumber: fd.get('vat_number'),
+      commercialAgentId: fd.get('commercial_agent_id')
     });
     e.target.reset();
     showAlert(note, 'Client créé avec le rôle client. Il peut confirmer son e-mail puis se connecter.', 'success');
@@ -145,7 +155,7 @@ function editProfile(profileId) {
 function syncInternalCompany() {
   const form = document.getElementById('profileEditForm');
   if (!form) return;
-  const internal = ['admin', 'super_root'].includes(form.elements.role.value);
+  const internal = ['agent_commercial', 'admin', 'super_root'].includes(form.elements.role.value);
   if (internal) form.elements.company.value = 'HB Commerce';
 }
 
@@ -162,7 +172,7 @@ async function handleProfileEditSubmit(e) {
   try {
     const role = fd.get('role');
     await updateProfileAsSuperRoot(profileId, {
-      company: ['admin', 'super_root'].includes(role) ? 'HB Commerce' : fd.get('company') || '',
+      company: ['agent_commercial', 'admin', 'super_root'].includes(role) ? 'HB Commerce' : fd.get('company') || '',
       full_name: fd.get('full_name') || '',
       email: fd.get('email') || '',
       phone: fd.get('phone') || '',

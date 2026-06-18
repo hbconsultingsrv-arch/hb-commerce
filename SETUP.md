@@ -63,6 +63,12 @@ Si votre base existe déjà, exécutez aussi la migration des champs société c
 -- Copier-coller le contenu de supabase/migration-company-client-fields.sql
 ```
 
+Puis exécutez la migration des agents commerciaux :
+
+```sql
+-- Copier-coller le contenu de supabase/migration-commercial-agents.sql
+```
+
 Promouvez ensuite votre compte principal en super root (remplacez l'e-mail) :
 
 ```sql

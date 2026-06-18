@@ -5,9 +5,10 @@ alter table public.profiles drop constraint if exists profiles_role_check;
 update public.profiles set role = 'client' where role = 'user';
 alter table public.profiles alter column role set default 'client';
 alter table public.profiles add constraint profiles_role_check
-  check (role in ('client', 'admin', 'super_root'));
+  check (role in ('client', 'agent_commercial', 'admin', 'super_root'));
 alter table public.profiles add column if not exists siren text;
 alter table public.profiles add column if not exists vat_number text;
+alter table public.profiles add column if not exists commercial_agent_id uuid references public.profiles(id);
 
 alter table public.orders drop constraint if exists orders_status_check;
 alter table public.orders add constraint orders_status_check check (
@@ -28,7 +29,7 @@ create table if not exists public.chat_messages (
   id uuid default gen_random_uuid() primary key,
   company_id uuid references public.profiles on delete cascade not null,
   author_id uuid references auth.users on delete set null,
-  author_role text not null check (author_role in ('client', 'admin', 'super_root')),
+  author_role text not null check (author_role in ('client', 'agent_commercial', 'admin', 'super_root')),
   message text not null check (length(trim(message)) > 0),
   status text default 'pending' check (status in ('pending', 'approved', 'rejected')),
   moderated_by uuid references auth.users on delete set null,

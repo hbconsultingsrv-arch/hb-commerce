@@ -11,6 +11,7 @@ async function initAdmin() {
   document.getElementById('logoutBtn')?.addEventListener('click', signOut);
   const superRootLink = document.getElementById('superRootLink');
   if (superRootLink && isSuperRootProfile(adminProfile)) superRootLink.style.display = '';
+  const commercialAgent = isCommercialAgentProfile(adminProfile);
 
   document.querySelectorAll('.admin-tab').forEach((tab) => {
     tab.addEventListener('click', () => {
@@ -20,17 +21,26 @@ async function initAdmin() {
       document.getElementById(`panel-${tab.dataset.tab}`).hidden = false;
     });
   });
+  if (commercialAgent) {
+    document.querySelectorAll('.admin-only').forEach((el) => { el.style.display = 'none'; });
+    document.querySelector('[data-tab="produits"]')?.setAttribute('hidden', '');
+    document.getElementById('panel-produits')?.setAttribute('hidden', '');
+    document.querySelector('[data-tab="commandes"]')?.click();
+  }
 
   await loadProductsTable();
   await loadOrdersTable();
   await loadClientsPanel();
+  await loadAdminPricePanel();
   await loadAdminChatPanel();
 
   const productForm = document.getElementById('productForm');
   productForm?.addEventListener('submit', handleProductSubmit);
   document.getElementById('cancelProductBtn')?.addEventListener('click', resetProductForm);
   document.getElementById('adminClientForm')?.addEventListener('submit', handleAdminClientSubmit);
+  document.getElementById('commercialAgentForm')?.addEventListener('submit', handleCommercialAgentSubmit);
   document.getElementById('refreshClientsBtn')?.addEventListener('click', loadClientsPanel);
+  document.getElementById('adminCustomerPriceForm')?.addEventListener('submit', handleAdminCustomerPriceSubmit);
 }
 
 async function loadProductsTable() {
@@ -174,17 +184,65 @@ async function loadClientsPanel() {
   try {
     adminProfiles = await fetchAllProfiles();
     const clients = adminProfiles.filter((p) => p.role === 'client');
+    const agents = adminProfiles.filter((p) => p.role === 'agent_commercial');
+    renderAgentSelect(document.getElementById('adminClientAgentSelect'), agents);
     body.innerHTML = clients.length ? clients.map((profile) => `
       <tr>
         <td><strong>${escapeHtml(profile.company || '—')}</strong><br><small>${escapeHtml(profile.address || '')}</small></td>
         <td>${escapeHtml(profile.full_name || '—')}</td>
         <td>${escapeHtml(profile.siren || '—')}</td>
         <td>${escapeHtml(profile.vat_number || '—')}</td>
+        <td>
+          ${isCommercialAgentProfile(adminProfile) ? escapeHtml(agentName(profile.commercial_agent_id, agents)) : `
+            <select data-assign-agent="${profile.id}">
+              <option value="">Aucun agent</option>
+              ${agents.map((agent) => `<option value="${agent.id}" ${profile.commercial_agent_id === agent.id ? 'selected' : ''}>${escapeHtml(profileLabel(agent))}</option>`).join('')}
+            </select>
+          `}
+        </td>
         <td>${escapeHtml(profile.email || '—')}</td>
       </tr>
-    `).join('') : '<tr><td colspan="5">Aucun client.</td></tr>';
+    `).join('') : '<tr><td colspan="6">Aucun client.</td></tr>';
+    body.querySelectorAll('[data-assign-agent]').forEach((select) => {
+      select.addEventListener('change', async () => {
+        await assignCommercialAgent(select.dataset.assignAgent, select.value);
+        await loadClientsPanel();
+        await loadAdminChatPanel();
+        await loadAdminPricePanel();
+      });
+    });
   } catch (err) {
-    body.innerHTML = `<tr><td colspan="5">${escapeHtml(err.message)}</td></tr>`;
+    body.innerHTML = `<tr><td colspan="6">${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+function renderAgentSelect(select, agents) {
+  if (!select) return;
+  select.innerHTML = '<option value="">Aucun agent assigné</option>'
+    + agents.map((agent) => `<option value="${agent.id}">${escapeHtml(profileLabel(agent))}</option>`).join('');
+}
+
+function agentName(agentId, agents) {
+  const agent = agents.find((p) => p.id === agentId);
+  return agent ? profileLabel(agent) : 'Aucun agent';
+}
+
+async function handleCommercialAgentSubmit(e) {
+  e.preventDefault();
+  const note = document.getElementById('commercialAgentNote');
+  const fd = new FormData(e.target);
+  try {
+    await createCommercialAgentUser({
+      email: fd.get('email'),
+      password: fd.get('password'),
+      fullName: fd.get('full_name'),
+      phone: fd.get('phone')
+    });
+    e.target.reset();
+    showAlert(note, 'Agent commercial créé.', 'success');
+    await loadClientsPanel();
+  } catch (err) {
+    showAlert(note, mapAuthError(err));
   }
 }
 
@@ -201,14 +259,45 @@ async function handleAdminClientSubmit(e) {
       address: fd.get('address'),
       company: fd.get('company'),
       siren: fd.get('siren'),
-      vatNumber: fd.get('vat_number')
+      vatNumber: fd.get('vat_number'),
+      commercialAgentId: fd.get('commercial_agent_id')
     });
     e.target.reset();
     showAlert(note, 'Client créé avec le rôle client.', 'success');
     await loadClientsPanel();
     await loadAdminChatPanel();
+    await loadAdminPricePanel();
   } catch (err) {
     showAlert(note, mapAuthError(err));
+  }
+}
+
+async function loadAdminPricePanel() {
+  const clientSelect = document.getElementById('adminPriceClientSelect');
+  const productSelect = document.getElementById('adminPriceProductSelect');
+  if (!clientSelect || !productSelect) return;
+  const profiles = adminProfiles.length ? adminProfiles : await fetchAllProfiles();
+  const clients = profiles.filter((p) => p.role === 'client');
+  clientSelect.innerHTML = clients.map((client) => `<option value="${client.id}">${escapeHtml(profileLabel(client))}</option>`).join('');
+  const products = await fetchAllProducts();
+  productSelect.innerHTML = products.map((product) => `<option value="${product.slug}">${escapeHtml(product.name || product.slug)}</option>`).join('');
+}
+
+async function handleAdminCustomerPriceSubmit(e) {
+  e.preventDefault();
+  const note = document.getElementById('adminCustomerPriceNote');
+  const fd = new FormData(e.target);
+  try {
+    await upsertCustomerPrice({
+      profileId: fd.get('profile_id'),
+      productSlug: fd.get('product_slug'),
+      price: parseFloat(fd.get('price'))
+    });
+    e.target.reset();
+    showAlert(note, 'Prix client fixé.', 'success');
+    await loadAdminPricePanel();
+  } catch (err) {
+    showAlert(note, err.message);
   }
 }
 
@@ -222,21 +311,22 @@ async function loadAdminChatPanel() {
   const select = document.getElementById('adminChatCompany');
   if (!select) return;
 
+  let chatProfiles = [];
   try {
-    adminProfiles = (await fetchAllProfiles()).filter((p) => p.role === 'client');
+    chatProfiles = (await fetchAllProfiles()).filter((p) => p.role === 'client');
   } catch (err) {
     document.getElementById('adminChatHistory').innerHTML = `<p class="empty-state">${escapeHtml(err.message)}</p>`;
     return;
   }
-  select.innerHTML = adminProfiles.length
-    ? adminProfiles.map((p) => `<option value="${p.id}">${escapeHtml(profileLabel(p))}</option>`).join('')
+  select.innerHTML = chatProfiles.length
+    ? chatProfiles.map((p) => `<option value="${p.id}">${escapeHtml(profileLabel(p))}</option>`).join('')
     : '<option value="">Aucune société</option>';
 
   select.addEventListener('change', () => renderAdminChat(select.value));
   document.getElementById('refreshAdminChatBtn')?.addEventListener('click', () => renderAdminChat(select.value));
   document.getElementById('adminChatReplyForm')?.addEventListener('submit', handleAdminChatReply);
 
-  if (adminProfiles[0]) await renderAdminChat(adminProfiles[0].id);
+  if (chatProfiles[0]) await renderAdminChat(chatProfiles[0].id);
 }
 
 async function renderAdminChat(companyId) {

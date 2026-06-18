@@ -87,11 +87,19 @@ function isSuperRootProfile(profile) {
   return profile?.role === 'super_root';
 }
 
+function isCommercialAgentProfile(profile) {
+  return profile?.role === 'agent_commercial';
+}
+
+function isBackofficeProfile(profile) {
+  return isAdminProfile(profile) || isCommercialAgentProfile(profile);
+}
+
 async function getDefaultDashboardUrl(session) {
   if (!session?.user?.id) return 'compte.html';
   const profile = await getProfile(session.user.id);
   if (isSuperRootProfile(profile)) return 'super-root.html';
-  if (isAdminProfile(profile)) return 'admin.html';
+  if (isBackofficeProfile(profile)) return 'admin.html';
   return 'compte.html';
 }
 

@@ -2,6 +2,13 @@ async function isAdmin() {
   const session = await getSession();
   if (!session) return false;
   const profile = await getProfile(session.user.id);
+  return isBackofficeProfile(profile);
+}
+
+async function isFullAdmin() {
+  const session = await getSession();
+  if (!session) return false;
+  const profile = await getProfile(session.user.id);
   return isAdminProfile(profile);
 }
 
@@ -86,7 +93,7 @@ function getDetachedSupabaseClient() {
   );
 }
 
-async function createClientUser({ email, password, fullName, phone, address, company, siren, vatNumber }) {
+async function createClientUser({ email, password, fullName, phone, address, company, siren, vatNumber, commercialAgentId }) {
   const authClient = getDetachedSupabaseClient();
   const { data, error } = await authClient.auth.signUp({
     email,
@@ -117,6 +124,7 @@ async function createClientUser({ email, password, fullName, phone, address, com
     company: company || '',
     siren: siren || '',
     vat_number: vatNumber || '',
+    commercial_agent_id: commercialAgentId || null,
     role: 'client'
   };
   const { data: savedProfile, error: profileError } = await sb
@@ -130,6 +138,54 @@ async function createClientUser({ email, password, fullName, phone, address, com
 
 async function createUserAsSuperRoot(fields) {
   return createClientUser(fields);
+}
+
+async function createCommercialAgentUser({ email, password, fullName, phone }) {
+  const authClient = getDetachedSupabaseClient();
+  const { data, error } = await authClient.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: getEmailConfirmRedirectUrl(),
+      data: {
+        full_name: fullName || '',
+        phone: phone || '',
+        company: 'HB Commerce'
+      }
+    }
+  });
+  if (error) throw error;
+  if (!data.user?.id) throw new Error('Agent non créé dans Supabase Auth.');
+
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { data: savedProfile, error: profileError } = await sb
+    .from('profiles')
+    .upsert({
+      id: data.user.id,
+      email,
+      full_name: fullName || '',
+      phone: phone || '',
+      company: 'HB Commerce',
+      role: 'agent_commercial'
+    }, { onConflict: 'id' })
+    .select()
+    .single();
+  if (profileError) throw profileError;
+  return savedProfile;
+}
+
+async function assignCommercialAgent(clientId, agentId) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { data, error } = await sb
+    .from('profiles')
+    .update({ commercial_agent_id: agentId || null })
+    .eq('id', clientId)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
 }
 
 async function fetchAllProducts() {

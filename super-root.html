@@ -79,6 +79,14 @@
               <input type="text" value="Client" disabled>
             </label>
             <label>
+              Agent commercial
+              <select name="commercial_agent_id" id="profileCreateAgentSelect">
+                <option value="">Aucun agent assigné</option>
+              </select>
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
               Mot de passe temporaire
               <input type="password" name="password" minlength="6" required autocomplete="new-password">
             </label>
@@ -131,6 +139,7 @@
             Rôle
             <select name="role">
               <option value="client">Client</option>
+              <option value="agent_commercial">Agent commercial</option>
               <option value="admin">Admin</option>
               <option value="super_root">Super root</option>
             </select>
@@ -140,7 +149,7 @@
             <button type="button" id="resetProfileEditBtn" class="btn btn-outline-dark">Réinitialiser</button>
           </div>
           <p class="form-note" id="profileEditNote"></p>
-          <p class="form-note">Les rôles admin et super root sont réservés aux comptes internes HB Commerce ; la société sera automatiquement définie sur HB Commerce.</p>
+          <p class="form-note">Les rôles agent commercial, admin et super root sont réservés aux comptes internes HB Commerce ; la société sera automatiquement définie sur HB Commerce.</p>
         </form>
       </div>
 

@@ -11,7 +11,8 @@ create table if not exists public.profiles (
   company text,
   siren text,
   vat_number text,
-  role text default 'client' check (role in ('client', 'admin', 'super_root')),
+  commercial_agent_id uuid references public.profiles(id),
+  role text default 'client' check (role in ('client', 'agent_commercial', 'admin', 'super_root')),
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -20,9 +21,10 @@ alter table public.profiles drop constraint if exists profiles_role_check;
 update public.profiles set role = 'client' where role = 'user';
 alter table public.profiles alter column role set default 'client';
 alter table public.profiles add constraint profiles_role_check
-  check (role in ('client', 'admin', 'super_root'));
+  check (role in ('client', 'agent_commercial', 'admin', 'super_root'));
 alter table public.profiles add column if not exists siren text;
 alter table public.profiles add column if not exists vat_number text;
+alter table public.profiles add column if not exists commercial_agent_id uuid references public.profiles(id);
 
 -- Catalogue produits alimentaires
 create table if not exists public.products (
@@ -90,7 +92,7 @@ create table if not exists public.chat_messages (
   id uuid default gen_random_uuid() primary key,
   company_id uuid references public.profiles on delete cascade not null,
   author_id uuid references auth.users on delete set null,
-  author_role text not null check (author_role in ('client', 'admin', 'super_root')),
+  author_role text not null check (author_role in ('client', 'agent_commercial', 'admin', 'super_root')),
   message text not null check (length(trim(message)) > 0),
   status text default 'pending' check (status in ('pending', 'approved', 'rejected')),
   moderated_by uuid references auth.users on delete set null,
@@ -125,6 +127,34 @@ as $$
   );
 $$;
 
+create or replace function public.is_commercial_agent()
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role = 'agent_commercial'
+  );
+$$;
+
+create or replace function public.is_assigned_commercial_agent(profile_id uuid)
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.profiles p
+    where p.id = profile_id
+      and p.role = 'client'
+      and p.commercial_agent_id = auth.uid()
+  );
+$$;
+
 create or replace function public.protect_profile_role()
 returns trigger
 language plpgsql
@@ -134,11 +164,16 @@ as $$
 begin
   if old.role is distinct from new.role
     and not public.is_super_root()
+    and not (
+      public.is_admin()
+      and old.role in ('client', 'agent_commercial')
+      and new.role in ('client', 'agent_commercial')
+    )
     and session_user not in ('postgres', 'supabase_admin')
   then
     raise exception 'Seul le super root peut modifier les roles.';
   end if;
-  if new.role in ('admin', 'super_root') then
+  if new.role in ('agent_commercial', 'admin', 'super_root') then
     new.company = 'HB Commerce';
   end if;
   return new;
@@ -158,6 +193,7 @@ drop policy if exists "Users update own profile" on public.profiles;
 drop policy if exists "Users insert own profile" on public.profiles;
 drop policy if exists "Admin read all profiles" on public.profiles;
 drop policy if exists "Admin manage client profiles" on public.profiles;
+drop policy if exists "Commercial agent read assigned profiles" on public.profiles;
 drop policy if exists "Super root manage profiles" on public.profiles;
 
 create policy "Users read own profile" on public.profiles for select using (auth.uid() = id);
@@ -165,8 +201,10 @@ create policy "Users update own profile" on public.profiles for update using (au
 create policy "Users insert own profile" on public.profiles for insert with check (auth.uid() = id);
 create policy "Admin read all profiles" on public.profiles for select using (public.is_admin());
 create policy "Admin manage client profiles" on public.profiles for all
-  using (public.is_admin() and role = 'client')
-  with check (public.is_admin() and role = 'client');
+  using (public.is_admin() and role in ('client', 'agent_commercial'))
+  with check (public.is_admin() and role in ('client', 'agent_commercial'));
+create policy "Commercial agent read assigned profiles" on public.profiles for select
+  using (role = 'client' and commercial_agent_id = auth.uid());
 create policy "Super root manage profiles" on public.profiles for all
   using (public.is_super_root()) with check (public.is_super_root());
 
@@ -184,17 +222,24 @@ drop policy if exists "Users read own orders" on public.orders;
 drop policy if exists "Users insert own orders" on public.orders;
 drop policy if exists "Admin read all orders" on public.orders;
 drop policy if exists "Admin update all orders" on public.orders;
+drop policy if exists "Commercial agent read assigned orders" on public.orders;
+drop policy if exists "Commercial agent update assigned orders" on public.orders;
 
 create policy "Users read own orders" on public.orders for select using (auth.uid() = user_id);
 create policy "Users insert own orders" on public.orders for insert with check (auth.uid() = user_id);
 create policy "Admin read all orders" on public.orders for select using (public.is_admin());
 create policy "Admin update all orders" on public.orders for update using (public.is_admin());
+create policy "Commercial agent read assigned orders" on public.orders for select
+  using (public.is_assigned_commercial_agent(user_id));
+create policy "Commercial agent update assigned orders" on public.orders for update
+  using (public.is_assigned_commercial_agent(user_id));
 
 -- Lignes commande
 drop policy if exists "Users read own order items" on public.order_items;
 drop policy if exists "Users insert own order items" on public.order_items;
 drop policy if exists "Admin read all order items" on public.order_items;
 drop policy if exists "Admin insert order items" on public.order_items;
+drop policy if exists "Commercial agent read assigned order items" on public.order_items;
 
 create policy "Users read own order items" on public.order_items for select
   using (exists (select 1 from public.orders o where o.id = order_id and o.user_id = auth.uid()));
@@ -202,16 +247,22 @@ create policy "Users insert own order items" on public.order_items for insert
   with check (exists (select 1 from public.orders o where o.id = order_id and o.user_id = auth.uid()));
 create policy "Admin read all order items" on public.order_items for select using (public.is_admin());
 create policy "Admin insert order items" on public.order_items for insert with check (public.is_admin());
+create policy "Commercial agent read assigned order items" on public.order_items for select
+  using (exists (select 1 from public.orders o where o.id = order_id and public.is_assigned_commercial_agent(o.user_id)));
 
 -- Prix personnalises
 drop policy if exists "Users read own customer prices" on public.customer_prices;
 drop policy if exists "Admin read customer prices" on public.customer_prices;
+drop policy if exists "Commercial agent manage assigned customer prices" on public.customer_prices;
 drop policy if exists "Super root manage customer prices" on public.customer_prices;
 
 create policy "Users read own customer prices" on public.customer_prices for select
   using (auth.uid() = profile_id);
 create policy "Admin read customer prices" on public.customer_prices for select
   using (public.is_admin());
+create policy "Commercial agent manage assigned customer prices" on public.customer_prices for all
+  using (public.is_admin() or public.is_assigned_commercial_agent(profile_id))
+  with check (public.is_admin() or public.is_assigned_commercial_agent(profile_id));
 create policy "Super root manage customer prices" on public.customer_prices for all
   using (public.is_super_root()) with check (public.is_super_root());
 
@@ -221,6 +272,9 @@ drop policy if exists "Users create own chat messages" on public.chat_messages;
 drop policy if exists "Admin read all chat" on public.chat_messages;
 drop policy if exists "Admin create chat messages" on public.chat_messages;
 drop policy if exists "Admin moderate chat messages" on public.chat_messages;
+drop policy if exists "Commercial agent read assigned chat" on public.chat_messages;
+drop policy if exists "Commercial agent create assigned chat" on public.chat_messages;
+drop policy if exists "Commercial agent moderate assigned chat" on public.chat_messages;
 
 create policy "Users read own chat" on public.chat_messages for select using (
   auth.uid() = company_id
@@ -243,6 +297,16 @@ create policy "Admin create chat messages" on public.chat_messages for insert wi
   and status = 'approved'
 );
 create policy "Admin moderate chat messages" on public.chat_messages for update using (public.is_admin());
+create policy "Commercial agent read assigned chat" on public.chat_messages for select
+  using (public.is_assigned_commercial_agent(company_id));
+create policy "Commercial agent create assigned chat" on public.chat_messages for insert with check (
+  public.is_assigned_commercial_agent(company_id)
+  and author_id = auth.uid()
+  and author_role = 'agent_commercial'
+  and status = 'approved'
+);
+create policy "Commercial agent moderate assigned chat" on public.chat_messages for update
+  using (public.is_assigned_commercial_agent(company_id));
 
 -- Création automatique du profil à l'inscription
 create or replace function public.handle_new_user()

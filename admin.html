@@ -34,6 +34,7 @@
       <button type="button" class="admin-tab active" data-tab="produits">Produits</button>
       <button type="button" class="admin-tab" data-tab="commandes">Commandes</button>
       <button type="button" class="admin-tab" data-tab="clients">Clients</button>
+      <button type="button" class="admin-tab" data-tab="prix">Prix clients</button>
       <button type="button" class="admin-tab" data-tab="chat">Chat sociétés</button>
     </div>
 
@@ -148,7 +149,35 @@
     </section>
 
     <section id="panel-clients" class="admin-panel" hidden>
-      <div class="dashboard-card">
+      <div class="dashboard-card admin-only">
+        <h2>Créer un agent commercial</h2>
+        <form id="commercialAgentForm" class="auth-form">
+          <div class="form-row">
+            <label>
+              Nom agent
+              <input type="text" name="full_name" required placeholder="Nom de l'agent">
+            </label>
+            <label>
+              E-mail agent
+              <input type="email" name="email" required placeholder="agent@hbcommerce.fr">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Téléphone
+              <input type="tel" name="phone" placeholder="Téléphone">
+            </label>
+            <label>
+              Mot de passe temporaire
+              <input type="password" name="password" minlength="6" required autocomplete="new-password">
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary">Créer l'agent commercial</button>
+          <p class="form-note" id="commercialAgentNote"></p>
+        </form>
+      </div>
+
+      <div class="dashboard-card admin-only">
         <h2>Créer un client société</h2>
         <form id="adminClientForm" class="auth-form">
           <div class="form-row">
@@ -186,6 +215,12 @@
             </label>
           </div>
           <label>
+            Agent commercial
+            <select name="commercial_agent_id" id="adminClientAgentSelect">
+              <option value="">Aucun agent assigné</option>
+            </select>
+          </label>
+          <label>
             Mot de passe temporaire
             <input type="password" name="password" minlength="6" required autocomplete="new-password">
           </label>
@@ -207,12 +242,35 @@
                 <th>Contact</th>
                 <th>SIREN</th>
                 <th>TVA</th>
+                <th>Agent</th>
                 <th>Email</th>
               </tr>
             </thead>
             <tbody id="clientsBody"></tbody>
           </table>
         </div>
+      </div>
+    </section>
+
+    <section id="panel-prix" class="admin-panel" hidden>
+      <div class="dashboard-card">
+        <h2>Prix client personnalisé</h2>
+        <form id="adminCustomerPriceForm" class="auth-form">
+          <label>
+            Client
+            <select name="profile_id" id="adminPriceClientSelect" required></select>
+          </label>
+          <label>
+            Produit
+            <select name="product_slug" id="adminPriceProductSelect" required></select>
+          </label>
+          <label>
+            Prix fixé (€)
+            <input type="number" name="price" min="0" step="0.01" required>
+          </label>
+          <button type="submit" class="btn btn-primary">Fixer le prix</button>
+          <p class="form-note" id="adminCustomerPriceNote"></p>
+        </form>
       </div>
     </section>
 
