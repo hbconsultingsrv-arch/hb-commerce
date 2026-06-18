@@ -420,23 +420,28 @@
           <h2>Chat sociétés</h2>
           <button type="button" id="refreshAdminChatBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
         </div>
-        <div class="form-row">
-          <label>
-            Société
-            <select id="adminChatCompany"></select>
-          </label>
+        <p class="auth-sub" style="margin-bottom:1rem">Sélectionnez une société dans la liste pour consulter l'historique et répondre.</p>
+        <div class="chat-inbox">
+          <aside class="chat-inbox-list">
+            <div id="adminChatList" class="chat-thread-list">
+              <p class="empty-state">Chargement des conversations…</p>
+            </div>
+          </aside>
+          <div class="chat-inbox-conversation">
+            <div id="adminChatSelectedTitle" class="chat-selected-title">Sélectionnez une société</div>
+            <div id="adminChatHistory" class="chat-history">
+              <p class="empty-state">Choisissez une société dans la liste à gauche.</p>
+            </div>
+            <form id="adminChatReplyForm" class="auth-form chat-reply-form">
+              <label>
+                Réponse à la société
+                <textarea name="message" rows="3" required placeholder="Votre réponse" disabled></textarea>
+              </label>
+              <button type="submit" class="btn btn-primary" disabled>Répondre</button>
+              <p class="form-note" id="adminChatNote"></p>
+            </form>
+          </div>
         </div>
-        <div id="adminChatHistory" class="chat-history" style="margin-top:1rem">
-          <p class="empty-state">Sélectionnez une société.</p>
-        </div>
-        <form id="adminChatReplyForm" class="auth-form" style="margin-top:1rem">
-          <label>
-            Réponse à la société
-            <textarea name="message" rows="3" required placeholder="Votre réponse"></textarea>
-          </label>
-          <button type="submit" class="btn btn-primary">Répondre</button>
-          <p class="form-note" id="adminChatNote"></p>
-        </form>
       </div>
     </section>
   </main>

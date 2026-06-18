@@ -4,6 +4,8 @@ let adminSession = null;
 let adminProfile = null;
 let adminProfiles = [];
 let adminSuppliers = [];
+let adminSelectedChatCompanyId = null;
+let adminChatBound = false;
 
 async function initAdmin() {
   adminSession = await requireAdmin();
@@ -628,43 +630,149 @@ function chatStatusLabel(status) {
   return 'Validé';
 }
 
-async function loadAdminChatPanel() {
-  const select = document.getElementById('adminChatCompany');
-  if (!select) return;
+function getChatEligibleProfiles(profiles) {
+  const clients = profiles.filter((profile) => profile.role === 'client');
+  if (isCommercialAgentProfile(adminProfile)) {
+    return clients.filter((profile) => profile.commercial_agent_id === adminProfile.id);
+  }
+  return clients;
+}
 
-  let chatProfiles = [];
+function buildChatSummaries(profiles, messages) {
+  const summaries = new Map(
+    profiles.map((profile) => [profile.id, {
+      profile,
+      pendingCount: 0,
+      lastMessage: null,
+      lastAt: null
+    }])
+  );
+
+  messages.forEach((message) => {
+    const summary = summaries.get(message.company_id);
+    if (!summary) return;
+    if (message.status === 'pending' && message.author_role === 'client') {
+      summary.pendingCount += 1;
+    }
+    if (!summary.lastAt || new Date(message.created_at) > new Date(summary.lastAt)) {
+      summary.lastAt = message.created_at;
+      summary.lastMessage = message;
+    }
+  });
+
+  return [...summaries.values()].sort((a, b) => {
+    const dateA = a.lastAt ? new Date(a.lastAt).getTime() : 0;
+    const dateB = b.lastAt ? new Date(b.lastAt).getTime() : 0;
+    if (dateB !== dateA) return dateB - dateA;
+    return profileLabel(a.profile).localeCompare(profileLabel(b.profile), 'fr');
+  });
+}
+
+function chatPreview(message) {
+  if (!message) return 'Aucun message';
+  const text = String(message.message || '').trim();
+  if (!text) return 'Aucun message';
+  return text.length > 72 ? `${text.slice(0, 72)}…` : text;
+}
+
+function syncAdminChatReplyForm(companyId) {
+  const form = document.getElementById('adminChatReplyForm');
+  if (!form) return;
+  const disabled = !companyId;
+  form.querySelector('textarea')?.toggleAttribute('disabled', disabled);
+  form.querySelector('button[type="submit"]')?.toggleAttribute('disabled', disabled);
+}
+
+async function loadAdminChatPanel() {
+  const listHost = document.getElementById('adminChatList');
+  if (!listHost) return;
+
+  let profiles = [];
+  let messages = [];
   try {
-    chatProfiles = (await fetchAllProfiles()).filter((p) => p.role === 'client');
+    profiles = getChatEligibleProfiles(await fetchAllProfiles());
+    messages = await fetchChatMessages();
   } catch (err) {
-    document.getElementById('adminChatHistory').innerHTML = `<p class="empty-state">${escapeHtml(err.message)}</p>`;
+    listHost.innerHTML = `<p class="empty-state">${escapeHtml(err.message)}</p>`;
     return;
   }
-  select.innerHTML = chatProfiles.length
-    ? chatProfiles.map((p) => `<option value="${p.id}">${escapeHtml(profileLabel(p))}</option>`).join('')
-    : '<option value="">Aucune société</option>';
 
-  select.addEventListener('change', () => renderAdminChat(select.value));
-  document.getElementById('refreshAdminChatBtn')?.addEventListener('click', () => renderAdminChat(select.value));
-  document.getElementById('adminChatReplyForm')?.addEventListener('submit', handleAdminChatReply);
+  const summaries = buildChatSummaries(profiles, messages);
+  if (!summaries.length) {
+    listHost.innerHTML = '<p class="empty-state">Aucune société client disponible.</p>';
+    adminSelectedChatCompanyId = null;
+    syncAdminChatReplyForm(null);
+    return;
+  }
 
-  if (chatProfiles[0]) await renderAdminChat(chatProfiles[0].id);
+  if (!adminSelectedChatCompanyId || !summaries.some((item) => item.profile.id === adminSelectedChatCompanyId)) {
+    adminSelectedChatCompanyId = summaries[0].profile.id;
+  }
+
+  listHost.innerHTML = summaries.map(({ profile, pendingCount, lastMessage, lastAt }) => `
+    <button
+      type="button"
+      class="chat-thread-item ${profile.id === adminSelectedChatCompanyId ? 'active' : ''}"
+      data-chat-company="${profile.id}"
+    >
+      <span class="chat-thread-title">${escapeHtml(profileLabel(profile))}</span>
+      <span class="chat-thread-preview">${escapeHtml(chatPreview(lastMessage))}</span>
+      <span class="chat-thread-meta">
+        <span>${lastAt ? escapeHtml(formatDateTime(lastAt)) : '—'}</span>
+        ${pendingCount ? `<span class="chat-thread-badge">${pendingCount} en attente</span>` : ''}
+      </span>
+    </button>
+  `).join('');
+
+  listHost.querySelectorAll('[data-chat-company]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      adminSelectedChatCompanyId = button.dataset.chatCompany;
+      listHost.querySelectorAll('.chat-thread-item').forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      await renderAdminChat(adminSelectedChatCompanyId);
+    });
+  });
+
+  if (!adminChatBound) {
+    adminChatBound = true;
+    document.getElementById('refreshAdminChatBtn')?.addEventListener('click', async () => {
+      await loadAdminChatPanel();
+      if (adminSelectedChatCompanyId) await renderAdminChat(adminSelectedChatCompanyId);
+    });
+    document.getElementById('adminChatReplyForm')?.addEventListener('submit', handleAdminChatReply);
+  }
+
+  await renderAdminChat(adminSelectedChatCompanyId);
 }
 
 async function renderAdminChat(companyId) {
   const host = document.getElementById('adminChatHistory');
+  const title = document.getElementById('adminChatSelectedTitle');
   if (!host) return;
+
+  syncAdminChatReplyForm(companyId);
+
   if (!companyId) {
-    host.innerHTML = '<p class="empty-state">Aucune société sélectionnée.</p>';
+    if (title) title.textContent = 'Sélectionnez une société';
+    host.innerHTML = '<p class="empty-state">Choisissez une société dans la liste à gauche.</p>';
     return;
   }
 
+  let profiles = [];
   let messages = [];
   try {
+    profiles = getChatEligibleProfiles(await fetchAllProfiles());
     messages = await fetchChatMessages(companyId);
   } catch (err) {
     host.innerHTML = `<p class="empty-state">${escapeHtml(err.message)}</p>`;
     return;
   }
+
+  const profile = profiles.find((item) => item.id === companyId);
+  if (title) {
+    title.textContent = profile ? profileLabel(profile) : 'Société';
+  }
+
   if (!messages.length) {
     host.innerHTML = '<p class="empty-state">Aucun message avec cette société.</p>';
     return;
@@ -674,7 +782,7 @@ async function renderAdminChat(companyId) {
     <article class="chat-message ${msg.author_role === 'client' ? 'from-client' : 'from-admin'}">
       <div class="chat-meta">
         <strong>${msg.author_role === 'client' ? escapeHtml(profileLabel(msg.company)) : 'Administration'}</strong>
-        <span>${formatDate(msg.created_at)}</span>
+        <span>${formatDateTime(msg.created_at)}</span>
         <span class="chat-status ${msg.status}">${chatStatusLabel(msg.status)}</span>
       </div>
       <p>${escapeHtml(msg.message)}</p>
@@ -691,13 +799,13 @@ async function renderAdminChat(companyId) {
   host.querySelectorAll('[data-chat-approve]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       await moderateChatMessage(btn.dataset.chatApprove, 'approved', adminSession.user.id);
-      await renderAdminChat(companyId);
+      await loadAdminChatPanel();
     });
   });
   host.querySelectorAll('[data-chat-reject]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       await moderateChatMessage(btn.dataset.chatReject, 'rejected', adminSession.user.id);
-      await renderAdminChat(companyId);
+      await loadAdminChatPanel();
     });
   });
 }
@@ -705,8 +813,7 @@ async function renderAdminChat(companyId) {
 async function handleAdminChatReply(e) {
   e.preventDefault();
   const note = document.getElementById('adminChatNote');
-  const select = document.getElementById('adminChatCompany');
-  const companyId = select?.value;
+  const companyId = adminSelectedChatCompanyId;
   if (!companyId) return;
 
   const fd = new FormData(e.target);
@@ -719,7 +826,7 @@ async function handleAdminChatReply(e) {
     });
     e.target.reset();
     showAlert(note, 'Réponse envoyée.', 'success');
-    await renderAdminChat(companyId);
+    await loadAdminChatPanel();
   } catch (err) {
     showAlert(note, err.message);
   }

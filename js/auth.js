@@ -144,6 +144,13 @@ function formatDate(iso) {
   });
 }
 
+function formatDateTime(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('fr-FR', {
+    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+  });
+}
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
