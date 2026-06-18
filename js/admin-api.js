@@ -58,6 +58,19 @@ async function updateProfileRole(profileId, role) {
   return data;
 }
 
+async function updateProfileAsSuperRoot(profileId, fields) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { data, error } = await sb
+    .from('profiles')
+    .update(fields)
+    .eq('id', profileId)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
 async function fetchAllProducts() {
   const sb = getSupabase();
   if (!sb) return [];

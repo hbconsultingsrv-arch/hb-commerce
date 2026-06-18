@@ -18,6 +18,8 @@ async function initSuperRoot() {
 
   document.getElementById('refreshProfilesBtn')?.addEventListener('click', loadSuperRootData);
   document.getElementById('customerPriceForm')?.addEventListener('submit', handleCustomerPriceSubmit);
+  document.getElementById('profileEditForm')?.addEventListener('submit', handleProfileEditSubmit);
+  document.getElementById('resetProfileEditBtn')?.addEventListener('click', resetProfileEditForm);
   await loadSuperRootData();
 }
 
@@ -63,8 +65,13 @@ function renderProfilesTable() {
           `).join('')}
         </select>
       </td>
+      <td><button type="button" class="btn btn-sm btn-outline-dark" data-edit-profile="${profile.id}">Modifier</button></td>
     </tr>
   `).join('');
+
+  body.querySelectorAll('[data-edit-profile]').forEach((btn) => {
+    btn.addEventListener('click', () => editProfile(btn.dataset.editProfile));
+  });
 
   body.querySelectorAll('[data-role-profile]').forEach((select) => {
     select.addEventListener('change', async () => {
@@ -78,6 +85,56 @@ function renderProfilesTable() {
       }
     });
   });
+}
+
+function resetProfileEditForm() {
+  const form = document.getElementById('profileEditForm');
+  if (!form) return;
+  form.reset();
+  form.elements.id.value = '';
+  document.getElementById('profileEditTitle').textContent = 'Modifier un utilisateur';
+}
+
+function editProfile(profileId) {
+  const profile = superRootProfiles.find((p) => p.id === profileId);
+  const form = document.getElementById('profileEditForm');
+  if (!profile || !form) return;
+
+  form.elements.id.value = profile.id;
+  form.elements.company.value = profile.company || '';
+  form.elements.full_name.value = profile.full_name || '';
+  form.elements.email.value = profile.email || '';
+  form.elements.phone.value = profile.phone || '';
+  form.elements.address.value = profile.address || '';
+  form.elements.role.value = profile.role || 'client';
+  document.getElementById('profileEditTitle').textContent = `Modifier ${profileLabel(profile)}`;
+  form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function handleProfileEditSubmit(e) {
+  e.preventDefault();
+  const note = document.getElementById('profileEditNote');
+  const fd = new FormData(e.target);
+  const profileId = fd.get('id');
+  if (!profileId) {
+    showAlert(note, 'Sélectionnez un utilisateur à modifier.');
+    return;
+  }
+
+  try {
+    await updateProfileAsSuperRoot(profileId, {
+      company: fd.get('company') || '',
+      full_name: fd.get('full_name') || '',
+      email: fd.get('email') || '',
+      phone: fd.get('phone') || '',
+      address: fd.get('address') || '',
+      role: fd.get('role')
+    });
+    showAlert(note, 'Utilisateur mis à jour.', 'success');
+    await loadSuperRootData();
+  } catch (err) {
+    showAlert(note, err.message);
+  }
 }
 
 function renderPriceSelectors() {
