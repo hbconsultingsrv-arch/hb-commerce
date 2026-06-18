@@ -52,6 +52,18 @@ async function fetchAllProfiles() {
   return data || [];
 }
 
+async function fetchInternalProfiles() {
+  const sb = getSupabase();
+  if (!sb) return [];
+  const { data, error } = await sb
+    .from('profiles')
+    .select('*')
+    .in('role', ['agent_commercial', 'admin', 'super_root'])
+    .order('full_name', { ascending: true });
+  if (error) throw error;
+  return (data || []).filter((profile) => !['client', 'supplier', 'pending_company'].includes(profile.role));
+}
+
 async function updateProfileRole(profileId, role) {
   const sb = getSupabase();
   if (!sb) throw new Error(configErrorMessage());

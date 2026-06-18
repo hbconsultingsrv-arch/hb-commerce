@@ -9,7 +9,9 @@ const INTERNAL_ROLE_LABELS = {
 };
 
 function isInternalProfile(profile) {
-  return INTERNAL_ROLES.includes(profile?.role);
+  if (!profile) return false;
+  if (['client', 'supplier', 'pending_company'].includes(profile.role)) return false;
+  return INTERNAL_ROLES.includes(profile.role);
 }
 
 function personLabel(profile) {
@@ -31,8 +33,9 @@ async function initSuperRoot() {
 
 async function loadSuperRootData() {
   try {
-    const profiles = await fetchAllProfiles();
-    superRootProfiles = profiles.filter(isInternalProfile);
+    superRootProfiles = typeof fetchInternalProfiles === 'function'
+      ? await fetchInternalProfiles()
+      : (await fetchAllProfiles()).filter(isInternalProfile);
     renderProfilesTable();
   } catch (err) {
     showAlert(document.getElementById('profilesNote'), err.message);
@@ -66,8 +69,14 @@ function renderProfilesTable() {
   body.querySelectorAll('[data-role-profile]').forEach((select) => {
     select.addEventListener('change', async () => {
       const note = document.getElementById('profilesNote');
+      const newRole = select.value;
+      if (!INTERNAL_ROLES.includes(newRole)) {
+        showAlert(note, 'Seuls les rôles internes HB Commerce sont autorisés ici.');
+        await loadSuperRootData();
+        return;
+      }
       try {
-        await updateProfileRole(select.dataset.roleProfile, select.value);
+        await updateProfileRole(select.dataset.roleProfile, newRole);
         showAlert(note, 'Rôle mis à jour.', 'success');
         await loadSuperRootData();
       } catch (err) {
