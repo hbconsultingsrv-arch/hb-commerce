@@ -755,3 +755,12 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 1024px) {
+  .hero-commerce .nav {
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+    background: rgba(15, 61, 50, 0.98);
+  }
+}
