@@ -18,6 +18,26 @@ function personLabel(profile) {
   return profile?.full_name || profile?.email || 'Utilisateur';
 }
 
+function showSuperRootSection(sectionId) {
+  const panel = document.getElementById('superRootPanel');
+  if (!panel || !sectionId) return;
+  panel.querySelectorAll('#superRootTabs .admin-tab[data-section]').forEach((tab) => {
+    tab.classList.toggle('active', tab.dataset.section === sectionId);
+  });
+  panel.querySelectorAll('[data-section-panel]').forEach((section) => {
+    section.hidden = section.dataset.sectionPanel !== sectionId;
+  });
+}
+
+function bindSuperRootTabs() {
+  const panel = document.getElementById('superRootPanel');
+  if (!panel || panel.dataset.tabsBound === '1') return;
+  panel.dataset.tabsBound = '1';
+  panel.querySelectorAll('#superRootTabs .admin-tab[data-section]').forEach((tab) => {
+    tab.addEventListener('click', () => showSuperRootSection(tab.dataset.section));
+  });
+}
+
 async function initSuperRoot() {
   const session = await requireSuperRoot();
   if (!session) return;
@@ -27,7 +47,8 @@ async function initSuperRoot() {
   document.getElementById('internalUserForm')?.addEventListener('submit', handleInternalUserSubmit);
   document.getElementById('profileEditForm')?.addEventListener('submit', handleProfileEditSubmit);
   document.getElementById('resetProfileEditBtn')?.addEventListener('click', resetProfileEditForm);
-  bindSectionTabs();
+  bindSuperRootTabs();
+  showSuperRootSection('equipe');
   await loadSuperRootData();
 }
 
@@ -108,7 +129,7 @@ async function handleInternalUserSubmit(e) {
     });
     showAlert(note, 'Utilisateur interne HB Commerce créé.', 'success');
     e.target.reset();
-    activateSectionTab('superRootPanel', 'equipe');
+    showSuperRootSection('equipe');
     await loadSuperRootData();
   } catch (err) {
     showAlert(note, mapAuthError(err));
@@ -126,7 +147,7 @@ function editProfile(profileId) {
   form.elements.phone.value = profile.phone || '';
   form.elements.role.value = profile.role || 'agent_commercial';
   document.getElementById('profileEditTitle').textContent = `Modifier ${personLabel(profile)}`;
-  activateSectionTab('superRootPanel', 'modifier');
+  showSuperRootSection('modifier');
 }
 
 async function handleProfileEditSubmit(e) {
@@ -155,7 +176,7 @@ async function handleProfileEditSubmit(e) {
     });
     showAlert(note, 'Utilisateur interne mis à jour.', 'success');
     resetProfileEditForm();
-    activateSectionTab('superRootPanel', 'equipe');
+    showSuperRootSection('equipe');
     await loadSuperRootData();
   } catch (err) {
     showAlert(note, err.message);
