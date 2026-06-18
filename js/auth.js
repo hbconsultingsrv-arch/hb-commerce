@@ -216,7 +216,30 @@ function bindMobileNav() {
   });
 }
 
+function bindPasswordToggles() {
+  document.querySelectorAll('input[type="password"]').forEach((input) => {
+    if (input.dataset.passwordToggleBound === '1') return;
+    input.dataset.passwordToggleBound = '1';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'password-toggle';
+    button.textContent = 'Afficher';
+    button.setAttribute('aria-label', 'Afficher le mot de passe');
+
+    button.addEventListener('click', () => {
+      const visible = input.type === 'text';
+      input.type = visible ? 'password' : 'text';
+      button.textContent = visible ? 'Afficher' : 'Masquer';
+      button.setAttribute('aria-label', visible ? 'Afficher le mot de passe' : 'Masquer le mot de passe');
+    });
+
+    input.insertAdjacentElement('afterend', button);
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   bindMobileNav();
+  bindPasswordToggles();
   updateNavAuth();
 });
