@@ -29,6 +29,15 @@ function profileLabel(profile) {
   return profile?.company || profile?.full_name || profile?.email || 'Société';
 }
 
+function commercialAgentLabel(profile) {
+  const roleLabel = {
+    agent_commercial: 'agent commercial',
+    admin: 'admin',
+    super_root: 'super root'
+  }[profile?.role] || profile?.role || 'agent';
+  return `${profileLabel(profile)} (${roleLabel})`;
+}
+
 function productLabel(product) {
   return product?.name || product?.slug || 'Produit';
 }
@@ -55,9 +64,9 @@ async function loadSuperRootData() {
 function renderSuperRootAgentSelectors() {
   const select = document.getElementById('profileCreateAgentSelect');
   if (!select) return;
-  const agents = superRootProfiles.filter((profile) => profile.role === 'agent_commercial');
+  const agents = superRootProfiles.filter(isCommercialAssignableProfile);
   select.innerHTML = '<option value="">Aucun agent assigné</option>'
-    + agents.map((agent) => `<option value="${agent.id}">${escapeHtml(profileLabel(agent))}</option>`).join('');
+    + agents.map((agent) => `<option value="${agent.id}">${escapeHtml(commercialAgentLabel(agent))}</option>`).join('');
 }
 
 function renderProfilesTable() {

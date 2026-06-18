@@ -102,6 +102,10 @@ function isCommercialAgentProfile(profile) {
   return profile?.role === 'agent_commercial';
 }
 
+function isCommercialAssignableProfile(profile) {
+  return ['agent_commercial', 'admin', 'super_root'].includes(profile?.role);
+}
+
 function isSupplierProfile(profile) {
   return profile?.role === 'supplier';
 }

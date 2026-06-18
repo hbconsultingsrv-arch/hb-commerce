@@ -395,13 +395,22 @@ function profileLabel(profile) {
   return profile?.company || profile?.full_name || profile?.email || 'Société';
 }
 
+function commercialAgentLabel(profile) {
+  const roleLabel = {
+    agent_commercial: 'agent commercial',
+    admin: 'admin',
+    super_root: 'super root'
+  }[profile?.role] || profile?.role || 'agent';
+  return `${profileLabel(profile)} (${roleLabel})`;
+}
+
 async function loadClientsPanel() {
   const body = document.getElementById('clientsBody');
   if (!body) return;
   try {
     adminProfiles = await fetchAllProfiles();
     const clients = adminProfiles.filter((p) => p.role === 'client');
-    const agents = adminProfiles.filter((p) => p.role === 'agent_commercial');
+    const agents = adminProfiles.filter(isCommercialAssignableProfile);
     renderAgentSelect(document.getElementById('adminClientAgentSelect'), agents);
     body.innerHTML = clients.length ? clients.map((profile) => `
       <tr>
@@ -413,7 +422,7 @@ async function loadClientsPanel() {
           ${isCommercialAgentProfile(adminProfile) ? escapeHtml(agentName(profile.commercial_agent_id, agents)) : `
             <select data-assign-agent="${profile.id}">
               <option value="">Aucun agent</option>
-              ${agents.map((agent) => `<option value="${agent.id}" ${profile.commercial_agent_id === agent.id ? 'selected' : ''}>${escapeHtml(profileLabel(agent))}</option>`).join('')}
+              ${agents.map((agent) => `<option value="${agent.id}" ${profile.commercial_agent_id === agent.id ? 'selected' : ''}>${escapeHtml(commercialAgentLabel(agent))}</option>`).join('')}
             </select>
           `}
         </td>
@@ -436,12 +445,12 @@ async function loadClientsPanel() {
 function renderAgentSelect(select, agents) {
   if (!select) return;
   select.innerHTML = '<option value="">Aucun agent assigné</option>'
-    + agents.map((agent) => `<option value="${agent.id}">${escapeHtml(profileLabel(agent))}</option>`).join('');
+    + agents.map((agent) => `<option value="${agent.id}">${escapeHtml(commercialAgentLabel(agent))}</option>`).join('');
 }
 
 function agentName(agentId, agents) {
   const agent = agents.find((p) => p.id === agentId);
-  return agent ? profileLabel(agent) : 'Aucun agent';
+  return agent ? commercialAgentLabel(agent) : 'Aucun agent';
 }
 
 async function handleCommercialAgentSubmit(e) {
