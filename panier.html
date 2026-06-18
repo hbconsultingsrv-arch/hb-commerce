@@ -51,20 +51,18 @@
       <div class="cart-summary">
         <div class="total-line">
           <span>Total</span>
-          <span id="cartTotal">0,00 €</span>
+          <span id="cartTotal">xx</span>
         </div>
         <a href="checkout.html" class="btn btn-primary btn-full" style="margin-top:1rem">Passer commande</a>
       </div>
     </div>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/cart-page.js"></script>
-  <script>
-    function formatPrice(amount) {
-      return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
-    }
-  </script>
 </body>
 </html>

@@ -19,7 +19,7 @@ function renderCartPage() {
       <tr>
         <td><img src="${item.image_url}" alt=""></td>
         <td><strong>${item.name}</strong></td>
-        <td>${formatPrice(item.price)} / ${item.unit}</td>
+        <td>${formatDisplayUnitPrice(item.price, item.unit)}</td>
         <td>
           <div class="qty-control">
             <button type="button" data-action="minus" data-id="${item.id}">−</button>
@@ -27,13 +27,13 @@ function renderCartPage() {
             <button type="button" data-action="plus" data-id="${item.id}">+</button>
           </div>
         </td>
-        <td><strong>${formatPrice(item.price * item.quantity)}</strong></td>
+        <td><strong>${formatDisplayPrice(item.price * item.quantity)}</strong></td>
         <td><button type="button" class="btn btn-sm btn-outline-dark" data-action="remove" data-id="${item.id}">Supprimer</button></td>
       </tr>
     `).join('');
   }
 
-  if (totalEl) totalEl.textContent = formatPrice(getCartTotal());
+  if (totalEl) totalEl.textContent = formatDisplayPrice(getCartTotal());
 
   bodyEl?.querySelectorAll('[data-action]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -60,4 +60,9 @@ function renderCartPage() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', renderCartPage);
+document.addEventListener('DOMContentLoaded', async () => {
+  if (typeof refreshPriceVisibility === 'function') {
+    await refreshPriceVisibility();
+  }
+  renderCartPage();
+});

@@ -1,6 +1,9 @@
 async function initCheckout() {
   const session = await requireAuth();
   if (!session) return;
+  if (typeof refreshPriceVisibility === 'function') {
+    await refreshPriceVisibility(session);
+  }
 
   const cart = getCart();
   if (!cart.length) {
@@ -17,13 +20,13 @@ async function initCheckout() {
     summaryEl.innerHTML = cart.map((item) => `
       <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #eee">
         <span>${item.name} × ${item.quantity} ${item.unit}</span>
-        <strong>${formatPrice(item.price * item.quantity)}</strong>
+        <strong>${formatDisplayPrice(item.price * item.quantity)}</strong>
       </div>
     `).join('');
   }
 
   const total = getCartTotal();
-  if (totalEl) totalEl.textContent = formatPrice(total);
+  if (totalEl) totalEl.textContent = formatDisplayPrice(total);
 
   if (form) {
     const nameInput = form.querySelector('[name="full_name"]');

@@ -88,6 +88,8 @@ function renderProductCard(product) {
   const acidity = product.acidity || '';
   const acidityDisplay = typeof formatAcidity === 'function' ? formatAcidity(acidity) : acidity;
   const packaging = getPackagingLabel(product.packaging_type);
+  const priceDisplay = typeof formatDisplayPrice === 'function' ? formatDisplayPrice(product.price) : formatPrice(product.price);
+  const unitDisplay = typeof canViewPrices === 'function' && !canViewPrices() ? '' : `/ ${product.unit}`;
 
   return `
     <article class="${cardClass}" data-product-id="${product.id}" data-category="${product.category || ''}">
@@ -104,8 +106,8 @@ function renderProductCard(product) {
         ${acidity ? `<p class="acidity-line">Acidit&eacute; : <strong>${acidityDisplay}</strong></p>` : ''}
         <p class="product-desc">${product.description || ''}</p>
         <div class="price-row">
-          <span class="price">${formatPrice(product.price)}</span>
-          <span class="unit">/ ${product.unit}</span>
+          <span class="price">${priceDisplay}</span>
+          ${unitDisplay ? `<span class="unit">${unitDisplay}</span>` : ''}
         </div>
         <p class="form-note min-qty">Minimum : ${minQty} ${product.unit}(s)</p>
         <div class="product-actions">

@@ -4,6 +4,10 @@ async function initProductsPage() {
   const qualityHost = document.getElementById('qualitySection');
   if (!grid) return;
 
+  if (typeof refreshPriceVisibility === 'function') {
+    await refreshPriceVisibility();
+  }
+
   if (qualityHost && typeof renderQualitySection === 'function') {
     qualityHost.innerHTML = renderQualitySection();
   }
@@ -32,6 +36,10 @@ async function initProductsPage() {
 }
 
 async function initHomeProducts() {
+  if (typeof refreshPriceVisibility === 'function') {
+    await refreshPriceVisibility();
+  }
+
   const showcase = document.getElementById('categoryShowcase');
   if (showcase && typeof renderCategoryShowcase === 'function') {
     showcase.innerHTML = renderCategoryShowcase();

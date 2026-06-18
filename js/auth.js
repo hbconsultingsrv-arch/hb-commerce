@@ -90,6 +90,34 @@ function formatPrice(amount) {
   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 }
 
+const PRICE_MASK_TEXT = 'xx';
+window.HB_CAN_VIEW_PRICES = false;
+
+function canViewPrices() {
+  return window.HB_CAN_VIEW_PRICES === true;
+}
+
+function formatDisplayPrice(amount) {
+  return canViewPrices() ? formatPrice(amount) : PRICE_MASK_TEXT;
+}
+
+function formatDisplayUnitPrice(amount, unit) {
+  return canViewPrices() ? `${formatPrice(amount)} / ${unit}` : PRICE_MASK_TEXT;
+}
+
+function applyPriceVisibility(root = document) {
+  root.querySelectorAll('[data-private-price]').forEach((el) => {
+    el.textContent = canViewPrices() ? el.dataset.privatePrice : PRICE_MASK_TEXT;
+  });
+}
+
+async function refreshPriceVisibility(session = undefined) {
+  const currentSession = session === undefined ? await getSession() : session;
+  window.HB_CAN_VIEW_PRICES = !!currentSession;
+  applyPriceVisibility();
+  return canViewPrices();
+}
+
 function showAlert(el, message, type = 'error') {
   if (!el) return;
   el.textContent = message;
@@ -104,6 +132,7 @@ async function updateNavAuth() {
   const cartBadge = document.getElementById('cartBadge');
 
   const session = await getSession();
+  await refreshPriceVisibility(session);
 
   if (session) {
     if (loginLink) loginLink.style.display = 'none';
