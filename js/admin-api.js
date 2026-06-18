@@ -86,7 +86,7 @@ function getDetachedSupabaseClient() {
   );
 }
 
-async function createUserAsSuperRoot({ email, password, fullName, phone, address, company, role }) {
+async function createUserAsSuperRoot({ email, password, fullName, phone, address, company, role = 'client' }) {
   const authClient = getDetachedSupabaseClient();
   const { data, error } = await authClient.auth.signUp({
     email,

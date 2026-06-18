@@ -109,7 +109,7 @@ async function handleProfileCreateSubmit(e) {
       phone: fd.get('phone'),
       address: fd.get('address'),
       company: fd.get('company'),
-      role: fd.get('role')
+      role: 'client'
     });
     e.target.reset();
     showAlert(note, 'Utilisateur créé. Il peut confirmer son e-mail puis se connecter.', 'success');

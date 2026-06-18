@@ -66,20 +66,16 @@
           <div class="form-row">
             <label>
               Rôle
-              <select name="role" required>
-                <option value="client">Client</option>
-                <option value="admin">Admin</option>
-                <option value="super_root">Super root</option>
-              </select>
+              <input type="text" value="Client" disabled>
             </label>
             <label>
               Mot de passe temporaire
               <input type="password" name="password" minlength="6" required autocomplete="new-password">
             </label>
           </div>
-          <button type="submit" class="btn btn-primary">Créer l'utilisateur</button>
+          <button type="submit" class="btn btn-primary">Créer le client</button>
           <p class="form-note" id="profileCreateNote"></p>
-          <p class="form-note">L'utilisateur recevra l'e-mail de confirmation Supabase si la confirmation e-mail est active.</p>
+          <p class="form-note">Le compte est créé avec le rôle client. Le super root peut modifier le rôle ensuite si nécessaire.</p>
         </form>
       </div>
 
