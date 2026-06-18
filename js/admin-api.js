@@ -175,6 +175,44 @@ async function createCommercialAgentUser({ email, password, fullName, phone }) {
   return savedProfile;
 }
 
+async function createInternalUser({ email, password, fullName, phone, role }) {
+  if (!['agent_commercial', 'admin', 'super_root'].includes(role)) {
+    throw new Error('Rôle interne invalide.');
+  }
+  const authClient = getDetachedSupabaseClient();
+  const { data, error } = await authClient.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: getEmailConfirmRedirectUrl(),
+      data: {
+        full_name: fullName || '',
+        phone: phone || '',
+        company: 'HB Commerce'
+      }
+    }
+  });
+  if (error) throw error;
+  if (!data.user?.id) throw new Error('Utilisateur interne non créé dans Supabase Auth.');
+
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { data: savedProfile, error: profileError } = await sb
+    .from('profiles')
+    .upsert({
+      id: data.user.id,
+      email,
+      full_name: fullName || '',
+      phone: phone || '',
+      company: 'HB Commerce',
+      role
+    }, { onConflict: 'id' })
+    .select()
+    .single();
+  if (profileError) throw profileError;
+  return savedProfile;
+}
+
 async function createSupplierUser({ supplierId, email, password, fullName, phone }) {
   const authClient = getDetachedSupabaseClient();
   const { data, error } = await authClient.auth.signUp({

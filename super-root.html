@@ -37,8 +37,15 @@
 
     <section id="panel-access" class="admin-panel">
       <div class="dashboard-card">
-        <h2>Créer un client société</h2>
+        <h2>Créer société client / fournisseur</h2>
         <form id="profileCreateForm" class="auth-form">
+          <label>
+            Type de société
+            <select name="company_type" id="profileCreateCompanyTypeSelect" required>
+              <option value="client">Client</option>
+              <option value="supplier">Fournisseur</option>
+            </select>
+          </label>
           <div class="form-row">
             <label>
               Société
@@ -78,7 +85,7 @@
               Rôle
               <input type="text" value="Client" disabled>
             </label>
-            <label>
+            <label class="client-only-field">
               Agent commercial
               <select name="commercial_agent_id" id="profileCreateAgentSelect">
                 <option value="">Aucun agent assigné</option>
@@ -91,9 +98,46 @@
               <input type="password" name="password" minlength="6" required autocomplete="new-password">
             </label>
           </div>
-          <button type="submit" class="btn btn-primary">Créer le client</button>
+          <button type="submit" class="btn btn-primary">Créer la société</button>
           <p class="form-note" id="profileCreateNote"></p>
-          <p class="form-note">Le compte est créé avec le rôle client. Le super root peut modifier le rôle ensuite si nécessaire.</p>
+          <p class="form-note">Les sociétés inscrites ou créées sont ensuite suivies comme client ou fournisseur.</p>
+        </form>
+      </div>
+
+      <div class="dashboard-card">
+        <h2>Créer utilisateur interne HB Commerce</h2>
+        <form id="internalUserForm" class="auth-form">
+          <label>
+            Profil interne
+            <select name="internal_role" required>
+              <option value="agent_commercial">Agent commercial</option>
+              <option value="admin">Admin</option>
+              <option value="super_root">Super root</option>
+            </select>
+          </label>
+          <div class="form-row">
+            <label>
+              Nom utilisateur
+              <input type="text" name="full_name" required placeholder="Nom de la personne">
+            </label>
+            <label>
+              E-mail
+              <input type="email" name="email" required placeholder="prenom.nom@hbcommerce.fr">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Téléphone
+              <input type="tel" name="phone" placeholder="Téléphone">
+            </label>
+            <label>
+              Mot de passe temporaire
+              <input type="password" name="password" minlength="6" required autocomplete="new-password">
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary">Créer l'utilisateur interne</button>
+          <p class="form-note" id="internalUserNote"></p>
+          <p class="form-note">Ces comptes sont rattachés à HB Commerce. Aucun champ société n’est requis.</p>
         </form>
       </div>
 
@@ -138,6 +182,7 @@
           <label>
             Rôle
             <select name="role">
+              <option value="pending_company">Société en attente</option>
               <option value="client">Client</option>
               <option value="supplier">Fournisseur</option>
               <option value="agent_commercial">Agent commercial</option>

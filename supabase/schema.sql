@@ -13,16 +13,16 @@ create table if not exists public.profiles (
   vat_number text,
   commercial_agent_id uuid references public.profiles(id),
   supplier_id uuid,
-  role text default 'client' check (role in ('client', 'supplier', 'agent_commercial', 'admin', 'super_root')),
+  role text default 'pending_company' check (role in ('pending_company', 'client', 'supplier', 'agent_commercial', 'admin', 'super_root')),
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
 
 alter table public.profiles drop constraint if exists profiles_role_check;
 update public.profiles set role = 'client' where role = 'user';
-alter table public.profiles alter column role set default 'client';
+alter table public.profiles alter column role set default 'pending_company';
 alter table public.profiles add constraint profiles_role_check
-  check (role in ('client', 'supplier', 'agent_commercial', 'admin', 'super_root'));
+  check (role in ('pending_company', 'client', 'supplier', 'agent_commercial', 'admin', 'super_root'));
 alter table public.profiles add column if not exists siren text;
 alter table public.profiles add column if not exists vat_number text;
 alter table public.profiles add column if not exists commercial_agent_id uuid references public.profiles(id);
@@ -265,8 +265,8 @@ begin
     and not public.is_super_root()
     and not (
       public.is_admin()
-      and old.role in ('client', 'supplier', 'agent_commercial')
-      and new.role in ('client', 'supplier', 'agent_commercial')
+      and old.role in ('pending_company', 'client', 'supplier', 'agent_commercial')
+      and new.role in ('pending_company', 'client', 'supplier', 'agent_commercial')
     )
     and session_user not in ('postgres', 'supabase_admin')
   then
@@ -303,8 +303,8 @@ create policy "Users update own profile" on public.profiles for update using (au
 create policy "Users insert own profile" on public.profiles for insert with check (auth.uid() = id);
 create policy "Admin read all profiles" on public.profiles for select using (public.is_admin());
 create policy "Admin manage client profiles" on public.profiles for all
-  using (public.is_admin() and role in ('client', 'supplier', 'agent_commercial'))
-  with check (public.is_admin() and role in ('client', 'supplier', 'agent_commercial'));
+  using (public.is_admin() and role in ('pending_company', 'client', 'supplier', 'agent_commercial'))
+  with check (public.is_admin() and role in ('pending_company', 'client', 'supplier', 'agent_commercial'));
 create policy "Commercial agent read assigned profiles" on public.profiles for select
   using (role = 'client' and commercial_agent_id = auth.uid());
 create policy "Super root manage profiles" on public.profiles for all
@@ -451,7 +451,7 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.profiles (id, email, full_name, phone, company, address, siren, vat_number)
+  insert into public.profiles (id, email, full_name, phone, company, address, siren, vat_number, role)
   values (
     new.id,
     new.email,
@@ -460,7 +460,8 @@ begin
     coalesce(new.raw_user_meta_data->>'company', ''),
     coalesce(new.raw_user_meta_data->>'address', ''),
     coalesce(new.raw_user_meta_data->>'siren', ''),
-    coalesce(new.raw_user_meta_data->>'vat_number', '')
+    coalesce(new.raw_user_meta_data->>'vat_number', ''),
+    coalesce(new.raw_user_meta_data->>'role', 'pending_company')
   );
   return new;
 end;

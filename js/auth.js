@@ -63,7 +63,8 @@ async function signUp({ email, password, fullName, phone, company, address, sire
         company: company || '',
         address: address || '',
         siren: siren || '',
-        vat_number: vatNumber || ''
+        vat_number: vatNumber || '',
+        role: 'pending_company'
       }
     }
   });

@@ -14,6 +14,9 @@ async function initAdmin() {
   const superRootLink = document.getElementById('superRootLink');
   if (superRootLink && isSuperRootProfile(adminProfile)) superRootLink.style.display = '';
   const commercialAgent = isCommercialAgentProfile(adminProfile);
+  if (!isSuperRootProfile(adminProfile)) {
+    document.querySelectorAll('.super-root-only').forEach((el) => el.remove());
+  }
 
   document.querySelectorAll('.admin-tab').forEach((tab) => {
     tab.addEventListener('click', () => {
@@ -48,8 +51,10 @@ async function initAdmin() {
   document.getElementById('supplierOrderForm')?.addEventListener('submit', handleSupplierOrderSubmit);
   document.getElementById('adminClientForm')?.addEventListener('submit', handleAdminClientSubmit);
   document.getElementById('commercialAgentForm')?.addEventListener('submit', handleCommercialAgentSubmit);
+  document.getElementById('adminCompanyTypeSelect')?.addEventListener('change', syncCompanyTypeFields);
   document.getElementById('refreshClientsBtn')?.addEventListener('click', loadClientsPanel);
   document.getElementById('adminCustomerPriceForm')?.addEventListener('submit', handleAdminCustomerPriceSubmit);
+  syncCompanyTypeFields();
 }
 
 async function loadProductsTable() {
@@ -413,12 +418,19 @@ async function loadClientsPanel() {
   if (!body) return;
   try {
     adminProfiles = await fetchAllProfiles();
-    const clients = adminProfiles.filter((p) => p.role === 'client');
+    const clients = adminProfiles.filter((p) => ['pending_company', 'client', 'supplier'].includes(p.role));
     const agents = adminProfiles.filter(isCommercialAssignableProfile);
     renderAgentSelect(document.getElementById('adminClientAgentSelect'), agents);
     body.innerHTML = clients.length ? clients.map((profile) => `
       <tr>
         <td><strong>${escapeHtml(profile.company || '—')}</strong><br><small>${escapeHtml(profile.address || '')}</small></td>
+        <td>
+          ${isCommercialAgentProfile(adminProfile) ? companyRoleLabel(profile.role) : `
+            <select data-company-role="${profile.id}">
+              ${['pending_company', 'client', 'supplier'].map((role) => `<option value="${role}" ${profile.role === role ? 'selected' : ''}>${companyRoleLabel(role)}</option>`).join('')}
+            </select>
+          `}
+        </td>
         <td>${escapeHtml(profile.full_name || '—')}</td>
         <td>${escapeHtml(profile.siren || '—')}</td>
         <td>${escapeHtml(profile.vat_number || '—')}</td>
@@ -432,7 +444,7 @@ async function loadClientsPanel() {
         </td>
         <td>${escapeHtml(profile.email || '—')}</td>
       </tr>
-    `).join('') : '<tr><td colspan="6">Aucun client.</td></tr>';
+    `).join('') : '<tr><td colspan="7">Aucune société.</td></tr>';
     body.querySelectorAll('[data-assign-agent]').forEach((select) => {
       select.addEventListener('change', async () => {
         await assignCommercialAgent(select.dataset.assignAgent, select.value);
@@ -441,9 +453,52 @@ async function loadClientsPanel() {
         await loadAdminPricePanel();
       });
     });
+    body.querySelectorAll('[data-company-role]').forEach((select) => {
+      select.addEventListener('change', async () => {
+        await updateCompanyRole(select.dataset.companyRole, select.value);
+        await loadClientsPanel();
+        await loadAdminChatPanel();
+        await loadAdminPricePanel();
+      });
+    });
   } catch (err) {
-    body.innerHTML = `<tr><td colspan="6">${escapeHtml(err.message)}</td></tr>`;
+    body.innerHTML = `<tr><td colspan="7">${escapeHtml(err.message)}</td></tr>`;
   }
+}
+
+async function updateCompanyRole(profileId, role) {
+  const profile = adminProfiles.find((p) => p.id === profileId);
+  const fields = { role };
+  if (role === 'supplier') {
+    let supplierId = profile?.supplier_id;
+    if (!supplierId) {
+      const supplier = await createSupplier({
+        name: profile?.company || profile?.full_name || profile?.email || 'Fournisseur',
+        contact_name: profile?.full_name || '',
+        email: profile?.email || '',
+        phone: profile?.phone || '',
+        address: profile?.address || '',
+        siren: profile?.siren || '',
+        vat_number: profile?.vat_number || '',
+        active: true
+      });
+      supplierId = supplier.id;
+    }
+    fields.supplier_id = supplierId;
+    fields.commercial_agent_id = null;
+  }
+  if (role === 'client' || role === 'pending_company') {
+    fields.supplier_id = null;
+  }
+  await updateProfileAsSuperRoot(profileId, fields);
+}
+
+function companyRoleLabel(role) {
+  return {
+    pending_company: 'À affecter',
+    client: 'Client',
+    supplier: 'Fournisseur'
+  }[role] || role || '—';
 }
 
 function renderAgentSelect(select, agents) {
@@ -461,42 +516,78 @@ async function handleCommercialAgentSubmit(e) {
   e.preventDefault();
   const note = document.getElementById('commercialAgentNote');
   const fd = new FormData(e.target);
+  const role = fd.get('internal_role');
+  if (role === 'super_root' && !isSuperRootProfile(adminProfile)) {
+    showAlert(note, 'Seul un super root peut créer un autre super root.');
+    return;
+  }
   try {
-    await createCommercialAgentUser({
+    await createInternalUser({
       email: fd.get('email'),
       password: fd.get('password'),
       fullName: fd.get('full_name'),
-      phone: fd.get('phone')
+      phone: fd.get('phone'),
+      role
     });
     e.target.reset();
-    showAlert(note, 'Agent commercial créé.', 'success');
+    showAlert(note, 'Utilisateur interne créé.', 'success');
     await loadClientsPanel();
   } catch (err) {
     showAlert(note, mapAuthError(err));
   }
 }
 
+function syncCompanyTypeFields() {
+  const type = document.getElementById('adminCompanyTypeSelect')?.value || 'client';
+  document.querySelectorAll('.client-only-field').forEach((el) => {
+    el.style.display = type === 'client' ? '' : 'none';
+  });
+}
+
 async function handleAdminClientSubmit(e) {
   e.preventDefault();
   const note = document.getElementById('adminClientNote');
   const fd = new FormData(e.target);
+  const companyType = fd.get('company_type');
   try {
-    await createClientUser({
-      email: fd.get('email'),
-      password: fd.get('password'),
-      fullName: fd.get('full_name'),
-      phone: fd.get('phone'),
-      address: fd.get('address'),
-      company: fd.get('company'),
-      siren: fd.get('siren'),
-      vatNumber: fd.get('vat_number'),
-      commercialAgentId: fd.get('commercial_agent_id')
-    });
+    if (companyType === 'supplier') {
+      const supplier = await createSupplier({
+        name: fd.get('company'),
+        contact_name: fd.get('full_name'),
+        email: fd.get('email'),
+        phone: fd.get('phone'),
+        address: fd.get('address'),
+        siren: fd.get('siren'),
+        vat_number: fd.get('vat_number'),
+        active: true
+      });
+      await createSupplierUser({
+        supplierId: supplier.id,
+        email: fd.get('email'),
+        password: fd.get('password'),
+        fullName: fd.get('full_name'),
+        phone: fd.get('phone')
+      });
+    } else {
+      await createClientUser({
+        email: fd.get('email'),
+        password: fd.get('password'),
+        fullName: fd.get('full_name'),
+        phone: fd.get('phone'),
+        address: fd.get('address'),
+        company: fd.get('company'),
+        siren: fd.get('siren'),
+        vatNumber: fd.get('vat_number'),
+        commercialAgentId: fd.get('commercial_agent_id')
+      });
+    }
     e.target.reset();
-    showAlert(note, 'Client créé avec le rôle client.', 'success');
+    showAlert(note, companyType === 'supplier' ? 'Société fournisseur créée.' : 'Société cliente créée.', 'success');
     await loadClientsPanel();
+    await loadSuppliersTable();
     await loadAdminChatPanel();
     await loadAdminPricePanel();
+    syncCompanyTypeFields();
   } catch (err) {
     showAlert(note, mapAuthError(err));
   }

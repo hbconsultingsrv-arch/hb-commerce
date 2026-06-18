@@ -19,10 +19,13 @@ async function initSuperRoot() {
   document.getElementById('refreshProfilesBtn')?.addEventListener('click', loadSuperRootData);
   document.getElementById('customerPriceForm')?.addEventListener('submit', handleCustomerPriceSubmit);
   document.getElementById('profileCreateForm')?.addEventListener('submit', handleProfileCreateSubmit);
+  document.getElementById('internalUserForm')?.addEventListener('submit', handleInternalUserSubmit);
   document.getElementById('profileEditForm')?.addEventListener('submit', handleProfileEditSubmit);
   document.getElementById('resetProfileEditBtn')?.addEventListener('click', resetProfileEditForm);
   document.querySelector('#profileEditForm [name="role"]')?.addEventListener('change', syncInternalCompany);
+  document.getElementById('profileCreateCompanyTypeSelect')?.addEventListener('change', syncSuperRootCompanyTypeFields);
   await loadSuperRootData();
+  syncSuperRootCompanyTypeFields();
 }
 
 function profileLabel(profile) {
@@ -86,7 +89,7 @@ function renderProfilesTable() {
       <td>${escapeHtml(profile.email || '—')}</td>
       <td>
         <select data-role-profile="${profile.id}">
-          ${['client', 'supplier', 'agent_commercial', 'admin', 'super_root'].map((role) => `
+          ${['pending_company', 'client', 'supplier', 'agent_commercial', 'admin', 'super_root'].map((role) => `
             <option value="${role}" ${profile.role === role ? 'selected' : ''}>${role}</option>
           `).join('')}
         </select>
@@ -125,25 +128,74 @@ async function handleProfileCreateSubmit(e) {
   e.preventDefault();
   const note = document.getElementById('profileCreateNote');
   const fd = new FormData(e.target);
+  const companyType = fd.get('company_type');
 
   try {
-    await createClientUser({
+    if (companyType === 'supplier') {
+      const supplier = await createSupplier({
+        name: fd.get('company'),
+        contact_name: fd.get('full_name'),
+        email: fd.get('email'),
+        phone: fd.get('phone'),
+        address: fd.get('address'),
+        siren: fd.get('siren'),
+        vat_number: fd.get('vat_number'),
+        active: true
+      });
+      await createSupplierUser({
+        supplierId: supplier.id,
+        email: fd.get('email'),
+        password: fd.get('password'),
+        fullName: fd.get('full_name'),
+        phone: fd.get('phone')
+      });
+    } else {
+      await createClientUser({
+        email: fd.get('email'),
+        password: fd.get('password'),
+        fullName: fd.get('full_name'),
+        phone: fd.get('phone'),
+        address: fd.get('address'),
+        company: fd.get('company'),
+        siren: fd.get('siren'),
+        vatNumber: fd.get('vat_number'),
+        commercialAgentId: fd.get('commercial_agent_id')
+      });
+    }
+    e.target.reset();
+    showAlert(note, companyType === 'supplier' ? 'Société fournisseur créée.' : 'Société cliente créée.', 'success');
+    await loadSuperRootData();
+    syncSuperRootCompanyTypeFields();
+  } catch (err) {
+    showAlert(note, mapAuthError(err));
+  }
+}
+
+async function handleInternalUserSubmit(e) {
+  e.preventDefault();
+  const note = document.getElementById('internalUserNote');
+  const fd = new FormData(e.target);
+  try {
+    await createInternalUser({
       email: fd.get('email'),
       password: fd.get('password'),
       fullName: fd.get('full_name'),
       phone: fd.get('phone'),
-      address: fd.get('address'),
-      company: fd.get('company'),
-      siren: fd.get('siren'),
-      vatNumber: fd.get('vat_number'),
-      commercialAgentId: fd.get('commercial_agent_id')
+      role: fd.get('internal_role')
     });
     e.target.reset();
-    showAlert(note, 'Client créé avec le rôle client. Il peut confirmer son e-mail puis se connecter.', 'success');
+    showAlert(note, 'Utilisateur interne HB Commerce créé.', 'success');
     await loadSuperRootData();
   } catch (err) {
     showAlert(note, mapAuthError(err));
   }
+}
+
+function syncSuperRootCompanyTypeFields() {
+  const type = document.getElementById('profileCreateCompanyTypeSelect')?.value || 'client';
+  document.querySelectorAll('#profileCreateForm .client-only-field').forEach((el) => {
+    el.style.display = type === 'client' ? '' : 'none';
+  });
 }
 
 function editProfile(profileId) {

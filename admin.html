@@ -273,16 +273,24 @@
 
     <section id="panel-clients" class="admin-panel" hidden>
       <div class="dashboard-card admin-only">
-        <h2>Créer un agent commercial</h2>
+        <h2>Créer utilisateur interne HB Commerce</h2>
         <form id="commercialAgentForm" class="auth-form">
+          <label>
+            Profil interne
+            <select name="internal_role" id="internalRoleSelect">
+              <option value="agent_commercial">Agent commercial</option>
+              <option value="admin">Admin</option>
+              <option value="super_root" class="super-root-only">Super root</option>
+            </select>
+          </label>
           <div class="form-row">
             <label>
-              Nom agent
-              <input type="text" name="full_name" required placeholder="Nom de l'agent">
+              Nom utilisateur
+              <input type="text" name="full_name" required placeholder="Nom de la personne">
             </label>
             <label>
-              E-mail agent
-              <input type="email" name="email" required placeholder="agent@hbcommerce.fr">
+              E-mail
+              <input type="email" name="email" required placeholder="prenom.nom@hbcommerce.fr">
             </label>
           </div>
           <div class="form-row">
@@ -295,14 +303,22 @@
               <input type="password" name="password" minlength="6" required autocomplete="new-password">
             </label>
           </div>
-          <button type="submit" class="btn btn-primary">Créer l'agent commercial</button>
+          <button type="submit" class="btn btn-primary">Créer l'utilisateur interne</button>
           <p class="form-note" id="commercialAgentNote"></p>
+          <p class="form-note">Ces comptes sont rattachés à HB Commerce. Aucun champ société n’est requis.</p>
         </form>
       </div>
 
       <div class="dashboard-card admin-only">
-        <h2>Créer un client société</h2>
+        <h2>Créer société client / fournisseur</h2>
         <form id="adminClientForm" class="auth-form">
+          <label>
+            Type de société
+            <select name="company_type" id="adminCompanyTypeSelect" required>
+              <option value="client">Client</option>
+              <option value="supplier">Fournisseur</option>
+            </select>
+          </label>
           <div class="form-row">
             <label>
               Société
@@ -337,7 +353,7 @@
               <input type="text" name="vat_number" required placeholder="FR...">
             </label>
           </div>
-          <label>
+          <label class="client-only-field">
             Agent commercial
             <select name="commercial_agent_id" id="adminClientAgentSelect">
               <option value="">Aucun agent assigné</option>
@@ -347,14 +363,14 @@
             Mot de passe temporaire
             <input type="password" name="password" minlength="6" required autocomplete="new-password">
           </label>
-          <button type="submit" class="btn btn-primary">Créer le client</button>
+          <button type="submit" class="btn btn-primary">Créer la société</button>
           <p class="form-note" id="adminClientNote"></p>
         </form>
       </div>
 
       <div class="dashboard-card dashboard-card-wide">
         <div class="dashboard-card-head">
-          <h2>Clients sociétés</h2>
+          <h2>Sociétés clients / fournisseurs</h2>
           <button type="button" id="refreshClientsBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
         </div>
         <div class="table-wrap">
@@ -362,6 +378,7 @@
             <thead>
               <tr>
                 <th>Société</th>
+                <th>Type</th>
                 <th>Contact</th>
                 <th>SIREN</th>
                 <th>TVA</th>

@@ -3,9 +3,9 @@
 
 alter table public.profiles drop constraint if exists profiles_role_check;
 update public.profiles set role = 'client' where role = 'user';
-alter table public.profiles alter column role set default 'client';
+alter table public.profiles alter column role set default 'pending_company';
 alter table public.profiles add constraint profiles_role_check
-  check (role in ('client', 'supplier', 'agent_commercial', 'admin', 'super_root'));
+  check (role in ('pending_company', 'client', 'supplier', 'agent_commercial', 'admin', 'super_root'));
 alter table public.profiles add column if not exists siren text;
 alter table public.profiles add column if not exists vat_number text;
 alter table public.profiles add column if not exists commercial_agent_id uuid references public.profiles(id);
@@ -140,7 +140,7 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.profiles (id, email, full_name, phone, company, address, siren, vat_number)
+  insert into public.profiles (id, email, full_name, phone, company, address, siren, vat_number, role)
   values (
     new.id,
     new.email,
@@ -149,7 +149,8 @@ begin
     coalesce(new.raw_user_meta_data->>'company', ''),
     coalesce(new.raw_user_meta_data->>'address', ''),
     coalesce(new.raw_user_meta_data->>'siren', ''),
-    coalesce(new.raw_user_meta_data->>'vat_number', '')
+    coalesce(new.raw_user_meta_data->>'vat_number', ''),
+    coalesce(new.raw_user_meta_data->>'role', 'pending_company')
   );
   return new;
 end;

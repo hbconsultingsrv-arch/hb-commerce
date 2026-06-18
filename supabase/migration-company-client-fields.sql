@@ -12,7 +12,7 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.profiles (id, email, full_name, phone, company, address, siren, vat_number)
+  insert into public.profiles (id, email, full_name, phone, company, address, siren, vat_number, role)
   values (
     new.id,
     new.email,
@@ -21,7 +21,8 @@ begin
     coalesce(new.raw_user_meta_data->>'company', ''),
     coalesce(new.raw_user_meta_data->>'address', ''),
     coalesce(new.raw_user_meta_data->>'siren', ''),
-    coalesce(new.raw_user_meta_data->>'vat_number', '')
+    coalesce(new.raw_user_meta_data->>'vat_number', ''),
+    coalesce(new.raw_user_meta_data->>'role', 'pending_company')
   );
   return new;
 end;
@@ -49,5 +50,5 @@ $$;
 
 drop policy if exists "Admin manage client profiles" on public.profiles;
 create policy "Admin manage client profiles" on public.profiles for all
-  using (public.is_admin() and role = 'client')
-  with check (public.is_admin() and role = 'client');
+  using (public.is_admin() and role in ('pending_company', 'client', 'supplier', 'agent_commercial'))
+  with check (public.is_admin() and role in ('pending_company', 'client', 'supplier', 'agent_commercial'));

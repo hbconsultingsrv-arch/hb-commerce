@@ -21,7 +21,7 @@ alter table public.products add column if not exists supplier_id uuid references
 alter table public.profiles add column if not exists supplier_id uuid references public.suppliers(id);
 alter table public.profiles drop constraint if exists profiles_role_check;
 alter table public.profiles add constraint profiles_role_check
-  check (role in ('client', 'supplier', 'agent_commercial', 'admin', 'super_root'));
+  check (role in ('pending_company', 'client', 'supplier', 'agent_commercial', 'admin', 'super_root'));
 
 create table if not exists public.product_stocks (
   id uuid default gen_random_uuid() primary key,
@@ -92,8 +92,8 @@ create policy "Supplier read own supplier" on public.suppliers for select
 
 drop policy if exists "Admin manage client profiles" on public.profiles;
 create policy "Admin manage client profiles" on public.profiles for all
-  using (public.is_admin() and role in ('client', 'supplier', 'agent_commercial'))
-  with check (public.is_admin() and role in ('client', 'supplier', 'agent_commercial'));
+  using (public.is_admin() and role in ('pending_company', 'client', 'supplier', 'agent_commercial'))
+  with check (public.is_admin() and role in ('pending_company', 'client', 'supplier', 'agent_commercial'));
 
 create or replace function public.protect_profile_role()
 returns trigger
@@ -106,8 +106,8 @@ begin
     and not public.is_super_root()
     and not (
       public.is_admin()
-      and old.role in ('client', 'supplier', 'agent_commercial')
-      and new.role in ('client', 'supplier', 'agent_commercial')
+      and old.role in ('pending_company', 'client', 'supplier', 'agent_commercial')
+      and new.role in ('pending_company', 'client', 'supplier', 'agent_commercial')
     )
     and session_user not in ('postgres', 'supabase_admin')
   then

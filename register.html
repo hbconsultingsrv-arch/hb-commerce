@@ -108,7 +108,7 @@
         });
 
         if (user && !user.confirmed_at) {
-          showAlert(note, 'Compte créé ! Vérifiez votre e-mail pour confirmer.', 'success');
+          showAlert(note, 'Compte créé ! Vérifiez votre e-mail. HB Commerce attribuera ensuite le profil client ou fournisseur.', 'success');
           e.target.reset();
         } else {
           window.location.href = 'compte.html';
