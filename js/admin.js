@@ -1,7 +1,9 @@
 let editingProductId = null;
+let editingSupplierId = null;
 let adminSession = null;
 let adminProfile = null;
 let adminProfiles = [];
+let adminSuppliers = [];
 
 async function initAdmin() {
   adminSession = await requireAdmin();
@@ -28,7 +30,10 @@ async function initAdmin() {
     document.querySelector('[data-tab="commandes"]')?.click();
   }
 
-  await loadProductsTable();
+  if (!commercialAgent) {
+    await loadSuppliersTable();
+    await loadProductsTable();
+  }
   await loadOrdersTable();
   await loadClientsPanel();
   await loadAdminPricePanel();
@@ -37,6 +42,9 @@ async function initAdmin() {
   const productForm = document.getElementById('productForm');
   productForm?.addEventListener('submit', handleProductSubmit);
   document.getElementById('cancelProductBtn')?.addEventListener('click', resetProductForm);
+  document.getElementById('supplierForm')?.addEventListener('submit', handleSupplierSubmit);
+  document.getElementById('cancelSupplierBtn')?.addEventListener('click', resetSupplierForm);
+  document.getElementById('refreshSuppliersBtn')?.addEventListener('click', loadSuppliersTable);
   document.getElementById('adminClientForm')?.addEventListener('submit', handleAdminClientSubmit);
   document.getElementById('commercialAgentForm')?.addEventListener('submit', handleCommercialAgentSubmit);
   document.getElementById('refreshClientsBtn')?.addEventListener('click', loadClientsPanel);
@@ -47,11 +55,15 @@ async function loadProductsTable() {
   const products = await fetchAllProducts();
   const body = document.getElementById('productsBody');
   if (!body) return;
+  if (!adminSuppliers.length) adminSuppliers = await fetchAllSuppliers();
+  renderProductSupplierSelect();
+  const supplierMap = new Map(adminSuppliers.map((supplier) => [supplier.id, supplier]));
 
   body.innerHTML = products.map((p) => `
     <tr>
       <td><img src="${p.image_url}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:6px"></td>
       <td><strong>${p.name}</strong><br><small>${p.origin || ''}</small></td>
+      <td>${escapeHtml(supplierMap.get(p.supplier_id)?.name || '—')}</td>
       <td>${formatPrice(p.price)} / ${p.unit}</td>
       <td>${p.tag || '—'}</td>
       <td>${p.active ? '✓ Visible' : 'Masqué'}</td>
@@ -86,6 +98,7 @@ function editProduct(id, products) {
   form.category.value = p.category || '';
   form.price.value = p.price;
   form.unit.value = p.unit || 'litre';
+  if (form.supplier_id) form.supplier_id.value = p.supplier_id || '';
   form.min_quantity.value = p.min_quantity || 1;
   form.image_url.value = p.image_url;
   form.tag.value = p.tag || '';
@@ -117,6 +130,7 @@ async function handleProductSubmit(e) {
     category: fd.get('category'),
     price: parseFloat(fd.get('price')),
     unit: fd.get('unit'),
+    supplier_id: fd.get('supplier_id') || null,
     min_quantity: parseInt(fd.get('min_quantity'), 10) || 1,
     image_url: fd.get('image_url'),
     tag: fd.get('tag'),
@@ -133,6 +147,115 @@ async function handleProductSubmit(e) {
       showAlert(note, 'Produit ajouté.', 'success');
     }
     resetProductForm();
+    await loadProductsTable();
+  } catch (err) {
+    showAlert(note, err.message);
+  }
+}
+
+function renderProductSupplierSelect() {
+  const select = document.getElementById('productSupplierSelect');
+  if (!select) return;
+  select.innerHTML = '<option value="">Aucun fournisseur</option>'
+    + adminSuppliers
+      .filter((supplier) => supplier.active)
+      .map((supplier) => `<option value="${supplier.id}">${escapeHtml(supplier.name)}</option>`)
+      .join('');
+}
+
+async function loadSuppliersTable() {
+  const body = document.getElementById('suppliersBody');
+  try {
+    adminSuppliers = await fetchAllSuppliers();
+    renderProductSupplierSelect();
+    if (!body) return;
+    body.innerHTML = adminSuppliers.length ? adminSuppliers.map((supplier) => `
+      <tr>
+        <td><strong>${escapeHtml(supplier.name)}</strong><br><small>${escapeHtml(supplier.address || '')}</small></td>
+        <td>${escapeHtml(supplier.contact_name || '—')}<br><small>${escapeHtml(supplier.email || '')}</small></td>
+        <td>${escapeHtml(supplier.country || '—')}</td>
+        <td>${escapeHtml(supplier.vat_number || '—')}</td>
+        <td>${supplier.active ? '✓ Actif' : 'Inactif'}</td>
+        <td>
+          <button type="button" class="btn btn-sm btn-outline-dark" data-edit-supplier="${supplier.id}">Modifier</button>
+          <button type="button" class="btn btn-sm btn-outline-dark" data-delete-supplier="${supplier.id}">Supprimer</button>
+        </td>
+      </tr>
+    `).join('') : '<tr><td colspan="6">Aucun fournisseur.</td></tr>';
+
+    body.querySelectorAll('[data-edit-supplier]').forEach((btn) => {
+      btn.addEventListener('click', () => editSupplier(btn.dataset.editSupplier));
+    });
+    body.querySelectorAll('[data-delete-supplier]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Supprimer ce fournisseur ? Les produits liés resteront sans fournisseur.')) return;
+        await deleteSupplier(btn.dataset.deleteSupplier);
+        await loadSuppliersTable();
+        await loadProductsTable();
+      });
+    });
+  } catch (err) {
+    if (body) body.innerHTML = `<tr><td colspan="6">${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+function editSupplier(id) {
+  const supplier = adminSuppliers.find((item) => item.id === id);
+  const form = document.getElementById('supplierForm');
+  if (!supplier || !form) return;
+
+  editingSupplierId = id;
+  form.name.value = supplier.name || '';
+  form.contact_name.value = supplier.contact_name || '';
+  form.email.value = supplier.email || '';
+  form.phone.value = supplier.phone || '';
+  form.address.value = supplier.address || '';
+  form.country.value = supplier.country || '';
+  form.siren.value = supplier.siren || '';
+  form.vat_number.value = supplier.vat_number || '';
+  form.notes.value = supplier.notes || '';
+  form.active.checked = supplier.active;
+  document.getElementById('supplierFormTitle').textContent = 'Modifier le fournisseur';
+  document.getElementById('saveSupplierBtn').textContent = 'Enregistrer';
+}
+
+function resetSupplierForm() {
+  editingSupplierId = null;
+  const form = document.getElementById('supplierForm');
+  if (!form) return;
+  form.reset();
+  form.active.checked = true;
+  document.getElementById('supplierFormTitle').textContent = 'Ajouter un fournisseur';
+  document.getElementById('saveSupplierBtn').textContent = 'Ajouter';
+}
+
+async function handleSupplierSubmit(e) {
+  e.preventDefault();
+  const note = document.getElementById('supplierNote');
+  const fd = new FormData(e.target);
+  const supplier = {
+    name: fd.get('name'),
+    contact_name: fd.get('contact_name') || '',
+    email: fd.get('email') || '',
+    phone: fd.get('phone') || '',
+    address: fd.get('address') || '',
+    country: fd.get('country') || '',
+    siren: fd.get('siren') || '',
+    vat_number: fd.get('vat_number') || '',
+    notes: fd.get('notes') || '',
+    active: fd.has('active')
+  };
+
+  try {
+    if (editingSupplierId) {
+      await updateSupplier(editingSupplierId, supplier);
+      showAlert(note, 'Fournisseur mis à jour.', 'success');
+    } else {
+      await createSupplier(supplier);
+      showAlert(note, 'Fournisseur ajouté.', 'success');
+    }
+    resetSupplierForm();
+    await loadSuppliersTable();
     await loadProductsTable();
   } catch (err) {
     showAlert(note, err.message);

@@ -26,9 +26,27 @@ alter table public.profiles add column if not exists siren text;
 alter table public.profiles add column if not exists vat_number text;
 alter table public.profiles add column if not exists commercial_agent_id uuid references public.profiles(id);
 
+-- Fournisseurs
+create table if not exists public.suppliers (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  contact_name text,
+  email text,
+  phone text,
+  address text,
+  siren text,
+  vat_number text,
+  country text,
+  notes text,
+  active boolean default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
 -- Catalogue produits alimentaires
 create table if not exists public.products (
   id uuid default gen_random_uuid() primary key,
+  supplier_id uuid references public.suppliers on delete set null,
   name text not null,
   slug text unique not null,
   description text,
@@ -44,6 +62,8 @@ create table if not exists public.products (
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+alter table public.products add column if not exists supplier_id uuid references public.suppliers on delete set null;
 
 -- Commandes
 create table if not exists public.orders (
@@ -202,6 +222,7 @@ end;
 $$;
 
 alter table public.profiles enable row level security;
+alter table public.suppliers enable row level security;
 alter table public.products enable row level security;
 alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
@@ -228,6 +249,14 @@ create policy "Commercial agent read assigned profiles" on public.profiles for s
   using (role = 'client' and commercial_agent_id = auth.uid());
 create policy "Super root manage profiles" on public.profiles for all
   using (public.is_super_root()) with check (public.is_super_root());
+
+-- Fournisseurs
+drop policy if exists "Admin read suppliers" on public.suppliers;
+drop policy if exists "Admin manage suppliers" on public.suppliers;
+
+create policy "Admin read suppliers" on public.suppliers for select using (public.is_admin());
+create policy "Admin manage suppliers" on public.suppliers for all
+  using (public.is_admin()) with check (public.is_admin());
 
 -- Produits
 drop policy if exists "Public read active products" on public.products;
@@ -367,6 +396,10 @@ $$;
 
 drop trigger if exists profiles_updated_at on public.profiles;
 create trigger profiles_updated_at before update on public.profiles
+  for each row execute procedure public.set_updated_at();
+
+drop trigger if exists suppliers_updated_at on public.suppliers;
+create trigger suppliers_updated_at before update on public.suppliers
   for each row execute procedure public.set_updated_at();
 
 drop trigger if exists protect_profile_role on public.profiles;

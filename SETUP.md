@@ -75,6 +75,12 @@ Enfin, exécutez la migration du suivi livraison et des factures :
 -- Copier-coller le contenu de supabase/migration-order-delivery-tracking.sql
 ```
 
+Pour activer la gestion des fournisseurs :
+
+```sql
+-- Copier-coller le contenu de supabase/migration-suppliers.sql
+```
+
 Promouvez ensuite votre compte principal en super root (remplacez l'e-mail) :
 
 ```sql

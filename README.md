@@ -29,6 +29,7 @@ Le site est hébergé sur **GitHub Pages** (gratuit). Les données passent par *
 - Dashboard admin pour validation des commandes et chat sociétés
 - Dashboard super root pour gérer les accès et les prix personnalisés par client
 - Chat société avec historique et modération des messages
+- Gestion des fournisseurs et rattachement fournisseur/produit
 
 **Configuration obligatoire** → voir **[SETUP.md](SETUP.md)**
 

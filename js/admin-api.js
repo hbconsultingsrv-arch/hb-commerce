@@ -199,6 +199,42 @@ async function fetchAllProducts() {
   return data || [];
 }
 
+async function fetchAllSuppliers(activeOnly = false) {
+  const sb = getSupabase();
+  if (!sb) return [];
+  let query = sb
+    .from('suppliers')
+    .select('*')
+    .order('name', { ascending: true });
+  if (activeOnly) query = query.eq('active', true);
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+async function createSupplier(supplier) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { data, error } = await sb.from('suppliers').insert(supplier).select().single();
+  if (error) throw error;
+  return data;
+}
+
+async function updateSupplier(id, fields) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { data, error } = await sb.from('suppliers').update(fields).eq('id', id).select().single();
+  if (error) throw error;
+  return data;
+}
+
+async function deleteSupplier(id) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { error } = await sb.from('suppliers').delete().eq('id', id);
+  if (error) throw error;
+}
+
 async function createProduct(product) {
   const sb = getSupabase();
   if (!sb) throw new Error(configErrorMessage());
