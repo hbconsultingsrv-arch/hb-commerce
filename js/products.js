@@ -88,7 +88,7 @@ function renderProductCard(product) {
   const acidity = product.acidity || '';
   const acidityDisplay = typeof formatAcidity === 'function' ? formatAcidity(acidity) : acidity;
   const packaging = getPackagingLabel(product.packaging_type);
-  const priceDisplay = typeof formatDisplayPrice === 'function' ? formatDisplayPrice(product.price) : formatPrice(product.price);
+  const priceDisplay = typeof formatDisplayPrice === 'function' ? formatDisplayPrice(product.price) : 'xx';
   const unitDisplay = typeof canViewPrices === 'function' && !canViewPrices() ? '' : `/ ${product.unit}`;
 
   return `
