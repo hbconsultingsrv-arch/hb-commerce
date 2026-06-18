@@ -21,6 +21,7 @@ async function initSuperRoot() {
   document.getElementById('profileCreateForm')?.addEventListener('submit', handleProfileCreateSubmit);
   document.getElementById('profileEditForm')?.addEventListener('submit', handleProfileEditSubmit);
   document.getElementById('resetProfileEditBtn')?.addEventListener('click', resetProfileEditForm);
+  document.querySelector('#profileEditForm [name="role"]')?.addEventListener('change', syncInternalCompany);
   await loadSuperRootData();
 }
 
@@ -136,8 +137,16 @@ function editProfile(profileId) {
   form.elements.siren.value = profile.siren || '';
   form.elements.vat_number.value = profile.vat_number || '';
   form.elements.role.value = profile.role || 'client';
+  syncInternalCompany();
   document.getElementById('profileEditTitle').textContent = `Modifier ${profileLabel(profile)}`;
   form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function syncInternalCompany() {
+  const form = document.getElementById('profileEditForm');
+  if (!form) return;
+  const internal = ['admin', 'super_root'].includes(form.elements.role.value);
+  if (internal) form.elements.company.value = 'HB Commerce';
 }
 
 async function handleProfileEditSubmit(e) {
@@ -151,13 +160,14 @@ async function handleProfileEditSubmit(e) {
   }
 
   try {
+    const role = fd.get('role');
     await updateProfileAsSuperRoot(profileId, {
-      company: fd.get('company') || '',
+      company: ['admin', 'super_root'].includes(role) ? 'HB Commerce' : fd.get('company') || '',
       full_name: fd.get('full_name') || '',
       email: fd.get('email') || '',
       phone: fd.get('phone') || '',
       address: fd.get('address') || '',
-      role: fd.get('role'),
+      role,
       siren: fd.get('siren') || '',
       vat_number: fd.get('vat_number') || ''
     });

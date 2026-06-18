@@ -138,6 +138,9 @@ begin
   then
     raise exception 'Seul le super root peut modifier les roles.';
   end if;
+  if new.role in ('admin', 'super_root') then
+    new.company = 'HB Commerce';
+  end if;
   return new;
 end;
 $$;

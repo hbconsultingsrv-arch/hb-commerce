@@ -25,6 +25,26 @@ begin
 end;
 $$;
 
+create or replace function public.protect_profile_role()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if old.role is distinct from new.role
+    and not public.is_super_root()
+    and session_user not in ('postgres', 'supabase_admin')
+  then
+    raise exception 'Seul le super root peut modifier les roles.';
+  end if;
+  if new.role in ('admin', 'super_root') then
+    new.company = 'HB Commerce';
+  end if;
+  return new;
+end;
+$$;
+
 drop policy if exists "Admin manage client profiles" on public.profiles;
 create policy "Admin manage client profiles" on public.profiles for all
   using (public.is_admin() and role = 'client')
