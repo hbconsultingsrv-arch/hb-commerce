@@ -270,6 +270,24 @@ body {
   color: var(--text-muted);
 }
 
+.password-toggle {
+  align-self: flex-end;
+  border: none;
+  background: transparent;
+  color: var(--green);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  margin-top: -0.15rem;
+}
+
+.password-toggle:hover {
+  color: var(--green-dark);
+  text-decoration: underline;
+}
+
 .auth-switch {
   text-align: center;
   margin-top: 1.5rem;
