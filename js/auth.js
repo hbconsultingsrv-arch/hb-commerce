@@ -194,7 +194,11 @@ async function refreshPriceVisibility(session = undefined) {
 
 function showAlert(el, message, type = 'error') {
   if (!el) return;
-  el.textContent = message;
+  let text = message;
+  if (typeof text !== 'string') {
+    text = typeof mapAuthError === 'function' ? mapAuthError(message) : (message?.message || 'Erreur inconnue.');
+  }
+  el.textContent = text;
   el.className = `form-note ${type === 'success' ? 'success' : 'error'}`;
 }
 

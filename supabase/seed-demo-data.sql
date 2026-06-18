@@ -46,8 +46,14 @@ declare
   v_order4  uuid := 'c0000001-0001-4001-8001-000000000004';
   v_order5  uuid := 'c0000001-0001-4001-8001-000000000005';
   v_order6  uuid := 'c0000001-0001-4001-8001-000000000006';
+  v_instance_id uuid;
   v_pwd text := crypt('Test1234!', gen_salt('bf'));
 begin
+  select coalesce(
+    (select instance_id from auth.users limit 1),
+    (select id from auth.instances limit 1),
+    '00000000-0000-0000-0000-000000000000'::uuid
+  ) into v_instance_id;
   -- Nettoyage des donnees demo precedentes (re-execution safe)
   delete from public.chat_messages where company_id in (
     v_client1, v_client2, v_client3, v_client4
@@ -95,23 +101,27 @@ begin
   -- -------------------------------------------------------------------------
   insert into auth.users (
     instance_id, id, aud, role, email, encrypted_password,
-    email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
-    created_at, updated_at, confirmation_token, is_super_admin, is_sso_user
+    email_confirmed_at, recovery_sent_at, last_sign_in_at,
+    raw_app_meta_data, raw_user_meta_data,
+    created_at, updated_at, confirmation_token,
+    email_change, email_change_token_new, recovery_token,
+    is_super_admin, is_sso_user
   ) values
-    ('00000000-0000-0000-0000-000000000000', v_super,   'authenticated', 'authenticated', 'super@hbcommerce.demo',          v_pwd, now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Super Root HB","company":"HB Commerce"}', now(), now(), '', false, false),
-    ('00000000-0000-0000-0000-000000000000', v_admin,   'authenticated', 'authenticated', 'admin@hbcommerce.demo',          v_pwd, now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Admin HB Commerce","company":"HB Commerce"}', now(), now(), '', false, false),
-    ('00000000-0000-0000-0000-000000000000', v_agent1,  'authenticated', 'authenticated', 'agent.martin@hbcommerce.demo',   v_pwd, now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Jean Martin","company":"HB Commerce"}', now(), now(), '', false, false),
-    ('00000000-0000-0000-0000-000000000000', v_agent2,  'authenticated', 'authenticated', 'agent.dubois@hbcommerce.demo',   v_pwd, now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Sophie Dubois","company":"HB Commerce"}', now(), now(), '', false, false),
-    ('00000000-0000-0000-0000-000000000000', v_client1, 'authenticated', 'authenticated', 'contact@restaurant-paris.demo',    v_pwd, now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Ahmed Benali","company":"Restaurant Le Jasmin"}', now(), now(), '', false, false),
-    ('00000000-0000-0000-0000-000000000000', v_client2, 'authenticated', 'authenticated', 'achats@traiteur-lyon.demo',        v_pwd, now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Marie Leroy","company":"Traiteur Lyon Gourmet"}', now(), now(), '', false, false),
-    ('00000000-0000-0000-0000-000000000000', v_client3, 'authenticated', 'authenticated', 'commandes@epicerie-bdx.demo',      v_pwd, now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Pierre Durand","company":"Epicerie Bordeaux Sud"}', now(), now(), '', false, false),
-    ('00000000-0000-0000-0000-000000000000', v_client4, 'authenticated', 'authenticated', 'direction@hotel-nice.demo',        v_pwd, now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Isabelle Moreau","company":"Hotel Riviera Nice"}', now(), now(), '', false, false),
-    ('00000000-0000-0000-0000-000000000000', v_pending, 'authenticated', 'authenticated', 'inscription@nouvelle-societe.demo', v_pwd, now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Nouveau Contact","company":"Societe En Attente SAS"}', now(), now(), '', false, false),
-    ('00000000-0000-0000-0000-000000000000', v_supusr,  'authenticated', 'authenticated', 'stock@fiafi-tunisie.demo',         v_pwd, now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Karim Ben Salah","company":"FIAFI Tunisie"}', now(), now(), '', false, false);
+    (v_instance_id, v_super,   'authenticated', 'authenticated', 'super@hbcommerce.demo',          v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Super Root HB","company":"HB Commerce"}', now(), now(), '', '', '', '', false, false),
+    (v_instance_id, v_admin,   'authenticated', 'authenticated', 'admin@hbcommerce.demo',          v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Admin HB Commerce","company":"HB Commerce"}', now(), now(), '', '', '', '', false, false),
+    (v_instance_id, v_agent1,  'authenticated', 'authenticated', 'agent.martin@hbcommerce.demo',   v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Jean Martin","company":"HB Commerce"}', now(), now(), '', '', '', '', false, false),
+    (v_instance_id, v_agent2,  'authenticated', 'authenticated', 'agent.dubois@hbcommerce.demo',   v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Sophie Dubois","company":"HB Commerce"}', now(), now(), '', '', '', '', false, false),
+    (v_instance_id, v_client1, 'authenticated', 'authenticated', 'contact@restaurant-paris.demo',    v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Ahmed Benali","company":"Restaurant Le Jasmin"}', now(), now(), '', '', '', '', false, false),
+    (v_instance_id, v_client2, 'authenticated', 'authenticated', 'achats@traiteur-lyon.demo',        v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Marie Leroy","company":"Traiteur Lyon Gourmet"}', now(), now(), '', '', '', '', false, false),
+    (v_instance_id, v_client3, 'authenticated', 'authenticated', 'commandes@epicerie-bdx.demo',      v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Pierre Durand","company":"Epicerie Bordeaux Sud"}', now(), now(), '', '', '', '', false, false),
+    (v_instance_id, v_client4, 'authenticated', 'authenticated', 'direction@hotel-nice.demo',        v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Isabelle Moreau","company":"Hotel Riviera Nice"}', now(), now(), '', '', '', '', false, false),
+    (v_instance_id, v_pending, 'authenticated', 'authenticated', 'inscription@nouvelle-societe.demo', v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Nouveau Contact","company":"Societe En Attente SAS"}', now(), now(), '', '', '', '', false, false),
+    (v_instance_id, v_supusr,  'authenticated', 'authenticated', 'stock@fiafi-tunisie.demo',         v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Karim Ben Salah","company":"FIAFI Tunisie"}', now(), now(), '', '', '', '', false, false);
 
+  -- id = user_id obligatoire pour que Supabase Auth accepte la connexion
   insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
-  select gen_random_uuid(), u.id,
-    jsonb_build_object('sub', u.id::text, 'email', u.email),
+  select u.id, u.id,
+    jsonb_build_object('sub', u.id::text, 'email', u.email, 'email_verified', true),
     'email', u.id::text, now(), now(), now()
   from auth.users u
   where u.id in (v_super, v_admin, v_agent1, v_agent2, v_client1, v_client2, v_client3, v_client4, v_pending, v_supusr);
