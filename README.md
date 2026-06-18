@@ -17,6 +17,7 @@ Vente en gros de produits alimentaires avec espace client, commandes en ligne et
 | `register.html` | Inscription professionnelle |
 | `compte.html` | Espace client (profil + commandes) |
 | `admin.html` | Dashboard admin (produits + commandes) |
+| `supplier.html` | Espace fournisseur (stock + commandes d'approvisionnement) |
 
 ## Backend (Supabase)
 
@@ -30,6 +31,7 @@ Le site est hébergé sur **GitHub Pages** (gratuit). Les données passent par *
 - Dashboard super root pour gérer les accès et les prix personnalisés par client
 - Chat société avec historique et modération des messages
 - Gestion des fournisseurs et rattachement fournisseur/produit
+- Espace fournisseur pour gérer les stocks et les commandes d'approvisionnement
 
 **Configuration obligatoire** → voir **[SETUP.md](SETUP.md)**
 

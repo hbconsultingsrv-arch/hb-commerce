@@ -12,7 +12,8 @@ create table if not exists public.profiles (
   siren text,
   vat_number text,
   commercial_agent_id uuid references public.profiles(id),
-  role text default 'client' check (role in ('client', 'agent_commercial', 'admin', 'super_root')),
+  supplier_id uuid,
+  role text default 'client' check (role in ('client', 'supplier', 'agent_commercial', 'admin', 'super_root')),
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -21,7 +22,7 @@ alter table public.profiles drop constraint if exists profiles_role_check;
 update public.profiles set role = 'client' where role = 'user';
 alter table public.profiles alter column role set default 'client';
 alter table public.profiles add constraint profiles_role_check
-  check (role in ('client', 'agent_commercial', 'admin', 'super_root'));
+  check (role in ('client', 'supplier', 'agent_commercial', 'admin', 'super_root'));
 alter table public.profiles add column if not exists siren text;
 alter table public.profiles add column if not exists vat_number text;
 alter table public.profiles add column if not exists commercial_agent_id uuid references public.profiles(id);
@@ -42,6 +43,8 @@ create table if not exists public.suppliers (
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+alter table public.profiles add column if not exists supplier_id uuid references public.suppliers(id);
 
 -- Catalogue produits alimentaires
 create table if not exists public.products (
@@ -64,6 +67,33 @@ create table if not exists public.products (
 );
 
 alter table public.products add column if not exists supplier_id uuid references public.suppliers on delete set null;
+
+-- Stock fournisseur par produit
+create table if not exists public.product_stocks (
+  id uuid default gen_random_uuid() primary key,
+  supplier_id uuid references public.suppliers on delete cascade not null,
+  product_slug text not null,
+  quantity int default 0 check (quantity >= 0),
+  reserved_quantity int default 0 check (reserved_quantity >= 0),
+  lead_time_days int default 7 check (lead_time_days >= 0),
+  updated_at timestamptz default now(),
+  unique (supplier_id, product_slug)
+);
+
+-- Commandes d'approvisionnement vers fournisseurs
+create table if not exists public.supplier_orders (
+  id uuid default gen_random_uuid() primary key,
+  supplier_id uuid references public.suppliers on delete cascade not null,
+  product_slug text not null,
+  quantity int not null check (quantity > 0),
+  status text default 'requested' check (status in ('requested', 'accepted', 'in_preparation', 'shipped', 'received', 'cancelled')),
+  expected_arrival_date date,
+  tracking_number text,
+  tracking_url text,
+  notes text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
 
 -- Commandes
 create table if not exists public.orders (
@@ -133,7 +163,7 @@ create table if not exists public.chat_messages (
   id uuid default gen_random_uuid() primary key,
   company_id uuid references public.profiles on delete cascade not null,
   author_id uuid references auth.users on delete set null,
-  author_role text not null check (author_role in ('client', 'agent_commercial', 'admin', 'super_root')),
+  author_role text not null check (author_role in ('client', 'supplier', 'agent_commercial', 'admin', 'super_root')),
   message text not null check (length(trim(message)) > 0),
   status text default 'pending' check (status in ('pending', 'approved', 'rejected')),
   moderated_by uuid references auth.users on delete set null,
@@ -181,6 +211,34 @@ as $$
   );
 $$;
 
+create or replace function public.is_supplier()
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role = 'supplier'
+  );
+$$;
+
+create or replace function public.is_own_supplier(supplier uuid)
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.profiles
+    where id = auth.uid()
+      and role = 'supplier'
+      and supplier_id = supplier
+  );
+$$;
+
 create or replace function public.is_assigned_commercial_agent(profile_id uuid)
 returns boolean
 language sql
@@ -207,8 +265,8 @@ begin
     and not public.is_super_root()
     and not (
       public.is_admin()
-      and old.role in ('client', 'agent_commercial')
-      and new.role in ('client', 'agent_commercial')
+      and old.role in ('client', 'supplier', 'agent_commercial')
+      and new.role in ('client', 'supplier', 'agent_commercial')
     )
     and session_user not in ('postgres', 'supabase_admin')
   then
@@ -227,6 +285,8 @@ alter table public.products enable row level security;
 alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
 alter table public.customer_prices enable row level security;
+alter table public.product_stocks enable row level security;
+alter table public.supplier_orders enable row level security;
 alter table public.chat_messages enable row level security;
 
 -- Profils (DROP IF EXISTS pour réexécution sans erreur)
@@ -243,8 +303,8 @@ create policy "Users update own profile" on public.profiles for update using (au
 create policy "Users insert own profile" on public.profiles for insert with check (auth.uid() = id);
 create policy "Admin read all profiles" on public.profiles for select using (public.is_admin());
 create policy "Admin manage client profiles" on public.profiles for all
-  using (public.is_admin() and role in ('client', 'agent_commercial'))
-  with check (public.is_admin() and role in ('client', 'agent_commercial'));
+  using (public.is_admin() and role in ('client', 'supplier', 'agent_commercial'))
+  with check (public.is_admin() and role in ('client', 'supplier', 'agent_commercial'));
 create policy "Commercial agent read assigned profiles" on public.profiles for select
   using (role = 'client' and commercial_agent_id = auth.uid());
 create policy "Super root manage profiles" on public.profiles for all
@@ -257,6 +317,9 @@ drop policy if exists "Admin manage suppliers" on public.suppliers;
 create policy "Admin read suppliers" on public.suppliers for select using (public.is_admin());
 create policy "Admin manage suppliers" on public.suppliers for all
   using (public.is_admin()) with check (public.is_admin());
+drop policy if exists "Supplier read own supplier" on public.suppliers;
+create policy "Supplier read own supplier" on public.suppliers for select
+  using (public.is_own_supplier(id));
 
 -- Produits
 drop policy if exists "Public read active products" on public.products;
@@ -266,6 +329,29 @@ create policy "Public read active products" on public.products for select
   using (active = true or public.is_admin());
 create policy "Admin manage products" on public.products for all
   using (public.is_admin()) with check (public.is_admin());
+
+-- Stock fournisseur
+drop policy if exists "Public read product stocks" on public.product_stocks;
+drop policy if exists "Admin manage product stocks" on public.product_stocks;
+drop policy if exists "Supplier manage own product stocks" on public.product_stocks;
+
+create policy "Public read product stocks" on public.product_stocks for select using (true);
+create policy "Admin manage product stocks" on public.product_stocks for all
+  using (public.is_admin()) with check (public.is_admin());
+create policy "Supplier manage own product stocks" on public.product_stocks for all
+  using (public.is_own_supplier(supplier_id)) with check (public.is_own_supplier(supplier_id));
+
+-- Commandes fournisseur
+drop policy if exists "Admin manage supplier orders" on public.supplier_orders;
+drop policy if exists "Supplier read own supplier orders" on public.supplier_orders;
+drop policy if exists "Supplier update own supplier orders" on public.supplier_orders;
+
+create policy "Admin manage supplier orders" on public.supplier_orders for all
+  using (public.is_admin()) with check (public.is_admin());
+create policy "Supplier read own supplier orders" on public.supplier_orders for select
+  using (public.is_own_supplier(supplier_id));
+create policy "Supplier update own supplier orders" on public.supplier_orders for update
+  using (public.is_own_supplier(supplier_id));
 
 -- Commandes
 drop policy if exists "Users read own orders" on public.orders;
@@ -400,6 +486,14 @@ create trigger profiles_updated_at before update on public.profiles
 
 drop trigger if exists suppliers_updated_at on public.suppliers;
 create trigger suppliers_updated_at before update on public.suppliers
+  for each row execute procedure public.set_updated_at();
+
+drop trigger if exists product_stocks_updated_at on public.product_stocks;
+create trigger product_stocks_updated_at before update on public.product_stocks
+  for each row execute procedure public.set_updated_at();
+
+drop trigger if exists supplier_orders_updated_at on public.supplier_orders;
+create trigger supplier_orders_updated_at before update on public.supplier_orders
   for each row execute procedure public.set_updated_at();
 
 drop trigger if exists protect_profile_role on public.profiles;

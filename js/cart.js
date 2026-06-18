@@ -35,6 +35,9 @@ function addToCart(product, quantity = 1) {
       price: product.price,
       unit: product.unit,
       image_url: product.image_url,
+      stock_available: product.stock_available || 0,
+      estimated_delivery_days: product.estimated_delivery_days || 14,
+      delivery_delay_label: product.delivery_delay_label || '',
       quantity
     });
   }

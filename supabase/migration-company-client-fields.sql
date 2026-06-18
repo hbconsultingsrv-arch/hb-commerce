@@ -4,6 +4,7 @@
 alter table public.profiles add column if not exists siren text;
 alter table public.profiles add column if not exists vat_number text;
 alter table public.profiles add column if not exists commercial_agent_id uuid references public.profiles(id);
+alter table public.profiles add column if not exists supplier_id uuid;
 
 create or replace function public.handle_new_user()
 returns trigger

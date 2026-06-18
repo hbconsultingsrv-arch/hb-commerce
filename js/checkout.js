@@ -19,7 +19,7 @@ async function initCheckout() {
   if (summaryEl) {
     summaryEl.innerHTML = cart.map((item) => `
       <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #eee">
-        <span>${item.name} × ${item.quantity} ${item.unit}</span>
+        <span>${item.name} × ${item.quantity} ${item.unit}<br><small>${item.delivery_delay_label || ''}</small></span>
         <strong>${formatDisplayPrice(item.price * item.quantity)}</strong>
       </div>
     `).join('');
@@ -70,7 +70,8 @@ async function handleCheckoutSubmit(e) {
       total: getCartTotal(),
       paymentMethod,
       notes: fd.get('notes') || '',
-      shippingAddress: fd.get('shipping_address')
+      shippingAddress: fd.get('shipping_address'),
+      estimatedDeliveryDate: estimateCartDeliveryDate(cart)
     });
 
     await updateProfile(session.user.id, {
@@ -95,6 +96,13 @@ async function handleCheckoutSubmit(e) {
   } catch (err) {
     showAlert(note, err.message || 'Erreur lors de la commande.');
   }
+}
+
+function estimateCartDeliveryDate(cart) {
+  const maxDays = cart.reduce((max, item) => Math.max(max, Number(item.estimated_delivery_days || 14)), 0);
+  const date = new Date();
+  date.setDate(date.getDate() + Math.max(maxDays, 1));
+  return date.toISOString().slice(0, 10);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -19,7 +19,46 @@ async function fetchProducts(activeOnly = true) {
     : (dbList.length ? dbList : catalog);
 
   const products = activeOnly ? merged.filter((p) => p.active) : merged;
-  return applyCustomerPrices(products);
+  const priced = await applyCustomerPrices(products);
+  return applyStockInfo(priced);
+}
+
+async function applyStockInfo(products) {
+  const sb = getSupabase();
+  if (!sb || !products.length) return products;
+  const slugs = [...new Set(products.map((product) => product.slug).filter(Boolean))];
+  const { data, error } = await sb
+    .from('product_stocks')
+    .select('product_slug, quantity, reserved_quantity, lead_time_days')
+    .in('product_slug', slugs);
+  if (error) {
+    console.warn('product_stocks:', error.message);
+    return products;
+  }
+
+  const bySlug = new Map();
+  (data || []).forEach((row) => {
+    const current = bySlug.get(row.product_slug) || { available: 0, lead: 30 };
+    const available = Math.max(0, Number(row.quantity || 0) - Number(row.reserved_quantity || 0));
+    bySlug.set(row.product_slug, {
+      available: current.available + available,
+      lead: Math.min(current.lead, Number(row.lead_time_days || 30))
+    });
+  });
+
+  return products.map((product) => {
+    const stock = bySlug.get(product.slug);
+    const available = stock?.available || 0;
+    const lead = available > 0 ? 3 : (stock?.lead || 14);
+    return {
+      ...product,
+      stock_available: available,
+      estimated_delivery_days: lead,
+      delivery_delay_label: available > 0
+        ? `En stock - livraison estimee ${lead} jours`
+        : `Sur commande - delai estime ${lead} jours`
+    };
+  });
 }
 
 async function applyCustomerPrices(products) {
@@ -140,6 +179,7 @@ function renderProductCard(product) {
           ${unitDisplay ? `<span class="unit">${unitDisplay}</span>` : ''}
         </div>
         ${product.customer_price ? '<p class="form-note min-qty">Prix personnalis&eacute; soci&eacute;t&eacute;</p>' : ''}
+        ${product.delivery_delay_label ? `<p class="form-note min-qty">${escapeHtml(product.delivery_delay_label)}</p>` : ''}
         <p class="form-note min-qty">Minimum : ${minQty} ${product.unit}(s)</p>
         <div class="product-actions">
           <div class="qty-control">

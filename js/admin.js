@@ -45,6 +45,7 @@ async function initAdmin() {
   document.getElementById('supplierForm')?.addEventListener('submit', handleSupplierSubmit);
   document.getElementById('cancelSupplierBtn')?.addEventListener('click', resetSupplierForm);
   document.getElementById('refreshSuppliersBtn')?.addEventListener('click', loadSuppliersTable);
+  document.getElementById('supplierOrderForm')?.addEventListener('submit', handleSupplierOrderSubmit);
   document.getElementById('adminClientForm')?.addEventListener('submit', handleAdminClientSubmit);
   document.getElementById('commercialAgentForm')?.addEventListener('submit', handleCommercialAgentSubmit);
   document.getElementById('refreshClientsBtn')?.addEventListener('click', loadClientsPanel);
@@ -161,6 +162,25 @@ function renderProductSupplierSelect() {
       .filter((supplier) => supplier.active)
       .map((supplier) => `<option value="${supplier.id}">${escapeHtml(supplier.name)}</option>`)
       .join('');
+  renderSupplierOrderSelectors();
+}
+
+function renderSupplierOrderSelectors() {
+  const supplierSelect = document.getElementById('supplierOrderSupplierSelect');
+  const productSelect = document.getElementById('supplierOrderProductSelect');
+  if (supplierSelect) {
+    supplierSelect.innerHTML = adminSuppliers
+      .filter((supplier) => supplier.active)
+      .map((supplier) => `<option value="${supplier.id}">${escapeHtml(supplier.name)}</option>`)
+      .join('');
+  }
+  if (productSelect) {
+    fetchAllProducts().then((products) => {
+      productSelect.innerHTML = products
+        .map((product) => `<option value="${product.slug}">${escapeHtml(product.name || product.slug)}</option>`)
+        .join('');
+    }).catch(() => {});
+  }
 }
 
 async function loadSuppliersTable() {
@@ -214,6 +234,7 @@ function editSupplier(id) {
   form.siren.value = supplier.siren || '';
   form.vat_number.value = supplier.vat_number || '';
   form.notes.value = supplier.notes || '';
+  if (form.supplier_password) form.supplier_password.value = '';
   form.active.checked = supplier.active;
   document.getElementById('supplierFormTitle').textContent = 'Modifier le fournisseur';
   document.getElementById('saveSupplierBtn').textContent = 'Enregistrer';
@@ -247,16 +268,47 @@ async function handleSupplierSubmit(e) {
   };
 
   try {
+    let savedSupplier = null;
     if (editingSupplierId) {
-      await updateSupplier(editingSupplierId, supplier);
+      savedSupplier = await updateSupplier(editingSupplierId, supplier);
       showAlert(note, 'Fournisseur mis à jour.', 'success');
     } else {
-      await createSupplier(supplier);
+      savedSupplier = await createSupplier(supplier);
       showAlert(note, 'Fournisseur ajouté.', 'success');
+    }
+    const password = fd.get('supplier_password');
+    if (password && savedSupplier?.email) {
+      await createSupplierUser({
+        supplierId: savedSupplier.id,
+        email: savedSupplier.email,
+        password,
+        fullName: savedSupplier.contact_name || savedSupplier.name,
+        phone: savedSupplier.phone
+      });
+      showAlert(note, 'Fournisseur et compte fournisseur créés.', 'success');
     }
     resetSupplierForm();
     await loadSuppliersTable();
     await loadProductsTable();
+  } catch (err) {
+    showAlert(note, err.message);
+  }
+}
+
+async function handleSupplierOrderSubmit(e) {
+  e.preventDefault();
+  const note = document.getElementById('supplierOrderNote');
+  const fd = new FormData(e.target);
+  try {
+    await createSupplierOrder({
+      supplier_id: fd.get('supplier_id'),
+      product_slug: fd.get('product_slug'),
+      quantity: parseInt(fd.get('quantity'), 10),
+      expected_arrival_date: fd.get('expected_arrival_date') || null,
+      notes: fd.get('notes') || ''
+    });
+    e.target.reset();
+    showAlert(note, 'Commande fournisseur créée.', 'success');
   } catch (err) {
     showAlert(note, err.message);
   }

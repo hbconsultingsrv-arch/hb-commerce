@@ -3,12 +3,12 @@
 
 alter table public.profiles drop constraint if exists profiles_role_check;
 alter table public.profiles add constraint profiles_role_check
-  check (role in ('client', 'agent_commercial', 'admin', 'super_root'));
+  check (role in ('client', 'supplier', 'agent_commercial', 'admin', 'super_root'));
 alter table public.profiles add column if not exists commercial_agent_id uuid references public.profiles(id);
 
 alter table public.chat_messages drop constraint if exists chat_messages_author_role_check;
 alter table public.chat_messages add constraint chat_messages_author_role_check
-  check (author_role in ('client', 'agent_commercial', 'admin', 'super_root'));
+  check (author_role in ('client', 'supplier', 'agent_commercial', 'admin', 'super_root'));
 
 create or replace function public.is_commercial_agent()
 returns boolean
@@ -49,8 +49,8 @@ begin
     and not public.is_super_root()
     and not (
       public.is_admin()
-      and old.role in ('client', 'agent_commercial')
-      and new.role in ('client', 'agent_commercial')
+      and old.role in ('client', 'supplier', 'agent_commercial')
+      and new.role in ('client', 'supplier', 'agent_commercial')
     )
     and session_user not in ('postgres', 'supabase_admin')
   then
@@ -66,8 +66,8 @@ $$;
 drop policy if exists "Admin manage client profiles" on public.profiles;
 drop policy if exists "Commercial agent read assigned profiles" on public.profiles;
 create policy "Admin manage client profiles" on public.profiles for all
-  using (public.is_admin() and role in ('client', 'agent_commercial'))
-  with check (public.is_admin() and role in ('client', 'agent_commercial'));
+  using (public.is_admin() and role in ('client', 'supplier', 'agent_commercial'))
+  with check (public.is_admin() and role in ('client', 'supplier', 'agent_commercial'));
 create policy "Commercial agent read assigned profiles" on public.profiles for select
   using (role = 'client' and commercial_agent_id = auth.uid());
 

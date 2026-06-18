@@ -178,6 +178,10 @@
             <input type="text" name="vat_number" placeholder="Code TVA">
           </label>
           <label>
+            Mot de passe espace fournisseur (optionnel)
+            <input type="password" name="supplier_password" minlength="6" autocomplete="new-password" placeholder="Créer un compte fournisseur">
+          </label>
+          <label>
             Notes
             <textarea name="notes" rows="3" placeholder="Conditions, produits, remarques"></textarea>
           </label>
@@ -189,6 +193,36 @@
             <button type="button" id="cancelSupplierBtn" class="btn btn-outline-dark">Annuler</button>
           </div>
           <p class="form-note" id="supplierNote"></p>
+        </form>
+      </div>
+
+      <div class="dashboard-card">
+        <h2>Commander auprès d'un fournisseur</h2>
+        <form id="supplierOrderForm" class="auth-form">
+          <label>
+            Fournisseur
+            <select name="supplier_id" id="supplierOrderSupplierSelect" required></select>
+          </label>
+          <label>
+            Produit
+            <select name="product_slug" id="supplierOrderProductSelect" required></select>
+          </label>
+          <div class="form-row">
+            <label>
+              Quantité
+              <input type="number" name="quantity" min="1" required>
+            </label>
+            <label>
+              Arrivée prévue
+              <input type="date" name="expected_arrival_date">
+            </label>
+          </div>
+          <label>
+            Notes
+            <textarea name="notes" rows="2" placeholder="Instructions fournisseur"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Créer la commande fournisseur</button>
+          <p class="form-note" id="supplierOrderNote"></p>
         </form>
       </div>
 

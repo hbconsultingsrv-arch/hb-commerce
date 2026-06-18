@@ -175,6 +175,42 @@ async function createCommercialAgentUser({ email, password, fullName, phone }) {
   return savedProfile;
 }
 
+async function createSupplierUser({ supplierId, email, password, fullName, phone }) {
+  const authClient = getDetachedSupabaseClient();
+  const { data, error } = await authClient.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: getEmailConfirmRedirectUrl(),
+      data: {
+        full_name: fullName || '',
+        phone: phone || '',
+        company: 'Fournisseur'
+      }
+    }
+  });
+  if (error) throw error;
+  if (!data.user?.id) throw new Error('Compte fournisseur non créé dans Supabase Auth.');
+
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { data: savedProfile, error: profileError } = await sb
+    .from('profiles')
+    .upsert({
+      id: data.user.id,
+      email,
+      full_name: fullName || '',
+      phone: phone || '',
+      company: 'Fournisseur',
+      supplier_id: supplierId,
+      role: 'supplier'
+    }, { onConflict: 'id' })
+    .select()
+    .single();
+  if (profileError) throw profileError;
+  return savedProfile;
+}
+
 async function assignCommercialAgent(clientId, agentId) {
   const sb = getSupabase();
   if (!sb) throw new Error(configErrorMessage());
@@ -233,6 +269,72 @@ async function deleteSupplier(id) {
   if (!sb) throw new Error(configErrorMessage());
   const { error } = await sb.from('suppliers').delete().eq('id', id);
   if (error) throw error;
+}
+
+async function fetchProductStocks(productSlugs = null) {
+  const sb = getSupabase();
+  if (!sb) return [];
+  let query = sb.from('product_stocks').select('*');
+  if (productSlugs?.length) query = query.in('product_slug', productSlugs);
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+async function fetchSupplierStocks(supplierId) {
+  const sb = getSupabase();
+  if (!sb) return [];
+  const { data, error } = await sb
+    .from('product_stocks')
+    .select('*')
+    .eq('supplier_id', supplierId)
+    .order('product_slug', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+async function upsertProductStock({ supplierId, productSlug, quantity, reservedQuantity = 0, leadTimeDays = 7 }) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { data, error } = await sb
+    .from('product_stocks')
+    .upsert({
+      supplier_id: supplierId,
+      product_slug: productSlug,
+      quantity,
+      reserved_quantity: reservedQuantity,
+      lead_time_days: leadTimeDays
+    }, { onConflict: 'supplier_id,product_slug' })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+async function fetchSupplierOrders(supplierId = null) {
+  const sb = getSupabase();
+  if (!sb) return [];
+  let query = sb.from('supplier_orders').select('*').order('created_at', { ascending: false });
+  if (supplierId) query = query.eq('supplier_id', supplierId);
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+async function createSupplierOrder(order) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { data, error } = await sb.from('supplier_orders').insert(order).select().single();
+  if (error) throw error;
+  return data;
+}
+
+async function updateSupplierOrder(id, fields) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { data, error } = await sb.from('supplier_orders').update(fields).eq('id', id).select().single();
+  if (error) throw error;
+  return data;
 }
 
 async function createProduct(product) {
@@ -406,7 +508,7 @@ async function moderateChatMessage(id, status, moderatorId) {
   return data;
 }
 
-async function createOrder({ userId, items, total, paymentMethod, notes, shippingAddress }) {
+async function createOrder({ userId, items, total, paymentMethod, notes, shippingAddress, estimatedDeliveryDate }) {
   const sb = getSupabase();
   if (!sb) throw new Error(configErrorMessage());
 
@@ -420,7 +522,8 @@ async function createOrder({ userId, items, total, paymentMethod, notes, shippin
       status,
       payment_method: paymentMethod,
       notes,
-      shipping_address: shippingAddress
+      shipping_address: shippingAddress,
+      estimated_delivery_date: estimatedDeliveryDate || null
     })
     .select()
     .single();

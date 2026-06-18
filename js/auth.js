@@ -102,6 +102,10 @@ function isCommercialAgentProfile(profile) {
   return profile?.role === 'agent_commercial';
 }
 
+function isSupplierProfile(profile) {
+  return profile?.role === 'supplier';
+}
+
 function isBackofficeProfile(profile) {
   return isAdminProfile(profile) || isCommercialAgentProfile(profile);
 }
@@ -111,6 +115,7 @@ async function getDefaultDashboardUrl(session) {
   const profile = await getProfile(session.user.id);
   if (isSuperRootProfile(profile)) return 'super-root.html';
   if (isBackofficeProfile(profile)) return 'admin.html';
+  if (isSupplierProfile(profile)) return 'supplier.html';
   return 'compte.html';
 }
 

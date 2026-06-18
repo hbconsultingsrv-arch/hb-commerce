@@ -73,7 +73,7 @@ function renderProfilesTable() {
       <td>${escapeHtml(profile.email || '—')}</td>
       <td>
         <select data-role-profile="${profile.id}">
-          ${['client', 'agent_commercial', 'admin', 'super_root'].map((role) => `
+          ${['client', 'supplier', 'agent_commercial', 'admin', 'super_root'].map((role) => `
             <option value="${role}" ${profile.role === role ? 'selected' : ''}>${role}</option>
           `).join('')}
         </select>
