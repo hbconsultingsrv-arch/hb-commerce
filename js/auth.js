@@ -164,4 +164,26 @@ async function updateNavAuth() {
   }, { once: true });
 }
 
-document.addEventListener('DOMContentLoaded', updateNavAuth);
+function bindMobileNav() {
+  const toggle = document.querySelector('.nav-toggle');
+  const links = document.querySelector('.nav-links');
+  if (!toggle || !links || toggle.dataset.bound === '1') return;
+
+  toggle.dataset.bound = '1';
+  toggle.addEventListener('click', () => {
+    const open = links.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  links.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      links.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  bindMobileNav();
+  updateNavAuth();
+});

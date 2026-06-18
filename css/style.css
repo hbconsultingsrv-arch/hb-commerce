@@ -23,6 +23,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -30,6 +31,7 @@ body {
   color: var(--text);
   background: var(--cream);
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 .container {
@@ -379,25 +381,65 @@ body {
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .nav {
+    min-height: 74px;
+    padding: 0.85rem 1rem;
+  }
+  .logo-img {
+    max-width: min(190px, 54vw);
+    height: auto;
+  }
   .nav-toggle { display: flex; }
   .nav-links {
     position: fixed;
-    top: 60px;
+    top: 74px;
     left: 0;
     right: 0;
     background: var(--green-dark);
     flex-direction: column;
+    align-items: stretch;
     padding: 1.5rem;
     gap: 1rem;
     transform: translateY(-120%);
     opacity: 0;
     transition: 0.3s;
     pointer-events: none;
+    z-index: 99;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+  }
+  .nav-links li,
+  .nav-links a,
+  .nav-links .btn {
+    width: 100%;
+  }
+  .nav-links a,
+  .nav-links .btn {
+    justify-content: center;
+    text-align: center;
   }
   .nav-links.open {
     transform: translateY(0);
     opacity: 1;
     pointer-events: all;
+  }
+  .nav-actions {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .dashboard-main {
+    padding: 2rem 1rem 4rem;
+  }
+  .dashboard-header h1 {
+    font-size: clamp(2rem, 9vw, 2.55rem);
+    line-height: 1.12;
+  }
+  .auth-sub {
+    font-size: 1rem;
   }
   .dashboard-grid, .form-row { grid-template-columns: 1fr; }
 }
