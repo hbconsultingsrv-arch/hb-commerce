@@ -48,10 +48,14 @@
   <script>
     const params = new URLSearchParams(window.location.search);
     const redirect = params.get('redirect') || 'compte.html';
+    const note = document.getElementById('loginNote');
+
+    if (params.get('confirmed') === '1') {
+      showAlert(note, 'E-mail confirmé. Vous pouvez vous connecter.', 'success');
+    }
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const note = document.getElementById('loginNote');
       const fd = new FormData(e.target);
       try {
         await signIn(fd.get('email'), fd.get('password'));

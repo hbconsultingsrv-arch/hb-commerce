@@ -42,9 +42,12 @@ window.HB_CONFIG = {
 1. **Authentication** → **Providers** → **Email** → activé
 2. **Authentication** → **URL Configuration** :
    - **Site URL** : `https://hbconsultingsrv-arch.github.io/hb-commerce/`
-   - **Redirect URLs** : ajoutez la même URL
+   - **Redirect URLs** : ajoutez :
+     - `https://hbconsultingsrv-arch.github.io/hb-commerce/`
+     - `https://hbconsultingsrv-arch.github.io/hb-commerce/login.html?confirmed=1`
+     - `https://hbconsultingsrv-arch.github.io/hb-commerce/**`
 
-> Pour les tests en local, ajoutez aussi `http://localhost:8080`
+> Supprimez `http://localhost:3000` des URL de production si vous ne l'utilisez plus. Pour les tests en local, ajoutez aussi `http://localhost:8080/**`.
 
 ## 6. Activer l'espace super root et admin
 

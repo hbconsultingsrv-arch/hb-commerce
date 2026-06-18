@@ -34,6 +34,10 @@ async function signIn(email, password) {
   return data;
 }
 
+function getEmailConfirmRedirectUrl() {
+  return new URL('login.html?confirmed=1', window.location.href).toString();
+}
+
 async function signUp({ email, password, fullName, phone, company }) {
   const sb = getSupabase();
   if (!sb) throw new Error(configErrorMessage());
@@ -41,6 +45,7 @@ async function signUp({ email, password, fullName, phone, company }) {
     email,
     password,
     options: {
+      emailRedirectTo: getEmailConfirmRedirectUrl(),
       data: { full_name: fullName, phone, company: company || '' }
     }
   });
