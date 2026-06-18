@@ -15,6 +15,7 @@ async function initSupplierSpace() {
   document.getElementById('supplierName').textContent = supplierProfile.full_name || supplierProfile.email;
   document.getElementById('refreshSupplierStockBtn')?.addEventListener('click', loadSupplierStock);
   document.getElementById('refreshSupplierOrdersBtn')?.addEventListener('click', loadSupplierOrders);
+  bindSectionTabs();
 
   supplierProducts = await fetchAllProducts();
   await loadSupplierStock();

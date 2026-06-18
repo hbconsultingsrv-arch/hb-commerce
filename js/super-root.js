@@ -25,6 +25,7 @@ async function initSuperRoot() {
   document.getElementById('internalUserForm')?.addEventListener('submit', handleInternalUserSubmit);
   document.getElementById('profileEditForm')?.addEventListener('submit', handleProfileEditSubmit);
   document.getElementById('resetProfileEditBtn')?.addEventListener('click', resetProfileEditForm);
+  bindSectionTabs();
   await loadSuperRootData();
 }
 
@@ -96,8 +97,9 @@ async function handleInternalUserSubmit(e) {
       phone: fd.get('phone'),
       role: fd.get('internal_role')
     });
-    e.target.reset();
     showAlert(note, 'Utilisateur interne HB Commerce créé.', 'success');
+    e.target.reset();
+    activateSectionTab('superRootPanel', 'equipe');
     await loadSuperRootData();
   } catch (err) {
     showAlert(note, mapAuthError(err));
@@ -115,7 +117,7 @@ function editProfile(profileId) {
   form.elements.phone.value = profile.phone || '';
   form.elements.role.value = profile.role || 'agent_commercial';
   document.getElementById('profileEditTitle').textContent = `Modifier ${personLabel(profile)}`;
-  form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  activateSectionTab('superRootPanel', 'modifier');
 }
 
 async function handleProfileEditSubmit(e) {
@@ -144,6 +146,7 @@ async function handleProfileEditSubmit(e) {
     });
     showAlert(note, 'Utilisateur interne mis à jour.', 'success');
     resetProfileEditForm();
+    activateSectionTab('superRootPanel', 'equipe');
     await loadSuperRootData();
   } catch (err) {
     showAlert(note, err.message);

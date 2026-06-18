@@ -26,11 +26,39 @@
     <header class="dashboard-header">
       <span class="section-tag">Super root</span>
       <h1>Utilisateurs HB Commerce</h1>
-      <p class="auth-sub">Gérez uniquement les comptes internes HB Commerce : super root, admin et agents commerciaux. Les sociétés clientes, produits, prix et chat sont gérés dans le dashboard admin.</p>
+      <p class="auth-sub">Gérez uniquement les comptes internes HB Commerce. Les sociétés, produits, prix et chat sont dans le dashboard admin.</p>
     </header>
 
-    <section class="admin-panel">
-      <div class="dashboard-card">
+    <section id="superRootPanel" class="admin-panel" data-tab-scope>
+      <div class="section-tabs" data-section-tabs>
+        <button type="button" class="section-tab active" data-section="equipe">Équipe</button>
+        <button type="button" class="section-tab" data-section="creer">Créer</button>
+        <button type="button" class="section-tab" data-section="modifier">Modifier</button>
+      </div>
+
+      <div data-section-panel="equipe" class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Équipe HB Commerce</h2>
+          <button type="button" id="refreshProfilesBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>E-mail</th>
+                <th>Téléphone</th>
+                <th>Rôle</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="profilesBody"></tbody>
+          </table>
+        </div>
+        <p class="form-note" id="profilesNote"></p>
+      </div>
+
+      <div data-section-panel="creer" class="dashboard-card" hidden>
         <h2>Créer un utilisateur interne</h2>
         <form id="internalUserForm" class="auth-form">
           <label>
@@ -63,11 +91,10 @@
           </div>
           <button type="submit" class="btn btn-primary">Créer l'utilisateur interne</button>
           <p class="form-note" id="internalUserNote"></p>
-          <p class="form-note">Ces comptes sont automatiquement rattachés à HB Commerce.</p>
         </form>
       </div>
 
-      <div class="dashboard-card">
+      <div data-section-panel="modifier" class="dashboard-card" hidden>
         <h2 id="profileEditTitle">Modifier un utilisateur interne</h2>
         <form id="profileEditForm" class="auth-form">
           <input type="hidden" name="id">
@@ -101,28 +128,6 @@
           </div>
           <p class="form-note" id="profileEditNote"></p>
         </form>
-      </div>
-
-      <div class="dashboard-card dashboard-card-wide">
-        <div class="dashboard-card-head">
-          <h2>Équipe HB Commerce</h2>
-          <button type="button" id="refreshProfilesBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
-        </div>
-        <div class="table-wrap">
-          <table class="requests-table">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>E-mail</th>
-                <th>Téléphone</th>
-                <th>Rôle</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="profilesBody"></tbody>
-          </table>
-        </div>
-        <p class="form-note" id="profilesNote"></p>
       </div>
     </section>
   </main>

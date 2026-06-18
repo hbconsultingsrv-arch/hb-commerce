@@ -39,8 +39,33 @@
       <button type="button" class="admin-tab" data-tab="chat">Chat &amp; modération</button>
     </div>
 
-    <section id="panel-produits" class="admin-panel">
-      <div class="dashboard-card">
+    <section id="panel-produits" class="admin-panel" data-tab-scope>
+      <div class="section-tabs" data-section-tabs>
+        <button type="button" class="section-tab active" data-section="liste">Catalogue</button>
+        <button type="button" class="section-tab" data-section="formulaire">Ajouter / modifier</button>
+      </div>
+
+      <div data-section-panel="liste" class="dashboard-card dashboard-card-wide">
+        <h2>Produits enregistrés</h2>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Produit</th>
+                <th>Fournisseur</th>
+                <th>Prix</th>
+                <th>Badge</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div data-section-panel="formulaire" class="dashboard-card" hidden>
         <h2 id="productFormTitle">Ajouter un produit</h2>
         <form id="productForm" class="auth-form">
           <div class="form-row">
@@ -113,30 +138,38 @@
           <p class="form-note" id="productNote"></p>
         </form>
       </div>
+    </section>
 
-      <div class="dashboard-card dashboard-card-wide">
-        <h2>Produits enregistrés</h2>
+    <section id="panel-fournisseurs" class="admin-panel admin-only" hidden data-tab-scope>
+      <div class="section-tabs" data-section-tabs>
+        <button type="button" class="section-tab active" data-section="liste">Fournisseurs</button>
+        <button type="button" class="section-tab" data-section="ajouter">Ajouter</button>
+        <button type="button" class="section-tab" data-section="commander">Commander</button>
+      </div>
+
+      <div data-section-panel="liste" class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Fournisseurs enregistrés</h2>
+          <button type="button" id="refreshSuppliersBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
         <div class="table-wrap">
           <table class="requests-table">
             <thead>
               <tr>
-                <th>Image</th>
-                <th>Produit</th>
-                <th>Fournisseur</th>
-                <th>Prix</th>
-                <th>Badge</th>
+                <th>Nom</th>
+                <th>Contact</th>
+                <th>Pays</th>
+                <th>TVA</th>
                 <th>Statut</th>
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody id="productsBody"></tbody>
+            <tbody id="suppliersBody"></tbody>
           </table>
         </div>
       </div>
-    </section>
 
-    <section id="panel-fournisseurs" class="admin-panel admin-only" hidden>
-      <div class="dashboard-card">
+      <div data-section-panel="ajouter" class="dashboard-card" hidden>
         <h2 id="supplierFormTitle">Ajouter un fournisseur</h2>
         <form id="supplierForm" class="auth-form">
           <div class="form-row">
@@ -196,7 +229,7 @@
         </form>
       </div>
 
-      <div class="dashboard-card">
+      <div data-section-panel="commander" class="dashboard-card" hidden>
         <h2>Commander auprès d'un fournisseur</h2>
         <form id="supplierOrderForm" class="auth-form">
           <label>
@@ -225,28 +258,6 @@
           <p class="form-note" id="supplierOrderNote"></p>
         </form>
       </div>
-
-      <div class="dashboard-card dashboard-card-wide">
-        <div class="dashboard-card-head">
-          <h2>Fournisseurs enregistrés</h2>
-          <button type="button" id="refreshSuppliersBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
-        </div>
-        <div class="table-wrap">
-          <table class="requests-table">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Contact</th>
-                <th>Pays</th>
-                <th>TVA</th>
-                <th>Statut</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="suppliersBody"></tbody>
-          </table>
-        </div>
-      </div>
     </section>
 
     <section id="panel-commandes" class="admin-panel" hidden>
@@ -271,8 +282,36 @@
       </div>
     </section>
 
-    <section id="panel-clients" class="admin-panel" hidden>
-      <div class="dashboard-card admin-only">
+    <section id="panel-clients" class="admin-panel" hidden data-tab-scope>
+      <div class="section-tabs" data-section-tabs>
+        <button type="button" class="section-tab active" data-section="liste">Sociétés enregistrées</button>
+        <button type="button" class="section-tab admin-only" data-section="creer">Créer une société</button>
+      </div>
+
+      <div data-section-panel="liste" class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Sociétés clients / fournisseurs</h2>
+          <button type="button" id="refreshClientsBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Société</th>
+                <th>Type</th>
+                <th>Contact</th>
+                <th>SIREN</th>
+                <th>TVA</th>
+                <th>Agent</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody id="clientsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div data-section-panel="creer" class="dashboard-card admin-only" hidden>
         <h2>Créer société client / fournisseur</h2>
         <form id="adminClientForm" class="auth-form">
           <label>
@@ -329,29 +368,6 @@
           <button type="submit" class="btn btn-primary">Créer la société</button>
           <p class="form-note" id="adminClientNote"></p>
         </form>
-      </div>
-
-      <div class="dashboard-card dashboard-card-wide">
-        <div class="dashboard-card-head">
-          <h2>Sociétés clients / fournisseurs</h2>
-          <button type="button" id="refreshClientsBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
-        </div>
-        <div class="table-wrap">
-          <table class="requests-table">
-            <thead>
-              <tr>
-                <th>Société</th>
-                <th>Type</th>
-                <th>Contact</th>
-                <th>SIREN</th>
-                <th>TVA</th>
-                <th>Agent</th>
-                <th>Email</th>
-              </tr>
-            </thead>
-            <tbody id="clientsBody"></tbody>
-          </table>
-        </div>
       </div>
     </section>
 

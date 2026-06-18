@@ -2,6 +2,8 @@ async function initDashboard() {
   const session = await requireAuth();
   if (!session) return;
 
+  bindDashboardTabs('#compteTabs .admin-tab');
+
   const profile = await getProfile(session.user.id);
   const welcomeName = document.getElementById('welcomeName');
   if (welcomeName) welcomeName.textContent = profile?.full_name || session.user.email;

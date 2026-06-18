@@ -28,47 +28,54 @@
       <p class="auth-sub">Gérez votre stock disponible et suivez les commandes d’approvisionnement HB Commerce.</p>
     </header>
 
-    <section class="dashboard-card dashboard-card-wide">
-      <div class="dashboard-card-head">
-        <h2>Stock existant</h2>
-        <button type="button" id="refreshSupplierStockBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+    <section id="supplierPanel" class="admin-panel" data-tab-scope>
+      <div class="section-tabs" data-section-tabs>
+        <button type="button" class="section-tab active" data-section="stock">Stock</button>
+        <button type="button" class="section-tab" data-section="commandes">Commandes HB</button>
       </div>
-      <div class="table-wrap">
-        <table class="requests-table">
-          <thead>
-            <tr>
-              <th>Produit</th>
-              <th>Stock</th>
-              <th>Réservé</th>
-              <th>Délai fournisseur</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="supplierStockBody"></tbody>
-        </table>
-      </div>
-    </section>
 
-    <section class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
-      <div class="dashboard-card-head">
-        <h2>Commandes HB Commerce</h2>
-        <button type="button" id="refreshSupplierOrdersBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+      <div data-section-panel="stock" class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Stock existant</h2>
+          <button type="button" id="refreshSupplierStockBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th>Stock</th>
+                <th>Réservé</th>
+                <th>Délai fournisseur</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="supplierStockBody"></tbody>
+          </table>
+        </div>
       </div>
-      <div class="table-wrap">
-        <table class="requests-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Produit</th>
-              <th>Quantité</th>
-              <th>Statut</th>
-              <th>Arrivée prévue</th>
-              <th>Suivi</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="supplierOrdersBody"></tbody>
-        </table>
+
+      <div data-section-panel="commandes" class="dashboard-card dashboard-card-wide" hidden>
+        <div class="dashboard-card-head">
+          <h2>Commandes HB Commerce</h2>
+          <button type="button" id="refreshSupplierOrdersBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Statut</th>
+                <th>Arrivée prévue</th>
+                <th>Suivi</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="supplierOrdersBody"></tbody>
+          </table>
+        </div>
       </div>
     </section>
   </main>

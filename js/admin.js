@@ -56,6 +56,7 @@ async function initAdmin() {
   document.getElementById('refreshClientsBtn')?.addEventListener('click', loadClientsPanel);
   document.getElementById('adminCustomerPriceForm')?.addEventListener('submit', handleAdminCustomerPriceSubmit);
   syncCompanyTypeFields();
+  bindSectionTabs();
 }
 
 async function loadProductsTable() {
@@ -113,6 +114,7 @@ function editProduct(id, products) {
   form.active.checked = p.active;
   document.getElementById('productFormTitle').textContent = 'Modifier le produit';
   document.getElementById('saveProductBtn').textContent = 'Enregistrer';
+  activateSectionTab('panel-produits', 'formulaire');
 }
 
 function resetProductForm() {
@@ -122,6 +124,7 @@ function resetProductForm() {
   form.active.checked = true;
   document.getElementById('productFormTitle').textContent = 'Ajouter un produit';
   document.getElementById('saveProductBtn').textContent = 'Ajouter';
+  activateSectionTab('panel-produits', 'liste');
 }
 
 async function handleProductSubmit(e) {
@@ -154,6 +157,7 @@ async function handleProductSubmit(e) {
       showAlert(note, 'Produit ajouté.', 'success');
     }
     resetProductForm();
+    activateSectionTab('panel-produits', 'liste');
     await loadProductsTable();
   } catch (err) {
     showAlert(note, err.message);
@@ -244,6 +248,7 @@ function editSupplier(id) {
   form.active.checked = supplier.active;
   document.getElementById('supplierFormTitle').textContent = 'Modifier le fournisseur';
   document.getElementById('saveSupplierBtn').textContent = 'Enregistrer';
+  activateSectionTab('panel-fournisseurs', 'ajouter');
 }
 
 function resetSupplierForm() {
@@ -294,6 +299,7 @@ async function handleSupplierSubmit(e) {
       showAlert(note, 'Fournisseur et compte fournisseur créés.', 'success');
     }
     resetSupplierForm();
+    activateSectionTab('panel-fournisseurs', 'liste');
     await loadSuppliersTable();
     await loadProductsTable();
   } catch (err) {
@@ -559,6 +565,7 @@ async function handleAdminClientSubmit(e) {
     }
     e.target.reset();
     showAlert(note, companyType === 'supplier' ? 'Société fournisseur créée.' : 'Société cliente créée.', 'success');
+    activateSectionTab('panel-clients', 'liste');
     await loadClientsPanel();
     await loadSuppliersTable();
     await loadAdminChatPanel();

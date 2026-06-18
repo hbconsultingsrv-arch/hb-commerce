@@ -33,27 +33,43 @@
       </div>
     </header>
 
-    <section class="dashboard-card dashboard-card-wide" style="margin-bottom:1.5rem">
-      <div class="dashboard-card-head">
-        <h2>Chat avec HB Commerce</h2>
-        <button type="button" id="refreshChatBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+    <div class="admin-tabs" id="compteTabs">
+      <button type="button" class="admin-tab active" data-tab="commandes">Mes commandes</button>
+      <button type="button" class="admin-tab" data-tab="profil">Mon profil</button>
+      <button type="button" class="admin-tab" data-tab="chat">Chat</button>
+    </div>
+
+    <section id="panel-commandes" class="admin-panel">
+      <div class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Mes commandes</h2>
+          <a href="produits.html" class="btn btn-sm btn-primary">+ Commander</a>
+        </div>
+        <div id="ordersEmpty" class="empty-state" hidden>
+          <p>Aucune commande pour le moment.</p>
+          <a href="produits.html" class="btn btn-sm btn-outline-dark">Voir les produits</a>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table" id="ordersTable" hidden>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>N°</th>
+                <th>Produits</th>
+                <th>Total</th>
+                <th>Statut</th>
+                <th>Livraison</th>
+                <th>Facture</th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+        </div>
       </div>
-      <div id="companyChatHistory" class="chat-history">
-        <p class="empty-state">Chargement du chat…</p>
-      </div>
-      <form id="companyChatForm" class="auth-form" style="margin-top:1rem">
-        <label>
-          Message à l'administration
-          <textarea name="message" rows="3" required placeholder="Écrivez votre message à HB Commerce"></textarea>
-        </label>
-        <button type="submit" class="btn btn-primary">Envoyer le message</button>
-        <p class="form-note" id="companyChatNote"></p>
-      </form>
-      <p class="form-note" style="margin-top:0.5rem">Les messages société sont visibles dans l'historique après modération.</p>
     </section>
 
-    <div class="dashboard-grid">
-      <section class="dashboard-card">
+    <section id="panel-profil" class="admin-panel" hidden>
+      <div class="dashboard-card">
         <h2>Mes informations</h2>
         <form id="profileForm" class="auth-form">
           <label>
@@ -89,35 +105,29 @@
           <button type="submit" class="btn btn-primary">Enregistrer</button>
           <p class="form-note" id="profileNote"></p>
         </form>
-      </section>
+      </div>
+    </section>
 
-      <section class="dashboard-card dashboard-card-wide">
+    <section id="panel-chat" class="admin-panel" hidden>
+      <div class="dashboard-card dashboard-card-wide">
         <div class="dashboard-card-head">
-          <h2>Mes commandes</h2>
-          <a href="produits.html" class="btn btn-sm btn-primary">+ Commander</a>
+          <h2>Chat avec HB Commerce</h2>
+          <button type="button" id="refreshChatBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
         </div>
-        <div id="ordersEmpty" class="empty-state" hidden>
-          <p>Aucune commande pour le moment.</p>
-          <a href="produits.html" class="btn btn-sm btn-outline-dark">Voir les produits</a>
+        <div id="companyChatHistory" class="chat-history">
+          <p class="empty-state">Chargement du chat…</p>
         </div>
-        <div class="table-wrap">
-          <table class="requests-table" id="ordersTable" hidden>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>N°</th>
-                <th>Produits</th>
-                <th>Total</th>
-                <th>Statut</th>
-                <th>Livraison</th>
-                <th>Facture</th>
-              </tr>
-            </thead>
-            <tbody id="ordersBody"></tbody>
-          </table>
-        </div>
-      </section>
-    </div>
+        <form id="companyChatForm" class="auth-form" style="margin-top:1rem">
+          <label>
+            Message à l'administration
+            <textarea name="message" rows="3" required placeholder="Écrivez votre message à HB Commerce"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Envoyer le message</button>
+          <p class="form-note" id="companyChatNote"></p>
+        </form>
+        <p class="form-note" style="margin-top:0.5rem">Les messages société sont visibles après modération.</p>
+      </div>
+    </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

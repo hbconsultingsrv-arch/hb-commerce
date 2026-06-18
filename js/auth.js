@@ -202,6 +202,45 @@ function showAlert(el, message, type = 'error') {
   el.className = `form-note ${type === 'success' ? 'success' : 'error'}`;
 }
 
+function activateSectionTabScope(scope, sectionId) {
+  if (!scope || !sectionId) return;
+  const tabBar = scope.querySelector('[data-section-tabs]');
+  tabBar?.querySelectorAll('.section-tab').forEach((tab) => {
+    tab.classList.toggle('active', tab.dataset.section === sectionId);
+  });
+  scope.querySelectorAll('[data-section-panel]').forEach((panel) => {
+    panel.hidden = panel.dataset.sectionPanel !== sectionId;
+  });
+}
+
+function activateSectionTab(scopeId, sectionId) {
+  const scope = typeof scopeId === 'string' ? document.getElementById(scopeId) : scopeId;
+  activateSectionTabScope(scope, sectionId);
+}
+
+function bindSectionTabs(root = document) {
+  root.querySelectorAll('[data-section-tabs]').forEach((tabBar) => {
+    if (tabBar.dataset.bound === '1') return;
+    tabBar.dataset.bound = '1';
+    const scope = tabBar.closest('[data-tab-scope]') || tabBar.parentElement;
+    tabBar.querySelectorAll('.section-tab').forEach((tab) => {
+      tab.addEventListener('click', () => activateSectionTabScope(scope, tab.dataset.section));
+    });
+  });
+}
+
+function bindDashboardTabs(tabSelector, panelPrefix = 'panel-') {
+  document.querySelectorAll(tabSelector).forEach((tab) => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll(tabSelector).forEach((t) => t.classList.remove('active'));
+      document.querySelectorAll('.admin-panel').forEach((p) => { p.hidden = true; });
+      tab.classList.add('active');
+      const panel = document.getElementById(`${panelPrefix}${tab.dataset.tab}`);
+      if (panel) panel.hidden = false;
+    });
+  });
+}
+
 async function updateNavAuth() {
   const loginLink = document.getElementById('navLogin');
   const accountLink = document.getElementById('navAccount');
