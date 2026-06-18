@@ -37,6 +37,53 @@
 
     <section id="panel-access" class="admin-panel">
       <div class="dashboard-card">
+        <h2>Créer un utilisateur</h2>
+        <form id="profileCreateForm" class="auth-form">
+          <div class="form-row">
+            <label>
+              Société
+              <input type="text" name="company" placeholder="Nom de la société" required>
+            </label>
+            <label>
+              Contact
+              <input type="text" name="full_name" placeholder="Nom du contact" required>
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              E-mail de connexion
+              <input type="email" name="email" placeholder="contact@societe.com" required>
+            </label>
+            <label>
+              Téléphone
+              <input type="tel" name="phone" placeholder="Téléphone">
+            </label>
+          </div>
+          <label>
+            Adresse
+            <input type="text" name="address" placeholder="Adresse société">
+          </label>
+          <div class="form-row">
+            <label>
+              Rôle
+              <select name="role" required>
+                <option value="client">Client</option>
+                <option value="admin">Admin</option>
+                <option value="super_root">Super root</option>
+              </select>
+            </label>
+            <label>
+              Mot de passe temporaire
+              <input type="password" name="password" minlength="6" required autocomplete="new-password">
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary">Créer l'utilisateur</button>
+          <p class="form-note" id="profileCreateNote"></p>
+          <p class="form-note">L'utilisateur recevra l'e-mail de confirmation Supabase si la confirmation e-mail est active.</p>
+        </form>
+      </div>
+
+      <div class="dashboard-card">
         <h2 id="profileEditTitle">Modifier un utilisateur</h2>
         <form id="profileEditForm" class="auth-form">
           <input type="hidden" name="id">

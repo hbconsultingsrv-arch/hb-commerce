@@ -71,6 +71,58 @@ async function updateProfileAsSuperRoot(profileId, fields) {
   return data;
 }
 
+function getDetachedSupabaseClient() {
+  if (!isConfigured() || !window.supabase) throw new Error(configErrorMessage());
+  return window.supabase.createClient(
+    normalizeSupabaseUrl(window.HB_CONFIG.supabaseUrl),
+    window.HB_CONFIG.supabaseAnonKey,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false
+      }
+    }
+  );
+}
+
+async function createUserAsSuperRoot({ email, password, fullName, phone, address, company, role }) {
+  const authClient = getDetachedSupabaseClient();
+  const { data, error } = await authClient.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: getEmailConfirmRedirectUrl(),
+      data: {
+        full_name: fullName || '',
+        phone: phone || '',
+        company: company || ''
+      }
+    }
+  });
+  if (error) throw error;
+  if (!data.user?.id) throw new Error('Utilisateur non créé dans Supabase Auth.');
+
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const profile = {
+    id: data.user.id,
+    email,
+    full_name: fullName || '',
+    phone: phone || '',
+    address: address || '',
+    company: company || '',
+    role: role || 'client'
+  };
+  const { data: savedProfile, error: profileError } = await sb
+    .from('profiles')
+    .upsert(profile, { onConflict: 'id' })
+    .select()
+    .single();
+  if (profileError) throw profileError;
+  return savedProfile;
+}
+
 async function fetchAllProducts() {
   const sb = getSupabase();
   if (!sb) return [];

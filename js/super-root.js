@@ -18,6 +18,7 @@ async function initSuperRoot() {
 
   document.getElementById('refreshProfilesBtn')?.addEventListener('click', loadSuperRootData);
   document.getElementById('customerPriceForm')?.addEventListener('submit', handleCustomerPriceSubmit);
+  document.getElementById('profileCreateForm')?.addEventListener('submit', handleProfileCreateSubmit);
   document.getElementById('profileEditForm')?.addEventListener('submit', handleProfileEditSubmit);
   document.getElementById('resetProfileEditBtn')?.addEventListener('click', resetProfileEditForm);
   await loadSuperRootData();
@@ -93,6 +94,29 @@ function resetProfileEditForm() {
   form.reset();
   form.elements.id.value = '';
   document.getElementById('profileEditTitle').textContent = 'Modifier un utilisateur';
+}
+
+async function handleProfileCreateSubmit(e) {
+  e.preventDefault();
+  const note = document.getElementById('profileCreateNote');
+  const fd = new FormData(e.target);
+
+  try {
+    await createUserAsSuperRoot({
+      email: fd.get('email'),
+      password: fd.get('password'),
+      fullName: fd.get('full_name'),
+      phone: fd.get('phone'),
+      address: fd.get('address'),
+      company: fd.get('company'),
+      role: fd.get('role')
+    });
+    e.target.reset();
+    showAlert(note, 'Utilisateur créé. Il peut confirmer son e-mail puis se connecter.', 'success');
+    await loadSuperRootData();
+  } catch (err) {
+    showAlert(note, mapAuthError(err));
+  }
 }
 
 function editProfile(profileId) {
