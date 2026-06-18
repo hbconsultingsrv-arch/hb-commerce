@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=tabs-20260619">
-  <link rel="stylesheet" href="css/commerce.css?v=tabs-20260619">
+  <link rel="stylesheet" href="css/style.css?v=tabs-20260619c">
+  <link rel="stylesheet" href="css/commerce.css?v=tabs-20260619c">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
 <body class="dashboard-page">
@@ -30,16 +30,19 @@
     </header>
 
     <section id="superRootPanel" class="admin-panel" data-tab-scope>
-      <div class="admin-tabs" id="superRootTabs">
+      <div class="admin-tabs admin-tabs-with-info" id="superRootTabs">
         <button type="button" class="admin-tab active" data-section="equipe">Équipe</button>
-        <button type="button" class="admin-tab" data-section="creer">Créer</button>
-        <button type="button" class="admin-tab" data-section="modifier">Modifier</button>
+        <button type="button" class="admin-tab" data-section="nouveau">Nouveau</button>
+        <button type="button" class="btn btn-sm btn-outline-dark admin-tabs-info" id="superRootInfoBtn">ℹ Aide</button>
       </div>
 
       <div data-section-panel="equipe" class="dashboard-card dashboard-card-wide">
         <div class="dashboard-card-head">
           <h2>Équipe HB Commerce</h2>
-          <button type="button" id="refreshProfilesBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+          <div class="dashboard-card-actions">
+            <button type="button" id="newProfileBtn" class="btn btn-sm btn-primary">Nouveau</button>
+            <button type="button" id="refreshProfilesBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+          </div>
         </div>
         <p class="auth-sub" style="margin-bottom:1rem">Uniquement les comptes internes : super root, admin et agents commerciaux. Les sociétés clientes et fournisseurs sont gérées dans le dashboard admin.</p>
         <div class="table-wrap">
@@ -59,8 +62,8 @@
         <p class="form-note" id="profilesNote"></p>
       </div>
 
-      <div data-section-panel="creer" class="dashboard-card" hidden>
-        <h2>Créer un utilisateur interne</h2>
+      <div data-section-panel="nouveau" class="dashboard-card" hidden>
+        <h2>Nouvel utilisateur interne</h2>
         <form id="internalUserForm" class="auth-form">
           <label>
             Profil interne
@@ -94,9 +97,35 @@
           <p class="form-note" id="internalUserNote"></p>
         </form>
       </div>
+    </section>
+  </main>
 
-      <div data-section-panel="modifier" class="dashboard-card" hidden>
+  <div id="superRootInfoModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog">
+      <div class="app-modal-header">
+        <h2>Aide — Super root</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
+        <p>Cet espace sert uniquement à gérer les <strong>comptes internes HB Commerce</strong> : super root, admin et agents commerciaux.</p>
+        <ul>
+          <li><strong>Équipe</strong> — liste des utilisateurs, changement de rôle et modification via le bouton en fin de ligne.</li>
+          <li><strong>Nouveau</strong> — création d'un compte interne avec mot de passe temporaire.</li>
+        </ul>
+        <p>Les sociétés clientes, fournisseurs, produits, prix et chat sont gérés dans le <a href="admin.html">dashboard admin</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="profileEditModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog">
+      <div class="app-modal-header">
         <h2 id="profileEditTitle">Modifier un utilisateur interne</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
         <form id="profileEditForm" class="auth-form">
           <input type="hidden" name="id">
           <div class="form-row">
@@ -130,14 +159,14 @@
           <p class="form-note" id="profileEditNote"></p>
         </form>
       </div>
-    </section>
-  </main>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js?v=tabs-20260619"></script>
-  <script src="js/admin-api.js?v=tabs-20260619"></script>
-  <script src="js/super-root.js?v=tabs-20260619"></script>
+  <script src="js/auth.js?v=tabs-20260619c"></script>
+  <script src="js/admin-api.js?v=tabs-20260619c"></script>
+  <script src="js/super-root.js?v=tabs-20260619c"></script>
 </body>
 </html>

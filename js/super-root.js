@@ -44,9 +44,13 @@ async function initSuperRoot() {
 
   document.getElementById('logoutBtn')?.addEventListener('click', signOut);
   document.getElementById('refreshProfilesBtn')?.addEventListener('click', loadSuperRootData);
+  document.getElementById('newProfileBtn')?.addEventListener('click', () => showSuperRootSection('nouveau'));
+  document.getElementById('superRootInfoBtn')?.addEventListener('click', () => openAppModal('superRootInfoModal'));
   document.getElementById('internalUserForm')?.addEventListener('submit', handleInternalUserSubmit);
   document.getElementById('profileEditForm')?.addEventListener('submit', handleProfileEditSubmit);
   document.getElementById('resetProfileEditBtn')?.addEventListener('click', resetProfileEditForm);
+  bindAppModal('superRootInfoModal');
+  bindAppModal('profileEditModal');
   bindSuperRootTabs();
   showSuperRootSection('equipe');
   await loadSuperRootData();
@@ -113,6 +117,7 @@ function resetProfileEditForm() {
   form.reset();
   form.elements.id.value = '';
   document.getElementById('profileEditTitle').textContent = 'Modifier un utilisateur interne';
+  showAlert(document.getElementById('profileEditNote'), '');
 }
 
 async function handleInternalUserSubmit(e) {
@@ -147,7 +152,8 @@ function editProfile(profileId) {
   form.elements.phone.value = profile.phone || '';
   form.elements.role.value = profile.role || 'agent_commercial';
   document.getElementById('profileEditTitle').textContent = `Modifier ${personLabel(profile)}`;
-  showSuperRootSection('modifier');
+  showAlert(document.getElementById('profileEditNote'), '');
+  openAppModal('profileEditModal');
 }
 
 async function handleProfileEditSubmit(e) {
@@ -176,6 +182,7 @@ async function handleProfileEditSubmit(e) {
     });
     showAlert(note, 'Utilisateur interne mis à jour.', 'success');
     resetProfileEditForm();
+    closeAppModal('profileEditModal');
     showSuperRootSection('equipe');
     await loadSuperRootData();
   } catch (err) {

@@ -334,6 +334,12 @@ body {
 
 .dashboard-card-head h2 { margin-bottom: 0; }
 
+.dashboard-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .table-wrap { overflow-x: auto; }
 
 .requests-table {
@@ -417,8 +423,94 @@ body {
   gap: 1.5rem;
 }
 
+.admin-tabs-with-info {
+  align-items: center;
+}
+
+.admin-tabs-with-info .admin-tabs-info {
+  margin-left: auto;
+}
+
 .admin-panel[hidden] {
   display: none !important;
+}
+
+.app-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.app-modal[hidden] {
+  display: none !important;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.app-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 45, 36, 0.55);
+}
+
+.app-modal-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 520px);
+  max-height: 90vh;
+  overflow: auto;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.18);
+}
+
+.app-modal-dialog-wide {
+  width: min(100%, 640px);
+}
+
+.app-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(26, 92, 74, 0.12);
+}
+
+.app-modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.app-modal-close {
+  border: 0;
+  background: transparent;
+  color: var(--green-dark);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.app-modal-body {
+  padding: 1.5rem;
+}
+
+.tracking-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.tracking-status {
+  font-size: 0.92rem;
+  color: var(--text-muted);
 }
 
 .section-tabs {

@@ -198,6 +198,11 @@ function showAlert(el, message, type = 'error') {
   if (typeof text !== 'string') {
     text = typeof mapAuthError === 'function' ? mapAuthError(message) : (message?.message || 'Erreur inconnue.');
   }
+  if (!text) {
+    el.textContent = '';
+    el.className = 'form-note';
+    return;
+  }
   el.textContent = text;
   el.className = `form-note ${type === 'success' ? 'success' : 'error'}`;
 }
@@ -238,6 +243,34 @@ function bindDashboardTabs(tabSelector, panelPrefix = 'panel-') {
       const panel = document.getElementById(`${panelPrefix}${tab.dataset.tab}`);
       if (panel) panel.hidden = false;
     });
+  });
+}
+
+function openAppModal(modalId) {
+  const modal = typeof modalId === 'string' ? document.getElementById(modalId) : modalId;
+  if (!modal) return;
+  modal.hidden = false;
+  document.body.classList.add('modal-open');
+}
+
+function closeAppModal(modalId) {
+  const modal = typeof modalId === 'string' ? document.getElementById(modalId) : modalId;
+  if (!modal) return;
+  modal.hidden = true;
+  if (!document.querySelector('.app-modal:not([hidden])')) {
+    document.body.classList.remove('modal-open');
+  }
+}
+
+function bindAppModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal || modal.dataset.bound === '1') return;
+  modal.dataset.bound = '1';
+  modal.querySelectorAll('[data-close-modal]').forEach((el) => {
+    el.addEventListener('click', () => closeAppModal(modalId));
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !modal.hidden) closeAppModal(modalId);
   });
 }
 

@@ -6,6 +6,7 @@ let adminProfiles = [];
 let adminSuppliers = [];
 let adminSelectedChatCompanyId = null;
 let adminChatBound = false;
+let adminOrders = [];
 
 function showAdminTab(tabId) {
   if (!tabId) return;
@@ -81,6 +82,9 @@ async function initAdmin() {
   syncCompanyTypeFields();
   bindSectionTabs();
   initSectionTabScopes();
+  bindAppModal('trackingModal');
+  document.getElementById('trackingModalForm')?.addEventListener('submit', handleTrackingModalSubmit);
+  populateTrackingStatusSelect();
 }
 
 async function loadProductsTable() {
@@ -351,15 +355,15 @@ async function handleSupplierOrderSubmit(e) {
 }
 
 async function loadOrdersTable() {
-  const orders = await fetchAllOrders();
+  adminOrders = await fetchAllOrders();
   const body = document.getElementById('ordersAdminBody');
   if (!body) return;
 
-  body.innerHTML = orders.map((order) => {
+  body.innerHTML = adminOrders.map((order) => {
     const items = (order.order_items || [])
       .map((i) => `${i.product_name} × ${i.quantity}`)
       .join(', ');
-    const statusLabel = ORDER_STATUS_LABELS[order.status] || order.status;
+    const deliveryLabel = DELIVERY_STATUS_LABELS[order.delivery_status || 'non_preparee'] || 'Non préparée';
     return `
       <tr>
         <td>${formatDate(order.created_at)}</td>
@@ -375,19 +379,9 @@ async function loadOrdersTable() {
           </select>
         </td>
         <td>
-          <div class="tracking-editor" data-tracking-order="${order.id}">
-            <select name="delivery_status">
-              ${Object.entries(DELIVERY_STATUS_LABELS).map(([k, v]) =>
-                `<option value="${k}" ${order.delivery_status === k ? 'selected' : ''}>${v}</option>`
-              ).join('')}
-            </select>
-            <input type="text" name="carrier" value="${escapeHtml(order.carrier || '')}" placeholder="Transporteur">
-            <input type="text" name="tracking_number" value="${escapeHtml(order.tracking_number || '')}" placeholder="N° suivi">
-            <input type="url" name="tracking_url" value="${escapeHtml(order.tracking_url || '')}" placeholder="Lien suivi">
-            <input type="date" name="estimated_delivery_date" value="${order.estimated_delivery_date || ''}">
-            <input type="datetime-local" name="delivered_at" value="${toDatetimeLocal(order.delivered_at)}">
-            <textarea name="delivery_notes" rows="2" placeholder="Notes livraison">${escapeHtml(order.delivery_notes || '')}</textarea>
-            <button type="button" class="btn btn-sm btn-primary" data-save-tracking="${order.id}">Enregistrer</button>
+          <div class="tracking-cell">
+            <span class="tracking-status">${escapeHtml(deliveryLabel)}</span>
+            <button type="button" class="btn btn-sm btn-outline-dark" data-open-tracking="${order.id}">Suivi</button>
           </div>
         </td>
       </tr>
@@ -399,21 +393,63 @@ async function loadOrdersTable() {
       await updateOrderStatus(select.dataset.order, select.value);
     });
   });
-  body.querySelectorAll('[data-save-tracking]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      const box = body.querySelector(`[data-tracking-order="${btn.dataset.saveTracking}"]`);
-      await updateOrderTracking(btn.dataset.saveTracking, {
-        delivery_status: box.querySelector('[name="delivery_status"]').value,
-        carrier: box.querySelector('[name="carrier"]').value || null,
-        tracking_number: box.querySelector('[name="tracking_number"]').value || null,
-        tracking_url: box.querySelector('[name="tracking_url"]').value || null,
-        estimated_delivery_date: box.querySelector('[name="estimated_delivery_date"]').value || null,
-        delivered_at: toIsoOrNull(box.querySelector('[name="delivered_at"]').value),
-        delivery_notes: box.querySelector('[name="delivery_notes"]').value || null
-      });
-      await loadOrdersTable();
-    });
+  body.querySelectorAll('[data-open-tracking]').forEach((btn) => {
+    btn.addEventListener('click', () => openTrackingModal(btn.dataset.openTracking));
   });
+}
+
+function populateTrackingStatusSelect() {
+  const select = document.getElementById('trackingDeliveryStatus');
+  if (!select) return;
+  select.innerHTML = Object.entries(DELIVERY_STATUS_LABELS)
+    .map(([value, label]) => `<option value="${value}">${label}</option>`)
+    .join('');
+}
+
+function openTrackingModal(orderId) {
+  const order = adminOrders.find((item) => item.id === orderId);
+  const form = document.getElementById('trackingModalForm');
+  if (!order || !form) return;
+
+  form.elements.order_id.value = order.id;
+  form.elements.delivery_status.value = order.delivery_status || 'non_preparee';
+  form.elements.carrier.value = order.carrier || '';
+  form.elements.tracking_number.value = order.tracking_number || '';
+  form.elements.tracking_url.value = order.tracking_url || '';
+  form.elements.estimated_delivery_date.value = order.estimated_delivery_date || '';
+  form.elements.delivered_at.value = toDatetimeLocal(order.delivered_at);
+  form.elements.delivery_notes.value = order.delivery_notes || '';
+  document.getElementById('trackingModalTitle').textContent = `Livraison / suivi — #${order.id.slice(0, 8)}`;
+  showAlert(document.getElementById('trackingModalNote'), '');
+  openAppModal('trackingModal');
+}
+
+async function handleTrackingModalSubmit(e) {
+  e.preventDefault();
+  const note = document.getElementById('trackingModalNote');
+  const fd = new FormData(e.target);
+  const orderId = fd.get('order_id');
+  if (!orderId) {
+    showAlert(note, 'Commande introuvable.');
+    return;
+  }
+
+  try {
+    await updateOrderTracking(orderId, {
+      delivery_status: fd.get('delivery_status'),
+      carrier: fd.get('carrier') || null,
+      tracking_number: fd.get('tracking_number') || null,
+      tracking_url: fd.get('tracking_url') || null,
+      estimated_delivery_date: fd.get('estimated_delivery_date') || null,
+      delivered_at: toIsoOrNull(fd.get('delivered_at')),
+      delivery_notes: fd.get('delivery_notes') || null
+    });
+    showAlert(note, 'Suivi livraison enregistré.', 'success');
+    closeAppModal('trackingModal');
+    await loadOrdersTable();
+  } catch (err) {
+    showAlert(note, err.message);
+  }
 }
 
 function toDatetimeLocal(value) {

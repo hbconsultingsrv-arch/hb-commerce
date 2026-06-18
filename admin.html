@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=tabs-20260619b">
-  <link rel="stylesheet" href="css/commerce.css?v=tabs-20260619b">
+  <link rel="stylesheet" href="css/style.css?v=tabs-20260619c">
+  <link rel="stylesheet" href="css/commerce.css?v=tabs-20260619c">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
 <body class="dashboard-page">
@@ -425,11 +425,60 @@
     </section>
   </main>
 
+  <div id="trackingModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog app-modal-dialog-wide">
+      <div class="app-modal-header">
+        <h2 id="trackingModalTitle">Livraison / suivi</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
+        <form id="trackingModalForm" class="auth-form">
+          <input type="hidden" name="order_id">
+          <label>
+            Statut livraison
+            <select name="delivery_status" id="trackingDeliveryStatus"></select>
+          </label>
+          <div class="form-row">
+            <label>
+              Transporteur
+              <input type="text" name="carrier" placeholder="Transporteur">
+            </label>
+            <label>
+              N° suivi
+              <input type="text" name="tracking_number" placeholder="N° suivi">
+            </label>
+          </div>
+          <label>
+            Lien suivi
+            <input type="url" name="tracking_url" placeholder="https://...">
+          </label>
+          <div class="form-row">
+            <label>
+              Livraison estimée
+              <input type="date" name="estimated_delivery_date">
+            </label>
+            <label>
+              Date de livraison
+              <input type="datetime-local" name="delivered_at">
+            </label>
+          </div>
+          <label>
+            Notes livraison
+            <textarea name="delivery_notes" rows="3" placeholder="Notes livraison"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <p class="form-note" id="trackingModalNote"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js?v=tabs-20260619b"></script>
-  <script src="js/admin-api.js?v=tabs-20260619b"></script>
-  <script src="js/admin.js?v=tabs-20260619b"></script>
+  <script src="js/auth.js?v=tabs-20260619c"></script>
+  <script src="js/admin-api.js?v=tabs-20260619c"></script>
+  <script src="js/admin.js?v=tabs-20260619c"></script>
 </body>
 </html>
