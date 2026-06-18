@@ -80,6 +80,14 @@ function isSuperRootProfile(profile) {
   return profile?.role === 'super_root';
 }
 
+async function getDefaultDashboardUrl(session) {
+  if (!session?.user?.id) return 'compte.html';
+  const profile = await getProfile(session.user.id);
+  if (isSuperRootProfile(profile)) return 'super-root.html';
+  if (isAdminProfile(profile)) return 'admin.html';
+  return 'compte.html';
+}
+
 async function updateProfile(userId, fields) {
   const sb = getSupabase();
   if (!sb) throw new Error(configErrorMessage());

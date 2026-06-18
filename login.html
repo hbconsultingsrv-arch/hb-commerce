@@ -47,7 +47,7 @@
   <script src="js/auth.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
-    const redirect = params.get('redirect') || 'compte.html';
+    const requestedRedirect = params.get('redirect');
     const note = document.getElementById('loginNote');
 
     if (params.get('confirmed') === '1') {
@@ -58,14 +58,16 @@
       e.preventDefault();
       const fd = new FormData(e.target);
       try {
-        await signIn(fd.get('email'), fd.get('password'));
-        window.location.href = redirect;
+        const data = await signIn(fd.get('email'), fd.get('password'));
+        window.location.href = requestedRedirect || await getDefaultDashboardUrl(data.session);
       } catch (err) {
         showAlert(note, mapAuthError(err));
       }
     });
 
-    getSession().then((s) => { if (s) window.location.href = redirect; });
+    getSession().then(async (s) => {
+      if (s) window.location.href = requestedRedirect || await getDefaultDashboardUrl(s);
+    });
   </script>
 </body>
 </html>
