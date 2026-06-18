@@ -7,6 +7,34 @@ let adminSuppliers = [];
 let adminSelectedChatCompanyId = null;
 let adminChatBound = false;
 
+function showAdminTab(tabId) {
+  if (!tabId) return;
+  document.querySelectorAll('.admin-tab').forEach((t) => {
+    t.classList.toggle('active', t.dataset.tab === tabId);
+  });
+  document.querySelectorAll('.admin-panel').forEach((p) => {
+    p.hidden = true;
+  });
+  const panel = document.getElementById(`panel-${tabId}`);
+  if (panel) panel.hidden = false;
+}
+
+function bindAdminTabs() {
+  document.querySelectorAll('.admin-tab').forEach((tab) => {
+    tab.addEventListener('click', () => showAdminTab(tab.dataset.tab));
+  });
+}
+
+function initSectionTabScopes() {
+  document.querySelectorAll('[data-tab-scope]').forEach((scope) => {
+    const activeTab = scope.querySelector('.section-tab.active');
+    const sectionId = activeTab?.dataset.section
+      || scope.querySelector('[data-section-panel]:not([hidden])')?.dataset.sectionPanel
+      || scope.querySelector('[data-section-panel]')?.dataset.sectionPanel;
+    if (sectionId) activateSectionTabScope(scope, sectionId);
+  });
+}
+
 async function initAdmin() {
   adminSession = await requireAdmin();
   if (!adminSession) return;
@@ -20,19 +48,14 @@ async function initAdmin() {
     document.querySelectorAll('.super-root-only').forEach((el) => el.remove());
   }
 
-  document.querySelectorAll('.admin-tab').forEach((tab) => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.admin-tab').forEach((t) => t.classList.remove('active'));
-      document.querySelectorAll('.admin-panel').forEach((p) => p.hidden = true);
-      tab.classList.add('active');
-      document.getElementById(`panel-${tab.dataset.tab}`).hidden = false;
-    });
-  });
+  bindAdminTabs();
   if (commercialAgent) {
     document.querySelectorAll('.admin-only').forEach((el) => { el.style.display = 'none'; });
     document.querySelector('[data-tab="produits"]')?.setAttribute('hidden', '');
     document.getElementById('panel-produits')?.setAttribute('hidden', '');
-    document.querySelector('[data-tab="commandes"]')?.click();
+    showAdminTab('commandes');
+  } else {
+    showAdminTab('produits');
   }
 
   if (!commercialAgent) {
@@ -57,6 +80,7 @@ async function initAdmin() {
   document.getElementById('adminCustomerPriceForm')?.addEventListener('submit', handleAdminCustomerPriceSubmit);
   syncCompanyTypeFields();
   bindSectionTabs();
+  initSectionTabScopes();
 }
 
 async function loadProductsTable() {

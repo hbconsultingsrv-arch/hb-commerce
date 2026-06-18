@@ -417,6 +417,10 @@ body {
   gap: 1.5rem;
 }
 
+.admin-panel[hidden] {
+  display: none !important;
+}
+
 .section-tabs {
   display: flex;
   gap: 0.5rem;
