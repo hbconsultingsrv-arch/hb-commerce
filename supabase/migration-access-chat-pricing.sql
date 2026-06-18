@@ -67,7 +67,10 @@ security definer
 set search_path = public
 as $$
 begin
-  if old.role is distinct from new.role and not public.is_super_root() then
+  if old.role is distinct from new.role
+    and not public.is_super_root()
+    and session_user not in ('postgres', 'supabase_admin')
+  then
     raise exception 'Seul le super root peut modifier les roles.';
   end if;
   return new;
