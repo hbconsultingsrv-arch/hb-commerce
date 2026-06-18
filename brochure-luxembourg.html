@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brochure FAYAFI - Luxembourg | HB Commerce</title>
+  <title>Brochure FIAFI - Luxembourg | HB Commerce</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -12,12 +12,12 @@
   <link rel="stylesheet" href="css/brochure.css">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
   <script>localStorage.setItem('hb_market','lu');</script>
-  <script src="js/fayafi-images.js"></script>
-  <script src="js/fayafi-catalog.js"></script>
+  <script src="js/fiafi-images.js"></script>
+  <script src="js/fiafi-catalog.js"></script>
 </head>
 <body class="brochure-page">
   <div class="brochure-toolbar">
-    <span><strong>Brochure Luxembourg</strong> &mdash; FAYAFI (FR / DE)</span>
+    <span><strong>Brochure Luxembourg</strong> &mdash; FIAFI (FR / DE)</span>
     <div>
       <a href="brochure-france.html">Version France</a> |
       <a href="index.html?market=lu">Site</a> |
@@ -28,38 +28,38 @@
 
   <!-- Page 1 — Couverture -->
   <article class="brochure-sheet brochure-full-image brochure-page-break">
-    <img src="images/image1.PNG" alt="FAYAFI Oliviers — couverture" class="brochure-full-bleed">
+    <img src="images/image1.PNG" alt="FIAFI Oliviers — couverture" class="brochure-full-bleed">
     <span class="brochure-market-stamp market-lu">LU &mdash; LUXEMBOURG / LUXEMBURG</span>
   </article>
 
   <!-- Page 2 — Presentation -->
   <article class="brochure-sheet brochure-full-image brochure-page-break">
-    <img src="images/image2.PNG" alt="FAYAFI Oliviers — Tunisie" class="brochure-full-bleed">
+    <img src="images/image2.PNG" alt="FIAFI Oliviers — Tunisie" class="brochure-full-bleed">
   </article>
 
   <!-- Page 3 — Premium -->
   <article class="brochure-sheet brochure-full-image brochure-page-break">
-    <img src="images/prenium.PNG" alt="FAYAFI Premium Extra Virgin Olive Oil 1L" class="brochure-full-bleed">
+    <img src="images/prenium.PNG" alt="FIAFI Premium Extra Virgin Olive Oil 1L" class="brochure-full-bleed">
   </article>
 
   <!-- Page 4 — Marasca -->
   <article class="brochure-sheet brochure-full-image brochure-page-break">
-    <img src="images/marasca.PNG" alt="FAYAFI Marasca — bouteilles verre" class="brochure-full-bleed">
+    <img src="images/marasca.PNG" alt="FIAFI Marasca — bouteilles verre" class="brochure-full-bleed">
   </article>
 
   <!-- Page 5 — Metallique -->
   <article class="brochure-sheet brochure-full-image brochure-page-break">
-    <img src="images/metallic.PNG" alt="FAYAFI Metallic Tin — 1L, 3L, 5L" class="brochure-full-bleed">
+    <img src="images/metallic.PNG" alt="FIAFI Metallic Tin — 1L, 3L, 5L" class="brochure-full-bleed">
   </article>
 
   <!-- Page 6 — Acidite -->
   <article class="brochure-sheet brochure-full-image brochure-page-break">
-    <img src="images/acidity.PNG" alt="FAYAFI — qualite et acidite" class="brochure-full-bleed">
+    <img src="images/acidity.PNG" alt="FIAFI — qualite et acidite" class="brochure-full-bleed">
   </article>
 
   <!-- Page 7 — Technologie -->
   <article class="brochure-sheet brochure-full-image brochure-page-break">
-    <img src="images/technology.PNG" alt="FAYAFI — technologie et fraicheur" class="brochure-full-bleed">
+    <img src="images/technology.PNG" alt="FIAFI — technologie et fraicheur" class="brochure-full-bleed">
   </article>
 
   <!-- Page 8 — Tarifs professionnels -->
@@ -109,13 +109,13 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const products = buildFayafiCatalog();
+      const products = buildFiafiCatalog();
       const tbody = document.getElementById('brochurePriceBody');
       if (tbody) {
         tbody.innerHTML = products.map((p) => `
           <tr>
             <td><strong>${p.format_label || p.name}</strong></td>
-            <td>${FAYAFI_CATEGORIES[p.category]?.label || p.category}</td>
+            <td>${FIAFI_CATEGORIES[p.category]?.label || p.category}</td>
             <td>${p.acidity || '—'}</td>
             <td>${p.price.toFixed(2).replace('.', ',')} &euro; / ${p.unit}</td>
             <td>${p.min_quantity} ${p.unit}(s)</td>

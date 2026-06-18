@@ -3,13 +3,13 @@
 Site e-commerce professionnel pour **HB Commerce**, filiale de **HB Consulting & Services**.  
 Vente en gros de produits alimentaires avec espace client, commandes en ligne et paiement.
 
-**Premier produit :** FAYAFI — Huile d'olive extra vierge (origine Tunisie)
+**Premier produit :** FIAFI — Huile d'olive extra vierge (origine Tunisie)
 
 ## Pages
 
 | Fichier | Description |
 |---------|-------------|
-| `index.html` | Site vitrine + produit phare FAYAFI |
+| `index.html` | Site vitrine + produit phare FIAFI |
 | `produits.html` | Catalogue produits |
 | `panier.html` | Panier |
 | `checkout.html` | Finalisation et paiement |

@@ -1,25 +1,25 @@
 /**
- * Images produit FAYAFI — Google Drive
+ * Images produit FIAFI — Google Drive
  * Fichier : https://drive.google.com/file/d/1SshjBp8ibdt14PwxdtdNscuBQM5iLRkp/view
  * Partage requis : « Tous les utilisateurs disposant du lien » → Lecteur
  */
-const FAYAFI_DRIVE_ID = '1SshjBp8ibdt14PwxdtdNscuBQM5iLRkp';
+const FIAFI_DRIVE_ID = '1SshjBp8ibdt14PwxdtdNscuBQM5iLRkp';
 
 function googleDriveImage(id, width = 1200) {
   return `https://drive.google.com/thumbnail?id=${id}&sz=w${width}`;
 }
 
 window.HB_BRANDING = {
-  fayafiDriveId: FAYAFI_DRIVE_ID,
+  fiafiDriveId: FIAFI_DRIVE_ID,
   images: {
-    product: googleDriveImage(FAYAFI_DRIVE_ID, 1200),
-    hero: googleDriveImage(FAYAFI_DRIVE_ID, 2000),
-    thumb: googleDriveImage(FAYAFI_DRIVE_ID, 600),
+    product: googleDriveImage(FIAFI_DRIVE_ID, 1200),
+    hero: googleDriveImage(FIAFI_DRIVE_ID, 2000),
+    thumb: googleDriveImage(FIAFI_DRIVE_ID, 600),
     /** URL alternative si thumbnail bloquée */
-    productAlt: `https://drive.google.com/uc?export=view&id=${FAYAFI_DRIVE_ID}`
+    productAlt: `https://drive.google.com/uc?export=view&id=${FIAFI_DRIVE_ID}`
   },
-  productName: 'FAYAFI',
-  productFullName: 'FAYAFI — Huile d\'olive extra vierge',
+  productName: 'FIAFI',
+  productFullName: 'FIAFI — Huile d\'olive extra vierge',
   origin: 'Tunisie',
   colors: {
     olive: '#3d5c3a',
@@ -32,14 +32,14 @@ window.HB_BRANDING = {
   }
 };
 
-function getFayafiImageUrl(size = 1200) {
+function getFiafiImageUrl(size = 1200) {
   if (typeof resolveMarketImage === 'function') {
     return resolveMarketImage(getMarket(), 'product', size).primary;
   }
-  return window.HB_BRANDING?.images?.product || googleDriveImage(FAYAFI_DRIVE_ID, size);
+  return window.HB_BRANDING?.images?.product || googleDriveImage(FIAFI_DRIVE_ID, size);
 }
 
-function applyFayafiImageFallback(img) {
+function applyFiafiImageFallback(img) {
   if (!img || img.dataset.fallbackApplied) return;
   img.addEventListener('error', () => {
     if (!img.dataset.fallbackApplied) {
@@ -50,5 +50,5 @@ function applyFayafiImageFallback(img) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('img[data-fayafi]').forEach(applyFayafiImageFallback);
+  document.querySelectorAll('img[data-fiafi]').forEach(applyFiafiImageFallback);
 });

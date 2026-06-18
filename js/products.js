@@ -11,7 +11,9 @@ async function fetchProducts(activeOnly = true) {
     return catalog;
   }
 
-  const dbList = (data || []).filter((p) => p.slug !== 'fayafi-huile-olive');
+  const dbList = (data || [])
+    .map((p) => (typeof normalizeFiafiProduct === 'function' ? normalizeFiafiProduct(p) : p))
+    .filter((p) => p.slug !== 'fiafi-huile-olive');
   const merged = typeof mergeProductsWithCatalog === 'function'
     ? mergeProductsWithCatalog(dbList.length ? dbList : catalog)
     : (dbList.length ? dbList : catalog);
@@ -21,22 +23,25 @@ async function fetchProducts(activeOnly = true) {
 }
 
 async function fetchProductBySlug(slug) {
+  const normalizedSlug = typeof normalizeFiafiProduct === 'function'
+    ? normalizeFiafiProduct({ slug }).slug
+    : slug;
   const sb = getSupabase();
   if (!sb) {
-    return getFallbackProducts().find((p) => p.slug === slug);
+    return getFallbackProducts().find((p) => p.slug === normalizedSlug);
   }
-  const { data, error } = await sb.from('products').select('*').eq('slug', slug).maybeSingle();
+  const { data, error } = await sb.from('products').select('*').eq('slug', normalizedSlug).maybeSingle();
   if (error) throw error;
-  return data;
+  return typeof normalizeFiafiProduct === 'function' ? normalizeFiafiProduct(data) : data;
 }
 
 function getFallbackProducts() {
-  if (typeof buildFayafiCatalog === 'function') return buildFayafiCatalog();
+  if (typeof buildFiafiCatalog === 'function') return buildFiafiCatalog();
   return [];
 }
 
 function getCategoryLabel(categoryId) {
-  const cat = FAYAFI_CATEGORIES?.[categoryId];
+  const cat = FIAFI_CATEGORIES?.[categoryId];
   return cat?.label || categoryId || '—';
 }
 
@@ -46,13 +51,13 @@ function getPackagingLabel(type) {
   return type || '';
 }
 
-function isFayafiProduct(product) {
+function isFiafiProduct(product) {
   const slug = (product.slug || '').toLowerCase();
   const name = (product.name || '').toLowerCase();
-  return slug.includes('fayafi') || name.includes('fayafi');
+  return slug.includes('fiafi') || name.includes('fiafi');
 }
 
-function isStaleFayafiImage(url) {
+function isStaleFiafiImage(url) {
   if (!url) return true;
   return url.includes('drive.google.com')
     || url.includes('assets/products/')
@@ -61,24 +66,24 @@ function isStaleFayafiImage(url) {
 }
 
 function resolveProductImage(product) {
-  if (isFayafiProduct(product) && typeof getFayafiProductImage === 'function') {
-    return getFayafiProductImage(product);
+  if (isFiafiProduct(product) && typeof getFiafiProductImage === 'function') {
+    return getFiafiProductImage(product);
   }
-  if (product.image_url && !isStaleFayafiImage(product.image_url)) {
+  if (product.image_url && !isStaleFiafiImage(product.image_url)) {
     return product.image_url;
   }
-  if (typeof getFayafiProductImage === 'function') {
-    return getFayafiProductImage(product);
+  if (typeof getFiafiProductImage === 'function') {
+    return getFiafiProductImage(product);
   }
-  return FAYAFI_IMAGES?.product || 'images/prenium.PNG';
+  return FIAFI_IMAGES?.product || 'images/prenium.PNG';
 }
 
 function renderProductCard(product) {
   const minQty = product.min_quantity || 1;
   const imgUrl = resolveProductImage(product);
-  const imgFallback = FAYAFI_IMAGES?.product || 'images/prenium.PNG';
-  const fayafi = isFayafiProduct(product);
-  const cardClass = fayafi ? 'product-card fayafi-card' : 'product-card';
+  const imgFallback = FIAFI_IMAGES?.product || 'images/prenium.PNG';
+  const fiafi = isFiafiProduct(product);
+  const cardClass = fiafi ? 'product-card fiafi-card' : 'product-card';
   const formatLabel = product.format_label || '';
   const acidity = product.acidity || '';
   const acidityDisplay = typeof formatAcidity === 'function' ? formatAcidity(acidity) : acidity;
@@ -109,7 +114,7 @@ function renderProductCard(product) {
             <input type="number" class="qty-input" value="${minQty}" min="${minQty}" step="1">
             <button type="button" class="qty-plus" aria-label="Plus">+</button>
           </div>
-          <button type="button" class="btn btn-primary btn-add-cart btn-fayafi">Ajouter au panier</button>
+          <button type="button" class="btn btn-primary btn-add-cart btn-fiafi">Ajouter au panier</button>
         </div>
       </div>
     </article>
@@ -117,7 +122,7 @@ function renderProductCard(product) {
 }
 
 function renderCategoryNav(activeId = 'all') {
-  const cats = Object.values(FAYAFI_CATEGORIES || {});
+  const cats = Object.values(FIAFI_CATEGORIES || {});
   return `
     <nav class="category-nav" aria-label="Categories produits">
       <button type="button" class="category-tab${activeId === 'all' ? ' active' : ''}" data-category="all">Tous les formats</button>
@@ -131,8 +136,8 @@ function renderCategoryNav(activeId = 'all') {
 }
 
 function renderCategoryShowcase() {
-  const cats = Object.values(FAYAFI_CATEGORIES || {});
-  const fallback = FAYAFI_IMAGES?.product || 'images/prenium.PNG';
+  const cats = Object.values(FIAFI_CATEGORIES || {});
+  const fallback = FIAFI_IMAGES?.product || 'images/prenium.PNG';
   return cats.map((c) => `
     <a href="produits.html#cat-${c.id}" class="category-card" id="cat-${c.id}">
       <img src="${c.image}" alt="${c.label}" width="200" height="140" onerror="this.onerror=null;this.src='${fallback}'">
@@ -143,10 +148,10 @@ function renderCategoryShowcase() {
 }
 
 function renderQualitySection() {
-  const q = FAYAFI_QUALITY || {};
+  const q = FIAFI_QUALITY || {};
   if (!q.specs) return '';
-  const qualityImg = q.image || FAYAFI_IMAGES?.acidity || 'images/acidity.PNG';
-  const techImg = FAYAFI_IMAGES?.technology || 'images/technology.PNG';
+  const qualityImg = q.image || FIAFI_IMAGES?.acidity || 'images/acidity.PNG';
+  const techImg = FIAFI_IMAGES?.technology || 'images/technology.PNG';
   return `
     <section class="quality-section" id="qualite">
       <div class="quality-grid">
@@ -158,8 +163,8 @@ function renderQualitySection() {
           </dl>
         </div>
         <div class="quality-visuals">
-          <img src="${qualityImg}" alt="Qualite FAYAFI - acidite" class="quality-photo">
-          <img src="${techImg}" alt="Technologie FAYAFI - fraicheur" class="quality-photo">
+          <img src="${qualityImg}" alt="Qualite FIAFI - acidite" class="quality-photo">
+          <img src="${techImg}" alt="Technologie FIAFI - fraicheur" class="quality-photo">
         </div>
       </div>
     </section>

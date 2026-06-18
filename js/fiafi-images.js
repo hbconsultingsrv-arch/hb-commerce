@@ -1,7 +1,7 @@
 /**
- * Photos FAYAFI — dossier images/ (brochures + site)
+ * Photos FIAFI — dossier images/ (brochures + site)
  */
-const FAYAFI_IMAGES = {
+const FIAFI_IMAGES = {
   cover: 'images/image1.PNG',
   welcome: 'images/image2.PNG',
   premium: 'images/prenium.PNG',
@@ -14,4 +14,4 @@ const FAYAFI_IMAGES = {
   product: 'images/prenium.PNG'
 };
 
-window.FAYAFI_IMAGES = FAYAFI_IMAGES;
+window.FIAFI_IMAGES = FIAFI_IMAGES;

@@ -1,4 +1,4 @@
-/* Brochures FAYAFI + sùlecteur marchù */
+/* Brochures FIAFI + sùlecteur marchù */
 
 .market-switcher {
   display: flex;
@@ -22,15 +22,15 @@
 
 .market-btn:hover,
 .market-btn.active {
-  background: var(--fayafi-gold);
-  color: var(--fayafi-olive-dark);
-  border-color: var(--fayafi-gold);
+  background: var(--fiafi-gold);
+  color: var(--fiafi-olive-dark);
+  border-color: var(--fiafi-gold);
 }
 
 .nav-simple .market-btn {
   border-color: rgba(61, 92, 58, 0.3);
-  color: var(--fayafi-olive-dark);
-  background: var(--fayafi-cream);
+  color: var(--fiafi-olive-dark);
+  background: var(--fiafi-cream);
 }
 
 /* Brochure pages */
@@ -40,7 +40,7 @@
 }
 
 .brochure-toolbar {
-  background: var(--fayafi-olive-dark);
+  background: var(--fiafi-olive-dark);
   color: white;
   padding: 0.75rem 1.5rem;
   display: flex;
@@ -51,7 +51,7 @@
 }
 
 .brochure-toolbar a {
-  color: var(--fayafi-gold-light);
+  color: var(--fiafi-gold-light);
 }
 
 .brochure-sheet {
@@ -62,7 +62,7 @@
 }
 
 .brochure-cover {
-  background: linear-gradient(160deg, var(--fayafi-olive-dark), #1e3d1c);
+  background: linear-gradient(160deg, var(--fiafi-olive-dark), #1e3d1c);
   color: white;
   padding: 3rem 2.5rem;
   text-align: center;
@@ -92,14 +92,14 @@
 .brochure-cover h1 {
   font-family: var(--font-display);
   font-size: 3rem;
-  color: var(--fayafi-gold-light);
+  color: var(--fiafi-gold-light);
   margin: 1rem 0 0.5rem;
 }
 
 .brochure-cover .market-label {
   display: inline-block;
-  background: var(--fayafi-gold);
-  color: var(--fayafi-olive-dark);
+  background: var(--fiafi-gold);
+  color: var(--fiafi-olive-dark);
   padding: 0.35rem 1rem;
   border-radius: 999px;
   font-size: 0.8rem;
@@ -127,10 +127,10 @@
 
 .brochure-body h2 {
   font-family: var(--font-display);
-  color: var(--fayafi-olive-dark);
+  color: var(--fiafi-olive-dark);
   font-size: 1.5rem;
   margin: 1.5rem 0 0.75rem;
-  border-bottom: 2px solid var(--fayafi-gold);
+  border-bottom: 2px solid var(--fiafi-gold);
   padding-bottom: 0.35rem;
 }
 
@@ -147,7 +147,7 @@
 
 .brochure-specs dt {
   font-weight: 700;
-  color: var(--fayafi-olive);
+  color: var(--fiafi-olive);
   font-size: 0.85rem;
 }
 
@@ -164,7 +164,7 @@
 }
 
 .brochure-bilingual .col-de {
-  border-left: 2px solid var(--fayafi-cream);
+  border-left: 2px solid var(--fiafi-cream);
   padding-left: 1.5rem;
 }
 
@@ -172,15 +172,15 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--fayafi-gold);
+  color: var(--fiafi-gold);
   margin-bottom: 0.5rem;
 }
 
 .brochure-cta {
-  background: var(--fayafi-cream);
+  background: var(--fiafi-cream);
   padding: 1.5rem 2.5rem;
   text-align: center;
-  border-top: 3px solid var(--fayafi-gold);
+  border-top: 3px solid var(--fiafi-gold);
 }
 
 .brochure-cta .btn {
@@ -211,7 +211,7 @@
 
 .brochure-thumb {
   text-align: center;
-  background: var(--fayafi-cream);
+  background: var(--fiafi-cream);
   border-radius: 12px;
   padding: 0.75rem;
 }
@@ -225,7 +225,7 @@
 .brochure-thumb figcaption {
   font-size: 0.8rem;
   margin-top: 0.5rem;
-  color: var(--fayafi-olive-dark);
+  color: var(--fiafi-olive-dark);
   font-weight: 600;
 }
 
@@ -253,8 +253,8 @@
   position: absolute;
   top: 1rem;
   left: 1rem;
-  background: var(--fayafi-gold);
-  color: var(--fayafi-olive-dark);
+  background: var(--fiafi-gold);
+  color: var(--fiafi-olive-dark);
   padding: 0.4rem 1rem;
   border-radius: 999px;
   font-size: 0.75rem;
@@ -285,7 +285,7 @@
 .brochure-contact-overlay h2 {
   font-family: var(--font-display);
   font-size: 2rem;
-  color: var(--fayafi-gold-light);
+  color: var(--fiafi-gold-light);
   margin: 0 0 0.5rem;
   border: none;
   padding: 0;
@@ -332,7 +332,7 @@
   .brochure-bilingual .col-de {
     border-left: none;
     padding-left: 0;
-    border-top: 2px solid var(--fayafi-cream);
+    border-top: 2px solid var(--fiafi-cream);
     padding-top: 1rem;
   }
   .brochure-market-stamp {

@@ -167,11 +167,11 @@ drop trigger if exists orders_updated_at on public.orders;
 create trigger orders_updated_at before update on public.orders
   for each row execute procedure public.set_updated_at();
 
--- Produit phare FAYAFI
+-- Produit phare FIAFI
 insert into public.products (name, slug, description, origin, category, price, unit, min_quantity, image_url, tag, sort_order) values
   (
-    'FAYAFI — Huile d''olive extra vierge',
-    'fayafi-huile-olive',
+    'FIAFI — Huile d''olive extra vierge',
+    'fiafi-huile-olive',
     'Huile d''olive extra vierge de première pression à froid, origine Tunisie. Parfaite pour la restauration et le commerce en gros.',
     'Tunisie',
     'huiles',

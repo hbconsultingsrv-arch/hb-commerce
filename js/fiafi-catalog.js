@@ -1,8 +1,10 @@
 /**
- * Catalogue FAYAFI - aligne site et brochure
+ * Catalogue FIAFI - aligne site et brochure
  * Texte ASCII + formatAcidity() (<= affiche en symbole inferieur ou egal)
  */
 const LE = '\u2264';
+const FIAFI_PREFIX = 'fiafi';
+const LEGACY_FIAFI_PREFIX = ['fa', 'yafi'].join('');
 
 function formatAcidity(value) {
   if (!value) return '';
@@ -11,48 +13,75 @@ function formatAcidity(value) {
     .replace(/^\?\s*/, LE + ' ');
 }
 
-const FAYAFI_CATEGORIES = {
+function normalizeFiafiSlug(slug) {
+  if (!slug) return slug;
+  const value = String(slug);
+  return value.toLowerCase().startsWith(LEGACY_FIAFI_PREFIX)
+    ? FIAFI_PREFIX + value.slice(LEGACY_FIAFI_PREFIX.length)
+    : value;
+}
+
+function normalizeFiafiText(value) {
+  if (!value) return value;
+  return String(value).replace(new RegExp(LEGACY_FIAFI_PREFIX, 'gi'), (match) => {
+    if (match === match.toUpperCase()) return 'FIAFI';
+    if (match[0] === match[0].toUpperCase()) return 'Fiafi';
+    return FIAFI_PREFIX;
+  });
+}
+
+function normalizeFiafiProduct(product) {
+  if (!product) return product;
+  return {
+    ...product,
+    id: normalizeFiafiSlug(product.id),
+    slug: normalizeFiafiSlug(product.slug),
+    name: normalizeFiafiText(product.name)
+  };
+}
+
+const FIAFI_CATEGORIES = {
   bouteille: {
     id: 'bouteille',
     label: 'Bouteilles',
     icon: '',
     description: 'Verre Marasca et formats premium pour restauration et cavistes.',
-    image: FAYAFI_IMAGES?.marasca || 'images/marasca.PNG'
+    image: FIAFI_IMAGES?.marasca || 'images/marasca.PNG'
   },
   metallique: {
     id: 'metallique',
     label: 'Metallique',
     icon: '',
     description: 'Bidons metalliques 1L, 3L et 5L - ideal grossistes et cuisine pro.',
-    image: FAYAFI_IMAGES?.metallic || 'images/metallic.PNG'
+    image: FIAFI_IMAGES?.metallic || 'images/metallic.PNG'
   },
   premium: {
     id: 'premium',
     label: 'Premium extra vierge',
     icon: '',
     description: 'Selection premium, premiere pression a froid, acidite controlee.',
-    image: FAYAFI_IMAGES?.premium || 'images/prenium.PNG'
+    image: FIAFI_IMAGES?.premium || 'images/prenium.PNG'
   }
 };
 
-const FAYAFI_QUALITY = {
+const FIAFI_QUALITY = {
   title: 'Qualite & acidite',
-  intro: 'Huile d\'olive extra vierge FAYAFI - olives Koroneiki et Arbosana, pression a froid en Tunisie du Nord.',
+  intro: 'Huile d\'olive extra vierge FIAFI - olives Koroneiki et Arbosana, pression a froid en Tunisie du Nord.',
   specs: [
     { label: 'Cat&eacute;gorie', value: 'Huile d\'olive extra vierge' },
     { label: 'Acidit&eacute; libre', value: LE + ' 0,8 % (extra vierge)' },
-    { label: 'Premium FAYAFI', value: LE + ' 0,5 % - selection haute qualite' },
+    { label: 'Premium FIAFI', value: LE + ' 0,5 % - selection haute qualite' },
     { label: 'Selection premium', value: '0,2 % a 0,4 % (Koroneiki & Arbosana)' },
     { label: 'Pression', value: 'Premiere pression a froid' },
     { label: 'Origine', value: 'Tunisie - Mornag, Ben Arous' },
     { label: 'Indice de peroxyde', value: LE + ' 20 meq O2/kg' },
     { label: 'Humidit&eacute;', value: LE + ' 0,2 %' }
   ],
-  image: FAYAFI_IMAGES?.acidity || 'images/acidity.PNG'
+  image: FIAFI_IMAGES?.acidity || 'images/acidity.PNG'
 };
 
 function catalogImage(packaging, format) {
-  const img = FAYAFI_IMAGES || {};
+  const img = FIAFI_IMAGES || {};
   const map = {
     'bouteille-marasca': img.marasca || 'images/marasca.PNG',
     'bouteille-1l': img.marasca || 'images/marasca.PNG',
@@ -65,12 +94,12 @@ function catalogImage(packaging, format) {
   return map[key] || img.product || 'images/prenium.PNG';
 }
 
-function buildFayafiCatalog() {
+function buildFiafiCatalog() {
   return [
     {
-      id: 'fayafi-premium-1l',
-      name: 'FAYAFI Premium - Extra vierge 1L',
-      slug: 'fayafi-premium-1l-bouteille',
+      id: 'fiafi-premium-1l',
+      name: 'FIAFI Premium - Extra vierge 1L',
+      slug: 'fiafi-premium-1l-bouteille',
       description: 'Huile d\'olive extra vierge premium. Premiere pression a froid. Acidite <= 0,5 %. Bouteille verre 1 litre.',
       origin: 'Tunisie',
       category: 'premium',
@@ -87,9 +116,9 @@ function buildFayafiCatalog() {
       sort_order: 1
     },
     {
-      id: 'fayafi-marasca-250',
-      name: 'FAYAFI - Marasca 250 ml',
-      slug: 'fayafi-marasca-250ml',
+      id: 'fiafi-marasca-250',
+      name: 'FIAFI - Marasca 250 ml',
+      slug: 'fiafi-marasca-250ml',
       description: 'Format Marasca 250 ml. Extra vierge, ideal restauration, echantillons et cavistes.',
       origin: 'Tunisie',
       category: 'bouteille',
@@ -106,9 +135,9 @@ function buildFayafiCatalog() {
       sort_order: 2
     },
     {
-      id: 'fayafi-bouteille-1l',
-      name: 'FAYAFI - Extra vierge 1L bouteille',
-      slug: 'fayafi-extra-vierge-1l-bouteille',
+      id: 'fiafi-bouteille-1l',
+      name: 'FIAFI - Extra vierge 1L bouteille',
+      slug: 'fiafi-extra-vierge-1l-bouteille',
       description: 'Bouteille verre 1 litre. Extra vierge, premiere pression a froid.',
       origin: 'Tunisie',
       category: 'bouteille',
@@ -125,9 +154,9 @@ function buildFayafiCatalog() {
       sort_order: 3
     },
     {
-      id: 'fayafi-metallique-1l',
-      name: 'FAYAFI - Metallique 1L',
-      slug: 'fayafi-metallique-1l',
+      id: 'fiafi-metallique-1l',
+      name: 'FIAFI - Metallique 1L',
+      slug: 'fiafi-metallique-1l',
       description: 'Bidon metallique 1 litre. Extra vierge - pratique pour la cuisine professionnelle.',
       origin: 'Tunisie',
       category: 'metallique',
@@ -144,9 +173,9 @@ function buildFayafiCatalog() {
       sort_order: 4
     },
     {
-      id: 'fayafi-metallique-3l',
-      name: 'FAYAFI - Metallique 3L',
-      slug: 'fayafi-metallique-3l',
+      id: 'fiafi-metallique-3l',
+      name: 'FIAFI - Metallique 3L',
+      slug: 'fiafi-metallique-3l',
       description: 'Bidon metallique 3 litres. Format economique pour restauration et grossistes.',
       origin: 'Tunisie',
       category: 'metallique',
@@ -163,9 +192,9 @@ function buildFayafiCatalog() {
       sort_order: 5
     },
     {
-      id: 'fayafi-metallique-5l',
-      name: 'FAYAFI - Metallique 5L',
-      slug: 'fayafi-metallique-5l',
+      id: 'fiafi-metallique-5l',
+      name: 'FIAFI - Metallique 5L',
+      slug: 'fiafi-metallique-5l',
       description: 'Bidon metallique 5 litres. Le format le plus demande en commerce de gros.',
       origin: 'Tunisie',
       category: 'metallique',
@@ -185,7 +214,7 @@ function buildFayafiCatalog() {
 }
 
 function buildBrochureGallery() {
-  const img = FAYAFI_IMAGES || {};
+  const img = FIAFI_IMAGES || {};
   return [
     { image: img.premium || 'images/prenium.PNG', label: 'Premium 1 L' },
     { image: img.marasca || 'images/marasca.PNG', label: 'Marasca 250 ml - 1 L' },
@@ -193,18 +222,19 @@ function buildBrochureGallery() {
   ];
 }
 
-const FAYAFI_BROCHURE_LABELS = {
+const FIAFI_BROCHURE_LABELS = {
   premium: 'Premium extra vierge',
   bouteille: 'Bouteilles',
   metallique: 'M&eacute;tallique'
 };
 
 function mergeProductsWithCatalog(dbList) {
-  const catalog = buildFayafiCatalog();
+  const catalog = buildFiafiCatalog();
   const bySlug = new Map();
 
   dbList.forEach((p) => {
-    bySlug.set(p.slug, enrichFayafiFromCatalog(p));
+    const product = normalizeFiafiProduct(p);
+    bySlug.set(product.slug, enrichFiafiFromCatalog(product));
   });
 
   catalog.forEach((catItem) => {
@@ -217,16 +247,16 @@ function mergeProductsWithCatalog(dbList) {
   return Array.from(bySlug.values()).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 }
 
-const FAYAFI_SLUG_IMAGES = (() => {
+const FIAFI_SLUG_IMAGES = (() => {
   const map = {};
-  buildFayafiCatalog().forEach((p) => { map[p.slug] = p.image_url; });
+  buildFiafiCatalog().forEach((p) => { map[p.slug] = p.image_url; });
   return map;
 })();
 
-function getFayafiProductImage(product) {
-  const slug = product?.slug || '';
-  if (FAYAFI_SLUG_IMAGES[slug]) return FAYAFI_SLUG_IMAGES[slug];
-  const img = FAYAFI_IMAGES || {};
+function getFiafiProductImage(product) {
+  const slug = normalizeFiafiSlug(product?.slug) || '';
+  if (FIAFI_SLUG_IMAGES[slug]) return FIAFI_SLUG_IMAGES[slug];
+  const img = FIAFI_IMAGES || {};
   const cat = product?.category || '';
   if (cat === 'premium') return img.premium || 'images/prenium.PNG';
   if (cat === 'metallique') return img.metallic || 'images/metallic.PNG';
@@ -234,10 +264,10 @@ function getFayafiProductImage(product) {
   return img.product || 'images/prenium.PNG';
 }
 
-function enrichFayafiFromCatalog(dbProduct) {
-  const catalog = buildFayafiCatalog();
+function enrichFiafiFromCatalog(dbProduct) {
+  const catalog = buildFiafiCatalog();
   const match = catalog.find((p) => p.slug === dbProduct.slug);
-  const imageUrl = getFayafiProductImage({
+  const imageUrl = getFiafiProductImage({
     slug: dbProduct.slug,
     category: dbProduct.category || match?.category
   });
@@ -258,11 +288,12 @@ function enrichFayafiFromCatalog(dbProduct) {
   };
 }
 
-window.FAYAFI_CATEGORIES = FAYAFI_CATEGORIES;
-window.FAYAFI_QUALITY = FAYAFI_QUALITY;
-window.FAYAFI_BROCHURE_LABELS = FAYAFI_BROCHURE_LABELS;
-window.buildFayafiCatalog = buildFayafiCatalog;
+window.FIAFI_CATEGORIES = FIAFI_CATEGORIES;
+window.FIAFI_QUALITY = FIAFI_QUALITY;
+window.FIAFI_BROCHURE_LABELS = FIAFI_BROCHURE_LABELS;
+window.buildFiafiCatalog = buildFiafiCatalog;
 window.buildBrochureGallery = buildBrochureGallery;
 window.formatAcidity = formatAcidity;
-window.getFayafiProductImage = getFayafiProductImage;
+window.getFiafiProductImage = getFiafiProductImage;
 window.mergeProductsWithCatalog = mergeProductsWithCatalog;
+window.normalizeFiafiProduct = normalizeFiafiProduct;

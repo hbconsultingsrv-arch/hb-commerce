@@ -15,7 +15,7 @@ Le site utilise **Supabase** (gratuit) comme backend : authentification, profils
 2. Copiez-collez le contenu de `supabase/schema.sql`
 3. Cliquez **Run**
 
-Le script crée les tables et insère le produit phare **FAYAFI**.
+Le script crée les tables et insère le produit phare **FIAFI**.
 
 ## 3. Récupérer les clés API
 
@@ -107,7 +107,7 @@ Pour utiliser la photo Google Drive de la brochure : rendez le fichier public, p
 Pour vos propres photos : remplacez `product.svg` par `product.jpg` dans chaque dossier marché et mettez à jour `js/markets.js` si besoin.
 
 
-Les photos FAYAFI sont hébergées sur Google Drive :
+Les photos FIAFI sont hébergées sur Google Drive :
 `https://drive.google.com/file/d/1SshjBp8ibdt14PwxdtdNscuBQM5iLRkp/view`
 
 **Pour que les images s'affichent sur le site**, le fichier doit être public :
@@ -116,9 +116,9 @@ Les photos FAYAFI sont hébergées sur Google Drive :
 2. **Accès général** → **Tous les utilisateurs disposant du lien** → **Lecteur**
 3. Enregistrer
 
-Puis exécutez dans SQL Editor : `supabase/update-fayafi-image.sql`
+Puis exécutez dans SQL Editor : `supabase/update-fiafi-image.sql`
 
-Pour changer l'image, modifiez l'ID dans `js/branding.js` (`FAYAFI_DRIVE_ID`).
+Pour changer l'image, modifiez l'ID dans `js/branding.js` (`FIAFI_DRIVE_ID`).
 
 
 Si l'inscription ou la connexion affiche **Failed to fetch** :
