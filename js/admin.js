@@ -1,10 +1,16 @@
 let editingProductId = null;
+let adminSession = null;
+let adminProfile = null;
+let adminProfiles = [];
 
 async function initAdmin() {
-  const session = await requireAdmin();
-  if (!session) return;
+  adminSession = await requireAdmin();
+  if (!adminSession) return;
+  adminProfile = await getProfile(adminSession.user.id);
 
   document.getElementById('logoutBtn')?.addEventListener('click', signOut);
+  const superRootLink = document.getElementById('superRootLink');
+  if (superRootLink && isSuperRootProfile(adminProfile)) superRootLink.style.display = '';
 
   document.querySelectorAll('.admin-tab').forEach((tab) => {
     tab.addEventListener('click', () => {
@@ -17,6 +23,7 @@ async function initAdmin() {
 
   await loadProductsTable();
   await loadOrdersTable();
+  await loadAdminChatPanel();
 
   const productForm = document.getElementById('productForm');
   productForm?.addEventListener('submit', handleProductSubmit);
@@ -152,6 +159,112 @@ async function loadOrdersTable() {
       await updateOrderStatus(select.dataset.order, select.value);
     });
   });
+}
+
+function profileLabel(profile) {
+  return profile?.company || profile?.full_name || profile?.email || 'Société';
+}
+
+function chatStatusLabel(status) {
+  if (status === 'pending') return 'En attente';
+  if (status === 'rejected') return 'Refusé';
+  return 'Validé';
+}
+
+async function loadAdminChatPanel() {
+  const select = document.getElementById('adminChatCompany');
+  if (!select) return;
+
+  try {
+    adminProfiles = (await fetchAllProfiles()).filter((p) => p.role === 'client');
+  } catch (err) {
+    document.getElementById('adminChatHistory').innerHTML = `<p class="empty-state">${escapeHtml(err.message)}</p>`;
+    return;
+  }
+  select.innerHTML = adminProfiles.length
+    ? adminProfiles.map((p) => `<option value="${p.id}">${escapeHtml(profileLabel(p))}</option>`).join('')
+    : '<option value="">Aucune société</option>';
+
+  select.addEventListener('change', () => renderAdminChat(select.value));
+  document.getElementById('refreshAdminChatBtn')?.addEventListener('click', () => renderAdminChat(select.value));
+  document.getElementById('adminChatReplyForm')?.addEventListener('submit', handleAdminChatReply);
+
+  if (adminProfiles[0]) await renderAdminChat(adminProfiles[0].id);
+}
+
+async function renderAdminChat(companyId) {
+  const host = document.getElementById('adminChatHistory');
+  if (!host) return;
+  if (!companyId) {
+    host.innerHTML = '<p class="empty-state">Aucune société sélectionnée.</p>';
+    return;
+  }
+
+  let messages = [];
+  try {
+    messages = await fetchChatMessages(companyId);
+  } catch (err) {
+    host.innerHTML = `<p class="empty-state">${escapeHtml(err.message)}</p>`;
+    return;
+  }
+  if (!messages.length) {
+    host.innerHTML = '<p class="empty-state">Aucun message avec cette société.</p>';
+    return;
+  }
+
+  host.innerHTML = messages.map((msg) => `
+    <article class="chat-message ${msg.author_role === 'client' ? 'from-client' : 'from-admin'}">
+      <div class="chat-meta">
+        <strong>${msg.author_role === 'client' ? escapeHtml(profileLabel(msg.company)) : 'Administration'}</strong>
+        <span>${formatDate(msg.created_at)}</span>
+        <span class="chat-status ${msg.status}">${chatStatusLabel(msg.status)}</span>
+      </div>
+      <p>${escapeHtml(msg.message)}</p>
+      ${msg.author_role === 'client' ? `
+        <div class="form-actions" style="margin-top:0.65rem">
+          <button type="button" class="btn btn-sm btn-primary" data-chat-approve="${msg.id}" ${msg.status === 'approved' ? 'disabled' : ''}>Valider</button>
+          <button type="button" class="btn btn-sm btn-outline-dark" data-chat-reject="${msg.id}" ${msg.status === 'rejected' ? 'disabled' : ''}>Refuser</button>
+        </div>
+      ` : ''}
+    </article>
+  `).join('');
+  host.scrollTop = host.scrollHeight;
+
+  host.querySelectorAll('[data-chat-approve]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      await moderateChatMessage(btn.dataset.chatApprove, 'approved', adminSession.user.id);
+      await renderAdminChat(companyId);
+    });
+  });
+  host.querySelectorAll('[data-chat-reject]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      await moderateChatMessage(btn.dataset.chatReject, 'rejected', adminSession.user.id);
+      await renderAdminChat(companyId);
+    });
+  });
+}
+
+async function handleAdminChatReply(e) {
+  e.preventDefault();
+  const note = document.getElementById('adminChatNote');
+  const select = document.getElementById('adminChatCompany');
+  const companyId = select?.value;
+  if (!companyId) return;
+
+  const fd = new FormData(e.target);
+  try {
+    await sendAdminChatMessage({
+      companyId,
+      authorId: adminSession.user.id,
+      authorRole: adminProfile.role,
+      message: fd.get('message')
+    });
+    e.target.reset();
+    showAlert(note, 'Réponse envoyée.', 'success');
+    await renderAdminChat(companyId);
+  } catch (err) {
+    showAlert(note, err.message);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', initAdmin);

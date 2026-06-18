@@ -32,6 +32,7 @@ async function initDashboard() {
     });
   }
 
+  await loadCompanyChat(session);
   const orders = await fetchUserOrders(session.user.id);
   const emptyEl = document.getElementById('ordersEmpty');
   const tableEl = document.getElementById('ordersTable');
@@ -40,13 +41,9 @@ async function initDashboard() {
   if (!orders.length) {
     if (emptyEl) emptyEl.hidden = false;
     if (tableEl) tableEl.hidden = true;
-    return;
-  }
-
-  if (emptyEl) emptyEl.hidden = true;
-  if (tableEl) tableEl.hidden = false;
-
-  if (bodyEl) {
+  } else if (bodyEl) {
+    if (emptyEl) emptyEl.hidden = true;
+    if (tableEl) tableEl.hidden = false;
     bodyEl.innerHTML = orders.map((order) => {
       const items = (order.order_items || [])
         .map((i) => `${i.product_name} × ${i.quantity}`)
@@ -68,8 +65,81 @@ async function initDashboard() {
   if (adminLink && await isAdmin()) {
     adminLink.style.display = '';
   }
+  const superRootLink = document.getElementById('compteSuperRootLink');
+  if (superRootLink && typeof isSuperRoot === 'function' && await isSuperRoot()) {
+    superRootLink.style.display = '';
+  }
 
   document.getElementById('logoutBtn')?.addEventListener('click', signOut);
+}
+
+function chatStatusLabel(status) {
+  if (status === 'pending') return 'En attente';
+  if (status === 'rejected') return 'Rejeté';
+  return 'Validé';
+}
+
+function renderCompanyChat(messages) {
+  const host = document.getElementById('companyChatHistory');
+  if (!host) return;
+
+  if (!messages.length) {
+    host.innerHTML = '<p class="empty-state">Aucun message pour le moment.</p>';
+    return;
+  }
+
+  host.innerHTML = messages.map((msg) => `
+    <article class="chat-message ${msg.author_role === 'client' ? 'from-client' : 'from-admin'}">
+      <div class="chat-meta">
+        <strong>${msg.author_role === 'client' ? 'Votre société' : 'HB Commerce'}</strong>
+        <span>${formatDate(msg.created_at)}</span>
+        <span class="chat-status ${msg.status}">${chatStatusLabel(msg.status)}</span>
+      </div>
+      <p>${escapeHtml(msg.message)}</p>
+    </article>
+  `).join('');
+  host.scrollTop = host.scrollHeight;
+}
+
+async function loadCompanyChat(session) {
+  if (typeof fetchChatMessages !== 'function') return;
+  try {
+    const messages = await fetchChatMessages(session.user.id);
+    renderCompanyChat(messages);
+  } catch (err) {
+    const host = document.getElementById('companyChatHistory');
+    if (host) host.innerHTML = `<p class="empty-state">${escapeHtml(err.message)}</p>`;
+    return;
+  }
+
+  document.getElementById('refreshChatBtn')?.addEventListener('click', async () => {
+    try {
+      renderCompanyChat(await fetchChatMessages(session.user.id));
+    } catch (err) {
+      showAlert(document.getElementById('companyChatNote'), err.message);
+    }
+  });
+
+  const form = document.getElementById('companyChatForm');
+  if (!form || form.dataset.bound === '1') return;
+  form.dataset.bound = '1';
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const note = document.getElementById('companyChatNote');
+    const fd = new FormData(form);
+    try {
+      await sendCompanyChatMessage({
+        companyId: session.user.id,
+        authorId: session.user.id,
+        message: fd.get('message')
+      });
+      form.reset();
+      showAlert(note, 'Message envoyé, en attente de validation.', 'success');
+      renderCompanyChat(await fetchChatMessages(session.user.id));
+    } catch (err) {
+      showAlert(note, err.message);
+    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', initDashboard);

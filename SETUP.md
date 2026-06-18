@@ -46,22 +46,31 @@ window.HB_CONFIG = {
 
 > Pour les tests en local, ajoutez aussi `http://localhost:8080`
 
-## 6. Activer l'espace admin
+## 6. Activer l'espace super root et admin
 
-Promouvez votre compte en admin (remplacez l'e-mail) :
+Exécutez d'abord la migration des accès, prix clients et chat :
 
 ```sql
-update public.profiles set role = 'admin' where email = 'votre-email@gmail.com';
+-- Copier-coller le contenu de supabase/migration-access-chat-pricing.sql
 ```
 
-Connectez-vous → accédez à **`admin.html`**
+Promouvez ensuite votre compte principal en super root (remplacez l'e-mail) :
+
+```sql
+update public.profiles set role = 'super_root' where email = 'votre-email@gmail.com';
+```
+
+Connectez-vous → accédez à **`super-root.html`** pour gérer les accès et les prix clients.
+
+Le super root peut attribuer le rôle `admin` à un compte pour valider les commandes et modérer le chat via **`admin.html`**.
 
 ### Dashboard admin
 
 | Onglet | Fonctions |
 |--------|-----------|
 | **Produits** | Ajouter, modifier, supprimer produits |
-| **Commandes** | Suivre et mettre à jour le statut des commandes |
+| **Commandes** | Valider et mettre à jour le statut des commandes |
+| **Chat sociétés** | Répondre aux sociétés et accepter/refuser les messages |
 
 ## 7. Paiement Stripe (optionnel)
 

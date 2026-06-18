@@ -26,7 +26,9 @@ Le site est hébergé sur **GitHub Pages** (gratuit). Les données passent par *
 - Profil client : nom, société, e-mail, téléphone, adresse
 - Catalogue produits dynamique
 - Commandes avec suivi de statut
-- Dashboard admin
+- Dashboard admin pour validation des commandes et chat sociétés
+- Dashboard super root pour gérer les accès et les prix personnalisés par client
+- Chat société avec historique et modération des messages
 
 **Configuration obligatoire** → voir **[SETUP.md](SETUP.md)**
 

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super root | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commerce.css">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo">
+      <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="210" height="44">
+    </a>
+    <div class="nav-actions">
+      <a href="admin.html" class="btn btn-sm btn-primary">Dashboard admin</a>
+      <a href="compte.html" class="btn btn-sm btn-outline-light">Mon compte</a>
+      <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="dashboard-main container">
+    <header class="dashboard-header">
+      <span class="section-tag">Super root</span>
+      <h1>Gestion globale</h1>
+      <p class="auth-sub">Gérez les accès, les rôles et les prix personnalisés par société.</p>
+    </header>
+
+    <div class="admin-tabs">
+      <button type="button" class="admin-tab active" data-tab="access">Accès</button>
+      <button type="button" class="admin-tab" data-tab="prices">Prix client</button>
+    </div>
+
+    <section id="panel-access" class="admin-panel">
+      <div class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Comptes et rôles</h2>
+          <button type="button" id="refreshProfilesBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Société</th>
+                <th>Contact</th>
+                <th>Email</th>
+                <th>Rôle</th>
+              </tr>
+            </thead>
+            <tbody id="profilesBody"></tbody>
+          </table>
+        </div>
+        <p class="form-note" id="profilesNote"></p>
+      </div>
+    </section>
+
+    <section id="panel-prices" class="admin-panel" hidden>
+      <div class="dashboard-card">
+        <h2>Prix personnalisé</h2>
+        <form id="customerPriceForm" class="auth-form">
+          <label>
+            Société
+            <select name="profile_id" id="priceProfileSelect" required></select>
+          </label>
+          <label>
+            Produit
+            <select name="product_slug" id="priceProductSelect" required></select>
+          </label>
+          <label>
+            Prix personnalisé (€)
+            <input type="number" name="price" min="0" step="0.01" required>
+          </label>
+          <button type="submit" class="btn btn-primary">Enregistrer le prix</button>
+          <p class="form-note" id="customerPriceNote"></p>
+        </form>
+      </div>
+
+      <div class="dashboard-card dashboard-card-wide">
+        <h2>Prix déjà configurés</h2>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Société</th>
+                <th>Produit</th>
+                <th>Prix</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="customerPricesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/fiafi-images.js"></script>
+  <script src="js/fiafi-catalog.js"></script>
+  <script src="js/admin-api.js"></script>
+  <script src="js/super-root.js"></script>
+</body>
+</html>

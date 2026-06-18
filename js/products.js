@@ -18,8 +18,36 @@ async function fetchProducts(activeOnly = true) {
     ? mergeProductsWithCatalog(dbList.length ? dbList : catalog)
     : (dbList.length ? dbList : catalog);
 
-  if (activeOnly) return merged.filter((p) => p.active);
-  return merged;
+  const products = activeOnly ? merged.filter((p) => p.active) : merged;
+  return applyCustomerPrices(products);
+}
+
+async function applyCustomerPrices(products) {
+  if (typeof getSession !== 'function') return products;
+  const session = await getSession();
+  if (!session) return products;
+
+  const sb = getSupabase();
+  if (!sb) return products;
+
+  const { data, error } = await sb
+    .from('customer_prices')
+    .select('product_slug, price')
+    .eq('profile_id', session.user.id);
+  if (error) {
+    console.warn('customer_prices:', error.message);
+    return products;
+  }
+
+  const prices = new Map((data || []).map((row) => [row.product_slug, Number(row.price)]));
+  return products.map((product) => {
+    if (!prices.has(product.slug)) return product;
+    return {
+      ...product,
+      price: prices.get(product.slug),
+      customer_price: true
+    };
+  });
 }
 
 async function fetchProductBySlug(slug) {
@@ -32,7 +60,9 @@ async function fetchProductBySlug(slug) {
   }
   const { data, error } = await sb.from('products').select('*').eq('slug', normalizedSlug).maybeSingle();
   if (error) throw error;
-  return typeof normalizeFiafiProduct === 'function' ? normalizeFiafiProduct(data) : data;
+  const product = typeof normalizeFiafiProduct === 'function' ? normalizeFiafiProduct(data) : data;
+  const priced = await applyCustomerPrices(product ? [product] : []);
+  return priced[0] || null;
 }
 
 function getFallbackProducts() {
@@ -109,6 +139,7 @@ function renderProductCard(product) {
           <span class="price">${priceDisplay}</span>
           ${unitDisplay ? `<span class="unit">${unitDisplay}</span>` : ''}
         </div>
+        ${product.customer_price ? '<p class="form-note min-qty">Prix personnalis&eacute; soci&eacute;t&eacute;</p>' : ''}
         <p class="form-note min-qty">Minimum : ${minQty} ${product.unit}(s)</p>
         <div class="product-actions">
           <div class="qty-control">

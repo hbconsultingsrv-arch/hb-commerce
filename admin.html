@@ -17,6 +17,7 @@
       <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="210" height="44">
     </a>
     <div class="nav-actions">
+      <a href="super-root.html" id="superRootLink" class="btn btn-sm btn-primary" style="display:none">Super root</a>
       <a href="index.html" class="btn btn-sm btn-outline-light">Voir le site</a>
       <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
     </div>
@@ -32,6 +33,7 @@
     <div class="admin-tabs">
       <button type="button" class="admin-tab active" data-tab="produits">Produits</button>
       <button type="button" class="admin-tab" data-tab="commandes">Commandes</button>
+      <button type="button" class="admin-tab" data-tab="chat">Chat sociétés</button>
     </div>
 
     <section id="panel-produits" class="admin-panel">
@@ -141,6 +143,32 @@
             <tbody id="ordersAdminBody"></tbody>
           </table>
         </div>
+      </div>
+    </section>
+
+    <section id="panel-chat" class="admin-panel" hidden>
+      <div class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Chat sociétés</h2>
+          <button type="button" id="refreshAdminChatBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="form-row">
+          <label>
+            Société
+            <select id="adminChatCompany"></select>
+          </label>
+        </div>
+        <div id="adminChatHistory" class="chat-history" style="margin-top:1rem">
+          <p class="empty-state">Sélectionnez une société.</p>
+        </div>
+        <form id="adminChatReplyForm" class="auth-form" style="margin-top:1rem">
+          <label>
+            Réponse à la société
+            <textarea name="message" rows="3" required placeholder="Votre réponse"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Répondre</button>
+          <p class="form-note" id="adminChatNote"></p>
+        </form>
       </div>
     </section>
   </main>

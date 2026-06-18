@@ -1,5 +1,6 @@
 const ORDER_STATUS_LABELS = {
   en_attente: 'En attente',
+  validee: 'Validée',
   en_attente_paiement: 'En attente de paiement',
   payee: 'Payée',
   en_preparation: 'En préparation',
@@ -66,6 +67,14 @@ async function getProfile(userId) {
   return data;
 }
 
+function isAdminProfile(profile) {
+  return profile?.role === 'admin' || profile?.role === 'super_root';
+}
+
+function isSuperRootProfile(profile) {
+  return profile?.role === 'super_root';
+}
+
 async function updateProfile(userId, fields) {
   const sb = getSupabase();
   if (!sb) throw new Error(configErrorMessage());
@@ -84,6 +93,15 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', {
     day: 'numeric', month: 'long', year: 'numeric'
   });
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 function formatPrice(amount) {
