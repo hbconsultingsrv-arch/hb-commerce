@@ -29,13 +29,17 @@ function profileLabel(profile) {
   return profile?.company || profile?.full_name || profile?.email || 'Société';
 }
 
+function personLabel(profile) {
+  return profile?.full_name || profile?.email || profile?.company || 'Utilisateur';
+}
+
 function commercialAgentLabel(profile) {
   const roleLabel = {
     agent_commercial: 'agent commercial',
     admin: 'admin',
     super_root: 'super root'
   }[profile?.role] || profile?.role || 'agent';
-  return `${profileLabel(profile)} (${roleLabel})`;
+  return `${personLabel(profile)} (${roleLabel})`;
 }
 
 function productLabel(product) {
