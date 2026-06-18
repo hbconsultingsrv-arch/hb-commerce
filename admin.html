@@ -27,16 +27,16 @@
     <header class="dashboard-header">
       <span class="section-tag">Administration</span>
       <h1>Dashboard HB Commerce</h1>
-      <p class="auth-sub">Gérez le catalogue produits et traitez les commandes clients.</p>
+      <p class="auth-sub">Gérez les sociétés clientes et fournisseurs, le catalogue, les prix, les commandes, l'affectation des agents commerciaux et la modération du chat.</p>
     </header>
 
     <div class="admin-tabs">
       <button type="button" class="admin-tab active" data-tab="produits">Produits</button>
       <button type="button" class="admin-tab admin-only" data-tab="fournisseurs">Fournisseurs</button>
       <button type="button" class="admin-tab" data-tab="commandes">Commandes</button>
-      <button type="button" class="admin-tab" data-tab="clients">Clients</button>
+      <button type="button" class="admin-tab" data-tab="clients">Sociétés</button>
       <button type="button" class="admin-tab" data-tab="prix">Prix clients</button>
-      <button type="button" class="admin-tab" data-tab="chat">Chat sociétés</button>
+      <button type="button" class="admin-tab" data-tab="chat">Chat &amp; modération</button>
     </div>
 
     <section id="panel-produits" class="admin-panel">
@@ -273,43 +273,6 @@
 
     <section id="panel-clients" class="admin-panel" hidden>
       <div class="dashboard-card admin-only">
-        <h2>Créer utilisateur interne HB Commerce</h2>
-        <form id="commercialAgentForm" class="auth-form">
-          <label>
-            Profil interne
-            <select name="internal_role" id="internalRoleSelect">
-              <option value="agent_commercial">Agent commercial</option>
-              <option value="admin">Admin</option>
-              <option value="super_root" class="super-root-only">Super root</option>
-            </select>
-          </label>
-          <div class="form-row">
-            <label>
-              Nom utilisateur
-              <input type="text" name="full_name" required placeholder="Nom de la personne">
-            </label>
-            <label>
-              E-mail
-              <input type="email" name="email" required placeholder="prenom.nom@hbcommerce.fr">
-            </label>
-          </div>
-          <div class="form-row">
-            <label>
-              Téléphone
-              <input type="tel" name="phone" placeholder="Téléphone">
-            </label>
-            <label>
-              Mot de passe temporaire
-              <input type="password" name="password" minlength="6" required autocomplete="new-password">
-            </label>
-          </div>
-          <button type="submit" class="btn btn-primary">Créer l'utilisateur interne</button>
-          <p class="form-note" id="commercialAgentNote"></p>
-          <p class="form-note">Ces comptes sont rattachés à HB Commerce. Aucun champ société n’est requis.</p>
-        </form>
-      </div>
-
-      <div class="dashboard-card admin-only">
         <h2>Créer société client / fournisseur</h2>
         <form id="adminClientForm" class="auth-form">
           <label>
@@ -417,10 +380,10 @@
     <section id="panel-chat" class="admin-panel" hidden>
       <div class="dashboard-card dashboard-card-wide">
         <div class="dashboard-card-head">
-          <h2>Chat sociétés</h2>
+          <h2>Chat &amp; modération</h2>
           <button type="button" id="refreshAdminChatBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
         </div>
-        <p class="auth-sub" style="margin-bottom:1rem">Sélectionnez une société dans la liste pour consulter l'historique et répondre.</p>
+        <p class="auth-sub" style="margin-bottom:1rem">Consultez les conversations par société, validez ou refusez les messages clients et répondez.</p>
         <div class="chat-inbox">
           <aside class="chat-inbox-list">
             <div id="adminChatList" class="chat-thread-list">

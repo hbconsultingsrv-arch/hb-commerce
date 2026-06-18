@@ -52,7 +52,6 @@ async function initAdmin() {
   document.getElementById('refreshSuppliersBtn')?.addEventListener('click', loadSuppliersTable);
   document.getElementById('supplierOrderForm')?.addEventListener('submit', handleSupplierOrderSubmit);
   document.getElementById('adminClientForm')?.addEventListener('submit', handleAdminClientSubmit);
-  document.getElementById('commercialAgentForm')?.addEventListener('submit', handleCommercialAgentSubmit);
   document.getElementById('adminCompanyTypeSelect')?.addEventListener('change', syncCompanyTypeFields);
   document.getElementById('refreshClientsBtn')?.addEventListener('click', loadClientsPanel);
   document.getElementById('adminCustomerPriceForm')?.addEventListener('submit', handleAdminCustomerPriceSubmit);
@@ -512,31 +511,6 @@ function renderAgentSelect(select, agents) {
 function agentName(agentId, agents) {
   const agent = agents.find((p) => p.id === agentId);
   return agent ? commercialAgentLabel(agent) : 'Aucun agent';
-}
-
-async function handleCommercialAgentSubmit(e) {
-  e.preventDefault();
-  const note = document.getElementById('commercialAgentNote');
-  const fd = new FormData(e.target);
-  const role = fd.get('internal_role');
-  if (role === 'super_root' && !isSuperRootProfile(adminProfile)) {
-    showAlert(note, 'Seul un super root peut créer un autre super root.');
-    return;
-  }
-  try {
-    await createInternalUser({
-      email: fd.get('email'),
-      password: fd.get('password'),
-      fullName: fd.get('full_name'),
-      phone: fd.get('phone'),
-      role
-    });
-    e.target.reset();
-    showAlert(note, 'Utilisateur interne créé.', 'success');
-    await loadClientsPanel();
-  } catch (err) {
-    showAlert(note, mapAuthError(err));
-  }
 }
 
 function syncCompanyTypeFields() {
