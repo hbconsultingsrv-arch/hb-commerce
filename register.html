@@ -46,6 +46,20 @@
           </label>
         </div>
         <label>
+          Adresse société
+          <input type="text" name="address" required placeholder="Adresse complète de la société">
+        </label>
+        <div class="form-row">
+          <label>
+            SIREN
+            <input type="text" name="siren" required placeholder="9 chiffres" inputmode="numeric">
+          </label>
+          <label>
+            Code TVA
+            <input type="text" name="vatNumber" required placeholder="FR...">
+          </label>
+        </div>
+        <label>
           Mot de passe
           <input type="password" name="password" required minlength="6" autocomplete="new-password">
         </label>
@@ -87,7 +101,10 @@
           password: fd.get('password'),
           fullName: fd.get('fullName'),
           phone: fd.get('phone'),
-          company: fd.get('company')
+          company: fd.get('company'),
+          address: fd.get('address'),
+          siren: fd.get('siren'),
+          vatNumber: fd.get('vatNumber')
         });
 
         if (user && !user.confirmed_at) {

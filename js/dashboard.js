@@ -13,6 +13,8 @@ async function initDashboard() {
     form.phone.value = profile.phone || '';
     form.address.value = profile.address || '';
     if (form.company) form.company.value = profile.company || '';
+    if (form.siren) form.siren.value = profile.siren || '';
+    if (form.vat_number) form.vat_number.value = profile.vat_number || '';
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -23,7 +25,9 @@ async function initDashboard() {
           full_name: fd.get('full_name'),
           phone: fd.get('phone'),
           address: fd.get('address'),
-          company: fd.get('company')
+          company: fd.get('company'),
+          siren: fd.get('siren'),
+          vat_number: fd.get('vat_number')
         });
         showAlert(note, 'Profil mis à jour.', 'success');
       } catch (err) {

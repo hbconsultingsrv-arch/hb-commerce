@@ -38,7 +38,7 @@ function getEmailConfirmRedirectUrl() {
   return new URL('login.html?confirmed=1', window.location.href).toString();
 }
 
-async function signUp({ email, password, fullName, phone, company }) {
+async function signUp({ email, password, fullName, phone, company, address, siren, vatNumber }) {
   const sb = getSupabase();
   if (!sb) throw new Error(configErrorMessage());
   const { data, error } = await sb.auth.signUp({
@@ -46,7 +46,14 @@ async function signUp({ email, password, fullName, phone, company }) {
     password,
     options: {
       emailRedirectTo: getEmailConfirmRedirectUrl(),
-      data: { full_name: fullName, phone, company: company || '' }
+      data: {
+        full_name: fullName,
+        phone,
+        company: company || '',
+        address: address || '',
+        siren: siren || '',
+        vat_number: vatNumber || ''
+      }
     }
   });
   if (error) throw error;

@@ -9,6 +9,8 @@ create table if not exists public.profiles (
   phone text,
   address text,
   company text,
+  siren text,
+  vat_number text,
   role text default 'client' check (role in ('client', 'admin', 'super_root')),
   created_at timestamptz default now(),
   updated_at timestamptz default now()
@@ -19,6 +21,8 @@ update public.profiles set role = 'client' where role = 'user';
 alter table public.profiles alter column role set default 'client';
 alter table public.profiles add constraint profiles_role_check
   check (role in ('client', 'admin', 'super_root'));
+alter table public.profiles add column if not exists siren text;
+alter table public.profiles add column if not exists vat_number text;
 
 -- Catalogue produits alimentaires
 create table if not exists public.products (
@@ -150,12 +154,16 @@ drop policy if exists "Users read own profile" on public.profiles;
 drop policy if exists "Users update own profile" on public.profiles;
 drop policy if exists "Users insert own profile" on public.profiles;
 drop policy if exists "Admin read all profiles" on public.profiles;
+drop policy if exists "Admin manage client profiles" on public.profiles;
 drop policy if exists "Super root manage profiles" on public.profiles;
 
 create policy "Users read own profile" on public.profiles for select using (auth.uid() = id);
 create policy "Users update own profile" on public.profiles for update using (auth.uid() = id);
 create policy "Users insert own profile" on public.profiles for insert with check (auth.uid() = id);
 create policy "Admin read all profiles" on public.profiles for select using (public.is_admin());
+create policy "Admin manage client profiles" on public.profiles for all
+  using (public.is_admin() and role = 'client')
+  with check (public.is_admin() and role = 'client');
 create policy "Super root manage profiles" on public.profiles for all
   using (public.is_super_root()) with check (public.is_super_root());
 
@@ -240,13 +248,16 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.profiles (id, email, full_name, phone, company)
+  insert into public.profiles (id, email, full_name, phone, company, address, siren, vat_number)
   values (
     new.id,
     new.email,
     coalesce(new.raw_user_meta_data->>'full_name', ''),
     coalesce(new.raw_user_meta_data->>'phone', ''),
-    coalesce(new.raw_user_meta_data->>'company', '')
+    coalesce(new.raw_user_meta_data->>'company', ''),
+    coalesce(new.raw_user_meta_data->>'address', ''),
+    coalesce(new.raw_user_meta_data->>'siren', ''),
+    coalesce(new.raw_user_meta_data->>'vat_number', '')
   );
   return new;
 end;

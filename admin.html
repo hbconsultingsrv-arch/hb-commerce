@@ -33,6 +33,7 @@
     <div class="admin-tabs">
       <button type="button" class="admin-tab active" data-tab="produits">Produits</button>
       <button type="button" class="admin-tab" data-tab="commandes">Commandes</button>
+      <button type="button" class="admin-tab" data-tab="clients">Clients</button>
       <button type="button" class="admin-tab" data-tab="chat">Chat sociétés</button>
     </div>
 
@@ -141,6 +142,75 @@
               </tr>
             </thead>
             <tbody id="ordersAdminBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-clients" class="admin-panel" hidden>
+      <div class="dashboard-card">
+        <h2>Créer un client société</h2>
+        <form id="adminClientForm" class="auth-form">
+          <div class="form-row">
+            <label>
+              Société
+              <input type="text" name="company" required placeholder="Nom de la société">
+            </label>
+            <label>
+              Contact
+              <input type="text" name="full_name" required placeholder="Nom du contact">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              E-mail de connexion
+              <input type="email" name="email" required placeholder="contact@societe.com">
+            </label>
+            <label>
+              Téléphone
+              <input type="tel" name="phone" placeholder="Téléphone">
+            </label>
+          </div>
+          <label>
+            Adresse société
+            <input type="text" name="address" required placeholder="Adresse complète">
+          </label>
+          <div class="form-row">
+            <label>
+              SIREN
+              <input type="text" name="siren" required placeholder="9 chiffres" inputmode="numeric">
+            </label>
+            <label>
+              Code TVA
+              <input type="text" name="vat_number" required placeholder="FR...">
+            </label>
+          </div>
+          <label>
+            Mot de passe temporaire
+            <input type="password" name="password" minlength="6" required autocomplete="new-password">
+          </label>
+          <button type="submit" class="btn btn-primary">Créer le client</button>
+          <p class="form-note" id="adminClientNote"></p>
+        </form>
+      </div>
+
+      <div class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Clients sociétés</h2>
+          <button type="button" id="refreshClientsBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Société</th>
+                <th>Contact</th>
+                <th>SIREN</th>
+                <th>TVA</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody id="clientsBody"></tbody>
           </table>
         </div>
       </div>

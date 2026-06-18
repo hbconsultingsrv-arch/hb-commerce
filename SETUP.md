@@ -57,6 +57,12 @@ Exécutez d'abord la migration des accès, prix clients et chat :
 -- Copier-coller le contenu de supabase/migration-access-chat-pricing.sql
 ```
 
+Si votre base existe déjà, exécutez aussi la migration des champs société client :
+
+```sql
+-- Copier-coller le contenu de supabase/migration-company-client-fields.sql
+```
+
 Promouvez ensuite votre compte principal en super root (remplacez l'e-mail) :
 
 ```sql

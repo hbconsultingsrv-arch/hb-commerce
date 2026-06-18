@@ -23,11 +23,14 @@ async function initAdmin() {
 
   await loadProductsTable();
   await loadOrdersTable();
+  await loadClientsPanel();
   await loadAdminChatPanel();
 
   const productForm = document.getElementById('productForm');
   productForm?.addEventListener('submit', handleProductSubmit);
   document.getElementById('cancelProductBtn')?.addEventListener('click', resetProductForm);
+  document.getElementById('adminClientForm')?.addEventListener('submit', handleAdminClientSubmit);
+  document.getElementById('refreshClientsBtn')?.addEventListener('click', loadClientsPanel);
 }
 
 async function loadProductsTable() {
@@ -163,6 +166,50 @@ async function loadOrdersTable() {
 
 function profileLabel(profile) {
   return profile?.company || profile?.full_name || profile?.email || 'Société';
+}
+
+async function loadClientsPanel() {
+  const body = document.getElementById('clientsBody');
+  if (!body) return;
+  try {
+    adminProfiles = await fetchAllProfiles();
+    const clients = adminProfiles.filter((p) => p.role === 'client');
+    body.innerHTML = clients.length ? clients.map((profile) => `
+      <tr>
+        <td><strong>${escapeHtml(profile.company || '—')}</strong><br><small>${escapeHtml(profile.address || '')}</small></td>
+        <td>${escapeHtml(profile.full_name || '—')}</td>
+        <td>${escapeHtml(profile.siren || '—')}</td>
+        <td>${escapeHtml(profile.vat_number || '—')}</td>
+        <td>${escapeHtml(profile.email || '—')}</td>
+      </tr>
+    `).join('') : '<tr><td colspan="5">Aucun client.</td></tr>';
+  } catch (err) {
+    body.innerHTML = `<tr><td colspan="5">${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+async function handleAdminClientSubmit(e) {
+  e.preventDefault();
+  const note = document.getElementById('adminClientNote');
+  const fd = new FormData(e.target);
+  try {
+    await createClientUser({
+      email: fd.get('email'),
+      password: fd.get('password'),
+      fullName: fd.get('full_name'),
+      phone: fd.get('phone'),
+      address: fd.get('address'),
+      company: fd.get('company'),
+      siren: fd.get('siren'),
+      vatNumber: fd.get('vat_number')
+    });
+    e.target.reset();
+    showAlert(note, 'Client créé avec le rôle client.', 'success');
+    await loadClientsPanel();
+    await loadAdminChatPanel();
+  } catch (err) {
+    showAlert(note, mapAuthError(err));
+  }
 }
 
 function chatStatusLabel(status) {

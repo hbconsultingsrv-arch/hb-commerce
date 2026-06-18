@@ -62,7 +62,7 @@
           </label>
           <label>
             Société
-            <input type="text" name="company">
+            <input type="text" name="company" required>
           </label>
           <label>
             E-mail
@@ -74,8 +74,18 @@
           </label>
           <label>
             Adresse
-            <input type="text" name="address">
+            <input type="text" name="address" required>
           </label>
+          <div class="form-row">
+            <label>
+              SIREN
+              <input type="text" name="siren" required inputmode="numeric">
+            </label>
+            <label>
+              Code TVA
+              <input type="text" name="vat_number" required>
+            </label>
+          </div>
           <button type="submit" class="btn btn-primary">Enregistrer</button>
           <p class="form-note" id="profileNote"></p>
         </form>

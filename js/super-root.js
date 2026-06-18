@@ -56,8 +56,10 @@ function renderProfilesTable() {
 
   body.innerHTML = superRootProfiles.map((profile) => `
     <tr>
-      <td><strong>${escapeHtml(profile.company || '—')}</strong></td>
+      <td><strong>${escapeHtml(profile.company || '—')}</strong><br><small>${escapeHtml(profile.address || '')}</small></td>
       <td>${escapeHtml(profile.full_name || '—')}</td>
+      <td>${escapeHtml(profile.siren || '—')}</td>
+      <td>${escapeHtml(profile.vat_number || '—')}</td>
       <td>${escapeHtml(profile.email || '—')}</td>
       <td>
         <select data-role-profile="${profile.id}">
@@ -102,17 +104,18 @@ async function handleProfileCreateSubmit(e) {
   const fd = new FormData(e.target);
 
   try {
-    await createUserAsSuperRoot({
+    await createClientUser({
       email: fd.get('email'),
       password: fd.get('password'),
       fullName: fd.get('full_name'),
       phone: fd.get('phone'),
       address: fd.get('address'),
       company: fd.get('company'),
-      role: 'client'
+      siren: fd.get('siren'),
+      vatNumber: fd.get('vat_number')
     });
     e.target.reset();
-    showAlert(note, 'Utilisateur créé. Il peut confirmer son e-mail puis se connecter.', 'success');
+    showAlert(note, 'Client créé avec le rôle client. Il peut confirmer son e-mail puis se connecter.', 'success');
     await loadSuperRootData();
   } catch (err) {
     showAlert(note, mapAuthError(err));
@@ -130,6 +133,8 @@ function editProfile(profileId) {
   form.elements.email.value = profile.email || '';
   form.elements.phone.value = profile.phone || '';
   form.elements.address.value = profile.address || '';
+  form.elements.siren.value = profile.siren || '';
+  form.elements.vat_number.value = profile.vat_number || '';
   form.elements.role.value = profile.role || 'client';
   document.getElementById('profileEditTitle').textContent = `Modifier ${profileLabel(profile)}`;
   form.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -152,7 +157,9 @@ async function handleProfileEditSubmit(e) {
       email: fd.get('email') || '',
       phone: fd.get('phone') || '',
       address: fd.get('address') || '',
-      role: fd.get('role')
+      role: fd.get('role'),
+      siren: fd.get('siren') || '',
+      vat_number: fd.get('vat_number') || ''
     });
     showAlert(note, 'Utilisateur mis à jour.', 'success');
     await loadSuperRootData();

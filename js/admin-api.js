@@ -86,7 +86,7 @@ function getDetachedSupabaseClient() {
   );
 }
 
-async function createUserAsSuperRoot({ email, password, fullName, phone, address, company, role = 'client' }) {
+async function createClientUser({ email, password, fullName, phone, address, company, siren, vatNumber }) {
   const authClient = getDetachedSupabaseClient();
   const { data, error } = await authClient.auth.signUp({
     email,
@@ -96,7 +96,10 @@ async function createUserAsSuperRoot({ email, password, fullName, phone, address
       data: {
         full_name: fullName || '',
         phone: phone || '',
-        company: company || ''
+        company: company || '',
+        address: address || '',
+        siren: siren || '',
+        vat_number: vatNumber || ''
       }
     }
   });
@@ -112,7 +115,9 @@ async function createUserAsSuperRoot({ email, password, fullName, phone, address
     phone: phone || '',
     address: address || '',
     company: company || '',
-    role: role || 'client'
+    siren: siren || '',
+    vat_number: vatNumber || '',
+    role: 'client'
   };
   const { data: savedProfile, error: profileError } = await sb
     .from('profiles')
@@ -121,6 +126,10 @@ async function createUserAsSuperRoot({ email, password, fullName, phone, address
     .single();
   if (profileError) throw profileError;
   return savedProfile;
+}
+
+async function createUserAsSuperRoot(fields) {
+  return createClientUser(fields);
 }
 
 async function fetchAllProducts() {
