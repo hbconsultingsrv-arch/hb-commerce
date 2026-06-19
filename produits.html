@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css?v=menu-20260618">
-  <link rel="stylesheet" href="css/commerce.css?v=menu-20260618">
+  <link rel="stylesheet" href="css/commerce.css?v=product-info-20260619">
   <link rel="stylesheet" href="css/brochure.css?v=menu-20260618">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
   <script src="js/markets.js"></script>
@@ -44,6 +44,17 @@
 
     <div id="qualitySection" class="dashboard-card dashboard-card-wide" style="margin-top:2rem"></div>
   </main>
+
+  <div id="productTechModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog app-modal-dialog-wide">
+      <div class="app-modal-header">
+        <h2>Fiche technique</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body" id="productTechModalBody"></div>
+    </div>
+  </div>
 
   <script src="js/markets.js"></script>
   <script src="js/fiafi-images.js"></script>

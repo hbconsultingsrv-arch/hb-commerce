@@ -147,6 +147,143 @@ function resolveProductImage(product) {
   return FIAFI_IMAGES?.product || 'images/prenium.PNG';
 }
 
+function isOilProduct(product) {
+  const text = `${product?.name || ''} ${product?.category || ''} ${product?.description || ''}`.toLowerCase();
+  return Boolean(product?.acidity) || /huile|olive|oil/.test(text);
+}
+
+function getProductAvailability(product) {
+  const available = Number(product?.stock_available || 0);
+  if (available > 0) {
+    return {
+      label: 'En stock',
+      detail: `${available} unité${available > 1 ? 's' : ''} disponible${available > 1 ? 's' : ''}`,
+      tone: 'in-stock'
+    };
+  }
+  return {
+    label: 'Sur commande',
+    detail: product?.delivery_delay_label || 'Délai selon approvisionnement',
+    tone: 'on-order'
+  };
+}
+
+function buildProductTechSpecs(product) {
+  const specs = [];
+  const LE = '\u2264';
+
+  if (product.name) specs.push({ label: 'Produit', value: product.name });
+  if (product.format_label) specs.push({ label: 'Format', value: product.format_label });
+  if (product.category) specs.push({ label: 'Catégorie', value: getCategoryLabel(product.category) });
+  if (product.packaging_type) specs.push({ label: 'Conditionnement', value: getPackagingLabel(product.packaging_type) });
+  if (product.volume_ml) specs.push({ label: 'Volume', value: `${product.volume_ml} ml` });
+  if (product.acidity) {
+    const acidityDisplay = typeof formatAcidity === 'function' ? formatAcidity(product.acidity) : product.acidity;
+    specs.push({ label: 'Acidité', value: acidityDisplay });
+  }
+  if (product.origin) specs.push({ label: 'Pays / origine', value: product.origin });
+
+  if (isOilProduct(product)) {
+    specs.push({ label: 'Type', value: 'Huile d\'olive extra vierge' });
+    if (isFiafiProduct(product)) {
+      specs.push({ label: 'Pression', value: 'Première pression à froid' });
+      specs.push({ label: 'Indice de peroxyde', value: `${LE} 20 meq O2/kg` });
+      specs.push({ label: 'Humidité', value: `${LE} 0,2 %` });
+    }
+  }
+
+  if (product.unit) specs.push({ label: 'Unité de vente', value: product.unit });
+  if (product.min_quantity) {
+    specs.push({ label: 'Quantité minimum', value: `${product.min_quantity} ${product.unit}(s)` });
+  }
+
+  const availability = getProductAvailability(product);
+  specs.push({ label: 'Disponibilité', value: availability.detail || availability.label });
+  if (product.delivery_delay_label) {
+    specs.push({ label: 'Délai de livraison', value: product.delivery_delay_label });
+  }
+  if (product.description) {
+    specs.push({ label: 'Description', value: product.description, wide: true });
+  }
+
+  return specs;
+}
+
+function renderProductInfoStrip(product) {
+  const origin = product.origin || '—';
+  const availability = getProductAvailability(product);
+  const showAcidity = isOilProduct(product);
+  const acidityDisplay = showAcidity
+    ? (typeof formatAcidity === 'function' ? formatAcidity(product.acidity || '') : (product.acidity || '—'))
+    : '';
+
+  return `
+    <div class="product-info-strip">
+      ${showAcidity ? `
+        <div class="product-info-item">
+          <span class="product-info-label">Acidité</span>
+          <span class="product-info-value">${escapeHtml(acidityDisplay || '—')}</span>
+        </div>
+      ` : ''}
+      <div class="product-info-item">
+        <span class="product-info-label">Pays</span>
+        <span class="product-info-value">${escapeHtml(origin)}</span>
+      </div>
+      <div class="product-info-item product-info-item--${availability.tone}">
+        <span class="product-info-label">Dispo.</span>
+        <span class="product-info-value">${escapeHtml(availability.label)}</span>
+      </div>
+      <button type="button" class="product-info-tech btn-tech-sheet" aria-label="Fiche technique de ${escapeHtml(product.name)}">
+        Fiche technique
+      </button>
+    </div>
+  `;
+}
+
+function renderProductTechSheetContent(product) {
+  const imgUrl = resolveProductImage(product);
+  const imgFallback = FIAFI_IMAGES?.product || 'images/prenium.PNG';
+  const specs = buildProductTechSpecs(product);
+
+  return `
+    <div class="tech-sheet">
+      <div class="tech-sheet-head">
+        <img src="${imgUrl}" alt="${escapeHtml(product.name)}" class="tech-sheet-img" onerror="this.onerror=null;this.src='${imgFallback}'">
+        <div>
+          <p class="tech-sheet-brand">${escapeHtml(getProductBrand(product))}</p>
+          <h3 id="productTechModalTitle">${escapeHtml(product.name)}</h3>
+          ${product.format_label ? `<p class="tech-sheet-format">${escapeHtml(product.format_label)}</p>` : ''}
+        </div>
+      </div>
+      <dl class="tech-sheet-specs">
+        ${specs.map((spec) => `
+          <div class="tech-sheet-row${spec.wide ? ' tech-sheet-row-wide' : ''}">
+            <dt>${escapeHtml(spec.label)}</dt>
+            <dd>${escapeHtml(spec.value)}</dd>
+          </div>
+        `).join('')}
+      </dl>
+    </div>
+  `;
+}
+
+function openProductTechSheet(product) {
+  const modal = document.getElementById('productTechModal');
+  const body = document.getElementById('productTechModalBody');
+  if (!modal || !body || !product) return;
+
+  body.innerHTML = renderProductTechSheetContent(product);
+  if (typeof bindAppModal === 'function' && modal.dataset.bound !== '1') {
+    bindAppModal('productTechModal');
+  }
+  if (typeof openAppModal === 'function') {
+    openAppModal('productTechModal');
+  } else {
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+  }
+}
+
 function renderProductCard(product) {
   const minQty = product.min_quantity || 1;
   const imgUrl = resolveProductImage(product);
@@ -154,8 +291,6 @@ function renderProductCard(product) {
   const fiafi = isFiafiProduct(product);
   const cardClass = fiafi ? 'product-card fiafi-card' : 'product-card';
   const formatLabel = product.format_label || '';
-  const acidity = product.acidity || '';
-  const acidityDisplay = typeof formatAcidity === 'function' ? formatAcidity(acidity) : acidity;
   const packaging = getPackagingLabel(product.packaging_type);
   const priceDisplay = typeof formatDisplayPrice === 'function' ? formatDisplayPrice(product.price) : 'xx';
   const unitDisplay = typeof canViewPrices === 'function' && !canViewPrices() ? '' : `/ ${product.unit}`;
@@ -167,12 +302,11 @@ function renderProductCard(product) {
         ${packaging ? `<span class="packaging-badge">${packaging}</span>` : ''}
         <img src="${imgUrl}" alt="${product.name}" loading="lazy" onerror="this.onerror=null;this.src='${imgFallback}'">
       </div>
+      ${renderProductInfoStrip(product)}
       <div class="product-card-body">
         ${product.tag ? `<span class="tag">${product.tag}</span>` : ''}
         ${formatLabel ? `<span class="format-label">${formatLabel}</span>` : ''}
         <h3>${product.name}</h3>
-        <p class="origin">Origine : ${product.origin || '—'}</p>
-        ${acidity ? `<p class="acidity-line">Acidit&eacute; : <strong>${acidityDisplay}</strong></p>` : ''}
         <p class="product-desc">${product.description || ''}</p>
         <div class="price-row">
           <span class="price">${priceDisplay}</span>
@@ -356,10 +490,22 @@ function filterProductsByCategory(products, categoryId) {
   return products.filter((p) => p.category === categoryId);
 }
 
-function bindProductCardEvents(container, onAdded) {
+function bindProductCardEvents(container, onAdded, productsList) {
+  const byId = new Map((productsList || []).map((product) => [String(product.id), product]));
+
   container.querySelectorAll('.product-card').forEach((card) => {
     const input = card.querySelector('.qty-input');
     const min = parseInt(input.min, 10) || 1;
+
+    card.querySelector('.btn-tech-sheet')?.addEventListener('click', async () => {
+      const id = card.dataset.productId;
+      let product = byId.get(id);
+      if (!product) {
+        const list = await fetchProducts();
+        product = list.find((item) => String(item.id) === id);
+      }
+      if (product) openProductTechSheet(product);
+    });
 
     card.querySelector('.qty-minus')?.addEventListener('click', () => {
       const v = parseInt(input.value, 10) || min;
@@ -393,7 +539,7 @@ function bindCategoryNav(container, products, gridEl, onAdded) {
     gridEl.innerHTML = filtered.length
       ? filtered.map(renderProductCard).join('')
       : '<p class="empty-state">Aucun produit dans cette catégorie.</p>';
-    bindProductCardEvents(gridEl, onAdded);
+    bindProductCardEvents(gridEl, onAdded, products);
     container.querySelectorAll('.category-tab').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.category === categoryId);
     });

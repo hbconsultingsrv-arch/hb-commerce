@@ -15,9 +15,19 @@
 --   direction@hotel-nice.demo      → client (Hotel Riviera) — agent Dubois
 --   inscription@nouvelle-societe.demo → pending_company
 --   stock@fiafi-tunisie.demo       → supplier (FIAFI Tunisie)
+--
+-- Catalogue demo (produits actifs) :
+--   6 x FIAFI (huile d'olive)
+--   3 x TOUNSI (huile d'olive)
+--   5 x autres marques (harissa, dattes, couscous, huile tournesol, confiture)
 -- =============================================================
 
 create extension if not exists pgcrypto;
+
+alter table public.products add column if not exists packaging_type text;
+alter table public.products add column if not exists format_label text;
+alter table public.products add column if not exists acidity text;
+alter table public.products add column if not exists volume_ml int;
 
 -- ---------------------------------------------------------------------------
 -- UUID fixes (reproductibles)
@@ -40,6 +50,8 @@ declare
   v_pending uuid := 'a0000001-0001-4001-8001-000000000015';
   v_supusr  uuid := 'a0000001-0001-4001-8001-000000000021';
   v_supplier uuid := 'b0000001-0001-4001-8001-000000000001';
+  v_supplier2 uuid := 'b0000001-0001-4001-8001-000000000002';
+  v_supplier3 uuid := 'b0000001-0001-4001-8001-000000000003';
   v_order1  uuid := 'c0000001-0001-4001-8001-000000000001';
   v_order2  uuid := 'c0000001-0001-4001-8001-000000000002';
   v_order3  uuid := 'c0000001-0001-4001-8001-000000000003';
@@ -61,8 +73,8 @@ begin
   delete from public.order_items where order_id in (v_order1, v_order2, v_order3, v_order4, v_order5, v_order6);
   delete from public.orders where id in (v_order1, v_order2, v_order3, v_order4, v_order5, v_order6);
   delete from public.customer_prices where profile_id in (v_client1, v_client2, v_client3, v_client4);
-  delete from public.supplier_orders where supplier_id = v_supplier;
-  delete from public.product_stocks where supplier_id = v_supplier;
+  delete from public.supplier_orders where supplier_id in (v_supplier, v_supplier2, v_supplier3);
+  delete from public.product_stocks where supplier_id in (v_supplier, v_supplier2, v_supplier3);
   delete from public.profiles where id in (
     v_super, v_admin, v_agent1, v_agent2,
     v_client1, v_client2, v_client3, v_client4, v_pending, v_supusr
@@ -75,7 +87,7 @@ begin
     v_super, v_admin, v_agent1, v_agent2,
     v_client1, v_client2, v_client3, v_client4, v_pending, v_supusr
   );
-  delete from public.suppliers where id = v_supplier;
+  delete from public.suppliers where id in (v_supplier, v_supplier2, v_supplier3);
 
   -- -------------------------------------------------------------------------
   -- Fournisseur FIAFI Tunisie
@@ -93,6 +105,38 @@ begin
     'TN000123456',
     'Tunisie',
     'Fournisseur principal huile FIAFI',
+    true
+  );
+
+  insert into public.suppliers (
+    id, name, contact_name, email, phone, address, siren, vat_number, country, notes, active
+  ) values (
+    v_supplier2,
+    'TOUNSI Agro — Sfax',
+    'Sami Trabelsi',
+    'contact@tounsi-agro.demo',
+    '+216 74 000 000',
+    'Route de Gabes, Sfax, Tunisie',
+    '000234567',
+    'TN000234567',
+    'Tunisie',
+    'Gamme huile TOUNSI — export B2B',
+    true
+  );
+
+  insert into public.suppliers (
+    id, name, contact_name, email, phone, address, siren, vat_number, country, notes, active
+  ) values (
+    v_supplier3,
+    'Tunisie Gourmet Distribution',
+    'Leila Mansouri',
+    'logistique@tunisie-gourmet.demo',
+    '+216 71 111 111',
+    'Zone logistique Rades, Ben Arous, Tunisie',
+    '000345678',
+    'TN000345678',
+    'Tunisie',
+    'Epicerie fine, conserves et produits secs',
     true
   );
 
@@ -153,32 +197,88 @@ begin
     supplier_id = excluded.supplier_id;
 
   -- -------------------------------------------------------------------------
-  -- Produits FIAFI (catalogue + lien fournisseur)
+  -- Catalogue demo : huiles (FIAFI, TOUNSI) + autres produits alimentaires
   -- -------------------------------------------------------------------------
   insert into public.products (
-    name, slug, description, origin, category, price, unit, min_quantity, image_url, tag, sort_order, active, supplier_id
+    name, slug, description, origin, category, packaging_type, format_label,
+    acidity, volume_ml, price, unit, min_quantity, image_url, tag, sort_order, active, supplier_id
   ) values
+    -- FIAFI — huile d'olive
     ('FIAFI Premium — Extra vierge 1L', 'fiafi-premium-1l-bouteille',
-     'Huile premium premiere pression a froid.', 'Tunisie', 'premium', 5.90, 'bouteille', 12,
-     'https://drive.google.com/thumbnail?id=1SshjBp8ibdt14PwxdtdNscuBQM5iLRkp&sz=w1200', 'Premium', 1, true, v_supplier),
+     'Huile premium premiere pression a froid. Acidite <= 0,5 %.', 'Tunisie', 'premium', 'bouteille', '1 L — Premium',
+     '<= 0,5 %', 1000, 5.90, 'bouteille', 12,
+     'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=80', 'Premium', 1, true, v_supplier),
     ('FIAFI — Marasca 250 ml', 'fiafi-marasca-250ml',
-     'Format Marasca 250 ml restauration.', 'Tunisie', 'bouteille', 2.95, 'bouteille', 24,
-     'https://drive.google.com/thumbnail?id=1SshjBp8ibdt14PwxdtdNscuBQM5iLRkp&sz=w1200', 'Marasca', 2, true, v_supplier),
+     'Format Marasca 250 ml restauration et cavistes.', 'Tunisie', 'bouteille', 'bouteille', 'Marasca 250 ml',
+     '<= 0,8 %', 250, 2.95, 'bouteille', 24,
+     'https://images.unsplash.com/photo-1607584548183-0d2435a5e4e0?w=800&q=80', 'Marasca', 2, true, v_supplier),
     ('FIAFI — Extra vierge 1L bouteille', 'fiafi-extra-vierge-1l-bouteille',
-     'Bouteille verre 1 litre extra vierge.', 'Tunisie', 'bouteille', 5.20, 'bouteille', 12,
-     'https://drive.google.com/thumbnail?id=1SshjBp8ibdt14PwxdtdNscuBQM5iLRkp&sz=w1200', 'Bouteille', 3, true, v_supplier),
+     'Bouteille verre 1 litre extra vierge.', 'Tunisie', 'bouteille', 'bouteille', '1 L bouteille',
+     '<= 0,8 %', 1000, 5.20, 'bouteille', 12,
+     'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=80', 'Bouteille', 3, true, v_supplier),
     ('FIAFI — Metallique 1L', 'fiafi-metallique-1l',
-     'Bidon metallique 1 litre cuisine pro.', 'Tunisie', 'metallique', 4.80, 'litre', 12,
-     'https://drive.google.com/thumbnail?id=1SshjBp8ibdt14PwxdtdNscuBQM5iLRkp&sz=w1200', 'Metallique', 4, true, v_supplier),
+     'Bidon metallique 1 litre cuisine pro.', 'Tunisie', 'metallique', 'metallique', '1 L metallique',
+     '<= 0,8 %', 1000, 4.80, 'litre', 12,
+     'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=80', 'Metallique', 4, true, v_supplier),
     ('FIAFI — Metallique 3L', 'fiafi-metallique-3l',
-     'Bidon metallique 3 litres grossistes.', 'Tunisie', 'metallique', 4.40, 'litre', 4,
-     'https://drive.google.com/thumbnail?id=1SshjBp8ibdt14PwxdtdNscuBQM5iLRkp&sz=w1200', 'Metallique', 5, true, v_supplier),
+     'Bidon metallique 3 litres grossistes.', 'Tunisie', 'metallique', 'metallique', '3 L metallique',
+     '<= 0,8 %', 3000, 4.40, 'litre', 4,
+     'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=80', 'Metallique', 5, true, v_supplier),
     ('FIAFI — Metallique 5L', 'fiafi-metallique-5l',
-     'Bidon metallique 5 litres best-seller.', 'Tunisie', 'metallique', 4.20, 'litre', 4,
-     'https://drive.google.com/thumbnail?id=1SshjBp8ibdt14PwxdtdNscuBQM5iLRkp&sz=w1200', 'Best-seller', 6, true, v_supplier)
+     'Bidon metallique 5 litres best-seller.', 'Tunisie', 'metallique', 'metallique', '5 L metallique',
+     '<= 0,8 %', 5000, 4.20, 'litre', 4,
+     'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=80', 'Best-seller', 6, true, v_supplier),
+
+    -- TOUNSI — huile d'olive
+    ('TOUNSI — Extra vierge 1L bouteille', 'tounsi-extra-vierge-1l-bouteille',
+     'Huile d''olive extra vierge TOUNSI. Premiere pression a froid.', 'Tunisie', 'bouteille', 'bouteille', '1 L bouteille',
+     '<= 0,8 %', 1000, 4.95, 'bouteille', 12,
+     'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=80', 'TOUNSI', 10, true, v_supplier2),
+    ('TOUNSI — Metallique 3L', 'tounsi-metallique-3l',
+     'Bidon metallique 3 litres. Format restauration.', 'Tunisie', 'metallique', 'metallique', '3 L metallique',
+     '<= 0,8 %', 3000, 4.15, 'litre', 4,
+     'https://images.unsplash.com/photo-1607584548183-0d2435a5e4e0?w=800&q=80', 'Metallique', 11, true, v_supplier2),
+    ('TOUNSI — Metallique 5L', 'tounsi-metallique-5l',
+     'Bidon metallique 5 litres. Reference grossiste TOUNSI.', 'Tunisie', 'metallique', 'metallique', '5 L metallique',
+     '<= 0,8 %', 5000, 3.90, 'litre', 4,
+     'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=80', 'Best-seller', 12, true, v_supplier2),
+
+    -- Autres produits alimentaires (multi-marques)
+    ('Cap Bon — Harissa forte 380 g', 'cap-bon-harissa-forte-380g',
+     'Harissa tunisienne forte. Pate epicee pour restauration et epicerie fine.', 'Tunisie', 'epicerie', 'pot', 'Pot 380 g',
+     null, 380, 2.40, 'pot', 12,
+     'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80', 'Epicerie', 20, true, v_supplier3),
+    ('Oasis — Dattes Deglet Nour 1 kg', 'oasis-dattes-deglet-nour-1kg',
+     'Dattes Deglet Nour calibre premium. Conditionnement vrac alimentaire 1 kg.', 'Tunisie', 'fruits-secs', 'sachet', 'Sachet 1 kg',
+     null, 1000, 6.80, 'kg', 6,
+     'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=800&q=80', 'Fruits secs', 21, true, v_supplier3),
+    ('Moncef — Couscous moyen 5 kg', 'moncef-couscous-moyen-5kg',
+     'Semoule de couscous moyen. Format professionnel restauration collective.', 'Tunisie', 'feculents', 'sac', 'Sac 5 kg',
+     null, 5000, 12.50, 'sac', 2,
+     'https://images.unsplash.com/photo-1598866594230-a7c127049e09?w=800&q=80', 'Couscous', 22, true, v_supplier3),
+    ('Les Moulins — Huile de tournesol 5 L', 'les-moulins-huile-tournesol-5l',
+     'Huile de tournesol raffinee. Bidon 5 litres pour friture professionnelle.', 'Tunisie', 'huiles', 'metallique', 'Bidon 5 L',
+     null, 5000, 8.90, 'litre', 4,
+     'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=80', 'Friture pro', 23, true, v_supplier3),
+    ('Moulin — Confiture figue 370 g', 'moulin-confiture-figue-370g',
+     'Confiture de figue traditionnelle. Pot verre 370 g.', 'Tunisie', 'epicerie', 'pot', 'Pot 370 g',
+     null, 370, 3.20, 'pot', 12,
+     'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800&q=80', 'Confiture', 24, true, v_supplier3)
   on conflict (slug) do update set
     name = excluded.name,
+    description = excluded.description,
+    origin = excluded.origin,
+    category = excluded.category,
+    packaging_type = excluded.packaging_type,
+    format_label = excluded.format_label,
+    acidity = excluded.acidity,
+    volume_ml = excluded.volume_ml,
     price = excluded.price,
+    unit = excluded.unit,
+    min_quantity = excluded.min_quantity,
+    image_url = excluded.image_url,
+    tag = excluded.tag,
+    sort_order = excluded.sort_order,
     supplier_id = excluded.supplier_id,
     active = true;
 
@@ -191,7 +291,15 @@ begin
     (v_supplier, 'fiafi-extra-vierge-1l-bouteille', 720,  36,  5),
     (v_supplier, 'fiafi-metallique-1l',            960,  60,  4),
     (v_supplier, 'fiafi-metallique-3l',            320,  16,  7),
-    (v_supplier, 'fiafi-metallique-5l',            180,  20, 10);
+    (v_supplier, 'fiafi-metallique-5l',            180,  20, 10),
+    (v_supplier2, 'tounsi-extra-vierge-1l-bouteille', 360, 12, 5),
+    (v_supplier2, 'tounsi-metallique-3l',           240,  8, 7),
+    (v_supplier2, 'tounsi-metallique-5l',           120,  0, 10),
+    (v_supplier3, 'cap-bon-harissa-forte-380g',     600, 24, 4),
+    (v_supplier3, 'oasis-dattes-deglet-nour-1kg',   180,  6, 5),
+    (v_supplier3, 'moncef-couscous-moyen-5kg',       90,  4, 6),
+    (v_supplier3, 'les-moulins-huile-tournesol-5l', 150, 10, 7),
+    (v_supplier3, 'moulin-confiture-figue-370g',    420, 18, 4);
 
   -- -------------------------------------------------------------------------
   -- Commandes d'approvisionnement HB → fournisseur
@@ -201,7 +309,9 @@ begin
   ) values
     (v_supplier, 'fiafi-metallique-5l', 200, 'shipped',     current_date + 5,  'TN-EXP-2026-001', 'Reappro urgent metallique 5L'),
     (v_supplier, 'fiafi-marasca-250ml', 500, 'accepted',    current_date + 10, null,              'Commande reguliere Marasca'),
-    (v_supplier, 'fiafi-premium-1l-bouteille', 150, 'requested', current_date + 14, null,         'Selection premium Q2');
+    (v_supplier, 'fiafi-premium-1l-bouteille', 150, 'requested', current_date + 14, null,         'Selection premium Q2'),
+    (v_supplier2, 'tounsi-metallique-5l', 100, 'accepted',   current_date + 8,  null,              'Reappro TOUNSI 5L'),
+    (v_supplier3, 'cap-bon-harissa-forte-380g', 300, 'requested', current_date + 12, null,         'Harissa forte saison estivale');
 
   -- -------------------------------------------------------------------------
   -- Prix personnalises par client
@@ -209,10 +319,14 @@ begin
   insert into public.customer_prices (profile_id, product_slug, price) values
     (v_client1, 'fiafi-metallique-5l',          3.95),
     (v_client1, 'fiafi-metallique-3l',          4.10),
+    (v_client1, 'tounsi-metallique-5l',         3.65),
     (v_client2, 'fiafi-marasca-250ml',          2.70),
     (v_client2, 'fiafi-extra-vierge-1l-bouteille', 4.85),
+    (v_client2, 'cap-bon-harissa-forte-380g',   2.15),
     (v_client3, 'fiafi-metallique-1l',          4.50),
-    (v_client4, 'fiafi-premium-1l-bouteille',   5.40);
+    (v_client3, 'moncef-couscous-moyen-5kg',    11.90),
+    (v_client4, 'fiafi-premium-1l-bouteille',   5.40),
+    (v_client4, 'tounsi-extra-vierge-1l-bouteille', 4.70);
 
   -- -------------------------------------------------------------------------
   -- Commandes clients (statuts varies + suivi livraison)
@@ -281,3 +395,4 @@ select role, count(*) as nb from public.profiles group by role order by role;
 select status, count(*) as nb from public.orders group by status order by status;
 select status, count(*) as nb from public.chat_messages group by status order by status;
 select product_slug, quantity, reserved_quantity, lead_time_days from public.product_stocks order by product_slug;
+select name, slug, category, active from public.products where active = true order by sort_order, name;

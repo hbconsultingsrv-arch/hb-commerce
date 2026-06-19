@@ -25,7 +25,7 @@ async function initProductsPage() {
     });
   } else {
     grid.innerHTML = products.map(renderProductCard).join('');
-    bindProductCardEvents(grid);
+    bindProductCardEvents(grid, null, products);
   }
 
   const hash = window.location.hash.replace('#cat-', '');
@@ -49,7 +49,7 @@ async function initHomeProducts() {
   catalogHost.innerHTML = typeof renderHomeBrandCatalog === 'function'
     ? renderHomeBrandCatalog(products)
     : products.map(renderProductCard).join('');
-  bindProductCardEvents(catalogHost);
+  bindProductCardEvents(catalogHost, null, products);
 
   const promoHost = document.getElementById('heroPromoBrands');
   if (promoHost && typeof renderHeroPromoBrands === 'function') {
@@ -75,6 +75,7 @@ async function initHomeProducts() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (typeof bindAppModal === 'function') bindAppModal('productTechModal');
   initProductsPage();
   initHomeProducts();
 });
