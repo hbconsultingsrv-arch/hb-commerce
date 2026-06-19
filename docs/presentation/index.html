@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Présentation HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="icon" href="../../assets/logo-icon.svg" type="image/svg+xml">
+  <style>
+    body { background: linear-gradient(180deg, #0d3c31 0%, #092b24 100%); min-height: 100vh; color: var(--white); }
+    .deck { max-width: 920px; margin: 0 auto; padding: 2rem 1rem 3rem; }
+    .slide { display: none; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; padding: 2rem; min-height: 420px; }
+    .slide.active { display: block; }
+    .slide h2 { font-family: var(--font-display); color: var(--gold-light); margin-bottom: 1rem; font-size: 2rem; }
+    .slide ul { line-height: 1.7; padding-left: 1.2rem; }
+    .slide a { color: var(--gold-light); }
+    .deck-nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+    .slide-counter { align-self: center; opacity: 0.85; }
+    .deck-top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <div class="deck-top">
+      <a href="../../index.html"><img src="../../assets/logo.svg" alt="HB Commerce" width="180" height="38"></a>
+      <div>
+        <a href="../exemples/index.html" class="btn btn-sm btn-outline-light">Pages demo</a>
+        <a href="../cahier-des-charges-hb-commerce.docx" class="btn btn-sm btn-primary">Cahier des charges</a>
+      </div>
+    </div>
+
+    <section class="slide active" data-slide="1">
+      <h2>HB Commerce</h2>
+      <ul>
+        <li>Plateforme B2B — huile FIAFI (Tunisie)</li>
+        <li>HB Consulting &amp; Services</li>
+        <li>Site demo : <a href="../../index.html">hb-commerce</a></li>
+      </ul>
+    </section>
+
+    <section class="slide" data-slide="2">
+      <h2>Objectifs</h2>
+      <ul>
+        <li>Vente en gros avec espace client professionnel</li>
+        <li>Gestion admin, agents, fournisseurs</li>
+        <li>Commandes, livraison, chat modéré</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-slide="3">
+      <h2>Rôles</h2>
+      <ul>
+        <li>Super root — utilisateurs internes</li>
+        <li>Admin — opérations catalogue et sociétés</li>
+        <li>Agent commercial — clients assignés</li>
+        <li>Client / Fournisseur / Société en attente</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-slide="4">
+      <h2>Environnement demo</h2>
+      <ul>
+        <li>Mot de passe : <strong>Test1234!</strong></li>
+        <li>Script : <code>supabase/seed-demo-data.sql</code></li>
+        <li>Hub : <a href="../exemples/index.html">docs/exemples/index.html</a></li>
+      </ul>
+    </section>
+
+    <section class="slide" data-slide="5">
+      <h2>Comptes demo — internes</h2>
+      <ul>
+        <li><code>super@hbcommerce.demo</code> → <a href="../../super-root.html">Super root</a></li>
+        <li><code>admin@hbcommerce.demo</code> → <a href="../../admin.html">Admin</a></li>
+        <li><code>agent.martin@</code> / <code>agent.dubois@</code> → Admin (clients assignés)</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-slide="6">
+      <h2>Comptes demo — clients</h2>
+      <ul>
+        <li><code>contact@restaurant-paris.demo</code> — Le Jasmin</li>
+        <li><code>achats@traiteur-lyon.demo</code> — Traiteur Lyon</li>
+        <li><code>commandes@epicerie-bdx.demo</code> — Bordeaux</li>
+        <li><code>direction@hotel-nice.demo</code> — Hotel Nice</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-slide="7">
+      <h2>Pages d'exemple — vitrine</h2>
+      <ul>
+        <li><a href="../../index.html">Accueil FIAFI</a></li>
+        <li><a href="../../produits.html">Catalogue produits</a></li>
+        <li><a href="../../brochure-france.html">Brochure France</a></li>
+        <li><a href="../../brochure-luxembourg.html">Brochure Luxembourg</a></li>
+      </ul>
+    </section>
+
+    <section class="slide" data-slide="8">
+      <h2>Pages d'exemple — commande</h2>
+      <ul>
+        <li><a href="../../panier.html">Panier</a></li>
+        <li><a href="../../checkout.html">Checkout</a></li>
+        <li><a href="../../compte.html">Espace client</a></li>
+        <li><a href="../../login.html">Connexion demo</a></li>
+      </ul>
+    </section>
+
+    <section class="slide" data-slide="9">
+      <h2>Pages d'exemple — back-office</h2>
+      <ul>
+        <li><a href="../../admin.html">Dashboard admin</a></li>
+        <li><a href="../../super-root.html">Super root</a></li>
+        <li><a href="../../supplier.html">Espace fournisseur</a></li>
+      </ul>
+    </section>
+
+    <section class="slide" data-slide="10">
+      <h2>Architecture</h2>
+      <ul>
+        <li>Frontend : GitHub Pages (HTML/CSS/JS)</li>
+        <li>Backend : Supabase Auth + PostgreSQL + RLS</li>
+        <li>Paiement : virement, chèque, Stripe</li>
+      </ul>
+    </section>
+
+    <div class="deck-nav">
+      <button type="button" class="btn btn-outline-light" id="prevSlide">Précédent</button>
+      <span class="slide-counter" id="slideCounter">1 / 10</span>
+      <button type="button" class="btn btn-primary" id="nextSlide">Suivant</button>
+    </div>
+  </div>
+
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+    let index = 0;
+    const counter = document.getElementById('slideCounter');
+    function show(i) {
+      index = Math.max(0, Math.min(slides.length - 1, i));
+      slides.forEach((slide, n) => slide.classList.toggle('active', n === index));
+      counter.textContent = `${index + 1} / ${slides.length}`;
+    }
+    document.getElementById('prevSlide').addEventListener('click', () => show(index - 1));
+    document.getElementById('nextSlide').addEventListener('click', () => show(index + 1));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') show(index + 1);
+      if (e.key === 'ArrowLeft') show(index - 1);
+    });
+  </script>
+</body>
+</html>

@@ -5,6 +5,25 @@ Vente en gros de produits alimentaires avec espace client, commandes en ligne et
 
 **Premier produit :** FIAFI — Huile d'olive extra vierge (origine Tunisie)
 
+## Documentation
+
+| Document | Lien |
+|----------|------|
+| Index documentation | [docs/README.md](docs/README.md) |
+| Cahier des charges (Markdown) | [docs/CAHIER-DES-CHARGES.md](docs/CAHIER-DES-CHARGES.md) |
+| Cahier des charges (Word) | [docs/cahier-des-charges-hb-commerce.docx](docs/cahier-des-charges-hb-commerce.docx) |
+| Présentation (PowerPoint) | [docs/presentation-hb-commerce.pptx](docs/presentation-hb-commerce.pptx) |
+| Présentation web | [docs/presentation/index.html](docs/presentation/index.html) |
+| Pages d'exemple & demo | [docs/exemples/index.html](docs/exemples/index.html) |
+
+### Environnement demo
+
+- **Site :** https://hbconsultingsrv-arch.github.io/hb-commerce/
+- **Mot de passe :** `Test1234!` (tous les comptes)
+- **Script SQL :** `supabase/seed-demo-data.sql`
+
+Comptes principaux : `super@hbcommerce.demo`, `admin@hbcommerce.demo`, `contact@restaurant-paris.demo`, `stock@fiafi-tunisie.demo` — voir [docs/README.md](docs/README.md) pour la liste complète.
+
 ## Pages
 
 | Fichier | Description |
@@ -17,7 +36,9 @@ Vente en gros de produits alimentaires avec espace client, commandes en ligne et
 | `register.html` | Inscription professionnelle |
 | `compte.html` | Espace client (profil + commandes) |
 | `admin.html` | Dashboard admin (produits + commandes) |
+| `super-root.html` | Dashboard super root (utilisateurs internes) |
 | `supplier.html` | Espace fournisseur (stock + commandes d'approvisionnement) |
+| `docs/exemples/index.html` | Hub demo et pages d'exemple |
 
 ## Backend (Supabase)
 

@@ -91,6 +91,25 @@ Connectez-vous → accédez à **`super-root.html`** pour gérer les accès et l
 
 Le super root peut attribuer le rôle `admin` à un compte pour valider les commandes et modérer le chat via **`admin.html`**.
 
+## 6bis. Jeu de données demo
+
+1. Exécutez les migrations listées ci-dessus
+2. Exécutez `supabase/seed-demo-data.sql`
+3. Connectez-vous avec les comptes demo (mot de passe **`Test1234!`**)
+
+Documentation complète : **[docs/README.md](docs/README.md)**  
+Pages d'exemple en ligne : **[docs/exemples/index.html](docs/exemples/index.html)**  
+Cahier des charges : **[docs/cahier-des-charges-hb-commerce.docx](docs/cahier-des-charges-hb-commerce.docx)**  
+Présentation : **[docs/presentation-hb-commerce.pptx](docs/presentation-hb-commerce.pptx)**
+
+| Compte | Rôle |
+|--------|------|
+| `super@hbcommerce.demo` | Super root |
+| `admin@hbcommerce.demo` | Admin |
+| `agent.martin@hbcommerce.demo` | Agent commercial |
+| `contact@restaurant-paris.demo` | Client |
+| `stock@fiafi-tunisie.demo` | Fournisseur |
+
 ### Dashboard admin
 
 | Onglet | Fonctions |
