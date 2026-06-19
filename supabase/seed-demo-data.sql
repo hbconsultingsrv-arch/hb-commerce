@@ -2,6 +2,9 @@
 -- =============================================================
 -- PREREQUIS : executer d'abord supabase/schema.sql (+ migrations si base existante)
 --
+-- IMPORTANT : le site (accueil, catalogue, panier) lit UNIQUEMENT la table products.
+-- Executer ce script est obligatoire pour afficher la demo multi-marques en ligne.
+--
 -- MOT DE PASSE pour TOUS les comptes demo : Test1234!
 --
 -- Comptes crees :

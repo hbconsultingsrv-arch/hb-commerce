@@ -1,9 +1,8 @@
 async function fetchProducts(activeOnly = true) {
-  const catalog = getFallbackProducts();
   const sb = getSupabase();
   if (!sb) {
-    const products = activeOnly ? catalog.filter((p) => p.active) : catalog;
-    return applyStockInfo(products);
+    console.warn('fetchProducts: Supabase non configure — catalogue vide.');
+    return [];
   }
 
   let query = sb.from('products').select('*').order('sort_order', { ascending: true });
@@ -11,17 +10,17 @@ async function fetchProducts(activeOnly = true) {
   const { data, error } = await query;
   if (error) {
     console.warn('fetchProducts:', error.message);
-    return catalog;
+    return [];
   }
 
   const dbList = (data || [])
     .map((p) => (typeof normalizeFiafiProduct === 'function' ? normalizeFiafiProduct(p) : p))
     .filter((p) => p.slug !== 'fiafi-huile-olive');
-  const merged = typeof mergeProductsWithCatalog === 'function'
-    ? mergeProductsWithCatalog(dbList.length ? dbList : catalog)
-    : (dbList.length ? dbList : catalog);
+  const enriched = typeof enrichDbProducts === 'function'
+    ? enrichDbProducts(dbList)
+    : dbList;
 
-  const products = activeOnly ? merged.filter((p) => p.active) : merged;
+  const products = activeOnly ? enriched.filter((p) => p.active) : enriched;
   const priced = await applyCustomerPrices(products);
   return applyStockInfo(priced);
 }
@@ -53,8 +52,7 @@ async function applyStockInfo(products) {
 
   return products.map((product) => {
     const stock = bySlug.get(product.slug);
-    const demoAvailable = Number(product.demo_stock_available);
-    const available = stock?.available ?? (Number.isFinite(demoAvailable) ? demoAvailable : 0);
+    const available = stock?.available || 0;
     const lead = available > 0 ? 3 : (stock?.lead || 14);
     return {
       ...product,
@@ -100,22 +98,12 @@ async function fetchProductBySlug(slug) {
     ? normalizeFiafiProduct({ slug }).slug
     : slug;
   const sb = getSupabase();
-  if (!sb) {
-    return getFallbackProducts().find((p) => p.slug === normalizedSlug);
-  }
+  if (!sb) return null;
   const { data, error } = await sb.from('products').select('*').eq('slug', normalizedSlug).maybeSingle();
   if (error) throw error;
   const product = typeof normalizeFiafiProduct === 'function' ? normalizeFiafiProduct(data) : data;
   const priced = await applyCustomerPrices(product ? [product] : []);
   return priced[0] || null;
-}
-
-function getFallbackProducts() {
-  const fiafi = typeof buildFiafiCatalog === 'function' ? buildFiafiCatalog() : [];
-  const demo = typeof buildHbDemoCatalog === 'function' ? buildHbDemoCatalog() : [];
-  const bySlug = new Map();
-  [...fiafi, ...demo].forEach((product) => bySlug.set(product.slug, product));
-  return [...bySlug.values()].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 }
 
 function getCategoryLabel(categoryId) {

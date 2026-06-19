@@ -228,28 +228,21 @@ const FIAFI_BROCHURE_LABELS = {
   metallique: 'M&eacute;tallique'
 };
 
+function enrichDbProducts(dbList) {
+  return (dbList || [])
+    .map((p) => {
+      const product = normalizeFiafiProduct(p);
+      const slug = (product.slug || '').toLowerCase();
+      const name = (product.name || '').toLowerCase();
+      const isFiafi = slug.includes('fiafi') || name.includes('fiafi');
+      return isFiafi ? enrichFiafiFromCatalog(product) : product;
+    })
+    .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+}
+
+/** @deprecated Utiliser enrichDbProducts — ne re-injecte plus de produits hors base */
 function mergeProductsWithCatalog(dbList) {
-  const fiafiCatalog = buildFiafiCatalog();
-  const demoCatalog = typeof buildHbDemoCatalog === 'function' ? buildHbDemoCatalog() : [];
-  const bySlug = new Map();
-
-  dbList.forEach((p) => {
-    const product = normalizeFiafiProduct(p);
-    const slug = (product.slug || '').toLowerCase();
-    const name = (product.name || '').toLowerCase();
-    const isFiafi = slug.includes('fiafi') || name.includes('fiafi');
-    const enriched = isFiafi ? enrichFiafiFromCatalog(product) : product;
-    bySlug.set(product.slug, enriched);
-  });
-
-  [...fiafiCatalog, ...demoCatalog].forEach((catItem) => {
-    if (!catItem.active) return;
-    if (!bySlug.has(catItem.slug)) {
-      bySlug.set(catItem.slug, { ...catItem, id: catItem.id || catItem.slug });
-    }
-  });
-
-  return Array.from(bySlug.values()).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+  return enrichDbProducts(dbList);
 }
 
 const FIAFI_SLUG_IMAGES = (() => {
@@ -300,5 +293,6 @@ window.buildFiafiCatalog = buildFiafiCatalog;
 window.buildBrochureGallery = buildBrochureGallery;
 window.formatAcidity = formatAcidity;
 window.getFiafiProductImage = getFiafiProductImage;
+window.enrichDbProducts = enrichDbProducts;
 window.mergeProductsWithCatalog = mergeProductsWithCatalog;
 window.normalizeFiafiProduct = normalizeFiafiProduct;
