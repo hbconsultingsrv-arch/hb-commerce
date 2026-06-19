@@ -552,9 +552,12 @@ async function moderateChatMessage(id, status, moderatorId) {
       moderated_at: new Date().toISOString()
     })
     .eq('id', id)
-    .select()
-    .single();
+    .select('id, status, company_id')
+    .maybeSingle();
   if (error) throw error;
+  if (!data) {
+    throw new Error('Impossible de modérer ce message. Vérifiez vos droits ou réessayez.');
+  }
   return data;
 }
 

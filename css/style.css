@@ -584,6 +584,19 @@ body.modal-open {
   background: #eef6f2;
 }
 
+.chat-message.needs-moderation {
+  box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.35);
+}
+
+.chat-moderation-actions {
+  margin-top: 0.65rem;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .chat-meta {
   display: flex;
   align-items: center;

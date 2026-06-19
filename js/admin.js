@@ -85,6 +85,7 @@ async function initAdmin() {
   bindAppModal('trackingModal');
   document.getElementById('trackingModalForm')?.addEventListener('submit', handleTrackingModalSubmit);
   populateTrackingStatusSelect();
+  bindAdminChatModeration();
 }
 
 async function loadProductsTable() {
@@ -665,6 +666,53 @@ async function handleAdminCustomerPriceSubmit(e) {
   }
 }
 
+function renderChatModerationActions(message) {
+  if (message.author_role !== 'client' || message.status !== 'pending') return '';
+  return `
+    <div class="form-actions chat-moderation-actions">
+      <button type="button" class="btn btn-sm btn-primary" data-chat-approve="${message.id}">Valider</button>
+      <button type="button" class="btn btn-sm btn-outline-dark" data-chat-reject="${message.id}">Refuser</button>
+    </div>
+  `;
+}
+
+async function handleChatModeration(messageId, status, button) {
+  const note = document.getElementById('adminChatNote');
+  if (!messageId || !adminSession?.user?.id) {
+    showAlert(note, 'Session expirée. Reconnectez-vous.');
+    return;
+  }
+
+  const label = status === 'approved' ? 'Validation' : 'Refus';
+  button.disabled = true;
+  showAlert(note, `${label} en cours…`, 'success');
+
+  try {
+    await moderateChatMessage(messageId, status, adminSession.user.id);
+    showAlert(note, status === 'approved' ? 'Message validé.' : 'Message refusé.', 'success');
+    await loadAdminChatPanel();
+  } catch (err) {
+    showAlert(note, err.message || 'Impossible de modérer ce message.');
+    button.disabled = false;
+  }
+}
+
+function bindAdminChatModeration() {
+  const host = document.getElementById('adminChatHistory');
+  if (!host || host.dataset.moderationBound === '1') return;
+  host.dataset.moderationBound = '1';
+  host.addEventListener('click', async (event) => {
+    const approveBtn = event.target.closest('[data-chat-approve]');
+    const rejectBtn = event.target.closest('[data-chat-reject]');
+    const button = approveBtn || rejectBtn;
+    if (!button || button.disabled) return;
+    event.preventDefault();
+    const messageId = button.dataset.chatApprove || button.dataset.chatReject;
+    const status = approveBtn ? 'approved' : 'rejected';
+    await handleChatModeration(messageId, status, button);
+  });
+}
+
 function chatStatusLabel(status) {
   if (status === 'pending') return 'En attente';
   if (status === 'rejected') return 'Refusé';
@@ -820,35 +868,23 @@ async function renderAdminChat(companyId) {
   }
 
   host.innerHTML = messages.map((msg) => `
-    <article class="chat-message ${msg.author_role === 'client' ? 'from-client' : 'from-admin'}">
+    <article class="chat-message ${msg.author_role === 'client' ? 'from-client' : 'from-admin'} ${msg.status === 'pending' && msg.author_role === 'client' ? 'needs-moderation' : ''}">
       <div class="chat-meta">
         <strong>${msg.author_role === 'client' ? escapeHtml(profileLabel(msg.company)) : 'Administration'}</strong>
         <span>${formatDateTime(msg.created_at)}</span>
         <span class="chat-status ${msg.status}">${chatStatusLabel(msg.status)}</span>
       </div>
       <p>${escapeHtml(msg.message)}</p>
-      ${msg.author_role === 'client' ? `
-        <div class="form-actions" style="margin-top:0.65rem">
-          <button type="button" class="btn btn-sm btn-primary" data-chat-approve="${msg.id}" ${msg.status === 'approved' ? 'disabled' : ''}>Valider</button>
-          <button type="button" class="btn btn-sm btn-outline-dark" data-chat-reject="${msg.id}" ${msg.status === 'rejected' ? 'disabled' : ''}>Refuser</button>
-        </div>
-      ` : ''}
+      ${renderChatModerationActions(msg)}
     </article>
   `).join('');
-  host.scrollTop = host.scrollHeight;
 
-  host.querySelectorAll('[data-chat-approve]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      await moderateChatMessage(btn.dataset.chatApprove, 'approved', adminSession.user.id);
-      await loadAdminChatPanel();
-    });
-  });
-  host.querySelectorAll('[data-chat-reject]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      await moderateChatMessage(btn.dataset.chatReject, 'rejected', adminSession.user.id);
-      await loadAdminChatPanel();
-    });
-  });
+  const firstPending = host.querySelector('.chat-message.needs-moderation');
+  if (firstPending) {
+    firstPending.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else {
+    host.scrollTop = host.scrollHeight;
+  }
 }
 
 async function handleAdminChatReply(e) {
