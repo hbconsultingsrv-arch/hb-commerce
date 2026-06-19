@@ -229,15 +229,20 @@ const FIAFI_BROCHURE_LABELS = {
 };
 
 function mergeProductsWithCatalog(dbList) {
-  const catalog = buildFiafiCatalog();
+  const fiafiCatalog = buildFiafiCatalog();
+  const demoCatalog = typeof buildHbDemoCatalog === 'function' ? buildHbDemoCatalog() : [];
   const bySlug = new Map();
 
   dbList.forEach((p) => {
     const product = normalizeFiafiProduct(p);
-    bySlug.set(product.slug, enrichFiafiFromCatalog(product));
+    const slug = (product.slug || '').toLowerCase();
+    const name = (product.name || '').toLowerCase();
+    const isFiafi = slug.includes('fiafi') || name.includes('fiafi');
+    const enriched = isFiafi ? enrichFiafiFromCatalog(product) : product;
+    bySlug.set(product.slug, enriched);
   });
 
-  catalog.forEach((catItem) => {
+  [...fiafiCatalog, ...demoCatalog].forEach((catItem) => {
     if (!catItem.active) return;
     if (!bySlug.has(catItem.slug)) {
       bySlug.set(catItem.slug, { ...catItem, id: catItem.id || catItem.slug });

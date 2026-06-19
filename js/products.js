@@ -1,7 +1,10 @@
 async function fetchProducts(activeOnly = true) {
   const catalog = getFallbackProducts();
   const sb = getSupabase();
-  if (!sb) return catalog;
+  if (!sb) {
+    const products = activeOnly ? catalog.filter((p) => p.active) : catalog;
+    return applyStockInfo(products);
+  }
 
   let query = sb.from('products').select('*').order('sort_order', { ascending: true });
   if (activeOnly) query = query.eq('active', true);
@@ -25,30 +28,33 @@ async function fetchProducts(activeOnly = true) {
 
 async function applyStockInfo(products) {
   const sb = getSupabase();
-  if (!sb || !products.length) return products;
-  const slugs = [...new Set(products.map((product) => product.slug).filter(Boolean))];
-  const { data, error } = await sb
-    .from('product_stocks')
-    .select('product_slug, quantity, reserved_quantity, lead_time_days')
-    .in('product_slug', slugs);
-  if (error) {
-    console.warn('product_stocks:', error.message);
-    return products;
-  }
+  if (!products.length) return products;
 
   const bySlug = new Map();
-  (data || []).forEach((row) => {
-    const current = bySlug.get(row.product_slug) || { available: 0, lead: 30 };
-    const available = Math.max(0, Number(row.quantity || 0) - Number(row.reserved_quantity || 0));
-    bySlug.set(row.product_slug, {
-      available: current.available + available,
-      lead: Math.min(current.lead, Number(row.lead_time_days || 30))
-    });
-  });
+  if (sb) {
+    const slugs = [...new Set(products.map((product) => product.slug).filter(Boolean))];
+    const { data, error } = await sb
+      .from('product_stocks')
+      .select('product_slug, quantity, reserved_quantity, lead_time_days')
+      .in('product_slug', slugs);
+    if (error) {
+      console.warn('product_stocks:', error.message);
+    } else {
+      (data || []).forEach((row) => {
+        const current = bySlug.get(row.product_slug) || { available: 0, lead: 30 };
+        const available = Math.max(0, Number(row.quantity || 0) - Number(row.reserved_quantity || 0));
+        bySlug.set(row.product_slug, {
+          available: current.available + available,
+          lead: Math.min(current.lead, Number(row.lead_time_days || 30))
+        });
+      });
+    }
+  }
 
   return products.map((product) => {
     const stock = bySlug.get(product.slug);
-    const available = stock?.available || 0;
+    const demoAvailable = Number(product.demo_stock_available);
+    const available = stock?.available ?? (Number.isFinite(demoAvailable) ? demoAvailable : 0);
     const lead = available > 0 ? 3 : (stock?.lead || 14);
     return {
       ...product,
@@ -105,8 +111,11 @@ async function fetchProductBySlug(slug) {
 }
 
 function getFallbackProducts() {
-  if (typeof buildFiafiCatalog === 'function') return buildFiafiCatalog();
-  return [];
+  const fiafi = typeof buildFiafiCatalog === 'function' ? buildFiafiCatalog() : [];
+  const demo = typeof buildHbDemoCatalog === 'function' ? buildHbDemoCatalog() : [];
+  const bySlug = new Map();
+  [...fiafi, ...demo].forEach((product) => bySlug.set(product.slug, product));
+  return [...bySlug.values()].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 }
 
 function getCategoryLabel(categoryId) {
@@ -141,10 +150,10 @@ function resolveProductImage(product) {
   if (product.image_url && !isStaleFiafiImage(product.image_url)) {
     return product.image_url;
   }
-  if (typeof getFiafiProductImage === 'function') {
+  if (isFiafiProduct(product) && typeof getFiafiProductImage === 'function') {
     return getFiafiProductImage(product);
   }
-  return FIAFI_IMAGES?.product || 'images/prenium.PNG';
+  return product.image_url || FIAFI_IMAGES?.product || 'images/prenium.PNG';
 }
 
 function isOilProduct(product) {
@@ -298,7 +307,7 @@ function renderProductCard(product) {
   return `
     <article class="${cardClass}" data-product-id="${product.id}" data-category="${product.category || ''}">
       <div class="product-img-area">
-        <span class="origin-badge">TUNISIE</span>
+        ${product.origin ? `<span class="origin-badge">${escapeHtml(String(product.origin).toUpperCase())}</span>` : ''}
         ${packaging ? `<span class="packaging-badge">${packaging}</span>` : ''}
         <img src="${imgUrl}" alt="${product.name}" loading="lazy" onerror="this.onerror=null;this.src='${imgFallback}'">
       </div>
