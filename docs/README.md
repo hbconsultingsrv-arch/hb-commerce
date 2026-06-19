@@ -64,5 +64,10 @@ Index de la documentation projet, de l'environnement de démonstration et des pa
 ## Régénérer les documents Office
 
 ```bash
+pip install python-pptx
 python scripts/generate-docs.py
 ```
+
+Ce script restaure les versions stables (Word v1.2, PowerPoint compatible Google Slides), puis ajoute les sections demo.
+
+> **Important :** n'utilisez pas l'ancien script PowerShell `generate-docs.ps1` (supprimé) — il produisait des fichiers Word corrompus.
