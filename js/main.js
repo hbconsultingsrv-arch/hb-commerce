@@ -60,9 +60,14 @@ async function initHomeProducts() {
   if (catalogNote) {
     const brandCount = brandGroups.length;
     const productCount = products.length;
-    catalogNote.textContent = brandCount
-      ? `${brandCount} marque${brandCount > 1 ? 's' : ''} · ${productCount} produit${productCount > 1 ? 's' : ''} en ligne`
-      : 'Catalogue en cours de mise à jour.';
+    if (brandCount) {
+      catalogNote.textContent = `${brandCount} marque${brandCount > 1 ? 's' : ''} · ${productCount} produit${productCount > 1 ? 's' : ''} en ligne`;
+    } else {
+      const status = typeof getCatalogStatus === 'function' ? getCatalogStatus() : null;
+      catalogNote.textContent = status?.code === 'empty'
+        ? 'Base vide — lancez seed-demo-data.sql dans Supabase.'
+        : (status?.message || 'Catalogue indisponible pour le moment.');
+    }
   }
 
   const heroPills = document.getElementById('heroBrandPills');

@@ -1,7 +1,17 @@
+let lastCatalogStatus = { code: 'loading', message: '' };
+
+function getCatalogStatus() {
+  return lastCatalogStatus;
+}
+
 async function fetchProducts(activeOnly = true) {
   const sb = getSupabase();
   if (!sb) {
-    console.warn('fetchProducts: Supabase non configure — catalogue vide.');
+    const message = typeof window.supabase === 'undefined'
+      ? 'Bibliotheque Supabase absente sur la page.'
+      : (typeof configErrorMessage === 'function' ? configErrorMessage() : 'Supabase non configure.');
+    lastCatalogStatus = { code: 'no_client', message };
+    console.warn('fetchProducts:', message);
     return [];
   }
 
@@ -9,6 +19,7 @@ async function fetchProducts(activeOnly = true) {
   if (activeOnly) query = query.eq('active', true);
   const { data, error } = await query;
   if (error) {
+    lastCatalogStatus = { code: 'error', message: error.message };
     console.warn('fetchProducts:', error.message);
     return [];
   }
@@ -21,6 +32,15 @@ async function fetchProducts(activeOnly = true) {
     : dbList;
 
   const products = activeOnly ? enriched.filter((p) => p.active) : enriched;
+  if (!products.length) {
+    lastCatalogStatus = {
+      code: 'empty',
+      message: 'Aucun produit actif en base. Executez supabase/seed-demo-data.sql dans Supabase.'
+    };
+  } else {
+    lastCatalogStatus = { code: 'ok', message: '' };
+  }
+
   const priced = await applyCustomerPrices(products);
   return applyStockInfo(priced);
 }
@@ -456,17 +476,31 @@ function renderBrandBlock(brand, products, options = {}) {
 
 function renderHomeBrandCatalog(products) {
   if (!products.length) {
-    return '<p class="empty-state">Aucun produit disponible pour le moment.</p>';
+    return `<p class="empty-state">${renderCatalogEmptyMessage()}</p>`;
   }
   return groupProductsByBrand(products)
     .map(([brand, list]) => renderBrandBlock(brand, list, { limit: 6 }))
     .join('');
 }
 
+function renderCatalogEmptyMessage() {
+  const status = typeof getCatalogStatus === 'function' ? getCatalogStatus() : null;
+  if (status?.code === 'empty') {
+    return 'Aucun produit actif en base. Executez <strong>supabase/seed-demo-data.sql</strong> dans le SQL Editor Supabase.';
+  }
+  if (status?.code === 'error') {
+    return `Erreur Supabase : ${escapeHtml(status.message || 'lecture impossible')}`;
+  }
+  if (status?.code === 'no_client') {
+    return escapeHtml(status.message || 'Connexion Supabase indisponible.');
+  }
+  return 'Catalogue en cours de mise a jour.';
+}
+
 function renderHeroPromoBrands(products) {
   const groups = groupProductsByBrand(products);
   if (!groups.length) {
-    return '<p class="hero-promo-empty">Catalogue en cours de mise à jour.</p>';
+    return `<p class="hero-promo-empty">${renderCatalogEmptyMessage()}</p>`;
   }
   return groups.map(([brand, list]) => {
     const meta = getBrandMeta(brand);
