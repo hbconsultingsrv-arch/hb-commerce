@@ -906,8 +906,16 @@
 }
 
 /* HB Commerce — accueil multi-marques */
+.hero-commerce:has(.hero-hb-inner) {
+  min-height: auto;
+}
+
 .hero-hb-inner {
   grid-template-columns: 1.1fr 0.9fr;
+  align-items: start;
+  align-content: start;
+  flex: 0 0 auto;
+  padding: 2rem 1.5rem 2.75rem;
 }
 
 .hero-hb-copy .hero-kicker {
@@ -1144,6 +1152,10 @@
 }
 
 @media (max-width: 900px) {
+  .hero-hb-inner {
+    padding: 1.5rem 1.5rem 2rem;
+  }
+
   .hero-hb-inner,
   .services-promo-grid {
     grid-template-columns: 1fr;
