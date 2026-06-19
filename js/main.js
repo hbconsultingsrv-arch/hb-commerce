@@ -40,41 +40,38 @@ async function initHomeProducts() {
     await refreshPriceVisibility();
   }
 
-  const showcase = document.getElementById('categoryShowcase');
-  if (showcase && typeof renderCategoryShowcase === 'function') {
-    showcase.innerHTML = renderCategoryShowcase();
-  }
+  const catalogHost = document.getElementById('homeBrandCatalog');
+  if (!catalogHost) return;
 
-  const grid = document.getElementById('homeProductsGrid');
-  if (!grid) return;
   const products = await fetchProducts();
-  updateHeroPrice(products);
-  const featured = products.slice(0, 6);
-  grid.innerHTML = featured.map(renderProductCard).join('');
-  bindProductCardEvents(grid);
-}
+  const brandGroups = typeof groupProductsByBrand === 'function' ? groupProductsByBrand(products) : [];
 
-function updateHeroPrice(products) {
-  const heroPrice = document.getElementById('heroPrice');
-  if (!heroPrice) return;
+  catalogHost.innerHTML = typeof renderHomeBrandCatalog === 'function'
+    ? renderHomeBrandCatalog(products)
+    : products.map(renderProductCard).join('');
+  bindProductCardEvents(catalogHost);
 
-  if (typeof canViewPrices === 'function' && !canViewPrices()) {
-    heroPrice.textContent = 'xx';
-    return;
+  const promoHost = document.getElementById('heroPromoBrands');
+  if (promoHost && typeof renderHeroPromoBrands === 'function') {
+    promoHost.innerHTML = renderHeroPromoBrands(products);
   }
 
-  const prices = products
-    .map((product) => Number(product.price))
-    .filter((price) => Number.isFinite(price));
-  if (!prices.length) {
-    heroPrice.textContent = 'xx';
-    return;
+  const catalogNote = document.getElementById('heroCatalogNote');
+  if (catalogNote) {
+    const brandCount = brandGroups.length;
+    const productCount = products.length;
+    catalogNote.textContent = brandCount
+      ? `${brandCount} marque${brandCount > 1 ? 's' : ''} · ${productCount} produit${productCount > 1 ? 's' : ''} en ligne`
+      : 'Catalogue en cours de mise à jour.';
   }
 
-  const premium = products.find((product) => product.category === 'premium') || products[0];
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-  heroPrice.textContent = `${formatPrice(premium.price)} / ${premium.unit} · formats ${formatPrice(min)} à ${formatPrice(max)}`;
+  const heroPills = document.getElementById('heroBrandPills');
+  if (heroPills && brandGroups.length) {
+    heroPills.innerHTML = brandGroups.slice(0, 4).map(([brand]) => {
+      const meta = getBrandMeta(brand);
+      return `<li><a href="#marque-${meta.slug}">${escapeHtml(brand)}</a></li>`;
+    }).join('');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

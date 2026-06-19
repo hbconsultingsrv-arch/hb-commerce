@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="FIAFI — Huile d'olive extra vierge de Tunisie. Commerce en gros France & Luxembourg." data-i18n-desc="meta.description">
-  <title data-i18n="meta.title">HB Commerce | FIAFI</title>
+  <meta name="description" content="HB Commerce — Vente en gros alimentaire B2B. Catalogue FIAFI, TOUNSI et produits sélectionnés. Commande, facturation et livraison en ligne." data-i18n-desc="meta.description">
+  <title data-i18n="meta.title">HB Commerce | Vente en gros B2B</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=menu-20260618">
-  <link rel="stylesheet" href="css/commerce.css?v=menu-20260618">
-  <link rel="stylesheet" href="css/brochure.css?v=menu-20260618">
+  <link rel="stylesheet" href="css/style.css?v=home-20260619">
+  <link rel="stylesheet" href="css/commerce.css?v=home-20260619">
+  <link rel="stylesheet" href="css/brochure.css?v=home-20260619">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
   <script src="js/markets.js"></script>
 </head>
@@ -28,7 +28,8 @@
       </button>
       <ul class="nav-links">
         <li><a href="#accueil" data-i18n="nav.home">Accueil</a></li>
-        <li><a href="produits.html" data-i18n="nav.products">Produits</a></li>
+        <li><a href="#produits" data-i18n="nav.products">Produits</a></li>
+        <li><a href="#services" data-i18n="nav.services">Services</a></li>
         <li><a href="#apropos" data-i18n="nav.about">À propos</a></li>
         <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
         <li><a href="#" id="brochureLink" data-i18n="nav.brochure">Brochure</a></li>
@@ -43,49 +44,86 @@
       </ul>
     </nav>
 
-    <div class="hero-commerce-inner">
-      <div>
-        <div class="hero-brand-line">
-          <span class="fiafi-mark">FIAFI</span>
-          <span class="origin-ribbon" data-i18n="hero.ribbon">Origine Tunisie</span>
-        </div>
+    <div class="hero-commerce-inner hero-hb-inner">
+      <div class="hero-hb-copy">
+        <span class="hero-kicker">Plateforme B2B · HB Consulting &amp; Services</span>
         <h1>
-          <span class="fiafi-title">FIAFI</span>
-          <span data-i18n="hero.title">Huile d'olive extra vierge en gros</span>
+          <span class="hb-title">HB Commerce</span>
+          <span data-i18n="hero.title">Vente en gros alimentaire professionnelle</span>
         </h1>
         <p class="hero-lead" data-i18n-html="hero.lead"></p>
-        <ul class="hero-pills">
-          <li data-i18n="hero.pill1">Extra vierge</li>
-          <li data-i18n="hero.pill2">Tunisie</li>
+        <ul class="hero-pills" id="heroBrandPills">
+          <li data-i18n="hero.pill1">Multi-marques</li>
+          <li data-i18n="hero.pill2">Commande en ligne</li>
           <li data-i18n="hero.pill3">Vente en gros</li>
         </ul>
-        <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
-          <a href="produits.html" class="btn btn-primary" data-i18n="hero.cta.order">Commander FIAFI</a>
+        <div class="hero-cta-row">
+          <a href="#produits" class="btn btn-primary" data-i18n="hero.cta.catalog">Voir le catalogue</a>
           <a href="register.html" class="btn btn-outline-light" data-i18n="hero.cta.account">Compte professionnel</a>
         </div>
       </div>
-      <div class="hero-product-showcase">
-        <div class="product-img-wrap">
-          <img id="heroProductImg" src="images/prenium.PNG" alt="FIAFI Premium" data-market-img="product" data-market-size="800">
-        </div>
-        <span class="tag-fiafi" data-i18n="product.tag">Produit phare</span>
-        <h3>FIAFI Premium &mdash; Extra vierge 1L</h3>
-        <p class="product-sub">Premi&egrave;re pression &agrave; froid &middot; Tunisie</p>
-        <p class="price" id="heroPrice">xx</p>
-        <a href="produits.html" class="btn btn-primary btn-fiafi" data-i18n="product.cta">Voir les formats</a>
-      </div>
+      <aside class="hero-promo-panel" aria-label="Mise en avant">
+        <p class="hero-promo-label">Catalogue actif</p>
+        <div id="heroPromoBrands" class="hero-promo-brands"></div>
+        <p class="hero-promo-note" id="heroCatalogNote">Chargement des marques et produits…</p>
+      </aside>
     </div>
   </header>
 
+  <section class="hb-services-band" id="services">
+    <div class="container">
+      <div class="section-head-inline">
+        <div>
+          <h2 data-i18n="section.services">Nos services professionnels</h2>
+          <p class="section-sub" data-i18n="section.services.sub">HB Commerce accompagne vos achats, de la commande à la livraison.</p>
+        </div>
+      </div>
+      <div class="services-promo-grid">
+        <article class="service-promo-card">
+          <span class="service-promo-icon" aria-hidden="true">🛒</span>
+          <h3 data-i18n="service.sales.title">Vente en gros B2B</h3>
+          <p data-i18n="service.sales.desc">Catalogue multi-marques, tarifs professionnels et quantités adaptées aux sociétés.</p>
+        </article>
+        <article class="service-promo-card">
+          <span class="service-promo-icon" aria-hidden="true">💻</span>
+          <h3 data-i18n="service.order.title">Commande en ligne</h3>
+          <p data-i18n="service.order.desc">Panier, validation et suivi des commandes depuis votre espace client sécurisé.</p>
+        </article>
+        <article class="service-promo-card">
+          <span class="service-promo-icon" aria-hidden="true">🧾</span>
+          <h3 data-i18n="service.invoice.title">Facturation</h3>
+          <p data-i18n="service.invoice.desc">Devis, factures téléchargeables et prix personnalisés par société cliente.</p>
+        </article>
+        <article class="service-promo-card">
+          <span class="service-promo-icon" aria-hidden="true">🚚</span>
+          <h3 data-i18n="service.delivery.title">Livraison &amp; suivi</h3>
+          <p data-i18n="service.delivery.desc">Statuts de commande, transporteur, numéro de suivi et délais selon le stock.</p>
+        </article>
+        <article class="service-promo-card">
+          <span class="service-promo-icon" aria-hidden="true">💬</span>
+          <h3 data-i18n="service.chat.title">Accompagnement commercial</h3>
+          <p data-i18n="service.chat.desc">Chat avec votre agent HB Commerce pour négocier, valider et suivre vos besoins.</p>
+        </article>
+        <article class="service-promo-card service-promo-card-highlight">
+          <span class="service-promo-icon" aria-hidden="true">🫒</span>
+          <h3 data-i18n="service.brands.title">Multi-marques</h3>
+          <p data-i18n="service.brands.desc">FIAFI, TOUNSI et autres références ajoutées au catalogue au fil des partenariats.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
   <section class="section-commerce fiafi-section container" id="produits">
-    <h2 data-i18n="section.products">Nos produits</h2>
-    <p class="section-sub" data-i18n="section.products.sub">Sélection professionnelle</p>
-    <div id="categoryShowcase" class="category-showcase"></div>
-    <div id="homeProductsGrid" class="products-grid"></div>
-    <p style="text-align:center;margin-top:2rem">
-      <a href="produits.html" class="btn btn-primary">Voir tous les formats</a>
-      <a href="produits.html#qualite" class="btn btn-outline-dark" style="margin-left:0.5rem">Qualité &amp; acidité</a>
-    </p>
+    <div class="section-head-inline">
+      <div>
+        <h2 data-i18n="section.products">Notre catalogue par marque</h2>
+        <p class="section-sub" data-i18n="section.products.sub">Les produits distribués par HB Commerce — chaque marque avec ses formats disponibles.</p>
+      </div>
+      <a href="produits.html" class="btn btn-outline-dark" data-i18n="section.products.all">Catalogue complet</a>
+    </div>
+    <div id="homeBrandCatalog" class="home-brand-catalog">
+      <p class="empty-state">Chargement du catalogue…</p>
+    </div>
   </section>
 
   <section class="section-commerce" id="apropos" style="background:var(--white)">
@@ -130,7 +168,7 @@
     <div class="container footer-grid">
       <div>
         <img src="assets/logo.svg" alt="HB Commerce" width="180" height="38" style="margin-bottom:1rem">
-        <p>Commerce en gros FIAFI — HB Consulting &amp; Services</p>
+        <p>Commerce en gros alimentaire — HB Consulting &amp; Services</p>
         <p style="margin-top:0.75rem"><a href="#" id="footerBrochureLink" data-i18n="footer.brochure">Brochure</a></p>
       </div>
       <div>
@@ -140,8 +178,9 @@
         <p><a href="compte.html" data-i18n="nav.account">Mon compte</a></p>
       </div>
       <div>
-        <h4>FIAFI</h4>
-        <p><a href="produits.html">Huile d'olive extra vierge</a></p>
+        <h4>HB Commerce</h4>
+        <p><a href="#produits" data-i18n="nav.products">Catalogue marques</a></p>
+        <p><a href="produits.html">FIAFI — huile d'olive</a></p>
         <p data-i18n="hero.ribbon">Origine Tunisie</p>
       </div>
     </div>
@@ -156,7 +195,7 @@
   <script src="js/branding.js"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js?v=menu-20260618"></script>
+  <script src="js/auth.js?v=home-20260619"></script>
   <script src="js/cart.js"></script>
   <script src="js/products.js"></script>
   <script src="js/main.js"></script>

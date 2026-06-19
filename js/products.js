@@ -244,6 +244,113 @@ function renderQualitySection() {
   `;
 }
 
+const HB_BRAND_META = {
+  FIAFI: {
+    slug: 'fiafi',
+    tagline: 'Huile d\'olive extra vierge — origine Tunisie',
+    origin: 'Tunisie',
+    accent: 'fiafi'
+  },
+  TOUNSI: {
+    slug: 'tounsi',
+    tagline: 'Huile d\'olive — gamme TOUNSI',
+    origin: 'Tunisie',
+    accent: 'tounsi'
+  }
+};
+
+function getProductBrand(product) {
+  const name = product?.name || '';
+  const slug = (product?.slug || '').toLowerCase();
+  if (/fiafi/i.test(name) || slug.includes('fiafi')) return 'FIAFI';
+  if (/tounsi/i.test(name) || slug.includes('tounsi')) return 'TOUNSI';
+  const prefix = name.split(/[—\-–|]/)[0]?.trim();
+  if (prefix && prefix.length <= 28) return prefix.toUpperCase();
+  return 'Autres produits';
+}
+
+function getBrandMeta(brand) {
+  return HB_BRAND_META[brand] || {
+    slug: brand.toLowerCase().replace(/\s+/g, '-'),
+    tagline: 'Produit distribué par HB Commerce',
+    origin: '',
+    accent: 'default'
+  };
+}
+
+function groupProductsByBrand(products) {
+  const map = new Map();
+  products.forEach((product) => {
+    const brand = getProductBrand(product);
+    if (!map.has(brand)) map.set(brand, []);
+    map.get(brand).push(product);
+  });
+  return [...map.entries()].sort(([a], [b]) => {
+    if (a === 'FIAFI') return -1;
+    if (b === 'FIAFI') return 1;
+    if (a === 'TOUNSI') return -1;
+    if (b === 'TOUNSI') return 1;
+    return a.localeCompare(b, 'fr');
+  });
+}
+
+function renderBrandBlock(brand, products, options = {}) {
+  const meta = getBrandMeta(brand);
+  const limit = options.limit || products.length;
+  const slice = products.slice(0, limit);
+  const heroProduct = products.find((p) => p.tag) || products[0];
+  const heroImg = heroProduct ? resolveProductImage(heroProduct) : (FIAFI_IMAGES?.product || 'images/prenium.PNG');
+  const countLabel = `${products.length} format${products.length > 1 ? 's' : ''}`;
+
+  return `
+    <section class="brand-block brand-block--${meta.accent}" id="marque-${meta.slug}">
+      <header class="brand-block-head">
+        <div class="brand-block-intro">
+          <img class="brand-block-thumb" src="${heroImg}" alt="${escapeHtml(brand)}" loading="lazy">
+          <div>
+            <span class="brand-block-label">Marque</span>
+            <h3 class="brand-block-title">${escapeHtml(brand)}</h3>
+            <p class="brand-block-tagline">${escapeHtml(meta.tagline)}${meta.origin ? ` · ${escapeHtml(meta.origin)}` : ''}</p>
+            <span class="brand-block-count">${countLabel}</span>
+          </div>
+        </div>
+        <a href="produits.html#marque-${meta.slug}" class="btn btn-sm btn-outline-dark">Tous les produits ${escapeHtml(brand)}</a>
+      </header>
+      <div class="products-grid brand-block-grid">
+        ${slice.map(renderProductCard).join('')}
+      </div>
+    </section>
+  `;
+}
+
+function renderHomeBrandCatalog(products) {
+  if (!products.length) {
+    return '<p class="empty-state">Aucun produit disponible pour le moment.</p>';
+  }
+  return groupProductsByBrand(products)
+    .map(([brand, list]) => renderBrandBlock(brand, list, { limit: 6 }))
+    .join('');
+}
+
+function renderHeroPromoBrands(products) {
+  const groups = groupProductsByBrand(products);
+  if (!groups.length) {
+    return '<p class="hero-promo-empty">Catalogue en cours de mise à jour.</p>';
+  }
+  return groups.map(([brand, list]) => {
+    const meta = getBrandMeta(brand);
+    const sample = list[0];
+    const img = sample ? resolveProductImage(sample) : (FIAFI_IMAGES?.product || 'images/prenium.PNG');
+    return `
+      <a href="#marque-${meta.slug}" class="hero-promo-brand hero-promo-brand--${meta.accent}">
+        <img src="${img}" alt="${escapeHtml(brand)}" loading="lazy">
+        <span class="hero-promo-brand-name">${escapeHtml(brand)}</span>
+        <span class="hero-promo-brand-count">${list.length} produit${list.length > 1 ? 's' : ''}</span>
+      </a>
+    `;
+  }).join('');
+}
+
 function filterProductsByCategory(products, categoryId) {
   if (!categoryId || categoryId === 'all') return products;
   return products.filter((p) => p.category === categoryId);
