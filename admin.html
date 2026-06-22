@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=chat-mod-20260619">
+  <link rel="stylesheet" href="css/commerce.css?v=chat-mod-20260619">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo">
+      <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="210" height="44">
+    </a>
+    <div class="nav-actions">
+      <a href="super-root.html" id="superRootLink" class="btn btn-sm btn-primary" style="display:none">Super root</a>
+      <a href="index.html" class="btn btn-sm btn-outline-light">Voir le site</a>
+      <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="dashboard-main container">
+    <header class="dashboard-header">
+      <span class="section-tag">Administration</span>
+      <h1>Dashboard HB Commerce</h1>
+      <p class="auth-sub">Gérez les sociétés clientes et fournisseurs, le catalogue, les prix, les commandes, l'affectation des agents commerciaux et la modération du chat.</p>
+    </header>
+
+    <div class="admin-tabs">
+      <button type="button" class="admin-tab active" data-tab="produits">Produits</button>
+      <button type="button" class="admin-tab admin-only" data-tab="fournisseurs">Fournisseurs</button>
+      <button type="button" class="admin-tab" data-tab="commandes">Commandes</button>
+      <button type="button" class="admin-tab" data-tab="clients">Sociétés</button>
+      <button type="button" class="admin-tab" data-tab="prix">Prix clients</button>
+      <button type="button" class="admin-tab" data-tab="chat">Chat &amp; modération</button>
+    </div>
+
+    <section id="panel-produits" class="admin-panel" data-tab-scope>
+      <div class="section-tabs" data-section-tabs>
+        <button type="button" class="section-tab active" data-section="liste">Catalogue</button>
+        <button type="button" class="section-tab" data-section="formulaire">Ajouter / modifier</button>
+      </div>
+
+      <div data-section-panel="liste" class="dashboard-card dashboard-card-wide">
+        <h2>Produits enregistrés</h2>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Produit</th>
+                <th>Fournisseur</th>
+                <th>Prix</th>
+                <th>Badge</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div data-section-panel="formulaire" class="dashboard-card" hidden>
+        <h2 id="productFormTitle">Ajouter un produit</h2>
+        <form id="productForm" class="auth-form">
+          <div class="form-row">
+            <label>
+              Nom du produit
+              <input type="text" name="name" required placeholder="FIAFI — Huile d'olive">
+            </label>
+            <label>
+              Slug
+              <input type="text" name="slug" placeholder="fiafi-huile-olive">
+            </label>
+          </div>
+          <label>
+            Description
+            <textarea name="description" rows="2" required></textarea>
+          </label>
+          <div class="form-row">
+            <label>
+              Origine
+              <input type="text" name="origin" placeholder="Tunisie">
+            </label>
+            <label>
+              Catégorie
+              <input type="text" name="category" placeholder="huiles">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Prix (€)
+              <input type="number" name="price" required min="0" step="0.01">
+            </label>
+            <label>
+              Unité
+              <input type="text" name="unit" value="litre">
+            </label>
+          </div>
+          <label>
+            Fournisseur
+            <select name="supplier_id" id="productSupplierSelect">
+              <option value="">Aucun fournisseur</option>
+            </select>
+          </label>
+          <div class="form-row">
+            <label>
+              Quantité minimum
+              <input type="number" name="min_quantity" value="12" min="1">
+            </label>
+            <label>
+              Badge
+              <input type="text" name="tag" placeholder="Produit phare">
+            </label>
+          </div>
+          <label>
+            URL de l'image
+            <input type="url" name="image_url" required placeholder="https://...">
+          </label>
+          <div class="form-row">
+            <label>
+              Ordre d'affichage
+              <input type="number" name="sort_order" value="0" min="0">
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="active" checked> Produit visible
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="saveProductBtn">Ajouter</button>
+            <button type="button" class="btn btn-outline-dark" id="cancelProductBtn">Annuler</button>
+          </div>
+          <p class="form-note" id="productNote"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="panel-fournisseurs" class="admin-panel admin-only" hidden data-tab-scope>
+      <div class="section-tabs" data-section-tabs>
+        <button type="button" class="section-tab active" data-section="liste">Fournisseurs</button>
+        <button type="button" class="section-tab" data-section="ajouter">Ajouter</button>
+        <button type="button" class="section-tab" data-section="commander">Commander</button>
+      </div>
+
+      <div data-section-panel="liste" class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Fournisseurs enregistrés</h2>
+          <button type="button" id="refreshSuppliersBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Contact</th>
+                <th>Pays</th>
+                <th>TVA</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="suppliersBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div data-section-panel="ajouter" class="dashboard-card" hidden>
+        <h2 id="supplierFormTitle">Ajouter un fournisseur</h2>
+        <form id="supplierForm" class="auth-form">
+          <div class="form-row">
+            <label>
+              Nom fournisseur
+              <input type="text" name="name" required placeholder="Nom du fournisseur">
+            </label>
+            <label>
+              Contact
+              <input type="text" name="contact_name" placeholder="Nom du contact">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              E-mail
+              <input type="email" name="email" placeholder="contact@fournisseur.com">
+            </label>
+            <label>
+              Téléphone
+              <input type="tel" name="phone" placeholder="Téléphone">
+            </label>
+          </div>
+          <label>
+            Adresse
+            <input type="text" name="address" placeholder="Adresse fournisseur">
+          </label>
+          <div class="form-row">
+            <label>
+              Pays
+              <input type="text" name="country" placeholder="Pays">
+            </label>
+            <label>
+              SIREN / Identifiant
+              <input type="text" name="siren" placeholder="Identifiant légal">
+            </label>
+          </div>
+          <label>
+            Code TVA
+            <input type="text" name="vat_number" placeholder="Code TVA">
+          </label>
+          <label>
+            Mot de passe espace fournisseur (optionnel)
+            <input type="password" name="supplier_password" minlength="6" autocomplete="new-password" placeholder="Créer un compte fournisseur">
+          </label>
+          <label>
+            Notes
+            <textarea name="notes" rows="3" placeholder="Conditions, produits, remarques"></textarea>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="active" checked> Fournisseur actif
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="saveSupplierBtn">Ajouter</button>
+            <button type="button" id="cancelSupplierBtn" class="btn btn-outline-dark">Annuler</button>
+          </div>
+          <p class="form-note" id="supplierNote"></p>
+        </form>
+      </div>
+
+      <div data-section-panel="commander" class="dashboard-card" hidden>
+        <h2>Commander auprès d'un fournisseur</h2>
+        <form id="supplierOrderForm" class="auth-form">
+          <label>
+            Fournisseur
+            <select name="supplier_id" id="supplierOrderSupplierSelect" required></select>
+          </label>
+          <label>
+            Produit
+            <select name="product_slug" id="supplierOrderProductSelect" required></select>
+          </label>
+          <div class="form-row">
+            <label>
+              Quantité
+              <input type="number" name="quantity" min="1" required>
+            </label>
+            <label>
+              Arrivée prévue
+              <input type="date" name="expected_arrival_date">
+            </label>
+          </div>
+          <label>
+            Notes
+            <textarea name="notes" rows="2" placeholder="Instructions fournisseur"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Créer la commande fournisseur</button>
+          <p class="form-note" id="supplierOrderNote"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="panel-commandes" class="admin-panel" hidden>
+      <div class="dashboard-card dashboard-card-wide">
+        <h2>Commandes clients</h2>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>N°</th>
+                <th>Produits</th>
+                <th>Total</th>
+                <th>Paiement</th>
+                <th>Statut</th>
+                <th>Livraison / suivi</th>
+              </tr>
+            </thead>
+            <tbody id="ordersAdminBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-clients" class="admin-panel" hidden data-tab-scope>
+      <div class="section-tabs" data-section-tabs>
+        <button type="button" class="section-tab active" data-section="liste">Sociétés enregistrées</button>
+        <button type="button" class="section-tab admin-only" data-section="creer">Créer une société</button>
+      </div>
+
+      <div data-section-panel="liste" class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Sociétés clients / fournisseurs</h2>
+          <button type="button" id="refreshClientsBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Société</th>
+                <th>Type</th>
+                <th>Contact</th>
+                <th>SIREN</th>
+                <th>TVA</th>
+                <th>Agent</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody id="clientsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div data-section-panel="creer" class="dashboard-card admin-only" hidden>
+        <h2>Créer société client / fournisseur</h2>
+        <form id="adminClientForm" class="auth-form">
+          <label>
+            Type de société
+            <select name="company_type" id="adminCompanyTypeSelect" required>
+              <option value="client">Client</option>
+              <option value="supplier">Fournisseur</option>
+            </select>
+          </label>
+          <div class="form-row">
+            <label>
+              Société
+              <input type="text" name="company" required placeholder="Nom de la société">
+            </label>
+            <label>
+              Contact
+              <input type="text" name="full_name" required placeholder="Nom du contact">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              E-mail de connexion
+              <input type="email" name="email" required placeholder="contact@societe.com">
+            </label>
+            <label>
+              Téléphone
+              <input type="tel" name="phone" placeholder="Téléphone">
+            </label>
+          </div>
+          <label>
+            Adresse société
+            <input type="text" name="address" required placeholder="Adresse complète">
+          </label>
+          <div class="form-row">
+            <label>
+              SIREN
+              <input type="text" name="siren" required placeholder="9 chiffres" inputmode="numeric">
+            </label>
+            <label>
+              Code TVA
+              <input type="text" name="vat_number" required placeholder="FR...">
+            </label>
+          </div>
+          <label class="client-only-field">
+            Agent commercial
+            <select name="commercial_agent_id" id="adminClientAgentSelect">
+              <option value="">Aucun agent assigné</option>
+            </select>
+          </label>
+          <label>
+            Mot de passe temporaire
+            <input type="password" name="password" minlength="6" required autocomplete="new-password">
+          </label>
+          <button type="submit" class="btn btn-primary">Créer la société</button>
+          <p class="form-note" id="adminClientNote"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="panel-prix" class="admin-panel" hidden>
+      <div class="dashboard-card">
+        <h2>Prix client personnalisé</h2>
+        <form id="adminCustomerPriceForm" class="auth-form">
+          <label>
+            Client
+            <select name="profile_id" id="adminPriceClientSelect" required></select>
+          </label>
+          <label>
+            Produit
+            <select name="product_slug" id="adminPriceProductSelect" required></select>
+          </label>
+          <label>
+            Prix fixé (€)
+            <input type="number" name="price" min="0" step="0.01" required>
+          </label>
+          <button type="submit" class="btn btn-primary">Fixer le prix</button>
+          <p class="form-note" id="adminCustomerPriceNote"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="panel-chat" class="admin-panel" hidden>
+      <div class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Chat &amp; modération</h2>
+          <button type="button" id="refreshAdminChatBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <p class="auth-sub" style="margin-bottom:1rem">Consultez les conversations par société, validez ou refusez les messages clients et répondez.</p>
+        <div class="chat-inbox">
+          <aside class="chat-inbox-list">
+            <div id="adminChatList" class="chat-thread-list">
+              <p class="empty-state">Chargement des conversations…</p>
+            </div>
+          </aside>
+          <div class="chat-inbox-conversation">
+            <div id="adminChatSelectedTitle" class="chat-selected-title">Sélectionnez une société</div>
+            <div id="adminChatHistory" class="chat-history">
+              <p class="empty-state">Choisissez une société dans la liste à gauche.</p>
+            </div>
+            <form id="adminChatReplyForm" class="auth-form chat-reply-form">
+              <label>
+                Réponse à la société
+                <textarea name="message" rows="3" required placeholder="Votre réponse" disabled></textarea>
+              </label>
+              <button type="submit" class="btn btn-primary" disabled>Répondre</button>
+              <p class="form-note" id="adminChatNote"></p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="trackingModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog app-modal-dialog-wide">
+      <div class="app-modal-header">
+        <h2 id="trackingModalTitle">Livraison / suivi</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
+        <form id="trackingModalForm" class="auth-form">
+          <input type="hidden" name="order_id">
+          <label>
+            Statut livraison
+            <select name="delivery_status" id="trackingDeliveryStatus"></select>
+          </label>
+          <div class="form-row">
+            <label>
+              Transporteur
+              <input type="text" name="carrier" placeholder="Transporteur">
+            </label>
+            <label>
+              N° suivi
+              <input type="text" name="tracking_number" placeholder="N° suivi">
+            </label>
+          </div>
+          <label>
+            Lien suivi
+            <input type="url" name="tracking_url" placeholder="https://...">
+          </label>
+          <div class="form-row">
+            <label>
+              Livraison estimée
+              <input type="date" name="estimated_delivery_date">
+            </label>
+            <label>
+              Date de livraison
+              <input type="datetime-local" name="delivered_at">
+            </label>
+          </div>
+          <label>
+            Notes livraison
+            <textarea name="delivery_notes" rows="3" placeholder="Notes livraison"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <p class="form-note" id="trackingModalNote"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js?v=chat-mod-20260619"></script>
+  <script src="js/admin-api.js?v=chat-mod-20260619"></script>
+  <script src="js/admin.js?v=chat-mod-20260619"></script>
+</body>
+</html>

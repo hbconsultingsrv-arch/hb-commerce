@@ -1,0 +1,343 @@
+/* Brochures FIAFI + sùlecteur marchù */
+
+.market-switcher {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.market-btn {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: 0.2s;
+}
+
+.market-btn:hover,
+.market-btn.active {
+  background: var(--fiafi-gold);
+  color: var(--fiafi-olive-dark);
+  border-color: var(--fiafi-gold);
+}
+
+.nav-simple .market-btn {
+  border-color: rgba(61, 92, 58, 0.3);
+  color: var(--fiafi-olive-dark);
+  background: var(--fiafi-cream);
+}
+
+/* Brochure pages */
+.brochure-page {
+  background: #e8e4dc;
+  min-height: 100vh;
+}
+
+.brochure-toolbar {
+  background: var(--fiafi-olive-dark);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.brochure-toolbar a {
+  color: var(--fiafi-gold-light);
+}
+
+.brochure-sheet {
+  max-width: 820px;
+  margin: 2rem auto;
+  background: white;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+}
+
+.brochure-cover {
+  background: linear-gradient(160deg, var(--fiafi-olive-dark), #1e3d1c);
+  color: white;
+  padding: 3rem 2.5rem;
+  text-align: center;
+  position: relative;
+}
+
+.brochure-cover.market-fr::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #002395 33%, #fff 33%, #fff 66%, #ed2939 66%);
+}
+
+.brochure-cover.market-lu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: linear-gradient(180deg, #00a1de 4px, #fff 4px, #fff 8px, #ed2939 8px);
+}
+
+.brochure-cover h1 {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  color: var(--fiafi-gold-light);
+  margin: 1rem 0 0.5rem;
+}
+
+.brochure-cover .market-label {
+  display: inline-block;
+  background: var(--fiafi-gold);
+  color: var(--fiafi-olive-dark);
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.brochure-cover img {
+  max-width: 320px;
+  max-height: 400px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: 1.5rem auto;
+  display: block;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 1rem;
+  min-height: 200px;
+}
+
+.brochure-body {
+  padding: 2rem 2.5rem;
+}
+
+.brochure-body h2 {
+  font-family: var(--font-display);
+  color: var(--fiafi-olive-dark);
+  font-size: 1.5rem;
+  margin: 1.5rem 0 0.75rem;
+  border-bottom: 2px solid var(--fiafi-gold);
+  padding-bottom: 0.35rem;
+}
+
+.brochure-body h2:first-child {
+  margin-top: 0;
+}
+
+.brochure-specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1.5rem;
+  margin: 1rem 0;
+}
+
+.brochure-specs dt {
+  font-weight: 700;
+  color: var(--fiafi-olive);
+  font-size: 0.85rem;
+}
+
+.brochure-specs dd {
+  margin: 0;
+  color: var(--text);
+}
+
+.brochure-bilingual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.brochure-bilingual .col-de {
+  border-left: 2px solid var(--fiafi-cream);
+  padding-left: 1.5rem;
+}
+
+.brochure-bilingual h3 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fiafi-gold);
+  margin-bottom: 0.5rem;
+}
+
+.brochure-cta {
+  background: var(--fiafi-cream);
+  padding: 1.5rem 2.5rem;
+  text-align: center;
+  border-top: 3px solid var(--fiafi-gold);
+}
+
+.brochure-cta .btn {
+  margin: 0.5rem;
+}
+
+.brochure-page-break {
+  margin-bottom: 2rem;
+}
+
+@media print {
+  .brochure-page-break {
+    page-break-after: always;
+    margin-bottom: 0;
+  }
+}
+
+.brochure-price-table {
+  margin-bottom: 1.5rem;
+}
+
+.brochure-product-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.brochure-thumb {
+  text-align: center;
+  background: var(--fiafi-cream);
+  border-radius: 12px;
+  padding: 0.75rem;
+}
+
+.brochure-thumb img {
+  max-height: 120px;
+  width: auto;
+  margin: 0 auto;
+}
+
+.brochure-thumb figcaption {
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  color: var(--fiafi-olive-dark);
+  font-weight: 600;
+}
+
+/* Pages image plein format (photos brochure) */
+.brochure-full-image {
+  position: relative;
+  overflow: hidden;
+  line-height: 0;
+  background: #1a1a1a;
+}
+
+.brochure-full-bleed {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  object-fit: contain;
+}
+
+.brochure-market-stamp {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: var(--fiafi-gold);
+  color: var(--fiafi-olive-dark);
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4;
+  z-index: 2;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.brochure-contact-sheet .brochure-full-bleed {
+  opacity: 0.35;
+}
+
+.brochure-contact-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  color: white;
+  background: linear-gradient(180deg, rgba(26, 42, 28, 0.55), rgba(26, 42, 28, 0.85));
+  line-height: 1.5;
+}
+
+.brochure-contact-overlay h2 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--fiafi-gold-light);
+  margin: 0 0 0.5rem;
+  border: none;
+  padding: 0;
+}
+
+.brochure-contact-lead {
+  margin: 0 0 1.25rem;
+  opacity: 0.9;
+  max-width: 520px;
+}
+
+.brochure-contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  font-size: 1.05rem;
+}
+
+.brochure-contact-list li {
+  margin: 0.35rem 0;
+}
+
+.brochure-contact-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media print {
+  .brochure-full-image {
+    page-break-inside: avoid;
+  }
+  .brochure-contact-overlay {
+    background: rgba(26, 42, 28, 0.75);
+  }
+}
+
+@media (max-width: 700px) {
+  .brochure-specs,
+  .brochure-bilingual {
+    grid-template-columns: 1fr;
+  }
+  .brochure-bilingual .col-de {
+    border-left: none;
+    padding-left: 0;
+    border-top: 2px solid var(--fiafi-cream);
+    padding-top: 1rem;
+  }
+  .brochure-market-stamp {
+    font-size: 0.65rem;
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+}

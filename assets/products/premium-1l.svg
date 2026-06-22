@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 360" fill="none">
+  <rect width="280" height="360" fill="#2a4228"/>
+  <path d="M95 80h110c8 0 14 6 14 14v170c0 16-13 28-28 28h-94c-15 0-28-12-28-28V94c0-8 6-14 14-14z" fill="#faf8f4" stroke="#e8c547" stroke-width="2"/>
+  <rect x="110" y="130" width="60" height="100" fill="#c9a227"/>
+  <text x="140" y="175" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#2a4228" font-weight="700">PREMIUM</text>
+  <text x="140" y="255" text-anchor="middle" font-size="18" font-weight="700" fill="#e8c547">1 L</text>
+  <text x="140" y="278" text-anchor="middle" font-size="10" fill="#c9a227">Acidité d 0,5%</text>
+</svg>

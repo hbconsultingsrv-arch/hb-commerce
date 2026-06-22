@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon compte | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commerce.css">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo">
+      <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="210" height="44">
+    </a>
+    <div class="nav-actions">
+      <a href="super-root.html" id="compteSuperRootLink" class="btn btn-sm btn-primary" style="display:none">Super root</a>
+      <a href="admin.html" id="compteAdminLink" class="btn btn-sm btn-primary" style="display:none">Administration</a>
+      <a href="produits.html" class="btn btn-sm btn-primary">Nouvelle commande</a>
+      <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="dashboard-main container">
+    <header class="dashboard-header">
+      <div>
+        <span class="section-tag">Espace client</span>
+        <h1>Bonjour, <span id="welcomeName">—</span></h1>
+        <p class="auth-sub">Gérez vos informations et consultez l'historique de vos commandes.</p>
+      </div>
+    </header>
+
+    <div class="admin-tabs" id="compteTabs">
+      <button type="button" class="admin-tab active" data-tab="commandes">Mes commandes</button>
+      <button type="button" class="admin-tab" data-tab="profil">Mon profil</button>
+      <button type="button" class="admin-tab" data-tab="chat">Chat</button>
+    </div>
+
+    <section id="panel-commandes" class="admin-panel">
+      <div class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Mes commandes</h2>
+          <a href="produits.html" class="btn btn-sm btn-primary">+ Commander</a>
+        </div>
+        <div id="ordersEmpty" class="empty-state" hidden>
+          <p>Aucune commande pour le moment.</p>
+          <a href="produits.html" class="btn btn-sm btn-outline-dark">Voir les produits</a>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table" id="ordersTable" hidden>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>N°</th>
+                <th>Produits</th>
+                <th>Total</th>
+                <th>Statut</th>
+                <th>Livraison</th>
+                <th>Facture</th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-profil" class="admin-panel" hidden>
+      <div class="dashboard-card">
+        <h2>Mes informations</h2>
+        <form id="profileForm" class="auth-form">
+          <label>
+            Prénom &amp; Nom
+            <input type="text" name="full_name" required>
+          </label>
+          <label>
+            Société
+            <input type="text" name="company" required>
+          </label>
+          <label>
+            E-mail
+            <input type="email" name="email" disabled>
+          </label>
+          <label>
+            Téléphone
+            <input type="tel" name="phone" required>
+          </label>
+          <label>
+            Adresse
+            <input type="text" name="address" required>
+          </label>
+          <div class="form-row">
+            <label>
+              SIREN
+              <input type="text" name="siren" required inputmode="numeric">
+            </label>
+            <label>
+              Code TVA
+              <input type="text" name="vat_number" required>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <p class="form-note" id="profileNote"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="panel-chat" class="admin-panel" hidden>
+      <div class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Chat avec HB Commerce</h2>
+          <button type="button" id="refreshChatBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div id="companyChatHistory" class="chat-history">
+          <p class="empty-state">Chargement du chat…</p>
+        </div>
+        <form id="companyChatForm" class="auth-form" style="margin-top:1rem">
+          <label>
+            Message à l'administration
+            <textarea name="message" rows="3" required placeholder="Écrivez votre message à HB Commerce"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Envoyer le message</button>
+          <p class="form-note" id="companyChatNote"></p>
+        </form>
+        <p class="form-note" style="margin-top:0.5rem">Les messages société sont visibles après modération.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin-api.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

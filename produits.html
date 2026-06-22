@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Produits | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=menu-20260618">
+  <link rel="stylesheet" href="css/commerce.css?v=product-info-20260619">
+  <link rel="stylesheet" href="css/brochure.css?v=menu-20260618">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+  <script src="js/markets.js"></script>
+</head>
+<body class="dashboard-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo">
+      <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="220" height="48">
+    </a>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html" data-i18n="nav.home">Accueil</a></li>
+      <li><a href="#" id="brochureLink" data-i18n="nav.brochure">Brochure</a></li>
+      <li id="navAccount" style="display:none"><a href="compte.html" data-i18n="nav.account">Mon compte</a></li>
+      <li id="navLogin"><a href="login.html" data-i18n="nav.login">Connexion</a></li>
+      <li><div id="marketSelector" class="market-switcher"></div></li>
+      <li><a href="panier.html" class="btn btn-sm btn-primary"><span data-i18n="nav.cart">Panier</span> <span id="cartBadge" class="cart-badge" style="display:none">0</span></a></li>
+    </ul>
+  </nav>
+
+  <main class="dashboard-main container">
+    <header class="dashboard-header">
+      <span class="section-tag">Catalogue FIAFI</span>
+      <h1>Formats &amp; catégories</h1>
+      <p class="auth-sub">Bouteilles, métallique (1L · 3L · 5L), Marasca 250 ml, Premium extra vierge</p>
+    </header>
+
+    <div id="categoryNav"></div>
+    <div id="cartToast" class="form-note success" hidden style="margin-bottom:1rem"></div>
+    <div id="productsGrid" class="products-grid"></div>
+
+    <div id="qualitySection" class="dashboard-card dashboard-card-wide" style="margin-top:2rem"></div>
+  </main>
+
+  <div id="productTechModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog app-modal-dialog-wide">
+      <div class="app-modal-header">
+        <h2>Fiche technique</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body" id="productTechModalBody"></div>
+    </div>
+  </div>
+
+  <script src="js/markets.js"></script>
+  <script src="js/fiafi-images.js"></script>
+  <script src="js/fiafi-catalog.js"></script>
+  <script src="js/locales.js"></script>
+  <script src="js/branding.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js?v=menu-20260618"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/products.js?v=db-only-20260619"></script>
+  <script src="js/main.js?v=db-only-20260619"></script>
+  <script src="js/market-ui.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const bl = document.getElementById('brochureLink');
+      if (bl) bl.href = getMarket().brochurePage;
+    });
+  </script>
+</body>
+</html>

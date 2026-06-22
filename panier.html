@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panier | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commerce.css">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo">
+      <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="210" height="44">
+    </a>
+    <div class="nav-actions">
+      <a href="produits.html" class="btn btn-sm btn-outline-light">Continuer mes achats</a>
+    </div>
+  </nav>
+
+  <main class="dashboard-main container">
+    <header class="dashboard-header">
+      <span class="section-tag">Commande</span>
+      <h1>Mon panier</h1>
+    </header>
+
+    <div id="cartEmpty" class="empty-state dashboard-card" hidden>
+      <p>Votre panier est vide.</p>
+      <a href="produits.html" class="btn btn-primary">Voir les produits</a>
+    </div>
+
+    <div class="dashboard-card dashboard-card-wide">
+      <div class="table-wrap" id="cartTable" hidden>
+        <table class="requests-table cart-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Produit</th>
+              <th>Prix</th>
+              <th>Quantité</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="cartBody"></tbody>
+        </table>
+      </div>
+      <div class="cart-summary">
+        <div class="total-line">
+          <span>Total</span>
+          <span id="cartTotal">xx</span>
+        </div>
+        <a href="checkout.html" class="btn btn-primary btn-full" style="margin-top:1rem">Passer commande</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/cart-page.js"></script>
+</body>
+</html>

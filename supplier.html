@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espace fournisseur | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commerce.css">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo">
+      <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="210" height="44">
+    </a>
+    <div class="nav-actions">
+      <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="dashboard-main container">
+    <header class="dashboard-header">
+      <span class="section-tag">Espace fournisseur</span>
+      <h1>Bonjour, <span id="supplierName">—</span></h1>
+      <p class="auth-sub">Gérez votre stock disponible et suivez les commandes d’approvisionnement HB Commerce.</p>
+    </header>
+
+    <section id="supplierPanel" class="admin-panel" data-tab-scope>
+      <div class="section-tabs" data-section-tabs>
+        <button type="button" class="section-tab active" data-section="stock">Stock</button>
+        <button type="button" class="section-tab" data-section="commandes">Commandes HB</button>
+      </div>
+
+      <div data-section-panel="stock" class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Stock existant</h2>
+          <button type="button" id="refreshSupplierStockBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th>Stock</th>
+                <th>Réservé</th>
+                <th>Délai fournisseur</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="supplierStockBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div data-section-panel="commandes" class="dashboard-card dashboard-card-wide" hidden>
+        <div class="dashboard-card-head">
+          <h2>Commandes HB Commerce</h2>
+          <button type="button" id="refreshSupplierOrdersBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Statut</th>
+                <th>Arrivée prévue</th>
+                <th>Suivi</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="supplierOrdersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/fiafi-images.js"></script>
+  <script src="js/fiafi-catalog.js"></script>
+  <script src="js/admin-api.js"></script>
+  <script src="js/supplier.js"></script>
+</body>
+</html>

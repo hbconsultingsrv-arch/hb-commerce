@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="auth-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo">
+      <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="210" height="44">
+    </a>
+    <a href="register.html" class="btn btn-sm btn-outline-light">Créer un compte</a>
+  </nav>
+
+  <main class="auth-main container">
+    <div class="auth-card">
+      <span class="section-tag">Espace client</span>
+      <h1>Connexion</h1>
+      <p class="auth-sub">Accédez à votre espace professionnel et suivez vos commandes.</p>
+
+      <form id="loginForm" class="auth-form">
+        <label>
+          E-mail
+          <input type="email" name="email" required placeholder="vous@entreprise.fr" autocomplete="email">
+        </label>
+        <label>
+          Mot de passe
+          <input type="password" name="password" required minlength="6" autocomplete="current-password">
+        </label>
+        <button type="submit" class="btn btn-primary btn-full">Se connecter</button>
+        <p class="form-note" id="loginNote"></p>
+      </form>
+
+      <p class="auth-switch">Pas encore de compte ? <a href="register.html">Inscrivez-vous</a></p>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const requestedRedirect = params.get('redirect');
+    const note = document.getElementById('loginNote');
+
+    if (params.get('confirmed') === '1') {
+      showAlert(note, 'E-mail confirmé. Vous pouvez vous connecter.', 'success');
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      try {
+        const data = await signIn(fd.get('email'), fd.get('password'));
+        window.location.href = requestedRedirect || await getDefaultDashboardUrl(data.session);
+      } catch (err) {
+        showAlert(note, mapAuthError(err));
+      }
+    });
+
+    getSession().then(async (s) => {
+      if (s) window.location.href = requestedRedirect || await getDefaultDashboardUrl(s);
+    });
+  </script>
+</body>
+</html>

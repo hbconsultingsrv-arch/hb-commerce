@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inscription | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="auth-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo">
+      <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="210" height="44">
+    </a>
+    <a href="login.html" class="btn btn-sm btn-outline-light">Connexion</a>
+  </nav>
+
+  <main class="auth-main container">
+    <div class="auth-card auth-card-wide">
+      <span class="section-tag">Espace professionnel</span>
+      <h1>Créer un compte</h1>
+      <p class="auth-sub">Inscrivez-vous pour commander nos produits alimentaires en gros.</p>
+
+      <form id="registerForm" class="auth-form">
+        <div class="form-row">
+          <label>
+            Prénom &amp; Nom
+            <input type="text" name="fullName" required>
+          </label>
+          <label>
+            Société
+            <input type="text" name="company" placeholder="Votre entreprise" required>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>
+            Téléphone
+            <input type="tel" name="phone" required>
+          </label>
+          <label>
+            E-mail
+            <input type="email" name="email" required autocomplete="email">
+          </label>
+        </div>
+        <label>
+          Adresse société
+          <input type="text" name="address" required placeholder="Adresse complète de la société">
+        </label>
+        <div class="form-row">
+          <label>
+            SIREN
+            <input type="text" name="siren" required placeholder="9 chiffres" inputmode="numeric">
+          </label>
+          <label>
+            Code TVA
+            <input type="text" name="vatNumber" required placeholder="FR...">
+          </label>
+        </div>
+        <label>
+          Mot de passe
+          <input type="password" name="password" required minlength="6" autocomplete="new-password">
+        </label>
+        <label>
+          Confirmer le mot de passe
+          <input type="password" name="passwordConfirm" required minlength="6" autocomplete="new-password">
+        </label>
+        <button type="submit" class="btn btn-primary btn-full">Créer mon compte</button>
+        <p class="form-note" id="registerNote"></p>
+      </form>
+
+      <p class="auth-switch">Déjà inscrit ? <a href="login.html">Connectez-vous</a></p>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const note = document.getElementById('registerNote');
+      const fd = new FormData(e.target);
+
+      if (fd.get('password') !== fd.get('passwordConfirm')) {
+        showAlert(note, 'Les mots de passe ne correspondent pas.');
+        return;
+      }
+
+      if (!isConfigured()) {
+        showAlert(note, configErrorMessage());
+        return;
+      }
+
+      try {
+        const { user } = await signUp({
+          email: fd.get('email'),
+          password: fd.get('password'),
+          fullName: fd.get('fullName'),
+          phone: fd.get('phone'),
+          company: fd.get('company'),
+          address: fd.get('address'),
+          siren: fd.get('siren'),
+          vatNumber: fd.get('vatNumber')
+        });
+
+        if (user && !user.confirmed_at) {
+          showAlert(note, 'Compte créé ! Vérifiez votre e-mail. HB Commerce attribuera ensuite le profil client ou fournisseur.', 'success');
+          e.target.reset();
+        } else {
+          window.location.href = 'compte.html';
+        }
+      } catch (err) {
+        showAlert(note, mapAuthError(err));
+      }
+    });
+  </script>
+</body>
+</html>
