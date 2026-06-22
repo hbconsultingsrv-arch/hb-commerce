@@ -10,6 +10,8 @@ function googleDriveImage(id, width = 1200) {
 }
 
 window.HB_BRANDING = {
+  siteName: 'HB Commerce',
+  siteTagline: 'HB Consulting & Services · B2B',
   fiafiDriveId: FIAFI_DRIVE_ID,
   images: {
     product: googleDriveImage(FIAFI_DRIVE_ID, 1200),

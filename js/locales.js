@@ -62,8 +62,8 @@ const HB_TRANSLATIONS = {
     'brochure.market': 'Marché : France'
   },
   lu: {
-    'meta.title': 'HB Commerce | FIAFI — Olivenöl Grosshandel',
-    'meta.description': 'FIAFI — Natives Olivenöl extra aus Tunesien. Grosshandel für Profis in Luxemburg.',
+    'meta.title': 'HB Commerce | Vente en gros B2B',
+    'meta.description': 'HB Commerce — Vente en gros alimentaire B2B. Catalogue FIAFI, TOUNSI et produits sélectionnés.',
     'nav.home': 'Accueil / Home',
     'nav.products': 'Produits / Produkte',
     'nav.about': 'À propos / Über uns',
