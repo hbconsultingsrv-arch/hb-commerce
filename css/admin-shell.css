@@ -575,3 +575,57 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Upload image produit */
+.form-optional {
+  font-weight: 400;
+  font-size: 0.78rem;
+  color: var(--admin-muted, #6b7a6e);
+}
+
+.product-image-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px dashed rgba(45, 90, 56, 0.25);
+  background: rgba(45, 90, 56, 0.04);
+}
+
+.product-image-upload-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.product-image-upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.product-image-file-btn {
+  cursor: pointer;
+  margin: 0;
+}
+
+.product-image-preview-wrap {
+  margin-top: 0.25rem;
+}
+
+.product-image-preview {
+  display: block;
+  max-width: 160px;
+  max-height: 160px;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid rgba(45, 90, 56, 0.15);
+  background: #fff;
+  padding: 0.35rem;
+}
+
+.product-image-url-fallback {
+  margin-top: 0.25rem;
+  font-size: 0.82rem;
+}

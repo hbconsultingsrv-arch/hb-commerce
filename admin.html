@@ -134,7 +134,7 @@
 
       <div data-section-panel="formulaire" class="dashboard-card" hidden>
         <h2 id="productFormTitle">Ajouter un produit</h2>
-        <form id="productForm" class="auth-form">
+        <form id="productForm" class="auth-form" enctype="multipart/form-data">
           <div class="form-row">
             <label>
               Nom du produit
@@ -147,7 +147,7 @@
           </div>
           <label>
             Description
-            <textarea name="description" rows="2" required></textarea>
+            <textarea name="description" rows="2" placeholder="Description courte du produit (optionnel)"></textarea>
           </label>
           <div class="form-row">
             <label>
@@ -180,9 +180,9 @@
             </label>
           </div>
           <label>
-            Fournisseur
+            Fournisseur <span class="form-optional">(optionnel)</span>
             <select name="supplier_id" id="productSupplierSelect">
-              <option value="">Aucun fournisseur</option>
+              <option value="">— Aucun fournisseur —</option>
             </select>
           </label>
           <div class="form-row">
@@ -205,10 +205,24 @@
               <input type="number" name="min_stock_alert" min="0" value="10" title="Alerte admin quand le stock atteint ce niveau">
             </label>
           </div>
-          <label>
-            URL de l'image
-            <input type="url" name="image_url" required placeholder="https://...">
-          </label>
+          <div class="product-image-upload">
+            <span class="product-image-upload-label">Image du produit</span>
+            <div class="product-image-upload-row">
+              <label class="btn btn-sm btn-outline-dark product-image-file-btn">
+                Importer une image
+                <input type="file" name="product_image" id="productImageFile" accept="image/*,.heic,.heif" hidden>
+              </label>
+              <button type="button" class="btn btn-sm btn-outline-dark" id="productImageClearBtn">Retirer</button>
+            </div>
+            <p class="form-note">JPG, PNG, WebP, GIF, SVG, HEIC… — max 10 Mo. L’image est enregistrée sur Supabase et l’URL est sauvegardée dans la fiche produit.</p>
+            <div id="productImagePreviewWrap" class="product-image-preview-wrap" hidden>
+              <img id="productImagePreview" class="product-image-preview" alt="Aperçu produit" hidden>
+            </div>
+            <label class="product-image-url-fallback">
+              Ou URL externe (optionnel)
+              <input type="url" name="image_url" placeholder="https://… (si pas d’import)">
+            </label>
+          </div>
           <div class="form-row">
             <label>
               Ordre d'affichage
@@ -810,6 +824,7 @@
   <script src="js/stock-alerts.js?v=stock-fallback-20260623"></script>
   <script src="js/stock-admin.js?v=stock-fallback-20260623"></script>
   <script src="js/stock-purchases.js?v=stock-fallback-20260623"></script>
+  <script src="js/product-image-upload.js?v=product-img-20260624"></script>
   <script src="js/analytics-admin.js?v=analytics-20260624"></script>
   <script src="js/admin-utils.js?v=admin-v2-20260624"></script>
   <script src="js/admin-dashboard.js?v=admin-v2-20260624"></script>

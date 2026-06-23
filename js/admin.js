@@ -118,6 +118,7 @@ async function initAdmin() {
   bindOrderFilters();
   bindChatEnhancements();
   bindPriceFormPreview();
+  initProductImageUpload();
   updateAdminNavBadges();
 }
 
@@ -274,7 +275,9 @@ function editProduct(id, products) {
   form.min_quantity.value = p.min_quantity || 1;
   if (form.stock_quantity) form.stock_quantity.value = p.stock_quantity ?? 0;
   if (form.min_stock_alert) form.min_stock_alert.value = p.min_stock_alert ?? 10;
-  form.image_url.value = p.image_url;
+  form.image_url.value = p.image_url || '';
+  if (typeof setProductImagePreview === 'function') setProductImagePreview(p.image_url || '');
+  if (typeof clearProductImageFileInput === 'function') clearProductImageFileInput();
   form.tag.value = p.tag || '';
   form.sort_order.value = p.sort_order || 0;
   form.active.checked = p.active;
@@ -288,6 +291,8 @@ function resetProductForm() {
   const form = document.getElementById('productForm');
   form.reset();
   form.active.checked = true;
+  if (typeof clearProductImageFileInput === 'function') clearProductImageFileInput();
+  if (typeof setProductImagePreview === 'function') setProductImagePreview('');
   document.getElementById('productFormTitle').textContent = 'Ajouter un produit';
   document.getElementById('saveProductBtn').textContent = 'Ajouter';
   activateSectionTab('panel-produits', 'liste');
@@ -296,23 +301,63 @@ function resetProductForm() {
 async function handleProductSubmit(e) {
   e.preventDefault();
   const note = document.getElementById('productNote');
-  const fd = new FormData(e.target);
+  const form = e.target;
+  const fd = new FormData(form);
+  const saveBtn = document.getElementById('saveProductBtn');
+
+  const slug = (fd.get('slug') || slugify(fd.get('name'))).toString().trim();
+  let imageUrl = (fd.get('image_url') || '').toString().trim();
+  const imageFile = fd.get('product_image');
+
+  if (imageFile instanceof File && imageFile.size > 0) {
+    if (typeof uploadProductImage !== 'function') {
+      showAlert(note, 'Module upload image indisponible.');
+      return;
+    }
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Upload image…';
+    try {
+      const uploaded = await uploadProductImage(imageFile, slug);
+      if (uploaded.url) {
+        imageUrl = uploaded.url;
+      } else {
+        showAlert(note, uploaded.uploadError
+          ? `Image : ${uploaded.uploadError} — exécutez supabase/migration-product-images-storage.sql`
+          : 'Échec upload image.', 'error');
+        if (!imageUrl) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = editingProductId ? 'Enregistrer' : 'Ajouter';
+          return;
+        }
+      }
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = editingProductId ? 'Enregistrer' : 'Ajouter';
+    }
+  }
+
+  if (!imageUrl) {
+    imageUrl = typeof DEFAULT_PRODUCT_IMAGE !== 'undefined' ? DEFAULT_PRODUCT_IMAGE : 'images/prenium.PNG';
+  }
+
+  const supplierRaw = fd.get('supplier_id');
+  const supplierId = supplierRaw && String(supplierRaw).trim() ? String(supplierRaw).trim() : null;
 
   const product = {
     name: fd.get('name'),
-    slug: fd.get('slug') || slugify(fd.get('name')),
-    description: fd.get('description'),
-    origin: fd.get('origin'),
-    category: fd.get('category'),
+    slug,
+    description: fd.get('description') || null,
+    origin: fd.get('origin') || null,
+    category: fd.get('category') || 'alimentaire',
     price: parseFloat(fd.get('price')),
     purchase_price: fd.get('purchase_price') ? parseFloat(fd.get('purchase_price')) : null,
-    unit: fd.get('unit'),
-    supplier_id: fd.get('supplier_id') || null,
+    unit: fd.get('unit') || 'litre',
+    supplier_id: supplierId,
     min_quantity: parseInt(fd.get('min_quantity'), 10) || 1,
     stock_quantity: parseInt(fd.get('stock_quantity'), 10) || 0,
     min_stock_alert: parseInt(fd.get('min_stock_alert'), 10) || 10,
-    image_url: fd.get('image_url'),
-    tag: fd.get('tag'),
+    image_url: imageUrl,
+    tag: fd.get('tag') || null,
     sort_order: parseInt(fd.get('sort_order'), 10) || 0,
     active: fd.has('active')
   };
@@ -344,7 +389,7 @@ async function handleProductSubmit(e) {
 function renderProductSupplierSelect() {
   const select = document.getElementById('productSupplierSelect');
   if (!select) return;
-  select.innerHTML = '<option value="">Aucun fournisseur</option>'
+  select.innerHTML = '<option value="">— Aucun fournisseur —</option>'
     + adminSuppliers
       .filter((supplier) => supplier.active)
       .map((supplier) => `<option value="${supplier.id}">${escapeHtml(supplier.name)}</option>`)
