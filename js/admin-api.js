@@ -689,3 +689,41 @@ async function deleteBusinessExpense(id) {
   const { error } = await sb.from('business_expenses').delete().eq('id', id);
   if (error) throw error;
 }
+
+async function fetchSiteRoadmapItems() {
+  const sb = getSupabase();
+  if (!sb) return [];
+  const { data, error } = await sb
+    .from('site_roadmap_items')
+    .select('*')
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: true });
+  if (error) {
+    if (error.message?.includes('site_roadmap_items')) return null;
+    throw error;
+  }
+  return data || [];
+}
+
+async function createSiteRoadmapItem(item) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { data, error } = await sb.from('site_roadmap_items').insert(item).select().single();
+  if (error) throw error;
+  return data;
+}
+
+async function updateSiteRoadmapItem(id, fields) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { data, error } = await sb.from('site_roadmap_items').update(fields).eq('id', id).select().single();
+  if (error) throw error;
+  return data;
+}
+
+async function deleteSiteRoadmapItem(id) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { error } = await sb.from('site_roadmap_items').delete().eq('id', id);
+  if (error) throw error;
+}

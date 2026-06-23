@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/commerce.css?v=chat-mod-20260619">
   <link rel="stylesheet" href="css/stock.css?v=stock-20260619">
   <link rel="stylesheet" href="css/analytics.css?v=analytics-20260624">
+  <link rel="stylesheet" href="css/admin-roadmap.css?v=roadmap-20260615">
   <link rel="stylesheet" href="css/admin-shell.css?v=admin-v2-20260624">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
@@ -35,6 +36,7 @@
         <button type="button" class="admin-nav-item" data-tab="clients"><span class="admin-nav-icon">◇</span> Clients</button>
         <button type="button" class="admin-nav-item" data-tab="prix"><span class="admin-nav-icon">€</span> Prix clients</button>
         <button type="button" class="admin-nav-item admin-only" data-tab="analyses"><span class="admin-nav-icon">◈</span> Analyses</button>
+        <button type="button" class="admin-nav-item admin-only" data-tab="construction"><span class="admin-nav-icon">⬡</span> Construction</button>
         <button type="button" class="admin-nav-item" data-tab="chat"><span class="admin-nav-icon">✉</span> Support<span class="admin-nav-badge" id="adminChatNavBadge" hidden></span></button>
       </nav>
       <div class="admin-sidebar-footer">
@@ -70,6 +72,7 @@
           <button type="button" class="admin-tab" data-tab="clients">Clients</button>
           <button type="button" class="admin-tab" data-tab="prix">Prix</button>
           <button type="button" class="admin-tab admin-only" data-tab="analyses">Analyses</button>
+          <button type="button" class="admin-tab admin-only" data-tab="construction">Construction</button>
           <button type="button" class="admin-tab" data-tab="chat">Chat</button>
         </div>
 
@@ -642,6 +645,58 @@
       </div>
     </section>
 
+    <section id="panel-construction" class="admin-panel admin-only" hidden>
+      <div id="roadmapProgressHost"></div>
+
+      <div class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Suivi construction du site</h2>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <button type="button" id="refreshRoadmapBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+            <button type="button" id="openRoadmapAddBtn" class="btn btn-sm btn-primary">+ Ajouter</button>
+          </div>
+        </div>
+        <p class="auth-sub">Visualisez ce qui existe déjà, ce qui est en cours et ce qu'il reste à construire. Ajoutez des tâches, notes et mettez à jour l'avancement.</p>
+
+        <div class="roadmap-toolbar">
+          <select id="roadmapFilterCategory" aria-label="Filtrer par catégorie">
+            <option value="">Toutes catégories</option>
+            <option value="front">Site public</option>
+            <option value="admin">Administration</option>
+            <option value="auth">Comptes &amp; auth</option>
+            <option value="stock">Stock &amp; achats</option>
+            <option value="legal">Pages légales</option>
+            <option value="infra">Technique</option>
+            <option value="general">Général</option>
+          </select>
+          <select id="roadmapFilterStatus" aria-label="Filtrer par statut">
+            <option value="">Tous statuts</option>
+            <option value="done">Terminé / existe</option>
+            <option value="in_progress">En cours</option>
+            <option value="todo">À faire</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Catégorie</th>
+                <th>Fonctionnalité</th>
+                <th>Statut</th>
+                <th>Mise à jour</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="roadmapItemsBody">
+              <tr><td colspan="5">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="form-note" id="roadmapPanelNote"></p>
+      </div>
+    </section>
+
     <section id="panel-analyses" class="admin-panel admin-only" hidden>
       <div class="dashboard-card dashboard-card-wide">
         <div class="dashboard-card-head">
@@ -791,6 +846,59 @@
     </div>
   </div>
 
+  <div id="roadmapItemModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog">
+      <div class="app-modal-header">
+        <h2 id="roadmapFormTitle">Ajouter une tâche / fonctionnalité</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
+        <form id="roadmapItemForm" class="auth-form">
+          <label>
+            Catégorie
+            <select name="category" required>
+              <option value="front">Site public</option>
+              <option value="admin">Administration</option>
+              <option value="auth">Comptes &amp; auth</option>
+              <option value="stock">Stock &amp; achats</option>
+              <option value="legal">Pages légales</option>
+              <option value="infra">Technique / Supabase</option>
+              <option value="general">Général</option>
+            </select>
+          </label>
+          <label>
+            Titre / fonctionnalité
+            <input type="text" name="title" required placeholder="Ex. Export PDF factures">
+          </label>
+          <label>
+            Note / description
+            <textarea name="notes" rows="3" placeholder="Détails, ce qui manque, priorités…"></textarea>
+          </label>
+          <div class="form-row">
+            <label>
+              Statut
+              <select name="status" required>
+                <option value="todo">À faire</option>
+                <option value="in_progress">En cours</option>
+                <option value="done">Terminé / existe</option>
+              </select>
+            </label>
+            <label>
+              Ordre d'affichage
+              <input type="number" name="sort_order" value="0" min="0" step="1">
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="saveRoadmapBtn">Ajouter</button>
+            <button type="button" class="btn btn-outline-dark" id="cancelRoadmapBtn">Annuler</button>
+          </div>
+          <p class="form-note" id="roadmapFormNote"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div id="analyticsExpenseModal" class="app-modal" hidden>
     <div class="app-modal-backdrop" data-close-modal></div>
     <div class="app-modal-dialog">
@@ -912,6 +1020,7 @@
   <script src="js/admin-utils.js?v=admin-v2-20260624"></script>
   <script src="js/admin-combobox.js?v=combobox-20260615"></script>
   <script src="js/admin-dashboard.js?v=admin-v2-20260624"></script>
+  <script src="js/admin-roadmap.js?v=roadmap-20260615"></script>
   <script src="js/admin-shell.js?v=admin-v2-20260624"></script>
   <script src="js/admin.js?v=admin-v2-20260624"></script>
 </body>

@@ -11,6 +11,7 @@ const ADMIN_TAB_TITLES = {
   clients: { title: 'Clients', sub: 'Comptes clients et agents commerciaux' },
   prix: { title: 'Prix personnalisés', sub: 'Tarifs par société et volume' },
   analyses: { title: 'Analyses', sub: 'Gains, dépenses et résultat net' },
+  construction: { title: 'Construction du site', sub: 'Avancement, existant et tâches restantes' },
   chat: { title: 'Support & chat', sub: 'Modération et réponses clients' }
 };
 

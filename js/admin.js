@@ -34,6 +34,9 @@ function showAdminTab(tabId) {
   if (tabId === 'analyses' && typeof initAnalyticsAdminPanel === 'function') {
     initAnalyticsAdminPanel();
   }
+  if (tabId === 'construction' && typeof initRoadmapAdminPanel === 'function') {
+    initRoadmapAdminPanel();
+  }
   if (tabId === 'prix') loadCustomerPricesTable();
 }
 
@@ -110,6 +113,7 @@ async function initAdmin() {
   bindAppModal('supplierDetailModal');
   bindAppModal('analyticsExpenseModal');
   bindAppModal('stockIncidentModal');
+  bindAppModal('roadmapItemModal');
   document.getElementById('trackingModalForm')?.addEventListener('submit', handleTrackingModalSubmit);
   populateTrackingStatusSelect();
   populateOrderStatusFilter();
