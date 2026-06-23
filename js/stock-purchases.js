@@ -123,7 +123,7 @@ async function handleSupplierPurchaseSubmit(e) {
       }
     }
 
-    await createSupplierOrder({
+    await createSupplierOrderSafe({
       supplier_id: fd.get('supplier_id'),
       product_slug: fd.get('product_slug'),
       quantity,
@@ -141,12 +141,7 @@ async function handleSupplierPurchaseSubmit(e) {
     showAlert(note, 'Achat fournisseur enregistré. Le stock augmentera à la réception au dépôt.', 'success');
     await loadSupplierPurchasesTable();
   } catch (err) {
-    const msg = err.message || '';
-    if (/depot_received|schema cache|column/i.test(msg)) {
-      showAlert(note, 'Migration Supabase manquante. Exécutez supabase/migration-stock-supplier-orders-patch.sql (ou migration-stock-management.sql) dans le SQL Editor du projet HB Commerce.');
-    } else {
-      showAlert(note, msg);
-    }
+    showAlert(note, err.message || 'Erreur lors de l\'enregistrement.');
   }
 }
 

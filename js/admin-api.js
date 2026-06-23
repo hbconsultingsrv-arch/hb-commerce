@@ -379,6 +379,49 @@ async function createSupplierOrder(order) {
   return data;
 }
 
+/** Insert achat fournisseur — retire les colonnes absentes et met les infos en notes. */
+async function createSupplierOrderSafe(order) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+
+  const extras = [];
+  if (order.unit_price != null) extras.push(`Prix unitaire: ${order.unit_price} EUR`);
+  if (order.total_price != null) extras.push(`Total: ${order.total_price} EUR`);
+  if (order.order_date) extras.push(`Date achat: ${order.order_date}`);
+  if (order.invoice_url) extras.push(`Facture URL: ${order.invoice_url}`);
+  if (order.invoice_document_name) extras.push(`Facture fichier: ${order.invoice_document_name}`);
+
+  let payload = {
+    supplier_id: order.supplier_id,
+    product_slug: order.product_slug,
+    quantity: order.quantity,
+    status: order.status || 'requested',
+    expected_arrival_date: order.expected_arrival_date || null,
+    notes: [order.notes, ...extras].filter(Boolean).join('\n'),
+    unit_price: order.unit_price,
+    total_price: order.total_price,
+    order_date: order.order_date,
+    invoice_url: order.invoice_url,
+    invoice_document_name: order.invoice_document_name,
+    depot_received: order.depot_received
+  };
+
+  Object.keys(payload).forEach((key) => {
+    if (payload[key] === undefined) delete payload[key];
+  });
+
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const { data, error } = await sb.from('supplier_orders').insert(payload).select().single();
+    if (!error) return data;
+
+    const missing = error.message?.match(/Could not find the '([^']+)' column/);
+    if (!missing || !(missing[1] in payload)) throw error;
+    delete payload[missing[1]];
+  }
+
+  throw new Error('Impossible d\'enregistrer la commande fournisseur.');
+}
+
 async function updateSupplierOrder(id, fields) {
   const sb = getSupabase();
   if (!sb) throw new Error(configErrorMessage());

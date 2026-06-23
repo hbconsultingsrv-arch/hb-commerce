@@ -146,16 +146,59 @@ async function receiveProductStock({ productSlug, quantity, notes, supplierOrder
     p_user_id: session?.user?.id || null,
     p_supplier_order_id: supplierOrderId
   });
-  if (error) throw error;
-  return data;
+  if (!error) return data;
+
+  if (!/function|receive_product_stock|schema cache/i.test(error.message || '')) {
+    throw error;
+  }
+
+  const { data: product, error: fetchErr } = await sb
+    .from('products')
+    .select('id, stock_quantity')
+    .eq('slug', productSlug)
+    .single();
+  if (fetchErr || !product) throw fetchErr || new Error('Produit introuvable');
+
+  const newQty = Math.max(0, Number(product.stock_quantity) || 0) + quantity;
+  const { error: updateErr } = await sb
+    .from('products')
+    .update({ stock_quantity: newQty })
+    .eq('slug', productSlug);
+  if (updateErr) throw updateErr;
+  return newQty;
 }
 
 async function receiveSupplierOrderAtDepot(orderId) {
   const sb = getSupabase();
   if (!sb) throw new Error(configErrorMessage());
+
   const { data, error } = await sb.rpc('receive_supplier_order_at_depot', { p_order_id: orderId });
-  if (error) throw error;
-  return data;
+  if (!error) return data;
+
+  if (!/function|receive_supplier_order_at_depot|schema cache|column/i.test(error.message || '')) {
+    throw error;
+  }
+
+  const { data: order, error: fetchErr } = await sb
+    .from('supplier_orders')
+    .select('*')
+    .eq('id', orderId)
+    .single();
+  if (fetchErr || !order) throw fetchErr || new Error('Commande fournisseur introuvable');
+
+  if (order.status === 'received' || order.depot_received) {
+    throw new Error('Cette commande est déjà réceptionnée.');
+  }
+
+  const newQty = await receiveProductStock({
+    productSlug: order.product_slug,
+    quantity: order.quantity,
+    notes: `Réception dépôt — commande ${String(orderId).slice(0, 8)}`,
+    supplierOrderId: orderId
+  });
+
+  await updateSupplierOrder(orderId, { status: 'received' });
+  return newQty;
 }
 
 async function fetchLowStockProducts() {
