@@ -11,7 +11,7 @@ const HB_MARKETS = {
     brochurePage: 'brochure-france.html',
     contact: {
       phone: '07 52 56 51 23',
-      email: 'contact@hbconsulting.fr',
+      email: 'hb.consulting.srv@gmail.com',
       address: 'France — distribution nationale'
     },
     images: {
@@ -36,7 +36,7 @@ const HB_MARKETS = {
     brochurePage: 'brochure-luxembourg.html',
     contact: {
       phone: '07 52 56 51 23',
-      email: 'contact@hbconsulting.fr',
+      email: 'hb.consulting.srv@gmail.com',
       address: 'Luxembourg & Grande Région'
     },
     images: {

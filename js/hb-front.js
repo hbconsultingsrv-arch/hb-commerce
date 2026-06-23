@@ -183,7 +183,7 @@ function initContactForm() {
     e.preventDefault();
     const note = document.getElementById('contactFormNote');
     const fd = new FormData(form);
-    const email = getMarket()?.contact?.email || 'contact@hbconsulting.fr';
+    const email = getMarket()?.contact?.email || 'hb.consulting.srv@gmail.com';
     const subject = encodeURIComponent(`[HB Commerce] ${fd.get('subject') || 'Demande pro'}`);
     const body = encodeURIComponent(
       `Société: ${fd.get('company')}\nNom: ${fd.get('name')}\nTél: ${fd.get('phone')}\n\n${fd.get('message')}`

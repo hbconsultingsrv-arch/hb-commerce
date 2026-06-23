@@ -86,7 +86,7 @@
     const note = document.getElementById('quoteFormNote');
     const fd = new FormData(form);
     const market = typeof getMarket === 'function' ? getMarket() : null;
-    const email = market?.contact?.email || 'contact@hbconsulting.fr';
+    const email = market?.contact?.email || 'hb.consulting.srv@gmail.com';
     const subject = encodeURIComponent('[HB Commerce] Demande de devis professionnel');
     const body = encodeURIComponent(
       `DEMANDE DE DEVIS B2B\n\n`
