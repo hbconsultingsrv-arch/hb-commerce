@@ -43,7 +43,7 @@ async function loadSupplierPurchasesTable() {
 
   body.innerHTML = orders.map((order) => {
     const statusLabel = SUPPLIER_ORDER_STATUS_LABELS[order.status] || order.status;
-    const inTransit = IN_TRANSIT_STATUSES.includes(order.status) && !order.depot_received;
+    const inTransit = IN_TRANSIT_STATUSES.includes(order.status) && !(order.depot_received ?? false);
     const price = order.total_price != null
       ? formatPrice(order.total_price)
       : (order.unit_price != null ? formatPrice(order.unit_price * order.quantity) : '—');
@@ -134,15 +134,19 @@ async function handleSupplierPurchaseSubmit(e) {
       invoice_url: invoiceUrl,
       invoice_document_name: invoiceName,
       status: fd.get('initial_status') || 'shipped',
-      notes: fd.get('notes') || '',
-      depot_received: false
+      notes: fd.get('notes') || ''
     });
 
     e.target.reset();
     showAlert(note, 'Achat fournisseur enregistré. Le stock augmentera à la réception au dépôt.', 'success');
     await loadSupplierPurchasesTable();
   } catch (err) {
-    showAlert(note, err.message);
+    const msg = err.message || '';
+    if (/depot_received|schema cache|column/i.test(msg)) {
+      showAlert(note, 'Migration Supabase manquante. Exécutez supabase/migration-stock-supplier-orders-patch.sql (ou migration-stock-management.sql) dans le SQL Editor du projet HB Commerce.');
+    } else {
+      showAlert(note, msg);
+    }
   }
 }
 
