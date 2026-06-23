@@ -2,12 +2,12 @@
  * Admin — réception manuelle, historique mouvements
  */
 
-function populateStockReceiveProductSelect(products) {
-  const select = document.getElementById('stockReceiveProductSelect');
-  if (!select) return;
-  select.innerHTML = (products || [])
-    .map((p) => `<option value="${escapeHtml(p.slug)}">${escapeHtml(p.name)} (${getProductStockQuantity(p)} en stock)</option>`)
-    .join('');
+async function populateStockReceiveProductSelect(products) {
+  if (typeof refreshAdminComboboxes === 'function') {
+    await refreshAdminComboboxes();
+    return;
+  }
+  if (typeof renderAdminComboboxes === 'function') renderAdminComboboxes(products);
 }
 
 async function loadStockMovementsTable() {
@@ -20,7 +20,7 @@ async function loadStockMovementsTable() {
     return;
   }
 
-  const typeLabels = { purchase: 'Réappro / achat', sale: 'Vente', adjustment: 'Ajustement' };
+  const typeLabels = { purchase: 'Réappro / achat', sale: 'Vente', adjustment: 'Casse / perte / ajustement' };
 
   body.innerHTML = rows.map((row) => `
     <tr>
@@ -37,11 +37,16 @@ async function handleStockReceiveSubmit(e) {
   e.preventDefault();
   const note = document.getElementById('stockReceiveNote');
   const fd = new FormData(e.target);
-  const slug = fd.get('product_slug');
+  const products = await fetchAllProducts();
+  const slug = findProductSlugByInput(fd.get('product_name'), products);
   const quantity = parseInt(fd.get('quantity'), 10);
   const notes = fd.get('notes') || '';
 
-  if (!slug || !quantity || quantity <= 0) {
+  if (!slug) {
+    showAlert(note, 'Produit introuvable — choisissez dans la liste.');
+    return;
+  }
+  if (!quantity || quantity <= 0) {
     showAlert(note, 'Produit et quantité valides requis.');
     return;
   }
@@ -58,28 +63,15 @@ async function handleStockReceiveSubmit(e) {
     if (typeof renderStockAlertBanner === 'function') await renderStockAlertBanner();
     if (typeof renderStockAlertsPanel === 'function') await renderStockAlertsPanel();
     await loadStockMovementsTable();
-    const products = await fetchAllProducts();
-    populateStockReceiveProductSelect(products);
+    await populateStockReceiveProductSelect(products);
   } catch (err) {
     showAlert(note, err.message || 'Erreur lors de la réception stock.');
   }
 }
 
 function renderSupplierPurchaseSelectors() {
-  const supplierSelect = document.getElementById('supplierPurchaseSupplierSelect');
-  const productSelect = document.getElementById('supplierPurchaseProductSelect');
-  if (supplierSelect && adminSuppliers?.length) {
-    supplierSelect.innerHTML = adminSuppliers
-      .filter((s) => s.active)
-      .map((s) => `<option value="${s.id}">${escapeHtml(s.name)}</option>`)
-      .join('');
-  }
-  if (productSelect) {
-    fetchAllProducts().then((products) => {
-      productSelect.innerHTML = products
-        .map((p) => `<option value="${p.slug}">${escapeHtml(p.name || p.slug)}</option>`)
-        .join('');
-    }).catch(() => {});
+  if (typeof refreshAdminComboboxes === 'function') {
+    refreshAdminComboboxes();
   }
 }
 
@@ -88,8 +80,9 @@ async function initStockAdminPanel() {
   if (typeof renderStockAlertBanner === 'function') await renderStockAlertBanner();
   if (typeof renderSupplierPurchaseSelectors === 'function') renderSupplierPurchaseSelectors();
   if (typeof loadSupplierPurchasesTable === 'function') await loadSupplierPurchasesTable();
+  if (typeof initStockIncidentsPanel === 'function') await initStockIncidentsPanel();
   const products = await fetchAllProducts();
-  populateStockReceiveProductSelect(products);
+  await populateStockReceiveProductSelect(products);
   await loadStockMovementsTable();
 }
 

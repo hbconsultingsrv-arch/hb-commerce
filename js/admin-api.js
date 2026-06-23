@@ -17,7 +17,8 @@ async function requireAdmin() {
   if (!session) return null;
   const admin = await isAdmin();
   if (!admin) {
-    window.location.href = 'compte.html';
+    const profile = await getProfile(session.user.id);
+    window.location.href = isSupplierProfile(profile) ? 'supplier.html' : 'compte.html';
     return null;
   }
   return session;
@@ -225,7 +226,7 @@ async function createInternalUser({ email, password, fullName, phone, role }) {
   return savedProfile;
 }
 
-async function createSupplierUser({ supplierId, email, password, fullName, phone }) {
+async function createSupplierUser({ supplierId, email, password, fullName, phone, company, address, siren, vatNumber }) {
   const authClient = getDetachedSupabaseClient();
   const { data, error } = await authClient.auth.signUp({
     email,
@@ -235,7 +236,10 @@ async function createSupplierUser({ supplierId, email, password, fullName, phone
       data: {
         full_name: fullName || '',
         phone: phone || '',
-        company: 'Fournisseur'
+        company: company || 'Fournisseur',
+        address: address || '',
+        siren: siren || '',
+        vat_number: vatNumber || ''
       }
     }
   });
@@ -251,7 +255,10 @@ async function createSupplierUser({ supplierId, email, password, fullName, phone
       email,
       full_name: fullName || '',
       phone: phone || '',
-      company: 'Fournisseur',
+      company: company || 'Fournisseur',
+      address: address || '',
+      siren: siren || '',
+      vat_number: vatNumber || '',
       supplier_id: supplierId,
       role: 'supplier'
     }, { onConflict: 'id' })

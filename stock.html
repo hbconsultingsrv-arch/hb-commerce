@@ -9,7 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css?v=stock-20260619">
   <link rel="stylesheet" href="css/commerce.css?v=stock-20260619">
-  <link rel="stylesheet" href="css/stock.css?v=stock-20260619">
+  <link rel="stylesheet" href="css/stock.css?v=stock-incidents-20260615">
+  <link rel="stylesheet" href="css/analytics.css?v=stock-incidents-20260615">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
 <body class="dashboard-page">
@@ -41,8 +42,8 @@
       <section class="dashboard-card">
         <h2>Nouvel achat fournisseur</h2>
         <form id="supplierPurchaseForm" class="auth-form" enctype="multipart/form-data">
-          <label>Fournisseur<select name="supplier_id" id="supplierPurchaseSupplierSelect" required></select></label>
-          <label>Produit<select name="product_slug" id="supplierPurchaseProductSelect" required></select></label>
+          <label>Fournisseur<input type="text" name="supplier_name" id="supplierPurchaseSupplierInput" list="supplierPurchaseSupplierList" placeholder="Choisir ou saisir" required autocomplete="off"></label>
+          <label>Produit<input type="text" name="product_name" id="supplierPurchaseProductInput" list="supplierPurchaseProductList" placeholder="Choisir ou saisir" required autocomplete="off"></label>
           <div class="form-row">
             <label>Quantité<input type="number" name="quantity" min="1" required></label>
             <label>Prix unitaire (€)<input type="number" name="unit_price" min="0" step="0.01" required></label>
@@ -79,6 +80,24 @@
     </section>
 
     <section class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
+      <div class="dashboard-card-head">
+        <h2>Casse, pertes &amp; incidents</h2>
+        <button type="button" id="openStockIncidentModalBtn" class="btn btn-sm btn-primary btn-analytics-add" title="Ajouter un incident">+</button>
+      </div>
+      <p class="auth-sub">Enregistrez une casse, une perte ou un incident avec le montant perdu.</p>
+      <div class="table-wrap">
+        <table class="requests-table">
+          <thead>
+            <tr>
+              <th>Date</th><th>Type</th><th>Libellé</th><th>Montant</th><th>Détails</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="stockIncidentsBody"><tr><td colspan="6">Chargement…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
       <h2>Mouvements stock</h2>
       <table class="stock-movements-table">
         <thead><tr><th>Date</th><th>Produit</th><th>Type</th><th>Δ</th><th>Après</th></tr></thead>
@@ -87,15 +106,55 @@
     </section>
   </main>
 
+  <div id="stockIncidentModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog">
+      <div class="app-modal-header">
+        <h2>Ajouter casse / perte / incident</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
+        <form id="stockIncidentForm" class="auth-form">
+          <label>Type<select name="expense_type" required>
+            <option value="casse">Casse</option>
+            <option value="perte">Perte</option>
+            <option value="dommage">Dommage</option>
+            <option value="stock">Autre incident stock</option>
+            <option value="autre">Autre</option>
+          </select></label>
+          <label>Libellé<input type="text" name="label" required placeholder="Ex. Casse palette"></label>
+          <div class="form-row">
+            <label>Montant perdu (€)<input type="number" name="amount" required min="0" step="0.01"></label>
+            <label>Date<input type="date" name="expense_date" required></label>
+          </div>
+          <div class="form-row">
+            <label>Produit (optionnel)<input type="text" name="product_name" list="stockReceiveProductList" autocomplete="off"></label>
+            <label>Qté perdue (optionnel)<input type="number" name="quantity" min="1"></label>
+          </div>
+          <label>Ce qui s'est passé<textarea name="notes" rows="3"></textarea></label>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <p class="form-note" id="stockIncidentNote"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <datalist id="supplierPurchaseSupplierList"></datalist>
+  <datalist id="supplierPurchaseProductList"></datalist>
+  <datalist id="stockReceiveProductList"></datalist>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js?v=stock-20260619"></script>
   <script src="js/admin-api.js?v=stock-20260619"></script>
+  <script src="js/admin-utils.js?v=stock-20260619"></script>
+  <script src="js/admin-combobox.js?v=combobox-20260615"></script>
   <script src="js/stock.js?v=stock-20260619"></script>
   <script src="js/stock-alerts.js?v=stock-20260619"></script>
   <script src="js/stock-admin.js?v=stock-20260619"></script>
   <script src="js/stock-purchases.js?v=stock-20260619"></script>
+  <script src="js/stock-incidents.js?v=stock-incidents-20260615"></script>
   <script src="js/stock-page.js?v=stock-20260619"></script>
 </body>
 </html>

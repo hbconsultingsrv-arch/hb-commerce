@@ -17,8 +17,20 @@
   <link rel="stylesheet" href="css/hero-premium.css?v=hero-premium-20260624">
   <link rel="stylesheet" href="css/hb-b2b.css?v=b2b-20260624">
   <link rel="stylesheet" href="css/hb-site-depth.css?v=depth-20260624">
+  <link rel="stylesheet" href="css/hb-theme-light.css?v=theme-20260615">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
   <script src="js/markets.js"></script>
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem('hb_site_theme') === 'light') {
+          document.documentElement.classList.add('site-theme-light');
+        } else {
+          document.documentElement.classList.add('site-theme-dark');
+        }
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
 </head>
 <body>
   <header class="hero-commerce" id="accueil">
@@ -54,6 +66,7 @@
         <li id="navLogout" style="display:none"><a href="#" data-i18n="nav.logout">Déconnexion</a></li>
       </ul>
       <div class="site-nav-actions">
+        <button type="button" id="siteThemeToggleBtn" class="nav-icon-btn nav-theme-toggle" aria-label="Passer en mode clair" title="Mode clair">☀️</button>
         <div id="marketSelector" class="market-switcher" aria-label="Pays"></div>
         <a href="panier.html" class="nav-icon-btn nav-icon-btn--cart nav-cart-link">
           <span data-i18n="nav.cart">Panier</span>
@@ -625,6 +638,7 @@
   <script src="js/hb-front.js?v=front-v3-20260624"></script>
   <script src="js/quote-request.js?v=b2b-20260624"></script>
   <script src="js/b2b-ui.js?v=b2b-20260624"></script>
+  <script src="js/theme-toggle.js?v=theme-20260615"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const m = getMarket();

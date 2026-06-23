@@ -4,7 +4,7 @@
 create table if not exists public.business_expenses (
   id uuid primary key default gen_random_uuid(),
   expense_type text not null default 'autre' check (
-    expense_type in ('livraison', 'stock', 'logistique', 'fournisseur', 'autre')
+    expense_type in ('livraison', 'stock', 'logistique', 'fournisseur', 'casse', 'perte', 'dommage', 'autre')
   ),
   label text not null,
   amount numeric(12, 2) not null check (amount >= 0),

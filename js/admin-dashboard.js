@@ -5,10 +5,10 @@
 const ADMIN_TAB_TITLES = {
   accueil: { title: 'Tableau de bord', sub: 'Vue d\'ensemble de l\'activité HB Commerce' },
   produits: { title: 'Produits', sub: 'Catalogue, stock et tarification' },
-  fournisseurs: { title: 'Fournisseurs', sub: 'Partenaires et commandes' },
-  stock: { title: 'Stock & achats', sub: 'Dépôt, mouvements et réceptions' },
+  fournisseurs: { title: 'Fournisseurs', sub: 'Comptes fournisseurs et commandes' },
+  stock: { title: 'Stock & achats', sub: 'Dépôt, achats, casse/pertes et réceptions' },
   commandes: { title: 'Commandes clients', sub: 'Suivi des ventes B2B' },
-  clients: { title: 'Sociétés', sub: 'Clients, fournisseurs et agents' },
+  clients: { title: 'Clients', sub: 'Comptes clients et agents commerciaux' },
   prix: { title: 'Prix personnalisés', sub: 'Tarifs par société et volume' },
   analyses: { title: 'Analyses', sub: 'Gains, dépenses et résultat net' },
   chat: { title: 'Support & chat', sub: 'Modération et réponses clients' }

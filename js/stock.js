@@ -201,6 +201,44 @@ async function receiveSupplierOrderAtDepot(orderId) {
   return newQty;
 }
 
+async function adjustProductStockLoss({ productSlug, quantity, notes }) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  if (!productSlug || !quantity || quantity <= 0) {
+    throw new Error('Produit et quantité valides requis pour ajuster le stock.');
+  }
+
+  const session = await getSession();
+  const { data: product, error: fetchErr } = await sb
+    .from('products')
+    .select('id, slug, name, stock_quantity, min_stock_alert')
+    .eq('slug', productSlug)
+    .single();
+  if (fetchErr || !product) throw fetchErr || new Error('Produit introuvable');
+
+  const currentQty = Math.max(0, Number(product.stock_quantity) || 0);
+  const newQty = Math.max(0, currentQty - quantity);
+
+  const { error: updateErr } = await sb
+    .from('products')
+    .update({ stock_quantity: newQty })
+    .eq('slug', productSlug);
+  if (updateErr) throw updateErr;
+
+  const { error: movementErr } = await sb.from('stock_movements').insert({
+    product_slug: productSlug,
+    product_id: product.id,
+    movement_type: 'adjustment',
+    quantity_delta: -quantity,
+    quantity_after: newQty,
+    notes: notes || `Incident stock −${quantity}`,
+    created_by: session?.user?.id || null
+  });
+  if (movementErr) console.warn('stock_movements insert:', movementErr.message);
+
+  return newQty;
+}
+
 async function fetchLowStockProducts() {
   const sb = getSupabase();
   if (!sb) return [];
@@ -295,6 +333,7 @@ window.checkCartStock = checkCartStock;
 window.deductStockForOrder = deductStockForOrder;
 window.receiveProductStock = receiveProductStock;
 window.receiveSupplierOrderAtDepot = receiveSupplierOrderAtDepot;
+window.adjustProductStockLoss = adjustProductStockLoss;
 window.fetchLowStockProducts = fetchLowStockProducts;
 window.fetchPendingRestockMap = fetchPendingRestockMap;
 window.fetchStockAlerts = fetchStockAlerts;

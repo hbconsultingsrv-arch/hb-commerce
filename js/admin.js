@@ -3,7 +3,7 @@ let editingSupplierId = null;
 let adminSession = null;
 let adminProfile = null;
 let adminProfiles = [];
-let adminSuppliers = [];
+var adminSuppliers = [];
 let adminSelectedChatCompanyId = null;
 let adminChatBound = false;
 let adminOrders = [];
@@ -91,8 +91,8 @@ async function initAdmin() {
   const productForm = document.getElementById('productForm');
   productForm?.addEventListener('submit', handleProductSubmit);
   document.getElementById('cancelProductBtn')?.addEventListener('click', resetProductForm);
-  document.getElementById('supplierForm')?.addEventListener('submit', handleSupplierSubmit);
-  document.getElementById('cancelSupplierBtn')?.addEventListener('click', resetSupplierForm);
+  document.getElementById('adminSupplierForm')?.addEventListener('submit', handleAdminSupplierSubmit);
+  document.getElementById('cancelAdminSupplierBtn')?.addEventListener('click', resetAdminSupplierForm);
   document.getElementById('refreshSuppliersBtn')?.addEventListener('click', loadSuppliersTable);
   document.getElementById('supplierOrderForm')?.addEventListener('submit', handleSupplierOrderSubmit);
   document.getElementById('refreshPurchasesBtn')?.addEventListener('click', () => {
@@ -102,15 +102,14 @@ async function initAdmin() {
     initStockAdminPanel();
   }
   document.getElementById('adminClientForm')?.addEventListener('submit', handleAdminClientSubmit);
-  document.getElementById('adminCompanyTypeSelect')?.addEventListener('change', syncCompanyTypeFields);
   document.getElementById('refreshClientsBtn')?.addEventListener('click', loadClientsPanel);
   document.getElementById('adminCustomerPriceForm')?.addEventListener('submit', handleAdminCustomerPriceSubmit);
-  syncCompanyTypeFields();
   bindSectionTabs();
   initSectionTabScopes();
   bindAppModal('trackingModal');
   bindAppModal('supplierDetailModal');
   bindAppModal('analyticsExpenseModal');
+  bindAppModal('stockIncidentModal');
   document.getElementById('trackingModalForm')?.addEventListener('submit', handleTrackingModalSubmit);
   populateTrackingStatusSelect();
   populateOrderStatusFilter();
@@ -137,6 +136,7 @@ async function loadProductsTable() {
       + adminSuppliers.map((s) => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
   }
   renderProductSupplierSelect();
+  if (typeof refreshAdminComboboxes === 'function') await refreshAdminComboboxes();
   renderProductsTableBody();
 }
 
@@ -271,7 +271,10 @@ function editProduct(id, products) {
   form.price.value = p.price;
   if (form.purchase_price) form.purchase_price.value = p.purchase_price ?? '';
   form.unit.value = p.unit || 'litre';
-  if (form.supplier_id) form.supplier_id.value = p.supplier_id || '';
+  if (form.supplier_name) {
+    const supplier = adminSuppliers.find((s) => s.id === p.supplier_id);
+    form.supplier_name.value = supplier?.name || '';
+  }
   form.min_quantity.value = p.min_quantity || 1;
   if (form.stock_quantity) form.stock_quantity.value = p.stock_quantity ?? 0;
   if (form.min_stock_alert) form.min_stock_alert.value = p.min_stock_alert ?? 10;
@@ -340,8 +343,11 @@ async function handleProductSubmit(e) {
     imageUrl = typeof DEFAULT_PRODUCT_IMAGE !== 'undefined' ? DEFAULT_PRODUCT_IMAGE : 'images/prenium.PNG';
   }
 
-  const supplierRaw = fd.get('supplier_id');
-  const supplierId = supplierRaw && String(supplierRaw).trim() ? String(supplierRaw).trim() : null;
+  const supplierNameRaw = fd.get('supplier_name');
+  let supplierId = null;
+  if (supplierNameRaw && String(supplierNameRaw).trim()) {
+    supplierId = await resolveSupplierIdFromInput(supplierNameRaw, { createIfMissing: true });
+  }
 
   const product = {
     name: fd.get('name'),
@@ -387,53 +393,32 @@ async function handleProductSubmit(e) {
 }
 
 function renderProductSupplierSelect() {
-  const select = document.getElementById('productSupplierSelect');
-  if (!select) return;
-  select.innerHTML = '<option value="">— Aucun fournisseur —</option>'
-    + adminSuppliers
-      .filter((supplier) => supplier.active)
-      .map((supplier) => `<option value="${supplier.id}">${escapeHtml(supplier.name)}</option>`)
-      .join('');
-  renderSupplierOrderSelectors();
+  /* datalists remplies par refreshAdminComboboxes */
 }
 
 function renderSupplierOrderSelectors() {
-  const supplierSelect = document.getElementById('supplierOrderSupplierSelect');
-  const productSelect = document.getElementById('supplierOrderProductSelect');
-  if (supplierSelect) {
-    supplierSelect.innerHTML = adminSuppliers
-      .filter((supplier) => supplier.active)
-      .map((supplier) => `<option value="${supplier.id}">${escapeHtml(supplier.name)}</option>`)
-      .join('');
-  }
-  if (productSelect) {
-    fetchAllProducts().then((products) => {
-      productSelect.innerHTML = products
-        .map((product) => `<option value="${product.slug}">${escapeHtml(product.name || product.slug)}</option>`)
-        .join('');
-    }).catch(() => {});
-  }
+  /* datalists remplies par refreshAdminComboboxes */
 }
 
 async function loadSuppliersTable() {
   const body = document.getElementById('suppliersBody');
   try {
     adminSuppliers = await fetchAllSuppliers();
+    adminProfiles = adminProfiles.length ? adminProfiles : await fetchAllProfiles();
     const orders = await fetchSupplierOrders();
     adminSupplierOrdersCache = orders;
     const products = await fetchAllProducts();
     renderProductSupplierSelect();
+    if (typeof refreshAdminComboboxes === 'function') await refreshAdminComboboxes();
     if (!body) return;
 
     const statsBySupplier = new Map();
     orders.forEach((o) => {
       if (o.status === 'cancelled') return;
-      const cur = statsBySupplier.get(o.supplier_id) || { total: 0, count: 0, lastDate: null };
+      const cur = statsBySupplier.get(o.supplier_id) || { total: 0, count: 0 };
       const amt = o.total_price != null ? parseFloat(o.total_price) : (o.unit_price ? parseFloat(o.unit_price) * o.quantity : 0);
       cur.total += amt || 0;
       cur.count += 1;
-      const d = o.order_date || o.created_at;
-      if (!cur.lastDate || new Date(d) > new Date(cur.lastDate)) cur.lastDate = d;
       statsBySupplier.set(o.supplier_id, cur);
     });
 
@@ -443,40 +428,36 @@ async function loadSuppliersTable() {
       productsBySupplier.set(p.supplier_id, (productsBySupplier.get(p.supplier_id) || 0) + 1);
     });
 
-    body.innerHTML = adminSuppliers.length ? adminSuppliers.map((supplier) => {
-      const stats = statsBySupplier.get(supplier.id) || { total: 0, count: 0, lastDate: null };
-      const prodCount = productsBySupplier.get(supplier.id) || 0;
-      const avgDays = stats.count > 1 ? '—' : '—';
+    const supplierProfiles = adminProfiles.filter((profile) => profile.role === 'supplier');
+
+    body.innerHTML = supplierProfiles.length ? supplierProfiles.map((profile) => {
+      const supplier = adminSuppliers.find((item) => item.id === profile.supplier_id);
+      const supplierId = profile.supplier_id || supplier?.id;
+      const stats = statsBySupplier.get(supplierId) || { total: 0, count: 0 };
+      const prodCount = productsBySupplier.get(supplierId) || 0;
+      const isActive = supplier ? supplier.active : true;
       return `
       <tr>
-        <td><strong>${escapeHtml(supplier.name)}</strong><br><small>${escapeHtml(supplier.address || '')}</small></td>
-        <td>${escapeHtml(supplier.contact_name || '—')}<br><small>${escapeHtml(supplier.email || '')}</small></td>
-        <td>${escapeHtml(supplier.country || '—')}<br><small>${escapeHtml(supplier.vat_number || '—')}</small></td>
+        <td><strong>${escapeHtml(profile.company || supplier?.name || '—')}</strong><br><small>${escapeHtml(profile.address || supplier?.address || '')}</small></td>
+        <td>${escapeHtml(profile.full_name || supplier?.contact_name || '—')}<br><small>${escapeHtml(profile.phone || supplier?.phone || '')}</small></td>
+        <td>${escapeHtml(profile.vat_number || supplier?.vat_number || '—')}</td>
         <td>${prodCount} produit(s)</td>
-        <td>${stats.lastDate ? formatDate(stats.lastDate) : '—'}</td>
         <td><strong>${formatPrice(stats.total)}</strong><br><small>${stats.count} cmd</small></td>
-        <td>${supplier.active ? '<span class="stock-pill stock-pill--ok">Actif</span>' : '<span class="stock-pill stock-pill--out">Inactif</span>'}</td>
+        <td>${isActive ? '<span class="stock-pill stock-pill--ok">Actif</span>' : '<span class="stock-pill stock-pill--out">Inactif</span>'}</td>
+        <td>${escapeHtml(profile.email || supplier?.email || '—')}</td>
         <td>
-          <button type="button" class="btn btn-sm btn-outline-dark" data-view-supplier="${supplier.id}">Fiche</button>
-          <button type="button" class="btn btn-sm btn-outline-dark" data-edit-supplier="${supplier.id}">Modifier</button>
+          ${supplierId ? `<button type="button" class="btn btn-sm btn-outline-dark" data-view-supplier="${supplierId}">Fiche</button>` : ''}
+          ${supplierId ? `<button type="button" class="btn btn-sm btn-outline-dark" data-edit-supplier="${supplierId}">Modifier</button>` : ''}
         </td>
       </tr>
     `;
-    }).join('') : '<tr><td colspan="8">Aucun fournisseur.</td></tr>';
+    }).join('') : '<tr><td colspan="8">Aucun fournisseur enregistré.</td></tr>';
 
     body.querySelectorAll('[data-view-supplier]').forEach((btn) => {
       btn.addEventListener('click', () => openSupplierDetail(btn.dataset.viewSupplier, orders, products));
     });
     body.querySelectorAll('[data-edit-supplier]').forEach((btn) => {
       btn.addEventListener('click', () => editSupplier(btn.dataset.editSupplier));
-    });
-    body.querySelectorAll('[data-delete-supplier]').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        if (!confirm('Supprimer ce fournisseur ?')) return;
-        await deleteSupplier(btn.dataset.deleteSupplier);
-        await loadSuppliersTable();
-        await loadProductsTable();
-      });
     });
   } catch (err) {
     if (body) body.innerHTML = `<tr><td colspan="8">${escapeHtml(err.message)}</td></tr>`;
@@ -517,43 +498,49 @@ function openSupplierDetail(supplierId, orders, products) {
 
 function editSupplier(id) {
   const supplier = adminSuppliers.find((item) => item.id === id);
-  const form = document.getElementById('supplierForm');
+  const form = document.getElementById('adminSupplierForm');
+  const profile = adminProfiles.find((item) => item.supplier_id === id);
   if (!supplier || !form) return;
 
   editingSupplierId = id;
-  form.name.value = supplier.name || '';
-  form.contact_name.value = supplier.contact_name || '';
-  form.email.value = supplier.email || '';
-  form.phone.value = supplier.phone || '';
-  form.address.value = supplier.address || '';
+  form.company.value = profile?.company || supplier.name || '';
+  form.full_name.value = profile?.full_name || supplier.contact_name || '';
+  form.email.value = profile?.email || supplier.email || '';
+  form.phone.value = profile?.phone || supplier.phone || '';
+  form.address.value = profile?.address || supplier.address || '';
   form.country.value = supplier.country || '';
-  form.siren.value = supplier.siren || '';
-  form.vat_number.value = supplier.vat_number || '';
+  form.siren.value = profile?.siren || supplier.siren || '';
+  form.vat_number.value = profile?.vat_number || supplier.vat_number || '';
   form.notes.value = supplier.notes || '';
-  if (form.supplier_password) form.supplier_password.value = '';
+  if (form.password) {
+    form.password.value = '';
+    form.password.required = false;
+  }
   form.active.checked = supplier.active;
-  document.getElementById('supplierFormTitle').textContent = 'Modifier le fournisseur';
-  document.getElementById('saveSupplierBtn').textContent = 'Enregistrer';
-  activateSectionTab('panel-fournisseurs', 'ajouter');
+  document.getElementById('adminSupplierFormTitle').textContent = 'Modifier le fournisseur';
+  document.getElementById('saveAdminSupplierBtn').textContent = 'Enregistrer';
+  activateSectionTab('panel-fournisseurs', 'creer');
 }
 
-function resetSupplierForm() {
+function resetAdminSupplierForm() {
   editingSupplierId = null;
-  const form = document.getElementById('supplierForm');
+  const form = document.getElementById('adminSupplierForm');
   if (!form) return;
   form.reset();
   form.active.checked = true;
-  document.getElementById('supplierFormTitle').textContent = 'Ajouter un fournisseur';
-  document.getElementById('saveSupplierBtn').textContent = 'Ajouter';
+  if (form.password) form.password.required = true;
+  document.getElementById('adminSupplierFormTitle').textContent = 'Créer un fournisseur';
+  document.getElementById('saveAdminSupplierBtn').textContent = 'Créer le fournisseur';
+  activateSectionTab('panel-fournisseurs', 'liste');
 }
 
-async function handleSupplierSubmit(e) {
+async function handleAdminSupplierSubmit(e) {
   e.preventDefault();
-  const note = document.getElementById('supplierNote');
+  const note = document.getElementById('adminSupplierNote');
   const fd = new FormData(e.target);
-  const supplier = {
-    name: fd.get('name'),
-    contact_name: fd.get('contact_name') || '',
+  const supplierPayload = {
+    name: fd.get('company'),
+    contact_name: fd.get('full_name') || '',
     email: fd.get('email') || '',
     phone: fd.get('phone') || '',
     address: fd.get('address') || '',
@@ -565,31 +552,31 @@ async function handleSupplierSubmit(e) {
   };
 
   try {
-    let savedSupplier = null;
     if (editingSupplierId) {
-      savedSupplier = await updateSupplier(editingSupplierId, supplier);
+      await updateSupplier(editingSupplierId, supplierPayload);
       showAlert(note, 'Fournisseur mis à jour.', 'success');
     } else {
-      savedSupplier = await createSupplier(supplier);
-      showAlert(note, 'Fournisseur ajouté.', 'success');
-    }
-    const password = fd.get('supplier_password');
-    if (password && savedSupplier?.email) {
+      const supplier = await createSupplier(supplierPayload);
       await createSupplierUser({
-        supplierId: savedSupplier.id,
-        email: savedSupplier.email,
-        password,
-        fullName: savedSupplier.contact_name || savedSupplier.name,
-        phone: savedSupplier.phone
+        supplierId: supplier.id,
+        email: fd.get('email'),
+        password: fd.get('password'),
+        fullName: fd.get('full_name'),
+        phone: fd.get('phone'),
+        company: fd.get('company'),
+        address: fd.get('address'),
+        siren: fd.get('siren'),
+        vatNumber: fd.get('vat_number')
       });
-      showAlert(note, 'Fournisseur et compte fournisseur créés.', 'success');
+      showAlert(note, 'Fournisseur et compte créés.', 'success');
     }
-    resetSupplierForm();
+    resetAdminSupplierForm();
     activateSectionTab('panel-fournisseurs', 'liste');
     await loadSuppliersTable();
     await loadProductsTable();
+    adminProfiles = await fetchAllProfiles();
   } catch (err) {
-    showAlert(note, err.message);
+    showAlert(note, mapAuthError(err));
   }
 }
 
@@ -598,9 +585,20 @@ async function handleSupplierOrderSubmit(e) {
   const note = document.getElementById('supplierOrderNote');
   const fd = new FormData(e.target);
   try {
+    const supplierId = await resolveSupplierIdFromInput(fd.get('supplier_name'), { createIfMissing: true });
+    if (!supplierId) {
+      showAlert(note, 'Indiquez un fournisseur.');
+      return;
+    }
+    const products = await fetchAllProducts();
+    const productSlug = findProductSlugByInput(fd.get('product_name'), products);
+    if (!productSlug) {
+      showAlert(note, 'Produit introuvable — choisissez dans la liste ou créez-le d\'abord.');
+      return;
+    }
     await createSupplierOrder({
-      supplier_id: fd.get('supplier_id'),
-      product_slug: fd.get('product_slug'),
+      supplier_id: supplierId,
+      product_slug: productSlug,
       quantity: parseInt(fd.get('quantity'), 10),
       expected_arrival_date: fd.get('expected_arrival_date') || null,
       notes: fd.get('notes') || ''
@@ -802,7 +800,7 @@ async function loadClientsPanel() {
       revenueByUser.set(o.user_id, (revenueByUser.get(o.user_id) || 0) + (parseFloat(o.total) || 0));
     });
 
-    const clients = adminProfiles.filter((p) => ['pending_company', 'client', 'supplier'].includes(p.role));
+    const clients = adminProfiles.filter((p) => ['pending_company', 'client'].includes(p.role));
     const agents = adminProfiles.filter(isCommercialAssignableProfile);
     renderAgentSelect(document.getElementById('adminClientAgentSelect'), agents);
     body.innerHTML = clients.length ? clients.map((profile) => `
@@ -811,7 +809,7 @@ async function loadClientsPanel() {
         <td>
           ${isCommercialAgentProfile(adminProfile) ? companyRoleLabel(profile.role) : `
             <select data-company-role="${profile.id}">
-              ${['pending_company', 'client', 'supplier'].map((role) => `<option value="${role}" ${profile.role === role ? 'selected' : ''}>${companyRoleLabel(role)}</option>`).join('')}
+              ${['pending_company', 'client'].map((role) => `<option value="${role}" ${profile.role === role ? 'selected' : ''}>${companyRoleLabel(role)}</option>`).join('')}
             </select>
           `}
         </td>
@@ -828,7 +826,7 @@ async function loadClientsPanel() {
         </td>
         <td>${escapeHtml(profile.email || '—')}</td>
       </tr>
-    `).join('') : '<tr><td colspan="7">Aucune société.</td></tr>';
+    `).join('') : '<tr><td colspan="7">Aucun client enregistré.</td></tr>';
     body.querySelectorAll('[data-assign-agent]').forEach((select) => {
       select.addEventListener('change', async () => {
         await assignCommercialAgent(select.dataset.assignAgent, select.value);
@@ -853,37 +851,14 @@ async function loadClientsPanel() {
 }
 
 async function updateCompanyRole(profileId, role) {
-  const profile = adminProfiles.find((p) => p.id === profileId);
-  const fields = { role };
-  if (role === 'supplier') {
-    let supplierId = profile?.supplier_id;
-    if (!supplierId) {
-      const supplier = await createSupplier({
-        name: profile?.company || profile?.full_name || profile?.email || 'Fournisseur',
-        contact_name: profile?.full_name || '',
-        email: profile?.email || '',
-        phone: profile?.phone || '',
-        address: profile?.address || '',
-        siren: profile?.siren || '',
-        vat_number: profile?.vat_number || '',
-        active: true
-      });
-      supplierId = supplier.id;
-    }
-    fields.supplier_id = supplierId;
-    fields.commercial_agent_id = null;
-  }
-  if (role === 'client' || role === 'pending_company') {
-    fields.supplier_id = null;
-  }
-  await updateProfileAsSuperRoot(profileId, fields);
+  if (!['pending_company', 'client'].includes(role)) return;
+  await updateProfileAsSuperRoot(profileId, { role, supplier_id: null });
 }
 
 function companyRoleLabel(role) {
   return {
     pending_company: 'À affecter',
-    client: 'Client',
-    supplier: 'Fournisseur'
+    client: 'Client'
   }[role] || role || '—';
 }
 
@@ -898,63 +873,29 @@ function agentName(agentId, agents) {
   return agent ? commercialAgentLabel(agent) : 'Aucun agent';
 }
 
-function syncCompanyTypeFields() {
-  const type = document.getElementById('adminCompanyTypeSelect')?.value || 'client';
-  document.querySelectorAll('.client-only-field').forEach((el) => {
-    el.style.display = (type === 'client' || type === 'mixed') ? '' : 'none';
-  });
-}
-
 async function handleAdminClientSubmit(e) {
   e.preventDefault();
   const note = document.getElementById('adminClientNote');
   const fd = new FormData(e.target);
-  const companyType = fd.get('company_type');
   try {
-    if (companyType === 'supplier' || companyType === 'mixed') {
-      const supplier = await createSupplier({
-        name: fd.get('company'),
-        contact_name: fd.get('full_name'),
-        email: fd.get('email'),
-        phone: fd.get('phone'),
-        address: fd.get('address'),
-        siren: fd.get('siren'),
-        vat_number: fd.get('vat_number'),
-        active: true
-      });
-      if (companyType === 'supplier') {
-        await createSupplierUser({
-          supplierId: supplier.id,
-          email: fd.get('email'),
-          password: fd.get('password'),
-          fullName: fd.get('full_name'),
-          phone: fd.get('phone')
-        });
-      }
-    }
-    if (companyType === 'client' || companyType === 'mixed') {
-      await createClientUser({
-        email: fd.get('email'),
-        password: fd.get('password'),
-        fullName: fd.get('full_name'),
-        phone: fd.get('phone'),
-        address: fd.get('address'),
-        company: fd.get('company'),
-        siren: fd.get('siren'),
-        vatNumber: fd.get('vat_number'),
-        commercialAgentId: fd.get('commercial_agent_id')
-      });
-    }
+    await createClientUser({
+      email: fd.get('email'),
+      password: fd.get('password'),
+      fullName: fd.get('full_name'),
+      phone: fd.get('phone'),
+      address: fd.get('address'),
+      company: fd.get('company'),
+      siren: fd.get('siren'),
+      vatNumber: fd.get('vat_number'),
+      commercialAgentId: fd.get('commercial_agent_id')
+    });
     e.target.reset();
-    const labels = { client: 'Société cliente créée.', supplier: 'Société fournisseur créée.', mixed: 'Société mixte créée (client + fournisseur).' };
-    showAlert(note, labels[companyType] || 'Société créée.', 'success');
+    showAlert(note, 'Client créé.', 'success');
     activateSectionTab('panel-clients', 'liste');
     await loadClientsPanel();
-    await loadSuppliersTable();
     await loadAdminChatPanel();
     updateAdminNavBadges();
     await loadAdminPricePanel();
-    syncCompanyTypeFields();
   } catch (err) {
     showAlert(note, mapAuthError(err));
   }

@@ -9,8 +9,14 @@ async function initStockPage() {
     orderDate.value = new Date().toISOString().slice(0, 10);
   }
 
+  if (typeof fetchAllSuppliers === 'function') {
+    adminSuppliers = await fetchAllSuppliers();
+  }
+
   if (typeof renderSupplierPurchaseSelectors === 'function') renderSupplierPurchaseSelectors();
+  if (typeof bindAppModal === 'function') bindAppModal('stockIncidentModal');
   if (typeof initStockAdminPanel === 'function') await initStockAdminPanel();
+  if (typeof initStockIncidentsPanel === 'function') await initStockIncidentsPanel();
   await renderLowStockList();
 }
 

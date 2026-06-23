@@ -7,6 +7,9 @@ const EXPENSE_TYPE_LABELS = {
   stock: 'Demande stock',
   logistique: 'Logistique',
   fournisseur: 'Fournisseur',
+  casse: 'Casse',
+  perte: 'Perte',
+  dommage: 'Dommage',
   autre: 'Autre'
 };
 

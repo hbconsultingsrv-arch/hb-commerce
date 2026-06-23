@@ -124,9 +124,21 @@ async function handleSupplierPurchaseSubmit(e) {
       }
     }
 
+    const supplierId = await resolveSupplierIdFromInput(fd.get('supplier_name'), { createIfMissing: true });
+    if (!supplierId) {
+      showAlert(note, 'Indiquez un fournisseur.');
+      return;
+    }
+    const products = await fetchAllProducts();
+    const productSlug = findProductSlugByInput(fd.get('product_name'), products);
+    if (!productSlug) {
+      showAlert(note, 'Produit introuvable — choisissez dans la liste ou créez-le d\'abord.');
+      return;
+    }
+
     await createSupplierOrderSafe({
-      supplier_id: fd.get('supplier_id'),
-      product_slug: fd.get('product_slug'),
+      supplier_id: supplierId,
+      product_slug: productSlug,
       quantity,
       unit_price: Number.isFinite(unitPrice) ? unitPrice : null,
       total_price: Number.isFinite(unitPrice) ? unitPrice * quantity : null,

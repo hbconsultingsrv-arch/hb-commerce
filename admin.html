@@ -32,7 +32,7 @@
         <button type="button" class="admin-nav-item admin-only" data-tab="fournisseurs"><span class="admin-nav-icon">◎</span> Fournisseurs</button>
         <button type="button" class="admin-nav-item admin-only" data-tab="stock"><span class="admin-nav-icon">▤</span> Stock &amp; achats</button>
         <button type="button" class="admin-nav-item" data-tab="commandes"><span class="admin-nav-icon">☰</span> Commandes</button>
-        <button type="button" class="admin-nav-item" data-tab="clients"><span class="admin-nav-icon">◇</span> Sociétés</button>
+        <button type="button" class="admin-nav-item" data-tab="clients"><span class="admin-nav-icon">◇</span> Clients</button>
         <button type="button" class="admin-nav-item" data-tab="prix"><span class="admin-nav-icon">€</span> Prix clients</button>
         <button type="button" class="admin-nav-item admin-only" data-tab="analyses"><span class="admin-nav-icon">◈</span> Analyses</button>
         <button type="button" class="admin-nav-item" data-tab="chat"><span class="admin-nav-icon">✉</span> Support<span class="admin-nav-badge" id="adminChatNavBadge" hidden></span></button>
@@ -55,9 +55,7 @@
             <p id="adminTopbarSub">Vue d'ensemble de l'activité HB Commerce</p>
           </div>
         </div>
-        <div class="admin-topbar-actions">
-          <a href="index.html" class="btn btn-sm btn-outline-dark">Site public</a>
-        </div>
+        <div class="admin-topbar-actions"></div>
       </header>
 
       <main class="admin-content">
@@ -69,7 +67,7 @@
           <button type="button" class="admin-tab admin-only" data-tab="fournisseurs">Fournisseurs</button>
           <button type="button" class="admin-tab admin-only" data-tab="stock">Stock</button>
           <button type="button" class="admin-tab" data-tab="commandes">Commandes</button>
-          <button type="button" class="admin-tab" data-tab="clients">Sociétés</button>
+          <button type="button" class="admin-tab" data-tab="clients">Clients</button>
           <button type="button" class="admin-tab" data-tab="prix">Prix</button>
           <button type="button" class="admin-tab admin-only" data-tab="analyses">Analyses</button>
           <button type="button" class="admin-tab" data-tab="chat">Chat</button>
@@ -152,11 +150,11 @@
           <div class="form-row">
             <label>
               Origine
-              <input type="text" name="origin" placeholder="Tunisie">
+              <input type="text" name="origin" list="productOriginList" placeholder="Tunisie" autocomplete="off">
             </label>
             <label>
               Catégorie
-              <input type="text" name="category" placeholder="huiles">
+              <input type="text" name="category" list="productCategoryList" placeholder="huiles" autocomplete="off">
             </label>
           </div>
           <div class="form-row">
@@ -181,9 +179,8 @@
           </div>
           <label>
             Fournisseur <span class="form-optional">(optionnel)</span>
-            <select name="supplier_id" id="productSupplierSelect">
-              <option value="">— Aucun fournisseur —</option>
-            </select>
+            <input type="text" name="supplier_name" id="productSupplierInput" list="supplierNameList" placeholder="Choisir ou saisir un fournisseur" autocomplete="off">
+            <span class="form-note">Sélectionnez dans la liste ou tapez un nouveau nom — il sera créé à l'enregistrement.</span>
           </label>
           <div class="form-row">
             <label>
@@ -243,8 +240,8 @@
 
     <section id="panel-fournisseurs" class="admin-panel admin-only" hidden data-tab-scope>
       <div class="section-tabs" data-section-tabs>
-        <button type="button" class="section-tab active" data-section="liste">Fournisseurs</button>
-        <button type="button" class="section-tab" data-section="ajouter">Ajouter</button>
+        <button type="button" class="section-tab active" data-section="liste">Fournisseurs enregistrés</button>
+        <button type="button" class="section-tab" data-section="creer">Créer un fournisseur</button>
         <button type="button" class="section-tab" data-section="commander">Commander</button>
       </div>
 
@@ -257,13 +254,13 @@
           <table class="requests-table">
             <thead>
               <tr>
-                <th>Fournisseur</th>
+                <th>Société</th>
                 <th>Contact</th>
-                <th>Pays / TVA</th>
+                <th>TVA</th>
                 <th>Produits</th>
-                <th>Dernière cmd</th>
                 <th>Total achats</th>
                 <th>Statut</th>
+                <th>E-mail</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -272,23 +269,23 @@
         </div>
       </div>
 
-      <div data-section-panel="ajouter" class="dashboard-card" hidden>
-        <h2 id="supplierFormTitle">Ajouter un fournisseur</h2>
-        <form id="supplierForm" class="auth-form">
+      <div data-section-panel="creer" class="dashboard-card" hidden>
+        <h2 id="adminSupplierFormTitle">Créer un fournisseur</h2>
+        <form id="adminSupplierForm" class="auth-form">
           <div class="form-row">
             <label>
-              Nom fournisseur
-              <input type="text" name="name" required placeholder="Nom du fournisseur">
+              Société fournisseur
+              <input type="text" name="company" required placeholder="Nom de la société fournisseur">
             </label>
             <label>
               Contact
-              <input type="text" name="contact_name" placeholder="Nom du contact">
+              <input type="text" name="full_name" required placeholder="Nom du contact">
             </label>
           </div>
           <div class="form-row">
             <label>
-              E-mail
-              <input type="email" name="email" placeholder="contact@fournisseur.com">
+              E-mail de connexion
+              <input type="email" name="email" required placeholder="contact@fournisseur.com">
             </label>
             <label>
               Téléphone
@@ -297,12 +294,12 @@
           </div>
           <label>
             Adresse
-            <input type="text" name="address" placeholder="Adresse fournisseur">
+            <input type="text" name="address" placeholder="Adresse complète">
           </label>
           <div class="form-row">
             <label>
               Pays
-              <input type="text" name="country" placeholder="Pays">
+              <input type="text" name="country" list="supplierCountryList" placeholder="France, Tunisie…" autocomplete="off">
             </label>
             <label>
               SIREN / Identifiant
@@ -314,21 +311,21 @@
             <input type="text" name="vat_number" placeholder="Code TVA">
           </label>
           <label>
-            Mot de passe espace fournisseur (optionnel)
-            <input type="password" name="supplier_password" minlength="6" autocomplete="new-password" placeholder="Créer un compte fournisseur">
+            Mot de passe temporaire
+            <input type="password" name="password" minlength="6" required autocomplete="new-password" placeholder="Mot de passe espace fournisseur">
           </label>
           <label>
-            Notes
+            Notes internes
             <textarea name="notes" rows="3" placeholder="Conditions, produits, remarques"></textarea>
           </label>
           <label class="checkbox-label">
             <input type="checkbox" name="active" checked> Fournisseur actif
           </label>
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary" id="saveSupplierBtn">Ajouter</button>
-            <button type="button" id="cancelSupplierBtn" class="btn btn-outline-dark">Annuler</button>
+            <button type="submit" class="btn btn-primary" id="saveAdminSupplierBtn">Créer le fournisseur</button>
+            <button type="button" class="btn btn-outline-dark" id="cancelAdminSupplierBtn">Annuler</button>
           </div>
-          <p class="form-note" id="supplierNote"></p>
+          <p class="form-note" id="adminSupplierNote"></p>
         </form>
       </div>
 
@@ -337,11 +334,11 @@
         <form id="supplierOrderForm" class="auth-form">
           <label>
             Fournisseur
-            <select name="supplier_id" id="supplierOrderSupplierSelect" required></select>
+            <input type="text" name="supplier_name" id="supplierOrderSupplierInput" list="supplierOrderSupplierList" placeholder="Choisir ou saisir" required autocomplete="off">
           </label>
           <label>
             Produit
-            <select name="product_slug" id="supplierOrderProductSelect" required></select>
+            <input type="text" name="product_name" id="supplierOrderProductInput" list="supplierOrderProductList" placeholder="Choisir ou saisir" required autocomplete="off">
           </label>
           <div class="form-row">
             <label>
@@ -371,8 +368,8 @@
           <h2>Achat fournisseur (admin / super)</h2>
           <p class="auth-sub invoice-hint">Enregistrez quantité, prix, date et facture. Le stock dépôt n'augmente qu'après réception au dépôt (livraison terminée).</p>
           <form id="supplierPurchaseForm" class="auth-form" enctype="multipart/form-data">
-            <label>Fournisseur<select name="supplier_id" id="supplierPurchaseSupplierSelect" required></select></label>
-            <label>Produit<select name="product_slug" id="supplierPurchaseProductSelect" required></select></label>
+            <label>Fournisseur<input type="text" name="supplier_name" id="supplierPurchaseSupplierInput" list="supplierPurchaseSupplierList" placeholder="Choisir ou saisir" required autocomplete="off"></label>
+            <label>Produit<input type="text" name="product_name" id="supplierPurchaseProductInput" list="supplierPurchaseProductList" placeholder="Choisir ou saisir" required autocomplete="off"></label>
             <div class="form-row">
               <label>Quantité<input type="number" name="quantity" min="1" required></label>
               <label>Prix unitaire (€)<input type="number" name="unit_price" min="0" step="0.01" required></label>
@@ -401,7 +398,7 @@
           <h2>Réception manuelle au dépôt</h2>
           <p class="auth-sub">Hors workflow fournisseur — ajustement direct du stock dépôt.</p>
           <form id="stockReceiveForm" class="auth-form">
-            <label>Produit<select name="product_slug" id="stockReceiveProductSelect" required></select></label>
+            <label>Produit<input type="text" name="product_name" id="stockReceiveProductInput" list="stockReceiveProductList" placeholder="Choisir ou saisir" required autocomplete="off"></label>
             <label>Quantité reçue<input type="number" name="quantity" min="1" required></label>
             <label>Notes<textarea name="notes" rows="2"></textarea></label>
             <button type="submit" class="btn btn-primary">Ajouter au stock</button>
@@ -432,6 +429,32 @@
             </thead>
             <tbody id="supplierPurchasesBody">
               <tr><td colspan="9">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
+        <div class="dashboard-card-head">
+          <h2>Casse, pertes &amp; incidents</h2>
+          <button type="button" id="openStockIncidentModalBtn" class="btn btn-sm btn-primary btn-analytics-add" title="Ajouter un incident">+</button>
+        </div>
+        <p class="auth-sub">Enregistrez une casse, une perte ou un incident avec le montant perdu et ce qui s'est passé. Vous pouvez aussi retirer des unités du stock dépôt.</p>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Libellé</th>
+                <th>Montant perdu</th>
+                <th>Détails</th>
+                <th>Enregistré le</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="stockIncidentsBody">
+              <tr><td colspan="7">Chargement…</td></tr>
             </tbody>
           </table>
         </div>
@@ -484,13 +507,13 @@
 
     <section id="panel-clients" class="admin-panel" hidden data-tab-scope>
       <div class="section-tabs" data-section-tabs>
-        <button type="button" class="section-tab active" data-section="liste">Sociétés enregistrées</button>
-        <button type="button" class="section-tab admin-only" data-section="creer">Créer une société</button>
+        <button type="button" class="section-tab active" data-section="liste">Clients enregistrés</button>
+        <button type="button" class="section-tab admin-only" data-section="creer">Créer un client</button>
       </div>
 
       <div data-section-panel="liste" class="dashboard-card dashboard-card-wide">
         <div class="dashboard-card-head">
-          <h2>Sociétés clients / fournisseurs</h2>
+          <h2>Clients enregistrés</h2>
           <button type="button" id="refreshClientsBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
         </div>
         <div class="table-wrap">
@@ -498,12 +521,12 @@
             <thead>
               <tr>
                 <th>Société</th>
-                <th>Type</th>
+                <th>Statut</th>
                 <th>Contact</th>
                 <th>TVA</th>
                 <th>CA généré</th>
                 <th>Agent</th>
-                <th>Email</th>
+                <th>E-mail</th>
               </tr>
             </thead>
             <tbody id="clientsBody"></tbody>
@@ -512,19 +535,11 @@
       </div>
 
       <div data-section-panel="creer" class="dashboard-card admin-only" hidden>
-        <h2>Créer société client / fournisseur</h2>
+        <h2>Créer un client</h2>
         <form id="adminClientForm" class="auth-form">
-          <label>
-            Type de société
-            <select name="company_type" id="adminCompanyTypeSelect" required>
-              <option value="client">Client</option>
-              <option value="supplier">Fournisseur</option>
-              <option value="mixed">Mixte (client + fournisseur)</option>
-            </select>
-          </label>
           <div class="form-row">
             <label>
-              Société
+              Société cliente
               <input type="text" name="company" required placeholder="Nom de la société">
             </label>
             <label>
@@ -543,7 +558,7 @@
             </label>
           </div>
           <label>
-            Adresse société
+            Adresse
             <input type="text" name="address" required placeholder="Adresse complète">
           </label>
           <div class="form-row">
@@ -556,7 +571,7 @@
               <input type="text" name="vat_number" required placeholder="FR...">
             </label>
           </div>
-          <label class="client-only-field">
+          <label>
             Agent commercial
             <select name="commercial_agent_id" id="adminClientAgentSelect">
               <option value="">Aucun agent assigné</option>
@@ -566,7 +581,7 @@
             Mot de passe temporaire
             <input type="password" name="password" minlength="6" required autocomplete="new-password">
           </label>
-          <button type="submit" class="btn btn-primary">Créer la société</button>
+          <button type="submit" class="btn btn-primary">Créer le client</button>
           <p class="form-note" id="adminClientNote"></p>
         </form>
       </div>
@@ -722,6 +737,60 @@
     </div>
   </div>
 
+  <div id="stockIncidentModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog">
+      <div class="app-modal-header">
+        <h2>Ajouter casse / perte / incident</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
+        <form id="stockIncidentForm" class="auth-form">
+          <label>
+            Type d'incident
+            <select name="expense_type" required>
+              <option value="casse">Casse</option>
+              <option value="perte">Perte</option>
+              <option value="dommage">Dommage</option>
+              <option value="stock">Autre incident stock</option>
+              <option value="autre">Autre</option>
+            </select>
+          </label>
+          <label>
+            Libellé
+            <input type="text" name="label" required placeholder="Ex. Casse palette huile d'olive">
+          </label>
+          <div class="form-row">
+            <label>
+              Montant perdu (€)
+              <input type="number" name="amount" required min="0" step="0.01">
+            </label>
+            <label>
+              Date
+              <input type="date" name="expense_date" required>
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Produit concerné <span class="form-optional">(optionnel)</span>
+              <input type="text" name="product_name" list="stockReceiveProductList" placeholder="Choisir ou saisir" autocomplete="off">
+            </label>
+            <label>
+              Quantité perdue <span class="form-optional">(optionnel)</span>
+              <input type="number" name="quantity" min="1" placeholder="Unités retirées du stock">
+            </label>
+          </div>
+          <label>
+            Ce qui s'est passé
+            <textarea name="notes" rows="3" placeholder="Décrivez l'incident, la cause, les actions prises…"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Enregistrer l'incident</button>
+          <p class="form-note" id="stockIncidentNote"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div id="analyticsExpenseModal" class="app-modal" hidden>
     <div class="app-modal-backdrop" data-close-modal></div>
     <div class="app-modal-dialog">
@@ -738,6 +807,9 @@
               <option value="stock">Demande stock</option>
               <option value="logistique">Logistique</option>
               <option value="fournisseur">Fournisseur</option>
+              <option value="casse">Casse</option>
+              <option value="perte">Perte</option>
+              <option value="dommage">Dommage</option>
               <option value="autre">Autre</option>
             </select>
           </label>
@@ -815,6 +887,16 @@
     </div>
   </div>
 
+  <datalist id="supplierNameList"></datalist>
+  <datalist id="supplierOrderSupplierList"></datalist>
+  <datalist id="supplierOrderProductList"></datalist>
+  <datalist id="supplierPurchaseSupplierList"></datalist>
+  <datalist id="supplierPurchaseProductList"></datalist>
+  <datalist id="stockReceiveProductList"></datalist>
+  <datalist id="productCategoryList"></datalist>
+  <datalist id="productOriginList"></datalist>
+  <datalist id="supplierCountryList"></datalist>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
@@ -824,9 +906,11 @@
   <script src="js/stock-alerts.js?v=stock-fallback-20260623"></script>
   <script src="js/stock-admin.js?v=stock-fallback-20260623"></script>
   <script src="js/stock-purchases.js?v=stock-fallback-20260623"></script>
+  <script src="js/stock-incidents.js?v=stock-incidents-20260615"></script>
   <script src="js/product-image-upload.js?v=product-img-20260624"></script>
   <script src="js/analytics-admin.js?v=analytics-20260624"></script>
   <script src="js/admin-utils.js?v=admin-v2-20260624"></script>
+  <script src="js/admin-combobox.js?v=combobox-20260615"></script>
   <script src="js/admin-dashboard.js?v=admin-v2-20260624"></script>
   <script src="js/admin-shell.js?v=admin-v2-20260624"></script>
   <script src="js/admin.js?v=admin-v2-20260624"></script>

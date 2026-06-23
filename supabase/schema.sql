@@ -334,12 +334,13 @@ create policy "Admin manage products" on public.products for all
 drop policy if exists "Public read product stocks" on public.product_stocks;
 drop policy if exists "Admin manage product stocks" on public.product_stocks;
 drop policy if exists "Supplier manage own product stocks" on public.product_stocks;
+drop policy if exists "Supplier read own product stocks" on public.product_stocks;
 
 create policy "Public read product stocks" on public.product_stocks for select using (true);
 create policy "Admin manage product stocks" on public.product_stocks for all
   using (public.is_admin()) with check (public.is_admin());
-create policy "Supplier manage own product stocks" on public.product_stocks for all
-  using (public.is_own_supplier(supplier_id)) with check (public.is_own_supplier(supplier_id));
+create policy "Supplier read own product stocks" on public.product_stocks for select
+  using (public.is_own_supplier(supplier_id));
 
 -- Commandes fournisseur
 drop policy if exists "Admin manage supplier orders" on public.supplier_orders;
@@ -349,8 +350,6 @@ drop policy if exists "Supplier update own supplier orders" on public.supplier_o
 create policy "Admin manage supplier orders" on public.supplier_orders for all
   using (public.is_admin()) with check (public.is_admin());
 create policy "Supplier read own supplier orders" on public.supplier_orders for select
-  using (public.is_own_supplier(supplier_id));
-create policy "Supplier update own supplier orders" on public.supplier_orders for update
   using (public.is_own_supplier(supplier_id));
 
 -- Commandes

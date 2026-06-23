@@ -149,6 +149,30 @@
 
 .movement-purchase { color: #1a5c4a; font-weight: 700; }
 .movement-sale { color: #8a1f1f; font-weight: 700; }
+.movement-adjustment { color: #9b1c1c; font-weight: 700; }
+
+.stock-incident-badge {
+  display: inline-flex;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #fde8e8;
+  color: #9b1c1c;
+  border: 1px solid rgba(155, 28, 28, 0.2);
+}
+
+.stock-incident-badge--perte {
+  background: #fff2c2;
+  color: #7a5b00;
+  border-color: rgba(201, 162, 39, 0.35);
+}
+
+.stock-incident-badge--dommage {
+  background: #f3e8ff;
+  color: #6b21a8;
+  border-color: rgba(107, 33, 168, 0.25);
+}
 
 .invoice-hint {
   font-size: 0.82rem;
