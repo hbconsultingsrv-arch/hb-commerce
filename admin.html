@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css?v=chat-mod-20260619">
   <link rel="stylesheet" href="css/commerce.css?v=chat-mod-20260619">
+  <link rel="stylesheet" href="css/stock.css?v=stock-20260619">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
 <body class="dashboard-page">
@@ -22,6 +23,7 @@
     </a>
     <div class="nav-actions">
       <a href="super-root.html" id="superRootLink" class="btn btn-sm btn-primary" style="display:none">Super root</a>
+      <a href="stock.html" class="btn btn-sm btn-outline-light admin-only">Stock</a>
       <a href="index.html" class="btn btn-sm btn-outline-light">Voir le site</a>
       <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
     </div>
@@ -31,12 +33,15 @@
     <header class="dashboard-header">
       <span class="section-tag">Administration</span>
       <h1>Dashboard HB Commerce</h1>
-      <p class="auth-sub">Gérez les sociétés clientes et fournisseurs, le catalogue, les prix, les commandes, l'affectation des agents commerciaux et la modération du chat.</p>
+      <p class="auth-sub">Gérez les sociétés clientes et fournisseurs, le catalogue, les prix, les commandes, le stock dépôt, les achats fournisseur et la modération du chat.</p>
     </header>
+
+    <div id="stockAlertBanner" hidden></div>
 
     <div class="admin-tabs">
       <button type="button" class="admin-tab active" data-tab="produits">Produits</button>
       <button type="button" class="admin-tab admin-only" data-tab="fournisseurs">Fournisseurs</button>
+      <button type="button" class="admin-tab admin-only" data-tab="stock">Stock &amp; achats</button>
       <button type="button" class="admin-tab" data-tab="commandes">Commandes</button>
       <button type="button" class="admin-tab" data-tab="clients">Sociétés</button>
       <button type="button" class="admin-tab" data-tab="prix">Prix clients</button>
@@ -59,6 +64,7 @@
                 <th>Produit</th>
                 <th>Fournisseur</th>
                 <th>Prix</th>
+                <th>Stock dépôt</th>
                 <th>Badge</th>
                 <th>Statut</th>
                 <th>Actions</th>
@@ -120,6 +126,16 @@
             <label>
               Badge
               <input type="text" name="tag" placeholder="Produit phare">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Stock dépôt (unités)
+              <input type="number" name="stock_quantity" min="0" value="0">
+            </label>
+            <label>
+              Seuil alerte
+              <input type="number" name="min_stock_alert" min="0" value="10" title="Alerte admin quand le stock atteint ce niveau">
             </label>
           </div>
           <label>
@@ -262,6 +278,93 @@
           <p class="form-note" id="supplierOrderNote"></p>
         </form>
       </div>
+    </section>
+
+    <section id="panel-stock" class="admin-panel admin-only" hidden>
+      <div id="stockAlertsPanel"></div>
+
+      <div class="dashboard-grid">
+        <section class="dashboard-card">
+          <h2>Achat fournisseur (admin / super)</h2>
+          <p class="auth-sub invoice-hint">Enregistrez quantité, prix, date et facture. Le stock dépôt n'augmente qu'après réception au dépôt (livraison terminée).</p>
+          <form id="supplierPurchaseForm" class="auth-form" enctype="multipart/form-data">
+            <label>Fournisseur<select name="supplier_id" id="supplierPurchaseSupplierSelect" required></select></label>
+            <label>Produit<select name="product_slug" id="supplierPurchaseProductSelect" required></select></label>
+            <div class="form-row">
+              <label>Quantité<input type="number" name="quantity" min="1" required></label>
+              <label>Prix unitaire (€)<input type="number" name="unit_price" min="0" step="0.01" required></label>
+            </div>
+            <div class="form-row">
+              <label>Date d'achat<input type="date" name="order_date" required></label>
+              <label>Arrivée prévue au dépôt<input type="date" name="expected_arrival_date"></label>
+            </div>
+            <label>Statut initial
+              <select name="initial_status">
+                <option value="requested">Demandée</option>
+                <option value="accepted">Acceptée</option>
+                <option value="in_preparation">En préparation</option>
+                <option value="shipped" selected>En transit</option>
+              </select>
+            </label>
+            <label>Lien facture (URL)<input type="url" name="invoice_url" placeholder="https://..."></label>
+            <label>Document facture (PDF, image)<input type="file" name="invoice_file" accept=".pdf,.png,.jpg,.jpeg,.webp"></label>
+            <label>Notes<textarea name="notes" rows="2" placeholder="N° commande fournisseur, conditions…"></textarea></label>
+            <button type="submit" class="btn btn-primary">Enregistrer l'achat</button>
+            <p class="form-note" id="supplierPurchaseNote"></p>
+          </form>
+        </section>
+
+        <section class="dashboard-card">
+          <h2>Réception manuelle au dépôt</h2>
+          <p class="auth-sub">Hors workflow fournisseur — ajustement direct du stock dépôt.</p>
+          <form id="stockReceiveForm" class="auth-form">
+            <label>Produit<select name="product_slug" id="stockReceiveProductSelect" required></select></label>
+            <label>Quantité reçue<input type="number" name="quantity" min="1" required></label>
+            <label>Notes<textarea name="notes" rows="2"></textarea></label>
+            <button type="submit" class="btn btn-primary">Ajouter au stock</button>
+            <p class="form-note" id="stockReceiveNote"></p>
+          </form>
+        </section>
+      </div>
+
+      <section class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
+        <div class="dashboard-card-head">
+          <h2>Achats fournisseur — suivi &amp; réception dépôt</h2>
+          <button type="button" id="refreshPurchasesBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Date achat</th>
+                <th>Fournisseur</th>
+                <th>Produit</th>
+                <th>Qté</th>
+                <th>Montant</th>
+                <th>Arrivée prévue</th>
+                <th>Facture</th>
+                <th>Statut</th>
+                <th>Dépôt</th>
+              </tr>
+            </thead>
+            <tbody id="supplierPurchasesBody">
+              <tr><td colspan="9">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
+        <h2>Historique mouvements stock</h2>
+        <div class="table-wrap">
+          <table class="stock-movements-table">
+            <thead>
+              <tr><th>Date</th><th>Produit</th><th>Type</th><th>Variation</th><th>Stock après</th></tr>
+            </thead>
+            <tbody id="stockMovementsBody"><tr><td colspan="5">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+      </section>
     </section>
 
     <section id="panel-commandes" class="admin-panel" hidden>
@@ -482,7 +585,11 @@
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js?v=chat-mod-20260619"></script>
-  <script src="js/admin-api.js?v=chat-mod-20260619"></script>
-  <script src="js/admin.js?v=chat-mod-20260619"></script>
+  <script src="js/admin-api.js?v=stock-20260619"></script>
+  <script src="js/stock.js?v=stock-20260619"></script>
+  <script src="js/stock-alerts.js?v=stock-20260619"></script>
+  <script src="js/stock-admin.js?v=stock-20260619"></script>
+  <script src="js/stock-purchases.js?v=stock-20260619"></script>
+  <script src="js/admin.js?v=stock-20260619"></script>
 </body>
 </html>

@@ -46,12 +46,39 @@ async function fetchProducts(activeOnly = true) {
 }
 
 async function applyStockInfo(products) {
-  const sb = getSupabase();
   if (!products.length) return products;
 
+  const slugs = [...new Set(products.map((p) => p.slug).filter(Boolean))];
+  const hasDepotStock = products.some((p) => typeof p.stock_quantity === 'number');
+
+  if (hasDepotStock) {
+    const pending = typeof fetchPendingRestockMap === 'function'
+      ? await fetchPendingRestockMap(slugs)
+      : {};
+
+    return products.map((product) => {
+      const available = Math.max(0, Number(product.stock_quantity) || 0);
+      const pendingRow = pending[product.slug];
+      const nextRestock = pendingRow?.next_arrival_date || null;
+      const lead = available > 0 ? 3 : 14;
+
+      return {
+        ...product,
+        stock_available: available,
+        next_restock_date: nextRestock,
+        estimated_delivery_days: lead,
+        delivery_delay_label: available > 0
+          ? `En stock (${available} u.) — livraison estimée ${lead} jours`
+          : (nextRestock
+            ? `Zero stock — réapprovisionnement estimé le ${formatRestockDate ? formatRestockDate(nextRestock) : nextRestock}`
+            : 'Zero stock — réapprovisionnement en cours')
+      };
+    });
+  }
+
+  const sb = getSupabase();
   const bySlug = new Map();
   if (sb) {
-    const slugs = [...new Set(products.map((product) => product.slug).filter(Boolean))];
     const { data, error } = await sb
       .from('product_stocks')
       .select('product_slug, quantity, reserved_quantity, lead_time_days')
@@ -170,6 +197,9 @@ function isOilProduct(product) {
 }
 
 function getProductAvailability(product) {
+  if (typeof getStockStatus === 'function' && typeof product?.stock_quantity === 'number') {
+    return getStockStatus(product);
+  }
   const available = Number(product?.stock_available || 0);
   if (available > 0) {
     return {
@@ -179,9 +209,9 @@ function getProductAvailability(product) {
     };
   }
   return {
-    label: 'Sur commande',
-    detail: product?.delivery_delay_label || 'Délai selon approvisionnement',
-    tone: 'on-order'
+    label: 'Zero stock',
+    detail: product?.delivery_delay_label || 'Zero stock — réapprovisionnement en cours',
+    tone: 'out-of-stock'
   };
 }
 

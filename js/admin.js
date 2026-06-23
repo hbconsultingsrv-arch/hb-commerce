@@ -18,6 +18,9 @@ function showAdminTab(tabId) {
   });
   const panel = document.getElementById(`panel-${tabId}`);
   if (panel) panel.hidden = false;
+  if (tabId === 'stock' && typeof initStockAdminPanel === 'function') {
+    initStockAdminPanel();
+  }
 }
 
 function bindAdminTabs() {
@@ -75,6 +78,12 @@ async function initAdmin() {
   document.getElementById('cancelSupplierBtn')?.addEventListener('click', resetSupplierForm);
   document.getElementById('refreshSuppliersBtn')?.addEventListener('click', loadSuppliersTable);
   document.getElementById('supplierOrderForm')?.addEventListener('submit', handleSupplierOrderSubmit);
+  document.getElementById('refreshPurchasesBtn')?.addEventListener('click', () => {
+    if (typeof loadSupplierPurchasesTable === 'function') loadSupplierPurchasesTable();
+  });
+  if (!commercialAgent && typeof initStockAdminPanel === 'function') {
+    initStockAdminPanel();
+  }
   document.getElementById('adminClientForm')?.addEventListener('submit', handleAdminClientSubmit);
   document.getElementById('adminCompanyTypeSelect')?.addEventListener('change', syncCompanyTypeFields);
   document.getElementById('refreshClientsBtn')?.addEventListener('click', loadClientsPanel);
@@ -102,6 +111,7 @@ async function loadProductsTable() {
       <td><strong>${p.name}</strong><br><small>${p.origin || ''}</small></td>
       <td>${escapeHtml(supplierMap.get(p.supplier_id)?.name || '—')}</td>
       <td>${formatPrice(p.price)} / ${p.unit}</td>
+      <td>${typeof renderAdminStockCell === 'function' ? renderAdminStockCell(p) : (p.stock_quantity ?? '—')}</td>
       <td>${p.tag || '—'}</td>
       <td>${p.active ? '✓ Visible' : 'Masqué'}</td>
       <td>
@@ -137,6 +147,8 @@ function editProduct(id, products) {
   form.unit.value = p.unit || 'litre';
   if (form.supplier_id) form.supplier_id.value = p.supplier_id || '';
   form.min_quantity.value = p.min_quantity || 1;
+  if (form.stock_quantity) form.stock_quantity.value = p.stock_quantity ?? 0;
+  if (form.min_stock_alert) form.min_stock_alert.value = p.min_stock_alert ?? 10;
   form.image_url.value = p.image_url;
   form.tag.value = p.tag || '';
   form.sort_order.value = p.sort_order || 0;
@@ -171,6 +183,8 @@ async function handleProductSubmit(e) {
     unit: fd.get('unit'),
     supplier_id: fd.get('supplier_id') || null,
     min_quantity: parseInt(fd.get('min_quantity'), 10) || 1,
+    stock_quantity: parseInt(fd.get('stock_quantity'), 10) || 0,
+    min_stock_alert: parseInt(fd.get('min_stock_alert'), 10) || 10,
     image_url: fd.get('image_url'),
     tag: fd.get('tag'),
     sort_order: parseInt(fd.get('sort_order'), 10) || 0,

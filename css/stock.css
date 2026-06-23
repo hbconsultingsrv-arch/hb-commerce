@@ -1,0 +1,157 @@
+/* Alertes, achats fournisseur, rupture stock */
+
+.zero-stock-msg {
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  background: #fde8e8;
+  color: #9b1c1c;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border: 1px solid rgba(155, 28, 28, 0.25);
+}
+
+.stock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.stock-badge--in-stock {
+  background: #dff4e9;
+  color: #1a5c4a;
+  border-color: rgba(26, 92, 74, 0.2);
+}
+
+.stock-badge--low-stock {
+  background: #fff2c2;
+  color: #7a5b00;
+  border-color: rgba(201, 162, 39, 0.45);
+}
+
+.stock-badge--out-of-stock {
+  background: #f8dddd;
+  color: #8a1f1f;
+  border-color: rgba(192, 57, 43, 0.25);
+}
+
+.product-info-item--low-stock .product-info-value {
+  color: #7a5b00;
+  font-weight: 700;
+}
+
+.product-info-item--out-of-stock .product-info-value {
+  color: #9b1c1c;
+  font-weight: 700;
+}
+
+.stock-alert-banner {
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.15rem;
+  border-radius: 14px;
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  background: linear-gradient(135deg, #fff8e6 0%, #fff2c2 100%);
+  color: #5c4500;
+}
+
+.stock-alert-banner ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.stock-alerts-panel {
+  margin-bottom: 1.5rem;
+}
+
+.stock-alerts-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stock-alerts-tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.stock-alerts-tab {
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.stock-alerts-tab.active {
+  background: var(--fiafi-olive-dark, #2a4228);
+  color: #fff;
+  border-color: var(--fiafi-olive-dark, #2a4228);
+}
+
+.stock-admin-cell strong {
+  font-size: 1.05rem;
+}
+
+.stock-admin-cell--low-stock,
+.stock-admin-cell--out-of-stock {
+  color: #7a5b00;
+}
+
+.stock-alert-msg {
+  display: block;
+  font-size: 0.72rem;
+  color: #a16207;
+  margin-top: 0.15rem;
+}
+
+.purchase-status {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.purchase-status--transit,
+.purchase-status--shipped {
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.purchase-status--received {
+  background: #dff4e9;
+  color: #1a5c4a;
+}
+
+.stock-movements-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.stock-movements-table th,
+.stock-movements-table td {
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.movement-purchase { color: #1a5c4a; font-weight: 700; }
+.movement-sale { color: #8a1f1f; font-weight: 700; }
+
+.invoice-hint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
