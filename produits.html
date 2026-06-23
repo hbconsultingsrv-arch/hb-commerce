@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/commerce.css?v=product-info-20260619">
   <link rel="stylesheet" href="css/stock.css?v=stock-20260619">
   <link rel="stylesheet" href="css/brochure.css?v=menu-20260618">
+  <link rel="stylesheet" href="css/hb-b2b.css?v=b2b-20260624">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
   <script src="js/markets.js"></script>
 </head>
@@ -41,6 +42,10 @@
       <span class="section-tag">Catalogue HB Commerce</span>
       <h1>Formats &amp; catégories</h1>
       <p class="auth-sub">Bouteilles, métallique (1L · 3L · 5L), Marasca 250 ml, Premium extra vierge</p>
+      <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.75rem">
+        <button type="button" class="btn-quote" data-open-quote data-i18n="quote.cta">Demander un devis</button>
+        <a href="paiement-facturation.html" class="btn btn-outline-dark" data-i18n="footer.payment">Paiement &amp; Facturation</a>
+      </div>
     </header>
 
     <div id="categoryNav"></div>
@@ -76,10 +81,13 @@
   <script src="js/products-stock.js?v=stock-20260619"></script>
   <script src="js/main.js?v=db-only-20260619"></script>
   <script src="js/market-ui.js"></script>
+  <script src="js/quote-request.js?v=b2b-20260624"></script>
+  <script src="js/b2b-ui.js?v=b2b-20260624"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const bl = document.getElementById('brochureLink');
       if (bl) bl.href = getMarket().brochurePage;
+      if (typeof initI18n === 'function') initI18n();
     });
   </script>
 </body>

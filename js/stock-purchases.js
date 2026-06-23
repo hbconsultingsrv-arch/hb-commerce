@@ -64,6 +64,7 @@ async function loadSupplierPurchasesTable() {
           <span class="purchase-status purchase-status--${order.status}${inTransit ? ' purchase-status--transit' : ''}">
             ${escapeHtml(statusLabel)}
           </span>
+          ${renderPurchaseTimeline(order)}
           ${order.depot_received ? '<br><small>Stock mis à jour</small>' : ''}
         </td>
         <td>
@@ -140,6 +141,10 @@ async function handleSupplierPurchaseSubmit(e) {
     e.target.reset();
     showAlert(note, 'Achat fournisseur enregistré. Le stock augmentera à la réception au dépôt.', 'success');
     await loadSupplierPurchasesTable();
+    if (!document.getElementById('panel-analyses')?.hidden && typeof loadAnalyticsData === 'function') {
+      await loadAnalyticsData();
+      refreshAnalyticsPanel();
+    }
   } catch (err) {
     showAlert(note, err.message || 'Erreur lors de l\'enregistrement.');
   }

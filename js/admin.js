@@ -8,9 +8,15 @@ let adminSelectedChatCompanyId = null;
 let adminChatBound = false;
 let adminOrders = [];
 
+let adminProductsCache = [];
+let adminProductSalesMap = new Map();
+let adminPurchasePriceMap = new Map();
+let adminSupplierOrdersCache = [];
+let adminCustomerPricesCache = [];
+
 function showAdminTab(tabId) {
   if (!tabId) return;
-  document.querySelectorAll('.admin-tab').forEach((t) => {
+  document.querySelectorAll('.admin-tab, .admin-nav-item').forEach((t) => {
     t.classList.toggle('active', t.dataset.tab === tabId);
   });
   document.querySelectorAll('.admin-panel').forEach((p) => {
@@ -18,9 +24,17 @@ function showAdminTab(tabId) {
   });
   const panel = document.getElementById(`panel-${tabId}`);
   if (panel) panel.hidden = false;
+  if (typeof updateAdminTopbar === 'function') updateAdminTopbar(tabId);
+  if (tabId === 'accueil' && typeof loadAdminDashboard === 'function') {
+    loadAdminDashboard();
+  }
   if (tabId === 'stock' && typeof initStockAdminPanel === 'function') {
     initStockAdminPanel();
   }
+  if (tabId === 'analyses' && typeof initAnalyticsAdminPanel === 'function') {
+    initAnalyticsAdminPanel();
+  }
+  if (tabId === 'prix') loadCustomerPricesTable();
 }
 
 function bindAdminTabs() {
@@ -56,10 +70,13 @@ async function initAdmin() {
   if (commercialAgent) {
     document.querySelectorAll('.admin-only').forEach((el) => { el.style.display = 'none'; });
     document.querySelector('[data-tab="produits"]')?.setAttribute('hidden', '');
+    document.querySelector('[data-tab="accueil"]')?.setAttribute('hidden', '');
     document.getElementById('panel-produits')?.setAttribute('hidden', '');
+    document.getElementById('panel-accueil')?.setAttribute('hidden', '');
     showAdminTab('commandes');
   } else {
-    showAdminTab('produits');
+    showAdminTab('accueil');
+    loadAdminDashboard();
   }
 
   if (!commercialAgent) {
@@ -92,37 +109,126 @@ async function initAdmin() {
   bindSectionTabs();
   initSectionTabScopes();
   bindAppModal('trackingModal');
+  bindAppModal('supplierDetailModal');
+  bindAppModal('analyticsExpenseModal');
   document.getElementById('trackingModalForm')?.addEventListener('submit', handleTrackingModalSubmit);
   populateTrackingStatusSelect();
-  bindAdminChatModeration();
+  populateOrderStatusFilter();
+  bindProductFilters();
+  bindOrderFilters();
+  bindChatEnhancements();
+  bindPriceFormPreview();
+  updateAdminNavBadges();
 }
 
 async function loadProductsTable() {
   const products = await fetchAllProducts();
+  adminProductsCache = products;
+  if (!adminOrders.length) adminOrders = await fetchAllOrders();
+  adminSupplierOrdersCache = await fetchSupplierOrders();
+  adminProductSalesMap = new Map(aggregateProductSales(adminOrders).map((s) => [s.name, s]));
+  adminPurchasePriceMap = buildPurchasePriceMap(adminSupplierOrdersCache);
+
+  const filterSupplier = document.getElementById('productFilterSupplier');
+  if (filterSupplier && filterSupplier.options.length <= 1) {
+    if (!adminSuppliers.length) adminSuppliers = await fetchAllSuppliers();
+    filterSupplier.innerHTML = '<option value="">Tous fournisseurs</option>'
+      + adminSuppliers.map((s) => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+  }
+  renderProductSupplierSelect();
+  renderProductsTableBody();
+}
+
+function filterAndSortProducts(products) {
+  const q = (document.getElementById('productSearchInput')?.value || '').trim().toLowerCase();
+  const supplierId = document.getElementById('productFilterSupplier')?.value || '';
+  const status = document.getElementById('productFilterStatus')?.value || '';
+  const stockFilter = document.getElementById('productFilterStock')?.value || '';
+  const sortBy = document.getElementById('productSortBy')?.value || 'name';
+
+  let list = [...products];
+  if (q) {
+    list = list.filter((p) =>
+      (p.name || '').toLowerCase().includes(q)
+      || (p.slug || '').toLowerCase().includes(q)
+      || (p.origin || '').toLowerCase().includes(q)
+    );
+  }
+  if (supplierId) list = list.filter((p) => p.supplier_id === supplierId);
+  if (status === 'active') list = list.filter((p) => p.active);
+  if (status === 'hidden') list = list.filter((p) => !p.active);
+  if (stockFilter) {
+    list = list.filter((p) => {
+      const qty = p.stock_quantity ?? 0;
+      const min = p.min_stock_alert ?? 10;
+      if (stockFilter === 'out') return qty <= 0;
+      if (stockFilter === 'low') return qty > 0 && qty <= min;
+      if (stockFilter === 'ok') return qty > min;
+      return true;
+    });
+  }
+
+  list.sort((a, b) => {
+    if (sortBy === 'price-asc') return (a.price || 0) - (b.price || 0);
+    if (sortBy === 'price-desc') return (b.price || 0) - (a.price || 0);
+    if (sortBy === 'stock-asc') return (a.stock_quantity ?? 0) - (b.stock_quantity ?? 0);
+    if (sortBy === 'stock-desc') return (b.stock_quantity ?? 0) - (a.stock_quantity ?? 0);
+    if (sortBy === 'sales') {
+      const sa = adminProductSalesMap.get(a.name)?.qty || 0;
+      const sb = adminProductSalesMap.get(b.name)?.qty || 0;
+      return sb - sa;
+    }
+    return (a.name || '').localeCompare(b.name || '', 'fr');
+  });
+  return list;
+}
+
+function getProductPurchasePrice(product) {
+  if (product.purchase_price != null) return parseFloat(product.purchase_price);
+  const fromOrder = adminPurchasePriceMap.get(product.slug);
+  return fromOrder?.price ?? null;
+}
+
+function renderProductsTableBody() {
   const body = document.getElementById('productsBody');
   if (!body) return;
-  if (!adminSuppliers.length) adminSuppliers = await fetchAllSuppliers();
-  renderProductSupplierSelect();
-  const supplierMap = new Map(adminSuppliers.map((supplier) => [supplier.id, supplier]));
+  const supplierMap = new Map(adminSuppliers.map((s) => [s.id, s]));
+  const products = filterAndSortProducts(adminProductsCache);
 
-  body.innerHTML = products.map((p) => `
+  body.innerHTML = products.length ? products.map((p) => {
+    const purchase = getProductPurchasePrice(p);
+    const margin = purchase != null ? computeProductMargin(parseFloat(p.price), purchase) : null;
+    const sales = adminProductSalesMap.get(p.name);
+    return `
     <tr>
-      <td><img src="${p.image_url}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:6px"></td>
-      <td><strong>${p.name}</strong><br><small>${p.origin || ''}</small></td>
+      <td><img src="${p.image_url}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:8px"></td>
+      <td><strong>${escapeHtml(p.name)}</strong><br><small class="order-ref">${escapeHtml(p.slug)}</small>${sales ? `<br><small>${sales.qty} vendus</small>` : ''}</td>
       <td>${escapeHtml(supplierMap.get(p.supplier_id)?.name || '—')}</td>
+      <td>${purchase != null ? formatPrice(purchase) : '—'}</td>
       <td>${formatPrice(p.price)} / ${p.unit}</td>
-      <td>${typeof renderAdminStockCell === 'function' ? renderAdminStockCell(p) : (p.stock_quantity ?? '—')}</td>
-      <td>${p.tag || '—'}</td>
-      <td>${p.active ? '✓ Visible' : 'Masqué'}</td>
+      <td>${margin ? `<span class="price-discount-badge">+${formatPrice(margin.margin)} (${margin.pct.toFixed(0)}%)</span>` : '—'}</td>
+      <td>${getStockPill(p)}</td>
+      <td>${p.active ? '<span class="stock-pill stock-pill--ok">Visible</span>' : '<span class="stock-pill stock-pill--out">Masqué</span>'}</td>
       <td>
         <button type="button" class="btn btn-sm btn-outline-dark" data-edit="${p.id}">Modifier</button>
-        <button type="button" class="btn btn-sm btn-outline-dark" data-delete="${p.id}">Supprimer</button>
+        <button type="button" class="btn btn-sm btn-outline-dark" data-duplicate="${p.id}">Dupliquer</button>
+        <button type="button" class="btn btn-sm btn-outline-dark" data-delete="${p.id}">Suppr.</button>
+        ${p.updated_at ? `<br><small title="Dernière modification">${formatDate(p.updated_at)}</small>` : ''}
       </td>
     </tr>
-  `).join('');
+  `;
+  }).join('') : '<tr><td colspan="9">Aucun produit.</td></tr>';
 
   body.querySelectorAll('[data-edit]').forEach((btn) => {
-    btn.addEventListener('click', () => editProduct(btn.dataset.edit, products));
+    btn.addEventListener('click', () => editProduct(btn.dataset.edit, adminProductsCache));
+  });
+  body.querySelectorAll('[data-duplicate]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const p = adminProductsCache.find((x) => x.id === btn.dataset.duplicate);
+      if (!p || !confirm('Dupliquer ce produit en brouillon (masqué) ?')) return;
+      await createProduct(duplicateProductPayload(p));
+      await loadProductsTable();
+    });
   });
   body.querySelectorAll('[data-delete]').forEach((btn) => {
     btn.addEventListener('click', async () => {
@@ -131,6 +237,24 @@ async function loadProductsTable() {
       await loadProductsTable();
     });
   });
+}
+
+function bindProductFilters() {
+  ['productSearchInput', 'productFilterSupplier', 'productFilterStatus', 'productFilterStock', 'productSortBy'].forEach((id) => {
+    document.getElementById(id)?.addEventListener('input', renderProductsTableBody);
+    document.getElementById(id)?.addEventListener('change', renderProductsTableBody);
+  });
+  const form = document.getElementById('productForm');
+  const preview = () => {
+    const el = document.getElementById('productMarginPreview');
+    if (!el || !form) return;
+    const sale = parseFloat(form.price?.value);
+    const purchase = parseFloat(form.purchase_price?.value);
+    const m = computeProductMargin(sale, purchase);
+    el.textContent = m ? `Marge estimée : ${formatPrice(m.margin)} (${m.pct.toFixed(1)}%)` : '';
+  };
+  form?.price?.addEventListener('input', preview);
+  form?.purchase_price?.addEventListener('input', preview);
 }
 
 function editProduct(id, products) {
@@ -144,6 +268,7 @@ function editProduct(id, products) {
   form.origin.value = p.origin || '';
   form.category.value = p.category || '';
   form.price.value = p.price;
+  if (form.purchase_price) form.purchase_price.value = p.purchase_price ?? '';
   form.unit.value = p.unit || 'litre';
   if (form.supplier_id) form.supplier_id.value = p.supplier_id || '';
   form.min_quantity.value = p.min_quantity || 1;
@@ -180,6 +305,7 @@ async function handleProductSubmit(e) {
     origin: fd.get('origin'),
     category: fd.get('category'),
     price: parseFloat(fd.get('price')),
+    purchase_price: fd.get('purchase_price') ? parseFloat(fd.get('purchase_price')) : null,
     unit: fd.get('unit'),
     supplier_id: fd.get('supplier_id') || null,
     min_quantity: parseInt(fd.get('min_quantity'), 10) || 1,
@@ -199,12 +325,20 @@ async function handleProductSubmit(e) {
       await createProduct(product);
       showAlert(note, 'Produit ajouté.', 'success');
     }
-    resetProductForm();
-    activateSectionTab('panel-produits', 'liste');
-    await loadProductsTable();
   } catch (err) {
-    showAlert(note, err.message);
+    if (err.message?.includes('purchase_price') && product.purchase_price != null) {
+      delete product.purchase_price;
+      if (editingProductId) await updateProduct(editingProductId, product);
+      else await createProduct(product);
+      showAlert(note, 'Enregistré (prix d\'achat ignoré — exécutez migration-admin-enhancements.sql).', 'warning');
+    } else {
+      showAlert(note, err.message);
+      return;
+    }
   }
+  resetProductForm();
+  activateSectionTab('panel-produits', 'liste');
+  await loadProductsTable();
 }
 
 function renderProductSupplierSelect() {
@@ -240,36 +374,100 @@ async function loadSuppliersTable() {
   const body = document.getElementById('suppliersBody');
   try {
     adminSuppliers = await fetchAllSuppliers();
+    const orders = await fetchSupplierOrders();
+    adminSupplierOrdersCache = orders;
+    const products = await fetchAllProducts();
     renderProductSupplierSelect();
     if (!body) return;
-    body.innerHTML = adminSuppliers.length ? adminSuppliers.map((supplier) => `
+
+    const statsBySupplier = new Map();
+    orders.forEach((o) => {
+      if (o.status === 'cancelled') return;
+      const cur = statsBySupplier.get(o.supplier_id) || { total: 0, count: 0, lastDate: null };
+      const amt = o.total_price != null ? parseFloat(o.total_price) : (o.unit_price ? parseFloat(o.unit_price) * o.quantity : 0);
+      cur.total += amt || 0;
+      cur.count += 1;
+      const d = o.order_date || o.created_at;
+      if (!cur.lastDate || new Date(d) > new Date(cur.lastDate)) cur.lastDate = d;
+      statsBySupplier.set(o.supplier_id, cur);
+    });
+
+    const productsBySupplier = new Map();
+    products.forEach((p) => {
+      if (!p.supplier_id) return;
+      productsBySupplier.set(p.supplier_id, (productsBySupplier.get(p.supplier_id) || 0) + 1);
+    });
+
+    body.innerHTML = adminSuppliers.length ? adminSuppliers.map((supplier) => {
+      const stats = statsBySupplier.get(supplier.id) || { total: 0, count: 0, lastDate: null };
+      const prodCount = productsBySupplier.get(supplier.id) || 0;
+      const avgDays = stats.count > 1 ? '—' : '—';
+      return `
       <tr>
         <td><strong>${escapeHtml(supplier.name)}</strong><br><small>${escapeHtml(supplier.address || '')}</small></td>
         <td>${escapeHtml(supplier.contact_name || '—')}<br><small>${escapeHtml(supplier.email || '')}</small></td>
-        <td>${escapeHtml(supplier.country || '—')}</td>
-        <td>${escapeHtml(supplier.vat_number || '—')}</td>
-        <td>${supplier.active ? '✓ Actif' : 'Inactif'}</td>
+        <td>${escapeHtml(supplier.country || '—')}<br><small>${escapeHtml(supplier.vat_number || '—')}</small></td>
+        <td>${prodCount} produit(s)</td>
+        <td>${stats.lastDate ? formatDate(stats.lastDate) : '—'}</td>
+        <td><strong>${formatPrice(stats.total)}</strong><br><small>${stats.count} cmd</small></td>
+        <td>${supplier.active ? '<span class="stock-pill stock-pill--ok">Actif</span>' : '<span class="stock-pill stock-pill--out">Inactif</span>'}</td>
         <td>
+          <button type="button" class="btn btn-sm btn-outline-dark" data-view-supplier="${supplier.id}">Fiche</button>
           <button type="button" class="btn btn-sm btn-outline-dark" data-edit-supplier="${supplier.id}">Modifier</button>
-          <button type="button" class="btn btn-sm btn-outline-dark" data-delete-supplier="${supplier.id}">Supprimer</button>
         </td>
       </tr>
-    `).join('') : '<tr><td colspan="6">Aucun fournisseur.</td></tr>';
+    `;
+    }).join('') : '<tr><td colspan="8">Aucun fournisseur.</td></tr>';
 
+    body.querySelectorAll('[data-view-supplier]').forEach((btn) => {
+      btn.addEventListener('click', () => openSupplierDetail(btn.dataset.viewSupplier, orders, products));
+    });
     body.querySelectorAll('[data-edit-supplier]').forEach((btn) => {
       btn.addEventListener('click', () => editSupplier(btn.dataset.editSupplier));
     });
     body.querySelectorAll('[data-delete-supplier]').forEach((btn) => {
       btn.addEventListener('click', async () => {
-        if (!confirm('Supprimer ce fournisseur ? Les produits liés resteront sans fournisseur.')) return;
+        if (!confirm('Supprimer ce fournisseur ?')) return;
         await deleteSupplier(btn.dataset.deleteSupplier);
         await loadSuppliersTable();
         await loadProductsTable();
       });
     });
   } catch (err) {
-    if (body) body.innerHTML = `<tr><td colspan="6">${escapeHtml(err.message)}</td></tr>`;
+    if (body) body.innerHTML = `<tr><td colspan="8">${escapeHtml(err.message)}</td></tr>`;
   }
+}
+
+function openSupplierDetail(supplierId, orders, products) {
+  const supplier = adminSuppliers.find((s) => s.id === supplierId);
+  if (!supplier) return;
+  const supplierOrders = orders.filter((o) => o.supplier_id === supplierId);
+  const supplierProducts = products.filter((p) => p.supplier_id === supplierId);
+  const total = supplierOrders.filter((o) => o.status !== 'cancelled').reduce((s, o) => {
+    const amt = o.total_price != null ? parseFloat(o.total_price) : (o.unit_price ? parseFloat(o.unit_price) * o.quantity : 0);
+    return s + (amt || 0);
+  }, 0);
+
+  document.getElementById('supplierDetailTitle').textContent = supplier.name;
+  document.getElementById('supplierDetailBody').innerHTML = `
+    <div class="dashboard-grid">
+      <div>
+        <p><strong>Contact :</strong> ${escapeHtml(supplier.contact_name || '—')} · ${escapeHtml(supplier.email || '')}</p>
+        <p><strong>Pays :</strong> ${escapeHtml(supplier.country || '—')} · <strong>TVA :</strong> ${escapeHtml(supplier.vat_number || '—')}</p>
+        <p><strong>Total acheté :</strong> ${formatPrice(total)} (${supplierOrders.length} commandes)</p>
+        <p><strong>Évaluation interne :</strong> ${supplier.active ? 'Partenaire actif' : 'Inactif'} — délai moyen à calculer selon historique</p>
+        <p>${escapeHtml(supplier.notes || '')}</p>
+      </div>
+      <div>
+        <h3>Produits fournis (${supplierProducts.length})</h3>
+        <ul>${supplierProducts.map((p) => `<li>${escapeHtml(p.name)}</li>`).join('') || '<li>—</li>'}</ul>
+      </div>
+    </div>
+    <h3 style="margin-top:1rem">Historique commandes</h3>
+    <div class="table-wrap"><table class="requests-table"><thead><tr><th>Date</th><th>Produit</th><th>Qté</th><th>Statut</th></tr></thead>
+    <tbody>${supplierOrders.slice(0, 15).map((o) => `<tr><td>${formatDate(o.order_date || o.created_at)}</td><td>${escapeHtml(o.product_slug)}</td><td>${o.quantity}</td><td>${escapeHtml(SUPPLIER_ORDER_STATUS_LABELS[o.status] || o.status)}</td></tr>`).join('') || '<tr><td colspan="4">Aucune</td></tr>'}</tbody></table></div>
+  `;
+  openAppModal('supplierDetailModal');
 }
 
 function editSupplier(id) {
@@ -369,21 +567,45 @@ async function handleSupplierOrderSubmit(e) {
   }
 }
 
-async function loadOrdersTable() {
-  adminOrders = await fetchAllOrders();
+function populateOrderStatusFilter() {
+  const select = document.getElementById('orderFilterStatus');
+  if (!select) return;
+  select.innerHTML = '<option value="">Tous statuts</option>'
+    + Object.entries(ADMIN_ORDER_STATUS_SHORT).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+}
+
+function bindOrderFilters() {
+  document.getElementById('orderSearchInput')?.addEventListener('input', renderOrdersTableBody);
+  document.getElementById('orderFilterStatus')?.addEventListener('change', renderOrdersTableBody);
+}
+
+function filterOrders(orders) {
+  const q = (document.getElementById('orderSearchInput')?.value || '').trim().toLowerCase();
+  const status = document.getElementById('orderFilterStatus')?.value || '';
+  return orders.filter((order) => {
+    if (status && order.status !== status) return false;
+    if (!q) return true;
+    const ref = formatOrderReference(order, orders).toLowerCase();
+    const profile = adminProfiles.find((p) => p.id === order.user_id);
+    const client = (profile?.company || profile?.full_name || '').toLowerCase();
+    return ref.includes(q) || client.includes(q) || order.id.toLowerCase().includes(q);
+  });
+}
+
+function renderOrdersTableBody() {
   const body = document.getElementById('ordersAdminBody');
   if (!body) return;
+  const orders = filterOrders(adminOrders);
 
-  body.innerHTML = adminOrders.map((order) => {
-    const items = (order.order_items || [])
-      .map((i) => `${i.product_name} × ${i.quantity}`)
-      .join(', ');
+  body.innerHTML = orders.map((order) => {
+    const profile = adminProfiles.find((p) => p.id === order.user_id);
+    const ref = formatOrderReference(order, adminOrders);
     const deliveryLabel = DELIVERY_STATUS_LABELS[order.delivery_status || 'non_preparee'] || 'Non préparée';
     return `
       <tr>
         <td>${formatDate(order.created_at)}</td>
-        <td>#${order.id.slice(0, 8)}</td>
-        <td>${items}</td>
+        <td><span class="order-ref">${ref}</span></td>
+        <td><strong>${escapeHtml(profile?.company || profile?.full_name || '—')}</strong><br><small>${escapeHtml(profile?.full_name || '')}</small></td>
         <td><strong>${formatPrice(order.total)}</strong></td>
         <td>${order.payment_method || '—'}</td>
         <td>
@@ -393,24 +615,53 @@ async function loadOrdersTable() {
             ).join('')}
           </select>
         </td>
+        <td>${renderOrderProgress(order.status)}</td>
         <td>
           <div class="tracking-cell">
             <span class="tracking-status">${escapeHtml(deliveryLabel)}</span>
             <button type="button" class="btn btn-sm btn-outline-dark" data-open-tracking="${order.id}">Suivi</button>
           </div>
         </td>
+        <td>
+          <button type="button" class="btn btn-sm btn-outline-dark" data-print-invoice="${order.id}">Facture</button>
+          <button type="button" class="btn btn-sm btn-outline-dark" data-print-delivery="${order.id}">BL</button>
+        </td>
       </tr>
     `;
-  }).join('');
+  }).join('') || '<tr><td colspan="9">Aucune commande.</td></tr>';
 
   body.querySelectorAll('.order-status-select').forEach((select) => {
     select.addEventListener('change', async () => {
       await updateOrderStatus(select.dataset.order, select.value);
+      adminOrders = await fetchAllOrders();
+      renderOrdersTableBody();
+      if (!document.getElementById('panel-analyses')?.hidden && typeof loadAnalyticsData === 'function') {
+        await loadAnalyticsData();
+        refreshAnalyticsPanel();
+      }
     });
   });
   body.querySelectorAll('[data-open-tracking]').forEach((btn) => {
     btn.addEventListener('click', () => openTrackingModal(btn.dataset.openTracking));
   });
+  body.querySelectorAll('[data-print-invoice]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const order = adminOrders.find((o) => o.id === btn.dataset.printInvoice);
+      if (order) printOrderDocument(order, adminProfiles, 'invoice');
+    });
+  });
+  body.querySelectorAll('[data-print-delivery]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const order = adminOrders.find((o) => o.id === btn.dataset.printDelivery);
+      if (order) printOrderDocument(order, adminProfiles, 'delivery');
+    });
+  });
+}
+
+async function loadOrdersTable() {
+  adminOrders = await fetchAllOrders();
+  if (!adminProfiles.length) adminProfiles = await fetchAllProfiles();
+  renderOrdersTableBody();
 }
 
 function populateTrackingStatusSelect() {
@@ -434,7 +685,7 @@ function openTrackingModal(orderId) {
   form.elements.estimated_delivery_date.value = order.estimated_delivery_date || '';
   form.elements.delivered_at.value = toDatetimeLocal(order.delivered_at);
   form.elements.delivery_notes.value = order.delivery_notes || '';
-  document.getElementById('trackingModalTitle').textContent = `Livraison / suivi — #${order.id.slice(0, 8)}`;
+  document.getElementById('trackingModalTitle').textContent = `Livraison — ${formatOrderReference(order, adminOrders)}`;
   showAlert(document.getElementById('trackingModalNote'), '');
   openAppModal('trackingModal');
 }
@@ -500,6 +751,12 @@ async function loadClientsPanel() {
   if (!body) return;
   try {
     adminProfiles = await fetchAllProfiles();
+    if (!adminOrders.length) adminOrders = await fetchAllOrders();
+    const revenueByUser = new Map();
+    adminOrders.filter((o) => o.status !== 'annulee').forEach((o) => {
+      revenueByUser.set(o.user_id, (revenueByUser.get(o.user_id) || 0) + (parseFloat(o.total) || 0));
+    });
+
     const clients = adminProfiles.filter((p) => ['pending_company', 'client', 'supplier'].includes(p.role));
     const agents = adminProfiles.filter(isCommercialAssignableProfile);
     renderAgentSelect(document.getElementById('adminClientAgentSelect'), agents);
@@ -513,9 +770,9 @@ async function loadClientsPanel() {
             </select>
           `}
         </td>
-        <td>${escapeHtml(profile.full_name || '—')}</td>
-        <td>${escapeHtml(profile.siren || '—')}</td>
+        <td>${escapeHtml(profile.full_name || '—')}<br><small>${escapeHtml(profile.phone || '')}</small></td>
         <td>${escapeHtml(profile.vat_number || '—')}</td>
+        <td><strong>${formatPrice(revenueByUser.get(profile.id) || 0)}</strong></td>
         <td>
           ${isCommercialAgentProfile(adminProfile) ? escapeHtml(agentName(profile.commercial_agent_id, agents)) : `
             <select data-assign-agent="${profile.id}">
@@ -532,6 +789,7 @@ async function loadClientsPanel() {
         await assignCommercialAgent(select.dataset.assignAgent, select.value);
         await loadClientsPanel();
         await loadAdminChatPanel();
+    updateAdminNavBadges();
         await loadAdminPricePanel();
       });
     });
@@ -540,6 +798,7 @@ async function loadClientsPanel() {
         await updateCompanyRole(select.dataset.companyRole, select.value);
         await loadClientsPanel();
         await loadAdminChatPanel();
+    updateAdminNavBadges();
         await loadAdminPricePanel();
       });
     });
@@ -597,7 +856,7 @@ function agentName(agentId, agents) {
 function syncCompanyTypeFields() {
   const type = document.getElementById('adminCompanyTypeSelect')?.value || 'client';
   document.querySelectorAll('.client-only-field').forEach((el) => {
-    el.style.display = type === 'client' ? '' : 'none';
+    el.style.display = (type === 'client' || type === 'mixed') ? '' : 'none';
   });
 }
 
@@ -607,7 +866,7 @@ async function handleAdminClientSubmit(e) {
   const fd = new FormData(e.target);
   const companyType = fd.get('company_type');
   try {
-    if (companyType === 'supplier') {
+    if (companyType === 'supplier' || companyType === 'mixed') {
       const supplier = await createSupplier({
         name: fd.get('company'),
         contact_name: fd.get('full_name'),
@@ -618,14 +877,17 @@ async function handleAdminClientSubmit(e) {
         vat_number: fd.get('vat_number'),
         active: true
       });
-      await createSupplierUser({
-        supplierId: supplier.id,
-        email: fd.get('email'),
-        password: fd.get('password'),
-        fullName: fd.get('full_name'),
-        phone: fd.get('phone')
-      });
-    } else {
+      if (companyType === 'supplier') {
+        await createSupplierUser({
+          supplierId: supplier.id,
+          email: fd.get('email'),
+          password: fd.get('password'),
+          fullName: fd.get('full_name'),
+          phone: fd.get('phone')
+        });
+      }
+    }
+    if (companyType === 'client' || companyType === 'mixed') {
       await createClientUser({
         email: fd.get('email'),
         password: fd.get('password'),
@@ -639,11 +901,13 @@ async function handleAdminClientSubmit(e) {
       });
     }
     e.target.reset();
-    showAlert(note, companyType === 'supplier' ? 'Société fournisseur créée.' : 'Société cliente créée.', 'success');
+    const labels = { client: 'Société cliente créée.', supplier: 'Société fournisseur créée.', mixed: 'Société mixte créée (client + fournisseur).' };
+    showAlert(note, labels[companyType] || 'Société créée.', 'success');
     activateSectionTab('panel-clients', 'liste');
     await loadClientsPanel();
     await loadSuppliersTable();
     await loadAdminChatPanel();
+    updateAdminNavBadges();
     await loadAdminPricePanel();
     syncCompanyTypeFields();
   } catch (err) {
@@ -659,7 +923,71 @@ async function loadAdminPricePanel() {
   const clients = profiles.filter((p) => p.role === 'client');
   clientSelect.innerHTML = clients.map((client) => `<option value="${client.id}">${escapeHtml(profileLabel(client))}</option>`).join('');
   const products = await fetchAllProducts();
-  productSelect.innerHTML = products.map((product) => `<option value="${product.slug}">${escapeHtml(product.name || product.slug)}</option>`).join('');
+  productSelect.innerHTML = products.map((product) => `<option value="${product.slug}" data-catalog-price="${product.price}">${escapeHtml(product.name || product.slug)}</option>`).join('');
+  if (!productSelect.dataset.bound) {
+    productSelect.dataset.bound = '1';
+    productSelect.addEventListener('change', updatePriceDiscountPreview);
+    clientSelect.addEventListener('change', updatePriceDiscountPreview);
+  }
+  await loadCustomerPricesTable();
+}
+
+async function loadCustomerPricesTable() {
+  const body = document.getElementById('customerPricesBody');
+  if (!body) return;
+  try {
+    adminCustomerPricesCache = await fetchCustomerPrices();
+    const profiles = adminProfiles.length ? adminProfiles : await fetchAllProfiles();
+    const products = await fetchAllProducts();
+    const profileMap = new Map(profiles.map((p) => [p.id, p]));
+    const productMap = new Map(products.map((p) => [p.slug, p]));
+
+    body.innerHTML = adminCustomerPricesCache.length ? adminCustomerPricesCache.map((row) => {
+      const catalog = productMap.get(row.product_slug);
+      const catalogPrice = catalog?.price ?? 0;
+      const discount = catalogPrice > 0 ? ((catalogPrice - row.price) / catalogPrice * 100) : 0;
+      return `
+        <tr>
+          <td>${escapeHtml(profileLabel(profileMap.get(row.profile_id)))}</td>
+          <td>${escapeHtml(row.client_category || '—')}</td>
+          <td>${escapeHtml(catalog?.name || row.product_slug)}</td>
+          <td>${formatPrice(catalogPrice)}</td>
+          <td><strong>${formatPrice(row.price)}</strong></td>
+          <td>${discount > 0 ? `<span class="price-discount-badge">−${discount.toFixed(1)}%</span>` : '—'}</td>
+          <td>${row.min_quantity || 1}</td>
+          <td><button type="button" class="btn btn-sm btn-outline-dark" data-delete-price="${row.id}">×</button></td>
+        </tr>
+      `;
+    }).join('') : '<tr><td colspan="8">Aucun tarif personnalisé.</td></tr>';
+
+    body.querySelectorAll('[data-delete-price]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Supprimer ce tarif ?')) return;
+        await deleteCustomerPrice(btn.dataset.deletePrice);
+        await loadCustomerPricesTable();
+      });
+    });
+  } catch (err) {
+    body.innerHTML = `<tr><td colspan="8">${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+function updatePriceDiscountPreview() {
+  const form = document.getElementById('adminCustomerPriceForm');
+  const preview = document.getElementById('adminPriceDiscountPreview');
+  if (!form || !preview) return;
+  const productSelect = form.elements.product_slug;
+  const opt = productSelect?.selectedOptions?.[0];
+  const catalog = parseFloat(opt?.dataset.catalogPrice || 0);
+  const custom = parseFloat(form.elements.price?.value || 0);
+  if (catalog > 0 && custom > 0) {
+    const pct = ((catalog - custom) / catalog * 100);
+    preview.textContent = pct > 0 ? `Remise de ${pct.toFixed(1)}% par rapport au catalogue (${formatPrice(catalog)})` : 'Prix égal ou supérieur au catalogue';
+  } else preview.textContent = '';
+}
+
+function bindPriceFormPreview() {
+  document.getElementById('adminCustomerPriceForm')?.elements.price?.addEventListener('input', updatePriceDiscountPreview);
 }
 
 async function handleAdminCustomerPriceSubmit(e) {
@@ -667,13 +995,29 @@ async function handleAdminCustomerPriceSubmit(e) {
   const note = document.getElementById('adminCustomerPriceNote');
   const fd = new FormData(e.target);
   try {
-    await upsertCustomerPrice({
+    const payload = {
       profileId: fd.get('profile_id'),
       productSlug: fd.get('product_slug'),
       price: parseFloat(fd.get('price'))
-    });
+    };
+    const sb = getSupabase();
+    if (sb) {
+      const extra = {
+        profile_id: payload.profileId,
+        product_slug: payload.productSlug,
+        price: payload.price,
+        client_category: fd.get('client_category') || null,
+        min_quantity: parseInt(fd.get('min_quantity'), 10) || 1
+      };
+      const { error } = await sb.from('customer_prices').upsert(extra, { onConflict: 'profile_id,product_slug' });
+      if (error && error.message?.includes('client_category')) {
+        await upsertCustomerPrice(payload);
+      } else if (error) throw error;
+    } else {
+      await upsertCustomerPrice(payload);
+    }
     e.target.reset();
-    showAlert(note, 'Prix client fixé.', 'success');
+    showAlert(note, 'Tarif enregistré.', 'success');
     await loadAdminPricePanel();
   } catch (err) {
     showAlert(note, err.message);
@@ -705,10 +1049,35 @@ async function handleChatModeration(messageId, status, button) {
     await moderateChatMessage(messageId, status, adminSession.user.id);
     showAlert(note, status === 'approved' ? 'Message validé.' : 'Message refusé.', 'success');
     await loadAdminChatPanel();
+    updateAdminNavBadges();
   } catch (err) {
     showAlert(note, err.message || 'Impossible de modérer ce message.');
     button.disabled = false;
   }
+}
+
+function bindChatEnhancements() {
+  bindAdminChatModeration();
+  const quickHost = document.getElementById('adminChatQuickReplies');
+  if (quickHost && !quickHost.dataset.bound) {
+    quickHost.dataset.bound = '1';
+    quickHost.innerHTML = CHAT_QUICK_REPLIES.map((text, i) =>
+      `<button type="button" data-quick-reply="${i}">${escapeHtml(text.slice(0, 42))}…</button>`
+    ).join('');
+    quickHost.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-quick-reply]');
+      if (!btn) return;
+      const textarea = document.querySelector('#adminChatReplyForm textarea');
+      if (textarea) textarea.value = CHAT_QUICK_REPLIES[parseInt(btn.dataset.quickReply, 10)] || '';
+    });
+  }
+  document.getElementById('adminChatSearch')?.addEventListener('input', () => loadAdminChatPanel());
+  document.getElementById('adminChatTicketFilter')?.addEventListener('change', () => loadAdminChatPanel());
+  document.getElementById('adminChatTicketStatus')?.addEventListener('change', (e) => {
+    if (adminSelectedChatCompanyId) {
+      setChatTicketStatus(adminSelectedChatCompanyId, e.target.value);
+    }
+  });
 }
 
 function bindAdminChatModeration() {
@@ -784,6 +1153,11 @@ function syncAdminChatReplyForm(companyId) {
   const disabled = !companyId;
   form.querySelector('textarea')?.toggleAttribute('disabled', disabled);
   form.querySelector('button[type="submit"]')?.toggleAttribute('disabled', disabled);
+  const ticketSelect = document.getElementById('adminChatTicketStatus');
+  if (ticketSelect) {
+    ticketSelect.toggleAttribute('disabled', disabled);
+    if (companyId) ticketSelect.value = getChatTicketStatus(companyId);
+  }
 }
 
 async function loadAdminChatPanel() {
@@ -808,24 +1182,44 @@ async function loadAdminChatPanel() {
     return;
   }
 
-  if (!adminSelectedChatCompanyId || !summaries.some((item) => item.profile.id === adminSelectedChatCompanyId)) {
-    adminSelectedChatCompanyId = summaries[0].profile.id;
+  const chatQ = (document.getElementById('adminChatSearch')?.value || '').trim().toLowerCase();
+  const ticketFilter = document.getElementById('adminChatTicketFilter')?.value || '';
+  const filtered = summaries.filter(({ profile }) => {
+    const label = profileLabel(profile).toLowerCase();
+    if (chatQ && !label.includes(chatQ)) return false;
+    if (ticketFilter && getChatTicketStatus(profile.id) !== ticketFilter) return false;
+    return true;
+  });
+
+  if (!filtered.length) {
+    listHost.innerHTML = '<p class="empty-state">Aucune conversation trouvée.</p>';
+    syncAdminChatReplyForm(null);
+    return;
   }
 
-  listHost.innerHTML = summaries.map(({ profile, pendingCount, lastMessage, lastAt }) => `
+  if (!adminSelectedChatCompanyId || !filtered.some((item) => item.profile.id === adminSelectedChatCompanyId)) {
+    adminSelectedChatCompanyId = filtered[0].profile.id;
+  }
+
+  listHost.innerHTML = filtered.map(({ profile, pendingCount, lastMessage, lastAt }) => {
+    const ticket = getChatTicketStatus(profile.id);
+    return `
     <button
       type="button"
       class="chat-thread-item ${profile.id === adminSelectedChatCompanyId ? 'active' : ''}"
       data-chat-company="${profile.id}"
     >
-      <span class="chat-thread-title">${escapeHtml(profileLabel(profile))}</span>
+      <span class="chat-thread-title">${escapeHtml(profileLabel(profile))}
+        <span class="chat-ticket-status">${CHAT_TICKET_STATUSES[ticket] || ticket}</span>
+      </span>
       <span class="chat-thread-preview">${escapeHtml(chatPreview(lastMessage))}</span>
       <span class="chat-thread-meta">
         <span>${lastAt ? escapeHtml(formatDateTime(lastAt)) : '—'}</span>
-        ${pendingCount ? `<span class="chat-thread-badge">${pendingCount} en attente</span>` : ''}
+        ${pendingCount ? `<span class="chat-thread-badge">${pendingCount} non lu</span>` : ''}
       </span>
     </button>
-  `).join('');
+  `;
+  }).join('');
 
   listHost.querySelectorAll('[data-chat-company]').forEach((button) => {
     button.addEventListener('click', async () => {
@@ -840,6 +1234,7 @@ async function loadAdminChatPanel() {
     adminChatBound = true;
     document.getElementById('refreshAdminChatBtn')?.addEventListener('click', async () => {
       await loadAdminChatPanel();
+    updateAdminNavBadges();
       if (adminSelectedChatCompanyId) await renderAdminChat(adminSelectedChatCompanyId);
     });
     document.getElementById('adminChatReplyForm')?.addEventListener('submit', handleAdminChatReply);
@@ -918,6 +1313,7 @@ async function handleAdminChatReply(e) {
     e.target.reset();
     showAlert(note, 'Réponse envoyée.', 'success');
     await loadAdminChatPanel();
+    updateAdminNavBadges();
   } catch (err) {
     showAlert(note, err.message);
   }

@@ -51,9 +51,16 @@ async function initHomeProducts() {
     : products.map(renderProductCard).join('');
   bindProductCardEvents(catalogHost, null, products);
 
-  const promoHost = document.getElementById('heroPromoBrands');
-  if (promoHost && typeof renderHeroPromoBrands === 'function') {
-    promoHost.innerHTML = renderHeroPromoBrands(products);
+  if (typeof populateCatalogFilters === 'function') populateCatalogFilters(products);
+  if (typeof updateHeroStats === 'function') updateHeroStats(products);
+
+  if (typeof initHeroBrandCube === 'function') {
+    initHeroBrandCube(products);
+  } else {
+    const promoHost = document.getElementById('heroPromoBrands');
+    if (promoHost && typeof renderHeroPromoBrands === 'function') {
+      promoHost.innerHTML = renderHeroPromoBrands(products);
+    }
   }
 
   const catalogNote = document.getElementById('heroCatalogNote');
@@ -71,11 +78,19 @@ async function initHomeProducts() {
   }
 
   const heroPills = document.getElementById('heroBrandPills');
-  if (heroPills && brandGroups.length) {
-    heroPills.innerHTML = brandGroups.slice(0, 4).map(([brand]) => {
+  const heroPillsRow = document.getElementById('heroBrandPillsRow');
+  if (brandGroups.length) {
+    const pillsHtml = brandGroups.slice(0, 6).map(([brand]) => {
       const meta = getBrandMeta(brand);
       return `<li><a href="#marque-${meta.slug}">${escapeHtml(brand)}</a></li>`;
     }).join('');
+    if (heroPills) {
+      heroPills.innerHTML = brandGroups.slice(0, 4).map(([brand]) => {
+        const meta = getBrandMeta(brand);
+        return `<li><a href="#marque-${meta.slug}">${escapeHtml(brand)}</a></li>`;
+      }).join('');
+    }
+    if (heroPillsRow) heroPillsRow.innerHTML = pillsHtml;
   }
 }
 

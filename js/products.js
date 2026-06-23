@@ -310,6 +310,11 @@ function renderProductTechSheetContent(product) {
           </div>
         `).join('')}
       </dl>
+      <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.65rem">
+        <button type="button" class="btn-quote" data-open-quote
+          data-product-name="${escapeHtml(product.name)}"
+          data-product-ref="${escapeHtml(product.slug || product.id)}">Demander un devis</button>
+      </div>
     </div>
   `;
 }
@@ -336,25 +341,53 @@ function renderProductCard(product) {
   const imgUrl = resolveProductImage(product);
   const imgFallback = FIAFI_IMAGES?.product || 'images/prenium.PNG';
   const fiafi = isFiafiProduct(product);
-  const cardClass = fiafi ? 'product-card fiafi-card' : 'product-card';
+  const cardClass = fiafi ? 'product-card fiafi-card product-card--premium' : 'product-card product-card--premium';
   const formatLabel = product.format_label || '';
-  const packaging = getPackagingLabel(product.packaging_type);
+  const packaging = getPackagingLabel(product.packaging_type) || product.unit || '—';
   const priceDisplay = typeof formatDisplayPrice === 'function' ? formatDisplayPrice(product.price) : 'xx';
   const unitDisplay = typeof canViewPrices === 'function' && !canViewPrices() ? '' : `/ ${product.unit}`;
+  const brand = getProductBrand(product);
+  const availability = getProductAvailability(product);
+  const stock = typeof getStockStatus === 'function' ? getStockStatus(product) : { tone: 'in-stock', detail: availability.detail };
+  const stockKey = stock.tone === 'out-of-stock' ? 'out' : (stock.low ? 'low' : 'in');
+  const stockClass = stock.tone === 'out-of-stock' ? 'stock-out' : (stock.low ? 'stock-low' : 'stock-in');
+  const ref = product.slug || product.id;
 
   return `
-    <article class="${cardClass}" data-product-id="${product.id}" data-category="${product.category || ''}">
+    <article class="${cardClass}" data-product-id="${product.id}" data-category="${product.category || ''}"
+      data-brand="${escapeHtml(brand)}" data-origin="${escapeHtml(product.origin || '')}"
+      data-format="${escapeHtml(formatLabel || product.unit || '')}" data-stock="${stockKey}">
       <div class="product-img-area">
+        ${product.tag ? '<span class="premium-badge">Premium</span>' : ''}
         ${product.origin ? `<span class="origin-badge">${escapeHtml(String(product.origin).toUpperCase())}</span>` : ''}
-        ${packaging ? `<span class="packaging-badge">${packaging}</span>` : ''}
+        ${packaging && packaging !== '—' ? `<span class="packaging-badge">${packaging}</span>` : ''}
         <img src="${imgUrl}" alt="${product.name}" loading="lazy" onerror="this.onerror=null;this.src='${imgFallback}'">
       </div>
       ${renderProductInfoStrip(product)}
       <div class="product-card-body">
+        <span class="sku-ref">Réf. ${escapeHtml(ref)}</span>
         ${product.tag ? `<span class="tag">${product.tag}</span>` : ''}
         ${formatLabel ? `<span class="format-label">${formatLabel}</span>` : ''}
         <h3>${product.name}</h3>
         <p class="product-desc">${product.description || ''}</p>
+        <div class="product-card-meta">
+          <div class="product-meta-row">
+            <span class="product-meta-label">Origine</span>
+            <span class="product-meta-value">${escapeHtml(product.origin || '—')}</span>
+          </div>
+          <div class="product-meta-row">
+            <span class="product-meta-label">Conditionnement</span>
+            <span class="product-meta-value">${escapeHtml(packaging)}</span>
+          </div>
+          <div class="product-meta-row">
+            <span class="product-meta-label">Disponibilité</span>
+            <span class="product-meta-value ${stockClass}">${escapeHtml(availability.label)}</span>
+          </div>
+          <div class="product-meta-row">
+            <span class="product-meta-label">Référence</span>
+            <span class="product-meta-value">${escapeHtml(String(ref))}</span>
+          </div>
+        </div>
         <div class="price-row">
           <span class="price">${priceDisplay}</span>
           ${unitDisplay ? `<span class="unit">${unitDisplay}</span>` : ''}
@@ -362,7 +395,11 @@ function renderProductCard(product) {
         ${product.customer_price ? '<p class="form-note min-qty">Prix personnalis&eacute; soci&eacute;t&eacute;</p>' : ''}
         ${product.delivery_delay_label ? `<p class="form-note min-qty">${escapeHtml(product.delivery_delay_label)}</p>` : ''}
         <p class="form-note min-qty">Minimum : ${minQty} ${product.unit}(s)</p>
-        <div class="product-actions">
+        <div class="product-actions product-actions--dual">
+          <button type="button" class="btn-quote-outline" data-open-quote
+            data-product-name="${escapeHtml(product.name)}"
+            data-product-ref="${escapeHtml(String(ref))}"
+            data-product-qty="${minQty} ${product.unit}(s) minimum">Demander un devis</button>
           <div class="qty-control">
             <button type="button" class="qty-minus" aria-label="Moins">−</button>
             <input type="number" class="qty-input" value="${minQty}" min="${minQty}" step="1">

@@ -1,0 +1,393 @@
+/* HB Commerce — fond premium continu sous le hero (3D / huile / verre) */
+
+body {
+  background: #0a1610;
+}
+
+.hb-site-depth {
+  position: relative;
+  background: #0a1610;
+  overflow: hidden;
+}
+
+.hb-depth-bg,
+.hb-depth-canvas,
+.hb-depth-shimmer,
+.hb-depth-overlay,
+.hb-depth-ripples {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hb-depth-bg {
+  z-index: 0;
+  background-size: cover;
+  background-position: center 30%;
+  opacity: 0.2;
+  filter: saturate(1.2) blur(0.5px);
+  transform: scale(1.06);
+  will-change: transform;
+}
+
+.hb-depth-canvas {
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  opacity: 0.32;
+}
+
+.hb-depth-shimmer {
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 45% 35% at 25% 25%, rgba(201, 162, 39, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 35% 28% at 80% 65%, rgba(45, 90, 56, 0.12) 0%, transparent 50%);
+  animation: oilShimmer 10s ease-in-out infinite alternate;
+}
+
+.hb-depth-overlay {
+  z-index: 2;
+  background:
+    linear-gradient(180deg, rgba(10, 22, 12, 0.35) 0%, rgba(10, 22, 12, 0.82) 8%, rgba(12, 26, 14, 0.88) 50%, rgba(8, 16, 10, 0.95) 100%),
+    radial-gradient(ellipse 70% 50% at 85% 20%, rgba(201, 162, 39, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 40% at 10% 80%, rgba(45, 90, 56, 0.1) 0%, transparent 50%);
+}
+
+.hb-depth-ripples {
+  z-index: 2;
+  overflow: hidden;
+}
+
+.hb-depth-content {
+  position: relative;
+  z-index: 3;
+}
+
+/* Séparateurs subtils entre sections */
+.hb-depth-section {
+  padding-top: 4.5rem;
+  padding-bottom: 4.5rem;
+  border-bottom: 1px solid rgba(201, 162, 39, 0.08);
+}
+
+.hb-depth-section:last-of-type {
+  border-bottom: none;
+}
+
+/* Titres sur fond sombre */
+.hb-site-depth h2 {
+  color: #fff;
+  font-family: var(--font-display, Georgia, serif);
+}
+
+.hb-site-depth .section-sub {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.hb-site-depth .section-head-inline h2 {
+  color: #fff;
+}
+
+/* Sections — fond transparent (le depth layer fait le travail) */
+.hb-site-depth .hb-services-band,
+.hb-site-depth .hb-stats-section,
+.hb-site-depth .hb-testimonials,
+.hb-site-depth .hb-contact-section,
+.hb-site-depth .hb-payments-section,
+.hb-site-depth .hb-process-section,
+.hb-site-depth .hb-faq-section,
+.hb-site-depth .hb-guarantees-section,
+.hb-site-depth .hb-trust-section,
+.hb-site-depth .hb-clients-section,
+.hb-site-depth .section-commerce {
+  background: transparent !important;
+  padding-top: 4.5rem;
+  padding-bottom: 4.5rem;
+}
+
+.hb-site-depth .hb-trust-section h2,
+.hb-site-depth .hb-clients-section h2 {
+  color: #fff;
+}
+
+/* Cartes verre premium */
+.hb-site-depth .service-promo-card,
+.hb-site-depth .payment-card,
+.hb-site-depth .guarantee-card,
+.hb-site-depth .stat-counter,
+.hb-site-depth .testimonial-card,
+.hb-site-depth .about-card,
+.hb-site-depth .contact-form-card {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(201, 162, 39, 0.22) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25) !important;
+  transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.hb-site-depth .service-promo-card:hover,
+.hb-site-depth .payment-card:hover,
+.hb-site-depth .guarantee-card:hover,
+.hb-site-depth .stat-counter:hover,
+.hb-site-depth .testimonial-card:hover,
+.hb-site-depth .about-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(232, 212, 138, 0.35) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35) !important;
+}
+
+.hb-site-depth .service-promo-card h3,
+.hb-site-depth .payment-card h3,
+.hb-site-depth .guarantee-card h3,
+.hb-site-depth .about-card h3 {
+  color: var(--hb-gold-soft, #e8d48a) !important;
+}
+
+.hb-site-depth .service-promo-card p,
+.hb-site-depth .payment-card p,
+.hb-site-depth .guarantee-card p,
+.hb-site-depth .about-card p {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.hb-site-depth .service-promo-card-highlight {
+  background: rgba(201, 162, 39, 0.1) !important;
+  border-color: rgba(201, 162, 39, 0.4) !important;
+}
+
+.hb-site-depth .service-promo-icon {
+  background: rgba(201, 162, 39, 0.15);
+}
+
+/* Trust items — verre renforcé */
+.hb-site-depth .trust-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(201, 162, 39, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.hb-site-depth .client-type-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(201, 162, 39, 0.25);
+}
+
+/* Stats */
+.hb-site-depth .stat-counter-value {
+  color: var(--hb-gold-soft, #e8d48a) !important;
+}
+
+.hb-site-depth .stat-counter-label {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Témoignages */
+.hb-site-depth .testimonial-quote {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.hb-site-depth .testimonial-author {
+  color: var(--hb-gold-soft, #e8d48a) !important;
+}
+
+.hb-site-depth .testimonial-role {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* FAQ */
+.hb-site-depth .faq-item {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(201, 162, 39, 0.18) !important;
+}
+
+.hb-site-depth .faq-item.is-open {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(201, 162, 39, 0.35) !important;
+}
+
+.hb-site-depth .faq-question {
+  color: #fff !important;
+}
+
+.hb-site-depth .faq-answer p {
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.hb-site-depth .faq-answer a {
+  color: var(--hb-gold-soft, #e8d48a);
+}
+
+/* Catalogue */
+.hb-site-depth .catalog-filters {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(201, 162, 39, 0.2) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+}
+
+.hb-site-depth .catalog-filters select,
+.hb-site-depth .catalog-filters input {
+  background: rgba(8, 16, 10, 0.5) !important;
+  border-color: rgba(201, 162, 39, 0.25) !important;
+  color: #fff !important;
+}
+
+.hb-site-depth .catalog-filters select option {
+  background: #1a2e1c;
+  color: #fff;
+}
+
+.hb-site-depth .product-card {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(201, 162, 39, 0.22) !important;
+  backdrop-filter: blur(12px);
+}
+
+.hb-site-depth .product-card h3,
+.hb-site-depth .product-card .product-meta-value {
+  color: #fff !important;
+}
+
+.hb-site-depth .product-card .product-desc,
+.hb-site-depth .product-card .sku-ref,
+.hb-site-depth .product-card .form-note {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.hb-site-depth .product-card .product-img-area {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(0, 0, 0, 0.15) 100%) !important;
+}
+
+.hb-site-depth .btn-outline-dark {
+  border-color: rgba(201, 162, 39, 0.45) !important;
+  color: var(--hb-gold-soft, #e8d48a) !important;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.hb-site-depth .btn-outline-dark:hover {
+  background: rgba(201, 162, 39, 0.2);
+  color: #fff !important;
+}
+
+.hb-site-depth .btn-quote-outline {
+  border-color: rgba(232, 212, 138, 0.5);
+  color: var(--hb-gold-soft, #e8d48a);
+}
+
+.hb-site-depth .btn-quote-outline:hover {
+  background: rgba(201, 162, 39, 0.25);
+  color: #fff;
+}
+
+/* Process timeline */
+.hb-site-depth .process-step h3 {
+  color: var(--hb-gold-soft, #e8d48a) !important;
+}
+
+.hb-site-depth .process-step p {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+/* Certifications slot */
+.hb-site-depth .cert-logos-slot {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(201, 162, 39, 0.2) !important;
+}
+
+.hb-site-depth .cert-logo-placeholder {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(201, 162, 39, 0.15);
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* Contact */
+.hb-site-depth .contact-info-card {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  backdrop-filter: blur(14px);
+}
+
+.hb-site-depth .contact-form-card h3 {
+  color: var(--hb-gold-soft, #e8d48a);
+}
+
+.hb-site-depth .contact-form-card label span {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hb-site-depth .contact-form-card input,
+.hb-site-depth .contact-form-card textarea {
+  background: rgba(8, 16, 10, 0.5);
+  border-color: rgba(201, 162, 39, 0.25);
+  color: #fff;
+}
+
+/* Bandeau devis */
+.hb-site-depth .b2b-quote-banner {
+  background: linear-gradient(135deg, rgba(30, 61, 40, 0.85) 0%, rgba(21, 42, 28, 0.9) 100%) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(201, 162, 39, 0.3) !important;
+}
+
+/* Footer intégré */
+.hb-site-depth .footer-commerce.footer-pro {
+  background: transparent !important;
+  border-top: 1px solid rgba(201, 162, 39, 0.15);
+  padding-top: 3rem;
+}
+
+.hb-site-depth .payment-steps-summary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(201, 162, 39, 0.15);
+  color: #fff;
+}
+
+/* Empty state catalogue */
+.hb-site-depth .empty-state {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Brand blocks home catalog */
+.hb-site-depth .brand-block {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(201, 162, 39, 0.2) !important;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28) !important;
+}
+
+.hb-site-depth .brand-block-head {
+  border-bottom-color: rgba(201, 162, 39, 0.15);
+}
+
+.hb-site-depth .brand-block-title {
+  color: var(--hb-gold-soft, #e8d48a) !important;
+}
+
+.hb-site-depth .brand-block-tagline,
+.hb-site-depth .brand-block-label {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.hb-site-depth .brand-block-count {
+  background: rgba(201, 162, 39, 0.15);
+  color: var(--hb-gold-soft, #e8d48a);
+}
+
+.hb-site-depth .brand-block h3,
+.hb-site-depth .home-brand-catalog h3 {
+  color: var(--hb-gold-soft, #e8d48a);
+}
+
+@media (max-width: 768px) {
+  .hb-depth-section,
+  .hb-site-depth .hb-services-band,
+  .hb-site-depth .section-commerce {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-depth-shimmer {
+    animation: none !important;
+  }
+}

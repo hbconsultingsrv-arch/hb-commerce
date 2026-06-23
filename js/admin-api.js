@@ -649,3 +649,36 @@ function slugify(text) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 }
+
+async function fetchBusinessExpenses() {
+  const sb = getSupabase();
+  if (!sb) return [];
+  const { data, error } = await sb
+    .from('business_expenses')
+    .select('*')
+    .order('expense_date', { ascending: false });
+  if (error) {
+    if (error.message?.includes('business_expenses')) return [];
+    throw error;
+  }
+  return data || [];
+}
+
+async function createBusinessExpense(expense) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { data, error } = await sb
+    .from('business_expenses')
+    .insert(expense)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+async function deleteBusinessExpense(id) {
+  const sb = getSupabase();
+  if (!sb) throw new Error(configErrorMessage());
+  const { error } = await sb.from('business_expenses').delete().eq('id', id);
+  if (error) throw error;
+}

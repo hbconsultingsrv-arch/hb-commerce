@@ -10,62 +10,119 @@
   <link rel="stylesheet" href="css/style.css?v=chat-mod-20260619">
   <link rel="stylesheet" href="css/commerce.css?v=chat-mod-20260619">
   <link rel="stylesheet" href="css/stock.css?v=stock-20260619">
+  <link rel="stylesheet" href="css/analytics.css?v=analytics-20260624">
+  <link rel="stylesheet" href="css/admin-shell.css?v=admin-v2-20260624">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
-<body class="dashboard-page">
-  <nav class="nav nav-simple container">
-    <a href="index.html" class="logo logo-hb-brand">
-      <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="40" height="40" aria-hidden="true">
-      <span class="logo-hb-text">
-        <span class="logo-hb-name">HB Commerce</span>
-        <span class="logo-hb-tag">Consulting &amp; Services · B2B</span>
-      </span>
-    </a>
-    <div class="nav-actions">
-      <a href="super-root.html" id="superRootLink" class="btn btn-sm btn-primary" style="display:none">Super root</a>
-      <a href="stock.html" class="btn btn-sm btn-outline-light admin-only">Stock</a>
-      <a href="index.html" class="btn btn-sm btn-outline-light">Voir le site</a>
-      <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
-    </div>
-  </nav>
+<body class="dashboard-page admin-v2">
+  <div class="admin-app">
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Navigation admin">
+      <div class="admin-sidebar-brand">
+        <a href="index.html" class="logo logo-hb-brand">
+          <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="36" height="36" aria-hidden="true">
+          <span class="logo-hb-text">
+            <span class="logo-hb-name">HB Commerce</span>
+            <span class="logo-hb-tag">Administration B2B</span>
+          </span>
+        </a>
+      </div>
+      <nav class="admin-sidebar-nav">
+        <button type="button" class="admin-nav-item active" data-tab="accueil"><span class="admin-nav-icon">◉</span> Tableau de bord</button>
+        <button type="button" class="admin-nav-item" data-tab="produits"><span class="admin-nav-icon">▣</span> Produits</button>
+        <button type="button" class="admin-nav-item admin-only" data-tab="fournisseurs"><span class="admin-nav-icon">◎</span> Fournisseurs</button>
+        <button type="button" class="admin-nav-item admin-only" data-tab="stock"><span class="admin-nav-icon">▤</span> Stock &amp; achats</button>
+        <button type="button" class="admin-nav-item" data-tab="commandes"><span class="admin-nav-icon">☰</span> Commandes</button>
+        <button type="button" class="admin-nav-item" data-tab="clients"><span class="admin-nav-icon">◇</span> Sociétés</button>
+        <button type="button" class="admin-nav-item" data-tab="prix"><span class="admin-nav-icon">€</span> Prix clients</button>
+        <button type="button" class="admin-nav-item admin-only" data-tab="analyses"><span class="admin-nav-icon">◈</span> Analyses</button>
+        <button type="button" class="admin-nav-item" data-tab="chat"><span class="admin-nav-icon">✉</span> Support<span class="admin-nav-badge" id="adminChatNavBadge" hidden></span></button>
+      </nav>
+      <div class="admin-sidebar-footer">
+        <a href="super-root.html" id="superRootLink" class="btn btn-sm btn-outline-light" style="display:none">Super root</a>
+        <a href="stock.html" class="btn btn-sm btn-outline-light admin-only">Page stock</a>
+        <a href="index.html" class="btn btn-sm btn-outline-light">Voir le site</a>
+        <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light">🌙 Sombre</button>
+        <button type="button" id="logoutBtn" class="btn btn-sm btn-primary">Déconnexion</button>
+      </div>
+    </aside>
 
-  <main class="dashboard-main container">
-    <header class="dashboard-header">
-      <span class="section-tag">Administration</span>
-      <h1>Dashboard HB Commerce</h1>
-      <p class="auth-sub">Gérez les sociétés clientes et fournisseurs, le catalogue, les prix, les commandes, le stock dépôt, les achats fournisseur et la modération du chat.</p>
-    </header>
+    <div class="admin-shell">
+      <header class="admin-topbar">
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <button type="button" class="admin-mobile-toggle" id="adminSidebarToggle" aria-label="Menu">☰</button>
+          <div class="admin-topbar-title">
+            <h1 id="adminTopbarTitle">Tableau de bord</h1>
+            <p id="adminTopbarSub">Vue d'ensemble de l'activité HB Commerce</p>
+          </div>
+        </div>
+        <div class="admin-topbar-actions">
+          <a href="index.html" class="btn btn-sm btn-outline-dark">Site public</a>
+        </div>
+      </header>
 
-    <div id="stockAlertBanner" hidden></div>
+      <main class="admin-content">
+        <div id="stockAlertBanner" hidden></div>
 
-    <div class="admin-tabs">
-      <button type="button" class="admin-tab active" data-tab="produits">Produits</button>
-      <button type="button" class="admin-tab admin-only" data-tab="fournisseurs">Fournisseurs</button>
-      <button type="button" class="admin-tab admin-only" data-tab="stock">Stock &amp; achats</button>
-      <button type="button" class="admin-tab" data-tab="commandes">Commandes</button>
-      <button type="button" class="admin-tab" data-tab="clients">Sociétés</button>
-      <button type="button" class="admin-tab" data-tab="prix">Prix clients</button>
-      <button type="button" class="admin-tab" data-tab="chat">Chat &amp; modération</button>
-    </div>
+        <div class="admin-tabs" aria-hidden="true">
+          <button type="button" class="admin-tab" data-tab="accueil">Accueil</button>
+          <button type="button" class="admin-tab" data-tab="produits">Produits</button>
+          <button type="button" class="admin-tab admin-only" data-tab="fournisseurs">Fournisseurs</button>
+          <button type="button" class="admin-tab admin-only" data-tab="stock">Stock</button>
+          <button type="button" class="admin-tab" data-tab="commandes">Commandes</button>
+          <button type="button" class="admin-tab" data-tab="clients">Sociétés</button>
+          <button type="button" class="admin-tab" data-tab="prix">Prix</button>
+          <button type="button" class="admin-tab admin-only" data-tab="analyses">Analyses</button>
+          <button type="button" class="admin-tab" data-tab="chat">Chat</button>
+        </div>
 
-    <section id="panel-produits" class="admin-panel" data-tab-scope>
+        <section id="panel-accueil" class="admin-panel">
+          <div id="adminDashboardHost"></div>
+        </section>
+
+    <section id="panel-produits" class="admin-panel" hidden data-tab-scope>
       <div class="section-tabs" data-section-tabs>
         <button type="button" class="section-tab active" data-section="liste">Catalogue</button>
         <button type="button" class="section-tab" data-section="formulaire">Ajouter / modifier</button>
       </div>
 
       <div data-section-panel="liste" class="dashboard-card dashboard-card-wide">
-        <h2>Produits enregistrés</h2>
+        <div class="dashboard-card-head">
+          <h2>Catalogue produits</h2>
+        </div>
+        <div class="admin-toolbar" id="productsToolbar">
+          <input type="search" class="admin-search-input" id="productSearchInput" placeholder="Rechercher un produit…" aria-label="Rechercher">
+          <select id="productFilterSupplier" aria-label="Filtre fournisseur"><option value="">Tous fournisseurs</option></select>
+          <select id="productFilterStatus" aria-label="Filtre statut">
+            <option value="">Tous statuts</option>
+            <option value="active">Visible</option>
+            <option value="hidden">Masqué</option>
+          </select>
+          <select id="productFilterStock" aria-label="Filtre stock">
+            <option value="">Tout stock</option>
+            <option value="ok">Stock OK</option>
+            <option value="low">Stock faible</option>
+            <option value="out">Rupture</option>
+          </select>
+          <select id="productSortBy" aria-label="Tri">
+            <option value="name">Tri : nom</option>
+            <option value="price-asc">Prix croissant</option>
+            <option value="price-desc">Prix décroissant</option>
+            <option value="stock-asc">Stock croissant</option>
+            <option value="stock-desc">Stock décroissant</option>
+            <option value="sales">Quantité vendue</option>
+          </select>
+        </div>
         <div class="table-wrap">
           <table class="requests-table">
             <thead>
               <tr>
-                <th>Image</th>
-                <th>Produit</th>
+                <th>Photo</th>
+                <th>Produit / SKU</th>
                 <th>Fournisseur</th>
-                <th>Prix</th>
-                <th>Stock dépôt</th>
-                <th>Badge</th>
+                <th>Prix achat</th>
+                <th>Prix vente</th>
+                <th>Marge</th>
+                <th>Stock</th>
                 <th>Statut</th>
                 <th>Actions</th>
               </tr>
@@ -104,12 +161,22 @@
           </div>
           <div class="form-row">
             <label>
-              Prix (€)
+              Prix de vente (€)
               <input type="number" name="price" required min="0" step="0.01">
             </label>
             <label>
+              Prix d'achat (€)
+              <input type="number" name="purchase_price" min="0" step="0.01" placeholder="Coût fournisseur">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
               Unité
               <input type="text" name="unit" value="litre">
+            </label>
+            <label>
+              &nbsp;
+              <span class="form-note" id="productMarginPreview"></span>
             </label>
           </div>
           <label>
@@ -176,10 +243,12 @@
           <table class="requests-table">
             <thead>
               <tr>
-                <th>Nom</th>
+                <th>Fournisseur</th>
                 <th>Contact</th>
-                <th>Pays</th>
-                <th>TVA</th>
+                <th>Pays / TVA</th>
+                <th>Produits</th>
+                <th>Dernière cmd</th>
+                <th>Total achats</th>
                 <th>Statut</th>
                 <th>Actions</th>
               </tr>
@@ -369,18 +438,28 @@
 
     <section id="panel-commandes" class="admin-panel" hidden>
       <div class="dashboard-card dashboard-card-wide">
-        <h2>Commandes clients</h2>
+        <div class="dashboard-card-head">
+          <h2>Commandes clients</h2>
+        </div>
+        <div class="admin-toolbar">
+          <input type="search" class="admin-search-input" id="orderSearchInput" placeholder="Rechercher N°, client…">
+          <select id="orderFilterStatus" aria-label="Filtre statut">
+            <option value="">Tous statuts</option>
+          </select>
+        </div>
         <div class="table-wrap">
           <table class="requests-table">
             <thead>
               <tr>
                 <th>Date</th>
-                <th>N°</th>
-                <th>Produits</th>
-                <th>Total</th>
+                <th>N° commande</th>
+                <th>Client / Société</th>
+                <th>Montant</th>
                 <th>Paiement</th>
                 <th>Statut</th>
-                <th>Livraison / suivi</th>
+                <th>Progression</th>
+                <th>Livraison</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="ordersAdminBody"></tbody>
@@ -407,8 +486,8 @@
                 <th>Société</th>
                 <th>Type</th>
                 <th>Contact</th>
-                <th>SIREN</th>
                 <th>TVA</th>
+                <th>CA généré</th>
                 <th>Agent</th>
                 <th>Email</th>
               </tr>
@@ -426,6 +505,7 @@
             <select name="company_type" id="adminCompanyTypeSelect" required>
               <option value="client">Client</option>
               <option value="supplier">Fournisseur</option>
+              <option value="mixed">Mixte (client + fournisseur)</option>
             </select>
           </label>
           <div class="form-row">
@@ -479,24 +559,85 @@
     </section>
 
     <section id="panel-prix" class="admin-panel" hidden>
-      <div class="dashboard-card">
-        <h2>Prix client personnalisé</h2>
-        <form id="adminCustomerPriceForm" class="auth-form">
-          <label>
-            Client
-            <select name="profile_id" id="adminPriceClientSelect" required></select>
-          </label>
-          <label>
-            Produit
-            <select name="product_slug" id="adminPriceProductSelect" required></select>
-          </label>
-          <label>
-            Prix fixé (€)
-            <input type="number" name="price" min="0" step="0.01" required>
-          </label>
-          <button type="submit" class="btn btn-primary">Fixer le prix</button>
-          <p class="form-note" id="adminCustomerPriceNote"></p>
-        </form>
+      <div class="dashboard-grid">
+        <div class="dashboard-card">
+          <h2>Fixer un prix personnalisé</h2>
+          <form id="adminCustomerPriceForm" class="auth-form">
+            <label>
+              Société cliente
+              <select name="profile_id" id="adminPriceClientSelect" required></select>
+            </label>
+            <label>
+              Produit
+              <select name="product_slug" id="adminPriceProductSelect" required></select>
+            </label>
+            <div class="form-row">
+              <label>
+                Catégorie client
+                <input type="text" name="client_category" placeholder="restaurant, hôtel, grossiste…">
+              </label>
+              <label>
+                Qté minimum
+                <input type="number" name="min_quantity" min="1" value="1">
+              </label>
+            </div>
+            <label>
+              Prix fixé (€)
+              <input type="number" name="price" min="0" step="0.01" required>
+            </label>
+            <p class="form-note" id="adminPriceDiscountPreview"></p>
+            <button type="submit" class="btn btn-primary">Enregistrer le tarif</button>
+            <p class="form-note" id="adminCustomerPriceNote"></p>
+          </form>
+        </div>
+        <div class="dashboard-card dashboard-card-wide">
+          <h2>Tarifs personnalisés actifs</h2>
+          <div class="table-wrap">
+            <table class="requests-table">
+              <thead>
+                <tr>
+                  <th>Société</th>
+                  <th>Catégorie</th>
+                  <th>Produit</th>
+                  <th>Prix catalogue</th>
+                  <th>Prix client</th>
+                  <th>Remise</th>
+                  <th>Qté min.</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="customerPricesBody"><tr><td colspan="8">Chargement…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-analyses" class="admin-panel admin-only" hidden>
+      <div class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Analyses financières</h2>
+          <div class="analytics-toolbar-actions">
+            <select id="analyticsPeriod" class="analytics-period-select" aria-label="Période">
+              <option value="month">30 derniers jours</option>
+              <option value="quarter">3 derniers mois</option>
+              <option value="year">12 derniers mois</option>
+              <option value="all" selected>Tout</option>
+            </select>
+            <button type="button" id="refreshAnalyticsBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+            <button type="button" id="openExpenseModalBtn" class="btn btn-sm btn-primary btn-analytics-add" title="Ajouter une dépense">+</button>
+          </div>
+        </div>
+        <p class="auth-sub" style="margin-bottom:1rem">
+          Suivi automatique des ventes clients et des achats stock fournisseur. Comparez gains et dépenses, ajoutez les frais manuels (livraison, logistique…).
+        </p>
+        <p class="form-note" id="analyticsPanelNote"></p>
+        <div id="analyticsKpis"></div>
+        <div class="analytics-section-title">
+          <h3>Journal des opérations</h3>
+        </div>
+        <div id="analyticsTableHost"></div>
+        <p class="form-note" id="analyticsNote" style="margin-top:1rem"></p>
       </div>
     </section>
 
@@ -506,7 +647,18 @@
           <h2>Chat &amp; modération</h2>
           <button type="button" id="refreshAdminChatBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
         </div>
-        <p class="auth-sub" style="margin-bottom:1rem">Consultez les conversations par société, validez ou refusez les messages clients et répondez.</p>
+        <p class="auth-sub" style="margin-bottom:1rem">Centre de support — modération, priorités et réponses rapides.</p>
+        <div class="chat-toolbar">
+          <input type="search" class="admin-search-input" id="adminChatSearch" placeholder="Rechercher une société…">
+          <select id="adminChatTicketFilter" aria-label="Filtre statut ticket">
+            <option value="">Tous tickets</option>
+            <option value="new">Nouveau</option>
+            <option value="in_progress">En cours</option>
+            <option value="waiting">En attente</option>
+            <option value="resolved">Résolu</option>
+            <option value="closed">Fermé</option>
+          </select>
+        </div>
         <div class="chat-inbox">
           <aside class="chat-inbox-list">
             <div id="adminChatList" class="chat-thread-list">
@@ -519,6 +671,17 @@
               <p class="empty-state">Choisissez une société dans la liste à gauche.</p>
             </div>
             <form id="adminChatReplyForm" class="auth-form chat-reply-form">
+              <div class="chat-quick-replies" id="adminChatQuickReplies"></div>
+              <label>
+                Statut du ticket
+                <select id="adminChatTicketStatus" disabled>
+                  <option value="new">Nouveau</option>
+                  <option value="in_progress">En cours</option>
+                  <option value="waiting">En attente</option>
+                  <option value="resolved">Résolu</option>
+                  <option value="closed">Fermé</option>
+                </select>
+              </label>
               <label>
                 Réponse à la société
                 <textarea name="message" rows="3" required placeholder="Votre réponse" disabled></textarea>
@@ -530,7 +693,64 @@
         </div>
       </div>
     </section>
-  </main>
+      </main>
+    </div>
+  </div>
+
+  <div id="supplierDetailModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog app-modal-dialog-wide">
+      <div class="app-modal-header">
+        <h2 id="supplierDetailTitle">Fiche fournisseur</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body" id="supplierDetailBody"></div>
+    </div>
+  </div>
+
+  <div id="analyticsExpenseModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog">
+      <div class="app-modal-header">
+        <h2>Ajouter une dépense</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
+        <form id="analyticsExpenseForm" class="auth-form">
+          <label>
+            Type
+            <select name="expense_type" required>
+              <option value="livraison">Livraison</option>
+              <option value="stock">Demande stock</option>
+              <option value="logistique">Logistique</option>
+              <option value="fournisseur">Fournisseur</option>
+              <option value="autre">Autre</option>
+            </select>
+          </label>
+          <label>
+            Libellé
+            <input type="text" name="label" required placeholder="Ex. Livraison commande Nice">
+          </label>
+          <div class="form-row">
+            <label>
+              Montant (€)
+              <input type="number" name="amount" required min="0" step="0.01">
+            </label>
+            <label>
+              Date
+              <input type="date" name="expense_date" required>
+            </label>
+          </div>
+          <label>
+            Notes (optionnel)
+            <textarea name="notes" rows="2" placeholder="Détails, référence facture…"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <p class="form-note" id="analyticsExpenseNote"></p>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <div id="trackingModal" class="app-modal" hidden>
     <div class="app-modal-backdrop" data-close-modal></div>
@@ -590,6 +810,10 @@
   <script src="js/stock-alerts.js?v=stock-fallback-20260623"></script>
   <script src="js/stock-admin.js?v=stock-fallback-20260623"></script>
   <script src="js/stock-purchases.js?v=stock-fallback-20260623"></script>
-  <script src="js/admin.js?v=stock-fallback-20260623"></script>
+  <script src="js/analytics-admin.js?v=analytics-20260624"></script>
+  <script src="js/admin-utils.js?v=admin-v2-20260624"></script>
+  <script src="js/admin-dashboard.js?v=admin-v2-20260624"></script>
+  <script src="js/admin-shell.js?v=admin-v2-20260624"></script>
+  <script src="js/admin.js?v=admin-v2-20260624"></script>
 </body>
 </html>

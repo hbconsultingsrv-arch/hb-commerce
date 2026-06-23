@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paiement &amp; Facturation | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=menu-20260618">
+  <link rel="stylesheet" href="css/commerce.css?v=product-info-20260619">
+  <link rel="stylesheet" href="css/hb-front.css?v=front-v3-20260624">
+  <link rel="stylesheet" href="css/hb-b2b.css?v=b2b-20260624">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+  <script src="js/markets.js"></script>
+</head>
+<body class="dashboard-page">
+  <nav class="nav nav-simple container site-nav">
+    <a href="index.html" class="logo logo-hb-brand">
+      <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="40" height="40" aria-hidden="true">
+      <span class="logo-hb-text">
+        <span class="logo-hb-name">HB Commerce</span>
+        <span class="logo-hb-tag">Consulting &amp; Services · B2B</span>
+      </span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" data-i18n="nav.home">Accueil</a></li>
+      <li><a href="produits.html" data-i18n="nav.products">Catalogue</a></li>
+      <li><a href="index.html#faq" data-i18n="section.faq">FAQ</a></li>
+      <li><a href="compte.html" data-i18n="nav.account">Mon compte</a></li>
+      <li><div id="marketSelector" class="market-switcher"></div></li>
+      <li><a href="panier.html" class="btn btn-sm btn-primary" data-i18n="nav.cart">Panier</a></li>
+    </ul>
+  </nav>
+
+  <header class="payment-page-hero">
+    <h1 data-i18n="payment.page.title">Paiement &amp; Facturation</h1>
+    <p data-i18n="payment.page.lead">Comprenez en quelques secondes comment régler votre commande professionnelle HB Commerce.</p>
+  </header>
+
+  <main class="container" style="padding-bottom:4rem">
+    <div class="payments-grid" style="margin-top:-1.5rem">
+      <article class="payment-card">
+        <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+        <h3 data-i18n="payment.transfer">Virement bancaire</h3>
+        <p data-i18n="payment.transfer.desc">Paiement sécurisé après validation de commande — RIB communiqué sur facture.</p>
+      </article>
+      <article class="payment-card">
+        <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></div>
+        <h3 data-i18n="payment.reception">Paiement à réception</h3>
+        <p data-i18n="payment.reception.desc">Disponible pour les comptes professionnels approuvés.</p>
+      </article>
+      <article class="payment-card">
+        <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <h3 data-i18n="payment.deferred">Paiement différé</h3>
+        <p data-i18n="payment.deferred.desc">30 jours pour clients récurrents après validation administrative.</p>
+      </article>
+      <article class="payment-card">
+        <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+        <h3 data-i18n="payment.invoice">Facture professionnelle</h3>
+        <p data-i18n="payment.invoice.desc">Facture avec SIREN/TVA, téléchargeable depuis votre espace client.</p>
+      </article>
+    </div>
+
+    <div class="payment-detail-grid">
+      <article class="payment-detail-card">
+        <h2 data-i18n="payment.detail.transfer.title">Virement bancaire</h2>
+        <ul>
+          <li data-i18n="payment.detail.transfer.1">Commande validée par HB Commerce</li>
+          <li data-i18n="payment.detail.transfer.2">Facture proforma ou définitive envoyée par e-mail</li>
+          <li data-i18n="payment.detail.transfer.3">Virement sur le RIB indiqué (IBAN / BIC)</li>
+          <li data-i18n="payment.detail.transfer.4">Préparation déclenchée à réception du paiement</li>
+        </ul>
+      </article>
+      <article class="payment-detail-card">
+        <h2 data-i18n="payment.detail.deferred.title">Paiement différé &amp; à réception</h2>
+        <ul>
+          <li data-i18n="payment.detail.deferred.1">Réservé aux comptes professionnels validés</li>
+          <li data-i18n="payment.detail.deferred.2">Conditions négociées selon votre historique</li>
+          <li data-i18n="payment.detail.deferred.3">Paiement à 30 jours fin de mois possible</li>
+          <li data-i18n="payment.detail.deferred.4">Contactez-nous pour activer cette option</li>
+        </ul>
+      </article>
+      <article class="payment-detail-card">
+        <h2 data-i18n="payment.detail.online.title">Paiement en ligne (Stripe)</h2>
+        <ul>
+          <li data-i18n="payment.detail.online.1">Carte bancaire sécurisée au checkout</li>
+          <li data-i18n="payment.detail.online.2">Confirmation immédiate de paiement</li>
+          <li data-i18n="payment.detail.online.3">Facture générée automatiquement</li>
+        </ul>
+      </article>
+      <article class="payment-detail-card">
+        <h2 data-i18n="payment.detail.invoice.title">Vos documents comptables</h2>
+        <ul>
+          <li data-i18n="payment.detail.invoice.1">Devis sur demande (formulaire devis)</li>
+          <li data-i18n="payment.detail.invoice.2">Factures PDF dans « Mon compte »</li>
+          <li data-i18n="payment.detail.invoice.3">Mentions légales, SIREN, TVA intracommunautaire</li>
+          <li data-i18n="payment.detail.invoice.4">Bon de livraison joint à l'expédition</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="payment-steps-summary">
+      <h2 style="margin-top:0;font-family:var(--font-display,Georgia,serif);color:var(--hb-green)" data-i18n="payment.summary.title">En résumé — votre parcours de paiement</h2>
+      <ol>
+        <li data-i18n="payment.summary.1">Vous passez commande en ligne ou demandez un devis</li>
+        <li data-i18n="payment.summary.2">HB Commerce valide la commande et émet la facture</li>
+        <li data-i18n="payment.summary.3">Vous réglez selon le mode convenu (virement, différé, en ligne)</li>
+        <li data-i18n="payment.summary.4">Préparation et livraison — suivi dans votre espace client</li>
+      </ol>
+    </div>
+
+    <div class="b2b-quote-banner" style="margin-top:2.5rem">
+      <div>
+        <h3 data-i18n="quote.banner.title">Une question sur la facturation ?</h3>
+        <p data-i18n="payment.page.cta">Notre équipe commerciale vous accompagne pour choisir le mode de paiement adapté.</p>
+      </div>
+      <button type="button" class="btn-quote" data-open-quote data-i18n="quote.cta">Demander un devis</button>
+    </div>
+  </main>
+
+  <footer class="footer-commerce footer-pro">
+    <div class="container footer-bottom" style="border-top:none;margin-top:0">
+      <span>© 2026 HB Commerce</span>
+      <div class="footer-legal-links">
+        <a href="conditions-generales.html" data-i18n="footer.cgv">CGV</a>
+        <a href="confidentialite.html" data-i18n="footer.privacy">Confidentialité</a>
+        <a href="index.html" data-i18n="nav.home">Accueil</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/locales.js"></script>
+  <script src="js/market-ui.js"></script>
+  <script src="js/quote-request.js?v=b2b-20260624"></script>
+  <script src="js/b2b-ui.js?v=b2b-20260624"></script>
+  <script>document.addEventListener('DOMContentLoaded', () => { if (typeof initI18n === 'function') initI18n(); });</script>
+</body>
+</html>
