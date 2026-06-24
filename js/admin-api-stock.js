@@ -1,5 +1,6 @@
 /**
  * Surcharge createOrder — validation stock + déduction automatique
+ * Charger APRÈS admin-api.js et stock.js
  */
 (function patchCreateOrderWithStock() {
   if (typeof createOrder !== 'function') return;

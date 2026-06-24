@@ -74,6 +74,10 @@ async function initDashboard() {
   if (adminLink && await isAdmin()) {
     adminLink.style.display = '';
   }
+  const qaLink = document.getElementById('compteQaLink');
+  if (qaLink && await isAdmin()) {
+    qaLink.style.display = '';
+  }
   const superRootLink = document.getElementById('compteSuperRootLink');
   if (superRootLink && typeof isSuperRoot === 'function' && await isSuperRoot()) {
     superRootLink.style.display = '';

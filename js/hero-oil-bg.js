@@ -7,14 +7,16 @@
   if (!canvas || !hero) return;
 
   const ctx = canvas.getContext('2d');
+  let w = 0;
+  let h = 0;
   let drops = [];
   let particles = [];
   let raf = 0;
 
   function resize() {
     const rect = hero.getBoundingClientRect();
-    canvas.width = Math.floor(rect.width * (window.devicePixelRatio || 1));
-    canvas.height = Math.floor(rect.height * (window.devicePixelRatio || 1));
+    w = canvas.width = Math.floor(rect.width * (window.devicePixelRatio || 1));
+    h = canvas.height = Math.floor(rect.height * (window.devicePixelRatio || 1));
     canvas.style.width = `${rect.width}px`;
     canvas.style.height = `${rect.height}px`;
     ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);

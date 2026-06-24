@@ -23,6 +23,8 @@
     <div class="nav-actions">
       <a href="super-root.html" id="compteSuperRootLink" class="btn btn-sm btn-primary" style="display:none">Super root</a>
       <a href="admin.html" id="compteAdminLink" class="btn btn-sm btn-primary" style="display:none">Administration</a>
+      <a href="qa.html" id="compteQaLink" class="btn btn-sm btn-outline-light" style="display:none">Qualité QA</a>
+      <a href="suivi-commande.html" class="btn btn-sm btn-outline-light">Suivi commande</a>
       <a href="produits.html" class="btn btn-sm btn-primary">Nouvelle commande</a>
       <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
     </div>
@@ -47,7 +49,10 @@
       <div class="dashboard-card dashboard-card-wide">
         <div class="dashboard-card-head">
           <h2>Mes commandes</h2>
-          <a href="produits.html" class="btn btn-sm btn-primary">+ Commander</a>
+          <div class="dashboard-card-actions">
+            <a href="suivi-commande.html" class="btn btn-sm btn-outline-dark">Suivi détaillé</a>
+            <a href="produits.html" class="btn btn-sm btn-primary">+ Commander</a>
+          </div>
         </div>
         <div id="ordersEmpty" class="empty-state" hidden>
           <p>Aucune commande pour le moment.</p>

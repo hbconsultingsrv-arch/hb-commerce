@@ -3,114 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-i18n="auth.login.title">Connexion | HB Commerce</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <title>Connexion | HB Commerce</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/hb-front.css?v=front-v3-20260624">
-  <link rel="stylesheet" href="css/auth-premium.css?v=auth-20260624">
-  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
-  <script src="js/markets.js"></script>
-  <script src="js/locales.js"></script>
 </head>
-<body class="auth-page auth-page--premium">
-  <div class="auth-premium-wrap">
-    <div class="auth-premium-bg" aria-hidden="true">
-      <div class="auth-premium-bg__image" id="authPremiumBg"></div>
-      <div class="auth-premium-bg__shimmer"></div>
+<body class="auth-page">
+  <main class="auth-main container">
+    <div class="auth-card">
+      <h1>Connexion</h1>
+      <form id="loginForm" class="auth-form">
+        <label>E-mail <input type="email" name="email" required></label>
+        <label>Mot de passe <input type="password" name="password" required minlength="6"></label>
+        <button type="submit" class="btn btn-primary">Se connecter</button>
+        <p class="form-note" id="loginNote"></p>
+      </form>
     </div>
-
-    <div class="auth-split auth-split--premium">
-      <aside class="auth-split-visual auth-split-visual--premium">
-        <a href="index.html" class="logo logo-hb-brand" style="margin-bottom:1.5rem">
-          <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="44" height="44" aria-hidden="true">
-          <span class="logo-hb-text">
-            <span class="logo-hb-name" style="color:#fff">HB Commerce</span>
-            <span class="logo-hb-tag">Consulting &amp; Services · B2B</span>
-          </span>
-        </a>
-        <span class="auth-visual-kicker" data-i18n="hero.kicker">Plateforme B2B</span>
-        <h1 data-i18n="auth.visual.title">La plateforme B2B des huiles alimentaires</h1>
-        <p data-i18n="auth.visual.sub">Commandez en gros, suivez vos livraisons et gérez votre facturation en ligne.</p>
-        <ul class="auth-benefits auth-benefits--premium">
-          <li data-i18n="auth.benefit.prices">Prix professionnels négociés</li>
-          <li data-i18n="auth.benefit.orders">Historique de commandes</li>
-          <li data-i18n="auth.benefit.invoice">Facturation et devis</li>
-          <li data-i18n="auth.benefit.support">Support commercial dédié</li>
-        </ul>
-        <a href="index.html" class="auth-back-home">← <span data-i18n="nav.home">Retour à l'accueil</span></a>
-      </aside>
-
-      <main class="auth-split-form auth-split-form--premium">
-        <div class="auth-card auth-card-premium auth-card-login">
-          <span class="section-tag" data-i18n="login.tag">Espace client</span>
-          <h1 data-i18n="auth.login.title">Connexion</h1>
-          <p class="auth-sub" data-i18n="auth.login.sub">Accédez à votre espace professionnel.</p>
-
-          <form id="loginForm" class="auth-form">
-            <label>
-              <span data-i18n="register.email">E-mail professionnel</span>
-              <input type="email" name="email" required placeholder="vous@entreprise.fr" autocomplete="email">
-            </label>
-            <label>
-              <span data-i18n="register.password">Mot de passe</span>
-              <div class="auth-password-row">
-                <input type="password" name="password" required minlength="6" autocomplete="current-password">
-                <button type="button" class="auth-toggle-pw" data-toggle-password aria-label="Afficher">👁</button>
-              </div>
-            </label>
-            <p style="text-align:right;margin:-0.25rem 0 0">
-              <a href="login.html" style="font-size:0.85rem;color:var(--hb-gold-soft,#e8d48a)" data-i18n="auth.forgot">Mot de passe oublié ?</a>
-            </p>
-            <button type="submit" class="btn btn-primary btn-full" style="margin-top:0.5rem" data-i18n="login.submit">Se connecter</button>
-            <p class="form-note" id="loginNote"></p>
-          </form>
-
-          <p class="auth-switch"><span data-i18n="login.noAccount">Pas encore de compte ?</span> <a href="register.html" data-i18n="login.register">Inscrivez-vous</a></p>
-        </div>
-      </main>
-    </div>
-  </div>
-
+  </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/market-ui.js"></script>
-  <script src="js/hb-front.js?v=front-v3-20260624"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof initI18n === 'function') initI18n();
-      const bg = document.getElementById('authPremiumBg');
-      const market = typeof getMarket === 'function' ? getMarket() : null;
-      if (bg && market?.images?.hero) {
-        bg.style.backgroundImage = `url('${market.images.hero}')`;
-      }
-
-      const params = new URLSearchParams(window.location.search);
-      const requestedRedirect = params.get('redirect');
-      const note = document.getElementById('loginNote');
-
-      if (params.get('confirmed') === '1') {
-        showAlert(note, 'E-mail confirmé. Vous pouvez vous connecter.', 'success');
-      }
-
-      document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const fd = new FormData(e.target);
-        try {
-          const data = await signIn(fd.get('email'), fd.get('password'));
-          window.location.href = requestedRedirect || await getDefaultDashboardUrl(data.session);
-        } catch (err) {
-          showAlert(note, mapAuthError(err));
-        }
-      });
-
-      getSession().then(async (s) => {
-        if (s) window.location.href = requestedRedirect || await getDefaultDashboardUrl(s);
-      });
-    });
-  </script>
 </body>
 </html>

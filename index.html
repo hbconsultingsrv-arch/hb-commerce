@@ -3,34 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="HB Commerce — Vente en gros alimentaire B2B. Catalogue FIAFI, TOUNSI et produits sélectionnés. Commande, facturation et livraison en ligne." data-i18n-desc="meta.description">
-  <title data-i18n="meta.title">HB Commerce | Vente en gros B2B</title>
+  <meta name="description" content="HB Commerce — Vente en gros alimentaire B2B. Catalogue multi-marques, commande en ligne et espace professionnel.">
+  <title>HB Commerce | Vente en gros B2B</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=home-20260619">
-  <link rel="stylesheet" href="css/commerce.css?v=hero-top-20260619">
-  <link rel="stylesheet" href="css/hero-3d.css?v=hero-slider-20260624">
-  <link rel="stylesheet" href="css/stock.css?v=stock-20260619">
-  <link rel="stylesheet" href="css/brochure.css?v=home-20260619">
-  <link rel="stylesheet" href="css/hb-front.css?v=front-v3-20260624">
-  <link rel="stylesheet" href="css/hero-premium.css?v=hero-premium-20260624">
-  <link rel="stylesheet" href="css/hb-b2b.css?v=b2b-20260624">
-  <link rel="stylesheet" href="css/hb-site-depth.css?v=depth-20260624">
-  <link rel="stylesheet" href="css/hb-theme-light.css?v=theme-20260615">
+  <link rel="stylesheet" href="css/style.css?v=home-20260615">
+  <link rel="stylesheet" href="css/commerce.css?v=hero-top-20260615">
+  <link rel="stylesheet" href="css/hero-3d.css?v=hero-3d-20260615">
+  <link rel="stylesheet" href="css/stock.css?v=stock-20260615">
+  <link rel="stylesheet" href="css/brochure.css?v=home-20260615">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
   <script src="js/markets.js"></script>
-  <script>
-    (function () {
-      try {
-        if (localStorage.getItem('hb_site_theme') === 'light') {
-          document.documentElement.classList.add('site-theme-light');
-        } else {
-          document.documentElement.classList.add('site-theme-dark');
-        }
-      } catch (e) { /* ignore */ }
-    })();
-  </script>
 </head>
 <body>
   <header class="hero-commerce" id="accueil">
@@ -40,116 +24,69 @@
     <div class="hero-oil-shimmer" aria-hidden="true"></div>
     <div class="hero-overlay" aria-hidden="true"></div>
 
-    <nav class="nav container site-nav">
-      <a href="index.html" class="logo logo-hb-brand">
-        <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="36" height="36" aria-hidden="true">
-        <span class="logo-hb-text">
-          <span class="logo-hb-name">HB Commerce</span>
-          <span class="logo-hb-tag">Consulting &amp; Services · B2B</span>
-        </span>
+    <nav class="nav container">
+      <a href="index.html" class="logo">
+        <img src="assets/logo.svg" alt="HB Commerce — HB Consulting &amp; Services" class="logo-img" width="220" height="48">
       </a>
       <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
       <ul class="nav-links">
         <li><a href="#accueil" data-i18n="nav.home">Accueil</a></li>
-        <li><a href="#produits" data-i18n="nav.products">Catalogue</a></li>
+        <li><a href="#products" data-i18n="nav.products">Produits</a></li>
         <li><a href="#services" data-i18n="nav.services">Services</a></li>
-        <li><a href="#confiance" data-i18n="nav.trust">Confiance</a></li>
-        <li><a href="paiement-facturation.html" data-i18n="footer.payment">Paiement</a></li>
-        <li><a href="#faq" data-i18n="section.faq">FAQ</a></li>
+        <li><a href="#apropos" data-i18n="nav.about">À propos</a></li>
         <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
         <li><a href="#" id="brochureLink" data-i18n="nav.brochure">Brochure</a></li>
-        <li id="navAccount" style="display:none"><a href="compte.html" class="nav-icon-btn nav-account-link" data-i18n="nav.account">Mon compte</a></li>
-        <li id="navAdmin" style="display:none"><a href="admin.html" class="nav-icon-btn">Admin</a></li>
-        <li id="navLogin"><a href="login.html" class="nav-icon-btn nav-account-link" data-i18n="nav.login">Connexion</a></li>
+        <li id="navAccount" style="display:none"><a href="compte.html" data-i18n="nav.account">Mon compte</a></li>
+        <li id="navTracking" style="display:none"><a href="suivi-commande.html">Suivi commande</a></li>
+        <li id="navAdmin" style="display:none"><a href="admin.html">Admin</a></li>
+        <li id="navLogin"><a href="login.html" data-i18n="nav.login">Connexion</a></li>
         <li id="navLogout" style="display:none"><a href="#" data-i18n="nav.logout">Déconnexion</a></li>
+        <li>
+          <div id="marketSelector" class="market-switcher" aria-label="Marché"></div>
+        </li>
+        <li><a href="panier.html" class="btn btn-sm btn-primary"><span data-i18n="nav.cart">Panier</span> <span id="cartBadge" class="cart-badge" style="display:none">0</span></a></li>
       </ul>
-      <div class="site-nav-actions">
-        <button type="button" id="siteThemeToggleBtn" class="nav-icon-btn nav-theme-toggle" aria-label="Passer en mode clair" title="Mode clair">☀️</button>
-        <div id="marketSelector" class="market-switcher" aria-label="Pays"></div>
-        <a href="panier.html" class="nav-icon-btn nav-icon-btn--cart nav-cart-link">
-          <span data-i18n="nav.cart">Panier</span>
-          <span id="cartBadge" class="cart-badge" style="display:none">0</span>
-        </a>
-      </div>
     </nav>
 
     <div class="hero-commerce-inner hero-hb-inner">
       <div class="hero-hb-copy">
-        <span class="hero-kicker" data-i18n="hero.kicker">Plateforme B2B · HB Consulting &amp; Services</span>
+        <span class="hero-kicker">Plateforme B2B · HB Consulting &amp; Services</span>
         <h1>
           <span class="hb-title">HB Commerce</span>
-          <span data-i18n="hero.title">Distribution professionnelle d'huiles alimentaires</span>
+          <span data-i18n="hero.title">Vente en gros alimentaire professionnelle</span>
         </h1>
         <p class="hero-lead" data-i18n-html="hero.lead"></p>
-        <p class="hero-trust-line" data-i18n="hero.trust">Distribution professionnelle d'huiles alimentaires pour restaurants, hôtels et grossistes en France et au Luxembourg.</p>
         <ul class="hero-pills" id="heroBrandPills">
           <li data-i18n="hero.pill1">Multi-marques</li>
           <li data-i18n="hero.pill2">Commande en ligne</li>
           <li data-i18n="hero.pill3">Vente en gros</li>
         </ul>
         <div class="hero-cta-row">
-          <a href="#produits" class="btn btn-primary" data-i18n="hero.cta.catalog">Voir le catalogue</a>
-          <button type="button" class="btn btn-quote" data-open-quote data-i18n="quote.cta">Demander un devis</button>
+          <a href="#products" class="btn btn-primary" data-i18n="hero.cta.catalog">Voir le catalogue</a>
           <a href="register.html" class="btn btn-outline-light" data-i18n="hero.cta.account">Compte professionnel</a>
         </div>
       </div>
+
       <aside class="hero-cube-stage" aria-label="Catalogue actif">
-        <div class="hero-showcase-3d" id="heroShowcase3d">
-          <div class="hero-showcase-glow" aria-hidden="true"></div>
-          <div class="hero-showcase-ring hero-showcase-ring--1" aria-hidden="true"></div>
-          <div class="hero-showcase-ring hero-showcase-ring--2" aria-hidden="true"></div>
-          <div class="hero-showcase-tilt">
-            <div class="hero-cube-header">
-              <p class="hero-promo-label">Catalogue actif</p>
-              <span class="hero-cube-counter" id="heroCubeCounter">—</span>
-            </div>
-            <div class="hero-cube-viewport" id="heroCubeViewport">
-              <div class="hero-cube-backdrop" id="heroCubeBackdrop" aria-hidden="true"></div>
-              <button type="button" class="hero-cube-nav hero-cube-nav--prev" id="heroCubePrev" aria-label="Marque précédente">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-              </button>
-              <div class="hero-cube-slider">
-                <div class="hero-cube-track" id="heroCube" aria-live="polite"></div>
-              </div>
-              <button type="button" class="hero-cube-nav hero-cube-nav--next" id="heroCubeNext" aria-label="Marque suivante">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
-              </button>
-            </div>
-          </div>
+        <div class="hero-cube-header">
+          <p class="hero-promo-label">Catalogue actif</p>
+          <span class="hero-cube-counter" id="heroCubeCounter">—</span>
         </div>
-        <p class="hero-cube-hint">
-          <span>Défilement auto</span> · glissez ← → ou utilisez les flèches
-        </p>
+        <div class="hero-cube-viewport" id="heroCubeViewport">
+          <div class="hero-cube" id="heroCube" aria-live="polite"></div>
+        </div>
+        <div class="hero-cube-meta" id="heroCubeMeta" hidden></div>
+        <div class="hero-cube-dots" id="heroCubeDots" hidden></div>
+        <p class="hero-cube-hint"><span>Glissez ou cliquez</span> pour parcourir les marques</p>
         <p class="hero-promo-note" id="heroCatalogNote">Chargement des marques et produits…</p>
         <div id="heroPromoBrands" class="hero-promo-brands" hidden aria-hidden="true"></div>
       </aside>
     </div>
-
-    <div class="hero-stats-band">
-      <div class="hero-stats-row">
-        <div class="hero-stat"><span class="hero-stat-value" id="heroStatBrands">—</span><span class="hero-stat-label" data-i18n="hero.stat.brands">Marques</span></div>
-        <div class="hero-stat"><span class="hero-stat-value" id="heroStatProducts">—</span><span class="hero-stat-label" data-i18n="hero.stat.products">Produits</span></div>
-        <div class="hero-stat"><span class="hero-stat-value" id="heroStatDelivery">FR+LU</span><span class="hero-stat-label" data-i18n="hero.stat.delivery">Livraison nationale</span></div>
-        <div class="hero-stat"><span class="hero-stat-value" id="heroStatSupport">24/7</span><span class="hero-stat-label" data-i18n="hero.stat.support">Support pro</span></div>
-      </div>
-      <ul class="hero-brand-pills-row" id="heroBrandPillsRow"></ul>
-    </div>
-
-    <div class="hero-scroll-hint" aria-hidden="true">Découvrir</div>
   </header>
 
-  <div class="hb-site-depth" id="hbSiteDepth">
-    <div class="hb-depth-bg" id="hbDepthBg" aria-hidden="true"></div>
-    <canvas id="hbDepthCanvas" class="hb-depth-canvas" aria-hidden="true"></canvas>
-    <div id="hbDepthRipples" class="hb-depth-ripples" aria-hidden="true"></div>
-    <div class="hb-depth-shimmer" aria-hidden="true"></div>
-    <div class="hb-depth-overlay" aria-hidden="true"></div>
-
-    <div class="hb-depth-content">
-
-  <section class="hb-services-band hb-depth-section" id="services">
+  <section class="hb-services-band" id="services">
     <div class="container">
       <div class="section-head-inline">
         <div>
@@ -174,30 +111,25 @@
           <p data-i18n="service.invoice.desc">Devis, factures téléchargeables et prix personnalisés par société cliente.</p>
         </article>
         <article class="service-promo-card">
-          <span class="service-promo-icon" aria-hidden="true">🌍</span>
-          <h3 data-i18n="service.brands.title">Import direct Tunisie</h3>
-          <p data-i18n="service.brands.desc">FIAFI, TOUNSI — sourcing direct et qualité extra vierge.</p>
-        </article>
-        <article class="service-promo-card">
           <span class="service-promo-icon" aria-hidden="true">🚚</span>
-          <h3 data-i18n="service.delivery.title">Livraison nationale</h3>
-          <p data-i18n="service.delivery.desc">Suivi transporteur et délais optimisés sur tout le territoire.</p>
+          <h3 data-i18n="service.delivery.title">Livraison &amp; suivi</h3>
+          <p data-i18n="service.delivery.desc">Statuts de commande, transporteur, numéro de suivi et délais selon le stock.</p>
         </article>
         <article class="service-promo-card">
-          <span class="service-promo-icon" aria-hidden="true">€</span>
-          <h3 data-i18n="service.pricing.title">Tarification professionnelle</h3>
-          <p data-i18n="service.pricing.desc">Prix par société, volume et catégorie client.</p>
+          <span class="service-promo-icon" aria-hidden="true">💬</span>
+          <h3 data-i18n="service.chat.title">Accompagnement commercial</h3>
+          <p data-i18n="service.chat.desc">Chat avec votre agent HB Commerce pour négocier, valider et suivre vos besoins.</p>
         </article>
         <article class="service-promo-card service-promo-card-highlight">
-          <span class="service-promo-icon" aria-hidden="true">💬</span>
-          <h3 data-i18n="service.chat.title">Support dédié</h3>
-          <p data-i18n="service.chat.desc">Agent commercial et chat pour vos besoins professionnels.</p>
+          <span class="service-promo-icon" aria-hidden="true">🫒</span>
+          <h3 data-i18n="service.brands.title">Multi-marques</h3>
+          <p data-i18n="service.brands.desc">FIAFI, TOUNSI et autres références ajoutées au catalogue au fil des partenariats.</p>
         </article>
       </div>
     </div>
   </section>
 
-  <section class="section-commerce fiafi-section container hb-depth-section" id="produits">
+  <section class="section-commerce fiafi-section container" id="products">
     <div class="section-head-inline">
       <div>
         <h2 data-i18n="section.products">Notre catalogue par marque</h2>
@@ -205,282 +137,12 @@
       </div>
       <a href="produits.html" class="btn btn-outline-dark" data-i18n="section.products.all">Catalogue complet</a>
     </div>
-    <div class="catalog-filters" id="catalogFilters">
-      <input type="search" class="catalog-search" id="catalogFilterSearch" data-i18n-placeholder="filter.search" placeholder="Rechercher un produit…">
-      <select id="catalogFilterBrand" aria-label="Marque"><option value="" data-i18n="filter.brand">Toutes les marques</option></select>
-      <select id="catalogFilterFormat" aria-label="Format"><option value="" data-i18n="filter.format">Tous les formats</option></select>
-      <select id="catalogFilterOrigin" aria-label="Origine"><option value="" data-i18n="filter.origin">Toutes les origines</option></select>
-      <select id="catalogFilterStock" aria-label="Stock">
-        <option value="" data-i18n="filter.stock.all">Tout</option>
-        <option value="in" data-i18n="filter.stock.in">En stock</option>
-        <option value="low" data-i18n="filter.stock.low">Stock faible</option>
-        <option value="out" data-i18n="filter.stock.out">Rupture</option>
-      </select>
-    </div>
     <div id="homeBrandCatalog" class="home-brand-catalog">
       <p class="empty-state">Chargement du catalogue…</p>
     </div>
   </section>
 
-    <div class="b2b-quote-banner" style="margin-top:2rem">
-      <div>
-        <h3 data-i18n="quote.banner.title">Besoin d'un tarif sur mesure ?</h3>
-        <p data-i18n="quote.banner.sub">Restaurants, hôtels et grossistes — recevez un devis personnalisé selon vos volumes et votre activité.</p>
-      </div>
-      <button type="button" class="btn-quote" data-open-quote data-i18n="quote.cta">Demander un devis</button>
-    </div>
-  </section>
-
-  <section class="hb-trust-section hb-depth-section" id="confiance">
-    <div class="container">
-      <h2 data-i18n="section.trust.pro">Pourquoi les professionnels travaillent avec HB Commerce ?</h2>
-      <p class="section-sub" data-i18n="section.trust.pro.sub">Un partenaire B2B fiable pour l'approvisionnement en huiles alimentaires — de la commande à la facturation.</p>
-      <div class="trust-grid">
-        <article class="trust-item">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
-          <h3 data-i18n="trust.certified">Produits certifiés</h3>
-          <p data-i18n="trust.certified.desc">Extra vierge, traçabilité complète et fiches techniques.</p>
-        </article>
-        <article class="trust-item">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 5v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
-          <h3 data-i18n="trust.delivery">Livraison rapide</h3>
-          <p data-i18n="trust.delivery.desc">France et Luxembourg — suivi transporteur et délais optimisés.</p>
-        </article>
-        <article class="trust-item">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
-          <h3 data-i18n="trust.pricing">Tarifs professionnels</h3>
-          <p data-i18n="trust.pricing.desc">Prix négociés par société, volume et catégorie client.</p>
-        </article>
-        <article class="trust-item">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></div>
-          <h3 data-i18n="trust.invoice">Facturation entreprise</h3>
-          <p data-i18n="trust.invoice.desc">Devis, factures PDF et conditions B2B adaptées.</p>
-        </article>
-        <article class="trust-item">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
-          <h3 data-i18n="trust.support">Support dédié</h3>
-          <p data-i18n="trust.support.desc">Agent commercial, chat et accompagnement personnalisé.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="hb-payments-section hb-depth-section" id="paiements">
-    <div class="container">
-      <h2 data-i18n="section.payments">Comment payez-vous votre commande ?</h2>
-      <p class="section-sub" data-i18n="section.payments.sub">Des modalités claires et adaptées aux professionnels — compréhension en moins de 10 secondes.</p>
-      <div class="payments-grid">
-        <article class="payment-card">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
-          <h3 data-i18n="payment.transfer">Virement bancaire</h3>
-          <p data-i18n="payment.transfer.desc">Paiement sécurisé après validation de commande — RIB communiqué sur facture.</p>
-        </article>
-        <article class="payment-card">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></div>
-          <h3 data-i18n="payment.reception">Paiement à réception</h3>
-          <p data-i18n="payment.reception.desc">Disponible pour les comptes professionnels approuvés.</p>
-        </article>
-        <article class="payment-card">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
-          <h3 data-i18n="payment.deferred">Paiement différé</h3>
-          <p data-i18n="payment.deferred.desc">30 jours pour clients récurrents après validation administrative.</p>
-        </article>
-        <article class="payment-card">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
-          <h3 data-i18n="payment.invoice">Facture professionnelle</h3>
-          <p data-i18n="payment.invoice.desc">Facture avec SIREN/TVA, téléchargeable depuis votre espace client.</p>
-        </article>
-      </div>
-      <div class="payments-cta">
-        <a href="paiement-facturation.html" class="btn btn-primary" data-i18n="payment.page.link">Voir paiement &amp; facturation en détail</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="hb-process-section hb-depth-section" id="commander">
-    <div class="container">
-      <h2 data-i18n="section.process">Comment commander ?</h2>
-      <p class="section-sub" data-i18n="section.process.sub">Un parcours simple en 6 étapes, de l'inscription à la livraison.</p>
-      <div class="process-timeline">
-        <div class="process-step">
-          <div class="process-step-num">1</div>
-          <h3 data-i18n="process.step1">Compte professionnel</h3>
-          <p data-i18n="process.step1.desc">Inscription gratuite avec vos informations société.</p>
-        </div>
-        <div class="process-step">
-          <div class="process-step-num">2</div>
-          <h3 data-i18n="process.step2">Choisir ses produits</h3>
-          <p data-i18n="process.step2.desc">Catalogue multi-marques avec tarifs pro.</p>
-        </div>
-        <div class="process-step">
-          <div class="process-step-num">3</div>
-          <h3 data-i18n="process.step3">Validation commande</h3>
-          <p data-i18n="process.step3.desc">Récapitulatif et confirmation en ligne.</p>
-        </div>
-        <div class="process-step">
-          <div class="process-step-num">4</div>
-          <h3 data-i18n="process.step4">Paiement</h3>
-          <p data-i18n="process.step4.desc">Virement, différé ou en ligne selon votre profil.</p>
-        </div>
-        <div class="process-step">
-          <div class="process-step-num">5</div>
-          <h3 data-i18n="process.step5">Préparation</h3>
-          <p data-i18n="process.step5.desc">Préparation dépôt et contrôle qualité.</p>
-        </div>
-        <div class="process-step">
-          <div class="process-step-num">6</div>
-          <h3 data-i18n="process.step6">Livraison</h3>
-          <p data-i18n="process.step6.desc">Expédition suivie sur toute la France et au Luxembourg.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="hb-clients-section hb-depth-section" id="clients-pro">
-    <div class="container">
-      <h2 data-i18n="section.clients">Nous travaillons avec</h2>
-      <p class="section-sub" data-i18n="section.clients.sub">Des professionnels de la restauration, de l'hôtellerie et de la distribution.</p>
-      <div class="clients-grid">
-        <article class="client-type-card">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 11h18M5 11V7a2 2 0 012-2h10a2 2 0 012 2v4M6 11v8M18 11v8M10 19h4"/></svg></div>
-          <h3 data-i18n="client.restaurant">Restaurants</h3>
-          <p data-i18n="client.restaurant.desc">Cartes gastronomiques et brasseries.</p>
-        </article>
-        <article class="client-type-card">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg></div>
-          <h3 data-i18n="client.hotel">Hôtels</h3>
-          <p data-i18n="client.hotel.desc">Groupes hôteliers et résidences.</p>
-        </article>
-        <article class="client-type-card">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 01-8 0"/></svg></div>
-          <h3 data-i18n="client.epicerie">Épiceries</h3>
-          <p data-i18n="client.epicerie.desc">Épiceries fines et commerces spécialisés.</p>
-        </article>
-        <article class="client-type-card">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div>
-          <h3 data-i18n="client.wholesale">Grossistes</h3>
-          <p data-i18n="client.wholesale.desc">Volumes importants et réassort régulier.</p>
-        </article>
-        <article class="client-type-card">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
-          <h3 data-i18n="client.distributor">Distributeurs</h3>
-          <p data-i18n="client.distributor.desc">Réseaux régionaux et importateurs.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="hb-guarantees-section hb-depth-section" id="garanties">
-    <div class="container">
-      <h2 data-i18n="section.guarantees">Nos garanties</h2>
-      <p class="section-sub" data-i18n="section.guarantees.sub">Qualité, conformité et transparence à chaque étape.</p>
-      <div class="guarantees-grid">
-        <article class="guarantee-card">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
-          <h3 data-i18n="guarantee.quality">Contrôle qualité</h3>
-          <p data-i18n="guarantee.quality.desc">Sélection rigoureuse et contrôles à réception.</p>
-        </article>
-        <article class="guarantee-card">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-          <h3 data-i18n="guarantee.compliant">Produits conformes</h3>
-          <p data-i18n="guarantee.compliant.desc">Normes alimentaires européennes respectées.</p>
-        </article>
-        <article class="guarantee-card">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
-          <h3 data-i18n="guarantee.trace">Traçabilité</h3>
-          <p data-i18n="guarantee.trace.desc">Origine, lots et fiches techniques disponibles.</p>
-        </article>
-        <article class="guarantee-card">
-          <div class="b2b-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
-          <h3 data-i18n="guarantee.invoice">Facturation professionnelle</h3>
-          <p data-i18n="guarantee.invoice.desc">Documents conformes pour votre comptabilité.</p>
-        </article>
-      </div>
-      <div class="cert-logos-slot" aria-label="Certifications">
-        <div class="cert-logo-placeholder" data-i18n="cert.placeholder">Logo certification</div>
-        <div class="cert-logo-placeholder" data-i18n="cert.placeholder">Logo certification</div>
-        <div class="cert-logo-placeholder" data-i18n="cert.placeholder">Logo certification</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="hb-stats-section hb-depth-section" id="chiffres">
-    <div class="container">
-      <h2 style="text-align:center;margin-bottom:2rem" data-i18n="section.stats">HB Commerce en chiffres</h2>
-      <div class="stats-counter-grid">
-        <div class="stat-counter"><span class="stat-counter-value" data-counter="counterBrands" data-counter-target="0">0</span><span class="stat-counter-label" data-i18n="stats.brands">Marques partenaires</span></div>
-        <div class="stat-counter"><span class="stat-counter-value" data-counter="counterProducts" data-counter-target="0">0</span><span class="stat-counter-label" data-i18n="stats.products">Produits disponibles</span></div>
-        <div class="stat-counter"><span class="stat-counter-value" data-counter="counterOrders" data-counter-target="0">0</span><span class="stat-counter-label" data-i18n="stats.orders">Commandes traitées</span></div>
-        <div class="stat-counter"><span class="stat-counter-value" data-counter="counterClients" data-counter-target="0">0</span><span class="stat-counter-label" data-i18n="stats.clients">Entreprises clientes</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="hb-testimonials hb-depth-section" id="temoignages">
-    <div class="container">
-      <h2 data-i18n="section.testimonials">Ils nous font confiance</h2>
-      <p class="section-sub" data-i18n="section.testimonials.sub">Restaurants, hôtels et distributeurs.</p>
-      <div class="testimonials-grid">
-        <article class="testimonial-card">
-          <p class="testimonial-quote" data-i18n="testimonial.1.quote"></p>
-          <p class="testimonial-author" data-i18n="testimonial.1.author"></p>
-          <p class="testimonial-role" data-i18n="testimonial.1.role"></p>
-        </article>
-        <article class="testimonial-card">
-          <p class="testimonial-quote" data-i18n="testimonial.2.quote"></p>
-          <p class="testimonial-author" data-i18n="testimonial.2.author"></p>
-          <p class="testimonial-role" data-i18n="testimonial.2.role"></p>
-        </article>
-        <article class="testimonial-card">
-          <p class="testimonial-quote" data-i18n="testimonial.3.quote"></p>
-          <p class="testimonial-author" data-i18n="testimonial.3.author"></p>
-          <p class="testimonial-role" data-i18n="testimonial.3.role"></p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="hb-faq-section hb-depth-section" id="faq">
-    <div class="container">
-      <h2 data-i18n="section.faq">Questions fréquentes</h2>
-      <p class="section-sub" data-i18n="section.faq.sub">Tout ce qu'un professionnel doit savoir avant de commander.</p>
-      <div class="faq-list">
-        <div class="faq-item">
-          <button type="button" class="faq-question" aria-expanded="false" data-i18n="faq.q1">Livrez-vous toute la France ?</button>
-          <div class="faq-answer"><p data-i18n="faq.a1">Oui, HB Commerce assure la livraison sur l'ensemble du territoire français métropolitain. Les délais varient selon votre zone et la disponibilité stock (généralement 3 à 7 jours ouvrés).</p></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" class="faq-question" aria-expanded="false" data-i18n="faq.q2">Livrez-vous le Luxembourg ?</button>
-          <div class="faq-answer"><p data-i18n="faq.a2">Oui, nous livrons au Luxembourg et dans la Grande Région. Contactez-nous pour un devis adapté à votre zone de livraison.</p></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" class="faq-question" aria-expanded="false" data-i18n="faq.q3">Quels sont les délais de livraison ?</button>
-          <div class="faq-answer"><p data-i18n="faq.a3">En stock : 3 à 5 jours ouvrés. Sur commande : 7 à 14 jours selon référence. Le délai exact est indiqué sur chaque fiche produit et dans votre espace client.</p></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" class="faq-question" aria-expanded="false" data-i18n="faq.q4">Quels moyens de paiement acceptez-vous ?</button>
-          <div class="faq-answer"><p data-i18n="faq.a4">Virement bancaire, paiement à réception (comptes approuvés), paiement différé 30 jours (clients récurrents) et carte bancaire en ligne via Stripe. Voir notre page <a href="paiement-facturation.html">Paiement &amp; Facturation</a>.</p></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" class="faq-question" aria-expanded="false" data-i18n="faq.q5">Y a-t-il un minimum de commande ?</button>
-          <div class="faq-answer"><p data-i18n="faq.a5">Chaque produit a une quantité minimum (indiquée sur la fiche). Pour les premières commandes ou gros volumes, demandez un devis personnalisé.</p></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" class="faq-question" aria-expanded="false" data-i18n="faq.q6">Comment obtenir un devis ?</button>
-          <div class="faq-answer"><p data-i18n="faq.a6">Cliquez sur « Demander un devis » depuis l'accueil, le catalogue ou une fiche produit. Renseignez votre société, les produits et quantités souhaités. Réponse sous 24 à 48 h ouvrées.</p></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" class="faq-question" aria-expanded="false" data-i18n="faq.q7">Comment contacter le support ?</button>
-          <div class="faq-answer"><p data-i18n="faq.a7">Par téléphone, e-mail ou formulaire de contact. Les clients connectés peuvent aussi utiliser le chat depuis leur espace « Mon compte ».</p></div>
-        </div>
-      </div>
-      <div class="payments-cta" style="margin-top:2.5rem">
-        <button type="button" class="btn-quote" data-open-quote data-i18n="quote.cta">Demander un devis</button>
-      </div>
-    </div>
-  </section>
-
-  <section class="section-commerce hb-depth-section container" id="apropos">
+  <section class="section-commerce" id="apropos" style="background:var(--white)">
     <div class="container">
       <h2 data-i18n="section.about">Pourquoi HB Commerce ?</h2>
       <p class="section-sub" data-i18n="section.about.sub"></p>
@@ -504,108 +166,45 @@
     </div>
   </section>
 
-  <section class="hb-contact-section section-commerce container hb-depth-section" id="contact">
-    <h2 data-i18n="section.contact">Contact professionnel</h2>
+  <section class="section-commerce container" id="contact">
+    <h2 data-i18n="section.contact">Contact</h2>
     <p class="section-sub" data-i18n="section.contact.sub"></p>
-    <div class="contact-grid">
-      <div class="contact-info-card">
-        <p><strong>HB Commerce</strong> — HB Consulting &amp; Services</p>
-        <div class="contact-info-item">
-          <span class="contact-info-icon">📞</span>
-          <div>
-            <strong data-i18n="contact.phone">Téléphone</strong><br>
-            <a href="tel:+33752565123" id="marketContactPhone">07 52 56 51 23</a>
-          </div>
-        </div>
-        <div class="contact-info-item">
-          <span class="contact-info-icon">✉</span>
-          <div>
-            <strong data-i18n="contact.email">E-mail</strong><br>
-            <a href="mailto:hb.consulting.srv@gmail.com" id="marketContactEmail">hb.consulting.srv@gmail.com</a>
-          </div>
-        </div>
-        <div class="contact-info-item">
-          <span class="contact-info-icon">📍</span>
-          <div>
-            <strong data-i18n="contact.address">Adresse</strong><br>
-            <span id="marketContactAddress"></span>
-          </div>
-        </div>
-        <a href="register.html" class="btn btn-primary" style="margin-top:1rem" data-i18n="hero.cta.account">Compte professionnel</a>
-        <button type="button" class="btn btn-quote" style="margin-top:0.75rem;width:100%" data-open-quote data-i18n="quote.cta">Demander un devis</button>
-      </div>
-      <div class="contact-form-card">
-        <h3 data-i18n="contact.form.title">Demande professionnelle</h3>
-        <form id="contactForm" class="auth-form">
-          <label><span data-i18n="contact.form.company">Société</span><input type="text" name="company" required></label>
-          <div class="form-row">
-            <label><span data-i18n="contact.form.name">Nom</span><input type="text" name="name" required></label>
-            <label><span data-i18n="contact.form.phone">Téléphone</span><input type="tel" name="phone"></label>
-          </div>
-          <label><span data-i18n="contact.form.subject">Objet</span><input type="text" name="subject" required></label>
-          <label><span data-i18n="contact.form.message">Message</span><textarea name="message" rows="4" required></textarea></label>
-          <button type="submit" class="btn btn-primary" data-i18n="contact.form.submit">Envoyer</button>
-          <p class="form-note" id="contactFormNote"></p>
-        </form>
-      </div>
+    <div class="dashboard-card" style="max-width:600px;margin:0 auto">
+      <p><strong>HB Commerce</strong> — HB Consulting &amp; Services</p>
+      <p id="marketContactEmail">E-mail : <a href="mailto:contact@hbconsulting.fr">contact@hbconsulting.fr</a></p>
+      <p id="marketContactPhone">Téléphone : 07 52 56 51 23</p>
+      <p id="marketContactAddress" style="color:var(--text-muted);font-size:0.95rem"></p>
+      <p style="margin-top:1rem">
+        <a href="register.html" class="btn btn-primary" data-i18n="hero.cta.account">Compte professionnel</a>
+      </p>
     </div>
   </section>
 
-  <footer class="footer-commerce footer-pro">
+  <footer class="footer-commerce">
     <div class="container footer-grid">
       <div>
-        <a href="index.html" class="logo logo-hb-brand" style="margin-bottom:1rem;display:inline-flex">
-          <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="36" height="36" aria-hidden="true">
-          <span class="logo-hb-text">
-            <span class="logo-hb-name">HB Commerce</span>
-            <span class="logo-hb-tag">Consulting &amp; Services · B2B</span>
-          </span>
-        </a>
-        <p data-i18n="footer.tagline">Distribution professionnelle d'huiles alimentaires — France &amp; Luxembourg.</p>
-        <p class="footer-hours">
-          <strong data-i18n="footer.hours.title">Horaires</strong><br>
-          <span data-i18n="footer.hours">Lun – Ven : 9h00 – 18h00</span>
-        </p>
-        <div class="footer-social" aria-label="Réseaux sociaux">
-          <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">in</a>
-          <a href="mailto:hb.consulting.srv@gmail.com" aria-label="E-mail">@</a>
-        </div>
-      </div>
-      <div>
-        <h4 data-i18n="footer.nav">Navigation</h4>
-        <p><a href="produits.html" data-i18n="nav.products">Catalogue</a></p>
-        <p><a href="paiement-facturation.html" data-i18n="footer.payment">Paiement &amp; Facturation</a></p>
-        <p><a href="index.html#faq" data-i18n="section.faq">FAQ</a></p>
-        <p><a href="panier.html" data-i18n="nav.cart">Panier</a></p>
-        <p><a href="compte.html" data-i18n="nav.account">Mon compte</a></p>
-      </div>
-      <div>
-        <h4 data-i18n="footer.contact">Contact</h4>
-        <p><a href="tel:+33752565123" id="footerPhone">07 52 56 51 23</a></p>
-        <p><a href="mailto:hb.consulting.srv@gmail.com" id="footerEmail">hb.consulting.srv@gmail.com</a></p>
-        <p id="footerAddress">France — distribution nationale</p>
+        <img src="assets/logo.svg" alt="HB Commerce" width="180" height="38" style="margin-bottom:1rem">
+        <p>Commerce en gros alimentaire — HB Consulting &amp; Services</p>
         <p style="margin-top:0.75rem"><a href="#" id="footerBrochureLink" data-i18n="footer.brochure">Brochure</a></p>
       </div>
       <div>
-        <h4 data-i18n="footer.legal">Informations légales</h4>
-        <p><a href="conditions-generales.html" data-i18n="footer.cgv">Conditions générales</a></p>
-        <p><a href="confidentialite.html" data-i18n="footer.privacy">Politique de confidentialité</a></p>
-        <p><a href="index.html#contact" data-i18n="nav.contact">Contact</a></p>
-        <p><button type="button" class="btn-quote" data-open-quote style="margin-top:0.5rem;font-size:0.82rem;padding:0.5rem 1rem" data-i18n="quote.cta">Demander un devis</button></p>
+        <h4>Navigation</h4>
+        <p><a href="produits.html" data-i18n="nav.products">Produits</a></p>
+        <p><a href="panier.html" data-i18n="nav.cart">Panier</a></p>
+        <p><a href="compte.html" data-i18n="nav.account">Mon compte</a></p>
+        <p><a href="suivi-commande.html">Suivi de commande</a></p>
+      </div>
+      <div>
+        <h4>HB Commerce</h4>
+        <p><a href="#products" data-i18n="nav.products">Catalogue marques</a></p>
+        <p><a href="produits.html">FIAFI — huile d'olive</a></p>
+        <p data-i18n="hero.ribbon">Origine Tunisie</p>
       </div>
     </div>
     <div class="container footer-bottom">
-      <span>© 2026 HB Commerce — HB Consulting &amp; Services</span>
-      <div class="footer-legal-links">
-        <a href="conditions-generales.html" data-i18n="footer.cgv">CGV</a>
-        <a href="confidentialite.html" data-i18n="footer.privacy">Confidentialité</a>
-        <a href="paiement-facturation.html" data-i18n="footer.payment">Paiement</a>
-      </div>
+      © 2026 HB Commerce — HB Consulting &amp; Services
     </div>
   </footer>
-
-  </div><!-- .hb-depth-content -->
-  </div><!-- .hb-site-depth -->
 
   <div id="productTechModal" class="app-modal" hidden>
     <div class="app-modal-backdrop" data-close-modal></div>
@@ -625,20 +224,15 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js?v=home-20260619"></script>
+  <script src="js/auth.js?v=home-20260615"></script>
   <script src="js/cart.js"></script>
-  <script src="js/products.js?v=supabase-fix-20260619"></script>
-  <script src="js/stock.js?v=stock-20260619"></script>
-  <script src="js/products-stock.js?v=stock-20260619"></script>
-  <script src="js/hero-oil-bg.js?v=hero-3d-20260623"></script>
-  <script src="js/hb-site-depth-bg.js?v=depth-20260624"></script>
-  <script src="js/hero-cube.js?v=hero-slider-20260624"></script>
-  <script src="js/main.js?v=front-v3-20260624"></script>
-  <script src="js/market-ui.js?v=front-v3-20260624"></script>
-  <script src="js/hb-front.js?v=front-v3-20260624"></script>
-  <script src="js/quote-request.js?v=b2b-20260624"></script>
-  <script src="js/b2b-ui.js?v=b2b-20260624"></script>
-  <script src="js/theme-toggle.js?v=theme-20260615"></script>
+  <script src="js/products.js?v=supabase-fix-20260615"></script>
+  <script src="js/stock.js?v=stock-20260615"></script>
+  <script src="js/products-stock.js?v=stock-20260615"></script>
+  <script src="js/hero-oil-bg.js?v=hero-3d-20260615"></script>
+  <script src="js/hero-cube.js?v=hero-3d-20260615"></script>
+  <script src="js/main.js?v=supabase-fix-20260615"></script>
+  <script src="js/market-ui.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const m = getMarket();
@@ -648,17 +242,6 @@
       if (footerBrochure) footerBrochure.href = m.brochurePage;
       const addr = document.getElementById('marketContactAddress');
       if (addr && m.contact) addr.textContent = m.contact.address;
-      const phone = document.getElementById('marketContactPhone');
-      if (phone && m.contact) {
-        phone.textContent = m.contact.phone;
-        phone.href = `tel:${m.contact.phone.replace(/\s/g, '')}`;
-      }
-      const email = document.getElementById('marketContactEmail');
-      if (email && m.contact) {
-        email.textContent = m.contact.email;
-        email.href = `mailto:${m.contact.email}`;
-      }
-      if (typeof initI18n === 'function') initI18n();
     });
   </script>
 </body>

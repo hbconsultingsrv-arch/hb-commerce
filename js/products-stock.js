@@ -1,7 +1,63 @@
 /**
- * Enrichit l'affichage catalogue avec stock dépôt et rupture
+ * Enrichit fetchProducts / affichage avec stock_quantity depuis products
+ * Charger APRÈS products.js et stock.js
  */
-(function patchProductsStockDisplay() {
+(function patchProductsStock() {
+  if (typeof applyStockInfo !== 'function') return;
+
+  const legacyApplyStockInfo = applyStockInfo;
+
+  window.applyStockInfo = async function applyStockInfoPatched(products) {
+    const enriched = await legacyApplyStockInfo(products);
+    return enriched.map((product) => {
+      if (typeof product.stock_quantity === 'number') {
+        const available = Math.max(0, product.stock_quantity);
+        const min = getProductMinStockAlert(product);
+        const lead = available > 0 ? 3 : 14;
+        return {
+          ...product,
+          stock_available: available,
+          estimated_delivery_days: lead,
+          delivery_delay_label: available > 0
+            ? `En stock (${available} u.) — livraison estimée ${lead} jours`
+            : `Sur commande — réapprovisionnement en cours`
+        };
+      }
+      return product;
+    });
+  };
+
+  if (typeof getProductAvailability === 'function') {
+    window.getProductAvailability = function getProductAvailabilityPatched(product) {
+      if (typeof product.stock_quantity === 'number') {
+        return getStockStatus(product);
+      }
+      return {
+        label: product?.stock_available > 0 ? 'En stock' : 'Sur commande',
+        detail: product?.delivery_delay_label || '',
+        tone: product?.stock_available > 0 ? 'in-stock' : 'on-order'
+      };
+    };
+  }
+
+  if (typeof renderProductInfoStrip === 'function') {
+    const legacyStrip = renderProductInfoStrip;
+    window.renderProductInfoStrip = function renderProductInfoStripPatched(product) {
+      const strip = legacyStrip(product);
+      if (typeof renderStockBadge !== 'function') return strip;
+      const badge = renderStockBadge(product);
+      return strip.replace('</div>\n    <button', `${badge}</div>\n    <button`).replace(
+        'class="product-info-strip"',
+        'class="product-info-strip"'
+      ).replace(
+        /<\/div>\s*<button class="btn-tech-sheet"/,
+        `${badge}\n    <button class="btn-tech-sheet"`
+      );
+    };
+  }
+})();
+
+(function patchRenderProductInfoStripSimple() {
   if (typeof renderProductInfoStrip !== 'function' || typeof getStockStatus !== 'function') return;
 
   window.renderProductInfoStrip = function renderProductInfoStripWithStock(product) {
@@ -28,24 +84,8 @@
         <span class="product-info-label">Stock</span>
         <span class="product-info-value">${escapeHtml(stock.detail)}</span>
       </div>
-      <button type="button" class="product-info-tech btn-tech-sheet" aria-label="Fiche technique de ${escapeHtml(product.name)}">
-        Fiche technique
-      </button>
+      <button type="button" class="btn-tech-sheet" data-action="tech-sheet">Fiche technique</button>
     </div>
     `;
   };
-
-  if (typeof renderProductCard === 'function') {
-    const legacyCard = renderProductCard;
-    window.renderProductCard = function renderProductCardWithZeroStock(product) {
-      const html = legacyCard(product);
-      if (typeof renderZeroStockBanner !== 'function') return html;
-      const banner = renderZeroStockBanner(product);
-      if (!banner) return html;
-      return html.replace(
-        '<div class="product-card-body">',
-        `${banner}<div class="product-card-body">`
-      );
-    };
-  }
 })();

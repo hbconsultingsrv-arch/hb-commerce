@@ -1,58 +1,18 @@
-async function initProductsPage() {
-  const grid = document.getElementById('productsGrid');
-  const navHost = document.getElementById('categoryNav');
-  const qualityHost = document.getElementById('qualitySection');
-  if (!grid) return;
-
-  if (typeof refreshPriceVisibility === 'function') {
-    await refreshPriceVisibility();
-  }
-
-  if (qualityHost && typeof renderQualitySection === 'function') {
-    qualityHost.innerHTML = renderQualitySection();
-  }
-
-  const products = await fetchProducts();
-
-  if (navHost && typeof bindCategoryNav === 'function') {
-    bindCategoryNav(navHost, products, grid, (product, qty) => {
-      const toast = document.getElementById('cartToast');
-      if (toast) {
-        toast.textContent = `${product.name} ajouté (${qty} ${product.unit}(s))`;
-        toast.hidden = false;
-        setTimeout(() => { toast.hidden = true; }, 3000);
-      }
-    });
-  } else {
-    grid.innerHTML = products.map(renderProductCard).join('');
-    bindProductCardEvents(grid, null, products);
-  }
-
-  const hash = window.location.hash.replace('#cat-', '');
-  if (hash && navHost) {
-    const btn = navHost.querySelector(`[data-category="${hash}"]`);
-    if (btn) btn.click();
-  }
-}
-
 async function initHomeProducts() {
   if (typeof refreshPriceVisibility === 'function') {
     await refreshPriceVisibility();
   }
 
   const catalogHost = document.getElementById('homeBrandCatalog');
-  if (!catalogHost) return;
-
   const products = await fetchProducts();
   const brandGroups = typeof groupProductsByBrand === 'function' ? groupProductsByBrand(products) : [];
 
-  catalogHost.innerHTML = typeof renderHomeBrandCatalog === 'function'
-    ? renderHomeBrandCatalog(products)
-    : products.map(renderProductCard).join('');
-  bindProductCardEvents(catalogHost, null, products);
-
-  if (typeof populateCatalogFilters === 'function') populateCatalogFilters(products);
-  if (typeof updateHeroStats === 'function') updateHeroStats(products);
+  if (catalogHost) {
+    catalogHost.innerHTML = typeof renderHomeBrandCatalog === 'function'
+      ? renderHomeBrandCatalog(products)
+      : products.map(renderProductCard).join('');
+    bindProductCardEvents(catalogHost, null, products);
+  }
 
   if (typeof initHeroBrandCube === 'function') {
     initHeroBrandCube(products);
@@ -78,19 +38,11 @@ async function initHomeProducts() {
   }
 
   const heroPills = document.getElementById('heroBrandPills');
-  const heroPillsRow = document.getElementById('heroBrandPillsRow');
-  if (brandGroups.length) {
-    const pillsHtml = brandGroups.slice(0, 6).map(([brand]) => {
+  if (heroPills && brandGroups.length) {
+    heroPills.innerHTML = brandGroups.slice(0, 4).map(([brand]) => {
       const meta = getBrandMeta(brand);
-      return `<li><a href="#marque-${meta.slug}">${escapeHtml(brand)}</a></li>`;
+      return `<li><a href="#products">${escapeHtml(brand)}</a></li>`;
     }).join('');
-    if (heroPills) {
-      heroPills.innerHTML = brandGroups.slice(0, 4).map(([brand]) => {
-        const meta = getBrandMeta(brand);
-        return `<li><a href="#marque-${meta.slug}">${escapeHtml(brand)}</a></li>`;
-      }).join('');
-    }
-    if (heroPillsRow) heroPillsRow.innerHTML = pillsHtml;
   }
 }
 

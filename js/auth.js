@@ -277,6 +277,7 @@ function bindAppModal(modalId) {
 async function updateNavAuth() {
   const loginLink = document.getElementById('navLogin');
   const accountLink = document.getElementById('navAccount');
+  const trackingLink = document.getElementById('navTracking');
   const adminLink = document.getElementById('navAdmin');
   const logoutBtn = document.getElementById('navLogout');
   const cartBadge = document.getElementById('cartBadge');
@@ -287,6 +288,7 @@ async function updateNavAuth() {
   if (session) {
     if (loginLink) loginLink.style.display = 'none';
     if (accountLink) accountLink.style.display = '';
+    if (trackingLink) trackingLink.style.display = '';
     if (logoutBtn) logoutBtn.style.display = '';
     if (adminLink) {
       let admin = false;
@@ -298,6 +300,7 @@ async function updateNavAuth() {
   } else {
     if (loginLink) loginLink.style.display = '';
     if (accountLink) accountLink.style.display = 'none';
+    if (trackingLink) trackingLink.style.display = 'none';
     if (adminLink) adminLink.style.display = 'none';
     if (logoutBtn) logoutBtn.style.display = 'none';
   }

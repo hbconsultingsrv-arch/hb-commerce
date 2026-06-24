@@ -1,15 +1,6 @@
 /**
- * Utilitaires stock HB Commerce — dépôt, alertes, achats fournisseur
+ * Utilitaires stock HB Commerce
  */
-
-function formatRestockDate(dateStr) {
-  if (!dateStr) return null;
-  try {
-    return new Date(dateStr).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
-  } catch {
-    return dateStr;
-  }
-}
 
 function getProductStockQuantity(product) {
   if (!product) return 0;
@@ -26,35 +17,28 @@ function getProductMinStockAlert(product) {
 function isLowStock(product) {
   const qty = getProductStockQuantity(product);
   const min = getProductMinStockAlert(product);
-  return qty > 0 && qty <= min;
+  return qty <= min;
 }
 
 function getStockStatus(product) {
   const available = getProductStockQuantity(product);
   const min = getProductMinStockAlert(product);
-  const restockDate = product?.next_restock_date || product?.estimated_restock_date;
-  const restockLabel = restockDate ? formatRestockDate(restockDate) : null;
 
   if (available <= 0) {
-    const detail = restockLabel
-      ? `Zero stock — réapprovisionnement estimé le ${restockLabel}`
-      : 'Zero stock — réapprovisionnement en cours';
     return {
-      label: 'Zero stock',
-      detail,
+      label: 'Rupture',
+      detail: 'Sur commande — réapprovisionnement nécessaire',
       tone: 'out-of-stock',
-      low: true,
-      zero: true
+      low: true
     };
   }
 
   if (available <= min) {
     return {
       label: 'Stock bas',
-      detail: `Plus que ${available} unité${available > 1 ? 's' : ''} — pensez à racheter (seuil ${min})`,
+      detail: `Plus que ${available} unité${available > 1 ? 's' : ''} — pensez à racheter`,
       tone: 'low-stock',
-      low: true,
-      zero: false
+      low: true
     };
   }
 
@@ -62,19 +46,19 @@ function getStockStatus(product) {
     label: 'En stock',
     detail: `${available} unité${available > 1 ? 's' : ''} disponible${available > 1 ? 's' : ''}`,
     tone: 'in-stock',
-    low: false,
-    zero: false
+    low: false
   };
 }
 
 function renderStockBadge(product) {
   const status = getStockStatus(product);
   const available = getProductStockQuantity(product);
+  const min = getProductMinStockAlert(product);
   const cls = `stock-badge stock-badge--${status.tone}`;
-  const text = status.zero ? 'Zero stock' : `${available} en stock`;
   return `
     <span class="${cls}" title="${escapeHtml(status.detail)}">
-      ${escapeHtml(text)}
+      ${escapeHtml(String(available))} en stock
+      ${status.low ? `<small>· seuil ${min}</small>` : ''}
     </span>
   `;
 }
@@ -88,15 +72,9 @@ function renderAdminStockCell(product) {
     <div class="${cls}">
       <strong>${available}</strong>
       <span>seuil ${min}</span>
-      ${status.low ? `<em class="stock-alert-msg">${status.zero ? 'Zero stock' : 'Stock bas'}</em>` : ''}
+      ${status.low ? `<em class="stock-alert-msg">⚠ Stock bas — racheter</em>` : ''}
     </div>
   `;
-}
-
-function renderZeroStockBanner(product) {
-  const status = getStockStatus(product);
-  if (!status.zero) return '';
-  return `<p class="zero-stock-msg" role="alert">${escapeHtml(status.detail)}</p>`;
 }
 
 async function checkCartStock(cartItems) {
@@ -135,7 +113,7 @@ async function deductStockForOrder(order, items, userId) {
   }
 }
 
-async function receiveProductStock({ productSlug, quantity, notes, supplierOrderId = null }) {
+async function receiveProductStock({ productSlug, quantity, notes }) {
   const sb = getSupabase();
   if (!sb) throw new Error(configErrorMessage());
   const session = await getSession();
@@ -143,100 +121,10 @@ async function receiveProductStock({ productSlug, quantity, notes, supplierOrder
     p_slug: productSlug,
     p_qty: quantity,
     p_notes: notes || null,
-    p_user_id: session?.user?.id || null,
-    p_supplier_order_id: supplierOrderId
+    p_user_id: session?.user?.id || null
   });
-  if (!error) return data;
-
-  if (!/function|receive_product_stock|schema cache/i.test(error.message || '')) {
-    throw error;
-  }
-
-  const { data: product, error: fetchErr } = await sb
-    .from('products')
-    .select('id, stock_quantity')
-    .eq('slug', productSlug)
-    .single();
-  if (fetchErr || !product) throw fetchErr || new Error('Produit introuvable');
-
-  const newQty = Math.max(0, Number(product.stock_quantity) || 0) + quantity;
-  const { error: updateErr } = await sb
-    .from('products')
-    .update({ stock_quantity: newQty })
-    .eq('slug', productSlug);
-  if (updateErr) throw updateErr;
-  return newQty;
-}
-
-async function receiveSupplierOrderAtDepot(orderId) {
-  const sb = getSupabase();
-  if (!sb) throw new Error(configErrorMessage());
-
-  const { data, error } = await sb.rpc('receive_supplier_order_at_depot', { p_order_id: orderId });
-  if (!error) return data;
-
-  if (!/function|receive_supplier_order_at_depot|schema cache|column/i.test(error.message || '')) {
-    throw error;
-  }
-
-  const { data: order, error: fetchErr } = await sb
-    .from('supplier_orders')
-    .select('*')
-    .eq('id', orderId)
-    .single();
-  if (fetchErr || !order) throw fetchErr || new Error('Commande fournisseur introuvable');
-
-  if (order.status === 'received' || order.depot_received) {
-    throw new Error('Cette commande est déjà réceptionnée.');
-  }
-
-  const newQty = await receiveProductStock({
-    productSlug: order.product_slug,
-    quantity: order.quantity,
-    notes: `Réception dépôt — commande ${String(orderId).slice(0, 8)}`,
-    supplierOrderId: orderId
-  });
-
-  await updateSupplierOrder(orderId, { status: 'received' });
-  return newQty;
-}
-
-async function adjustProductStockLoss({ productSlug, quantity, notes }) {
-  const sb = getSupabase();
-  if (!sb) throw new Error(configErrorMessage());
-  if (!productSlug || !quantity || quantity <= 0) {
-    throw new Error('Produit et quantité valides requis pour ajuster le stock.');
-  }
-
-  const session = await getSession();
-  const { data: product, error: fetchErr } = await sb
-    .from('products')
-    .select('id, slug, name, stock_quantity, min_stock_alert')
-    .eq('slug', productSlug)
-    .single();
-  if (fetchErr || !product) throw fetchErr || new Error('Produit introuvable');
-
-  const currentQty = Math.max(0, Number(product.stock_quantity) || 0);
-  const newQty = Math.max(0, currentQty - quantity);
-
-  const { error: updateErr } = await sb
-    .from('products')
-    .update({ stock_quantity: newQty })
-    .eq('slug', productSlug);
-  if (updateErr) throw updateErr;
-
-  const { error: movementErr } = await sb.from('stock_movements').insert({
-    product_slug: productSlug,
-    product_id: product.id,
-    movement_type: 'adjustment',
-    quantity_delta: -quantity,
-    quantity_after: newQty,
-    notes: notes || `Incident stock −${quantity}`,
-    created_by: session?.user?.id || null
-  });
-  if (movementErr) console.warn('stock_movements insert:', movementErr.message);
-
-  return newQty;
+  if (error) throw error;
+  return data;
 }
 
 async function fetchLowStockProducts() {
@@ -251,50 +139,6 @@ async function fetchLowStockProducts() {
     return [];
   }
   return data || [];
-}
-
-async function fetchPendingRestockMap(slugs = null) {
-  const sb = getSupabase();
-  if (!sb) return {};
-  let query = sb.from('pending_restock_orders').select('*');
-  if (slugs?.length) query = query.in('product_slug', slugs);
-  const { data, error } = await query;
-  if (error) {
-    console.warn('pending_restock_orders:', error.message);
-    return {};
-  }
-  return Object.fromEntries((data || []).map((row) => [row.product_slug, row]));
-}
-
-async function fetchStockAlerts(status = 'open') {
-  const sb = getSupabase();
-  if (!sb) return [];
-  let query = sb.from('stock_alerts').select('*').order('created_at', { ascending: false });
-  if (status) query = query.eq('status', status);
-  const { data, error } = await query;
-  if (error) {
-    console.warn('stock_alerts:', error.message);
-    return [];
-  }
-  return data || [];
-}
-
-async function closeStockAlert(alertId) {
-  const sb = getSupabase();
-  if (!sb) throw new Error(configErrorMessage());
-  const session = await getSession();
-  const { data, error } = await sb
-    .from('stock_alerts')
-    .update({
-      status: 'closed',
-      closed_at: new Date().toISOString(),
-      closed_by: session?.user?.id || null
-    })
-    .eq('id', alertId)
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
 }
 
 async function fetchRecentStockMovements(limit = 30) {
@@ -312,31 +156,14 @@ async function fetchRecentStockMovements(limit = 30) {
   return data || [];
 }
 
-const SUPPLIER_ORDER_STATUS_LABELS = {
-  requested: 'Demandée',
-  accepted: 'Acceptée',
-  in_preparation: 'En préparation',
-  shipped: 'En transit',
-  received: 'Reçue au dépôt',
-  cancelled: 'Annulée'
-};
-
-window.formatRestockDate = formatRestockDate;
 window.getProductStockQuantity = getProductStockQuantity;
 window.getProductMinStockAlert = getProductMinStockAlert;
 window.isLowStock = isLowStock;
 window.getStockStatus = getStockStatus;
 window.renderStockBadge = renderStockBadge;
 window.renderAdminStockCell = renderAdminStockCell;
-window.renderZeroStockBanner = renderZeroStockBanner;
 window.checkCartStock = checkCartStock;
 window.deductStockForOrder = deductStockForOrder;
 window.receiveProductStock = receiveProductStock;
-window.receiveSupplierOrderAtDepot = receiveSupplierOrderAtDepot;
-window.adjustProductStockLoss = adjustProductStockLoss;
 window.fetchLowStockProducts = fetchLowStockProducts;
-window.fetchPendingRestockMap = fetchPendingRestockMap;
-window.fetchStockAlerts = fetchStockAlerts;
-window.closeStockAlert = closeStockAlert;
 window.fetchRecentStockMovements = fetchRecentStockMovements;
-window.SUPPLIER_ORDER_STATUS_LABELS = SUPPLIER_ORDER_STATUS_LABELS;

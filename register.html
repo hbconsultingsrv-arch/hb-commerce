@@ -3,157 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-i18n="auth.register.title">Inscription | HB Commerce</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <title>Inscription | HB Commerce</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/hb-front.css?v=front-v3-20260624">
-  <link rel="stylesheet" href="css/auth-premium.css?v=auth-20260624">
-  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
-  <script src="js/markets.js"></script>
-  <script src="js/locales.js"></script>
 </head>
-<body class="auth-page auth-page--premium">
-  <div class="auth-premium-wrap">
-    <div class="auth-premium-bg" aria-hidden="true">
-      <div class="auth-premium-bg__image" id="authPremiumBg"></div>
-      <div class="auth-premium-bg__shimmer"></div>
+<body class="auth-page">
+  <main class="auth-main container">
+    <div class="auth-card auth-card-wide">
+      <h1>Inscription professionnelle</h1>
+      <form id="registerForm" class="auth-form">
+        <label>E-mail <input type="email" name="email" required></label>
+        <label>Mot de passe <input type="password" name="password" required minlength="6"></label>
+        <label>Société <input type="text" name="company" required></label>
+        <button type="submit" class="btn btn-primary">Créer le compte</button>
+      </form>
     </div>
-
-    <div class="auth-split auth-split--premium">
-      <aside class="auth-split-visual auth-split-visual--premium">
-        <a href="index.html" class="logo logo-hb-brand" style="margin-bottom:1.5rem">
-          <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="44" height="44" aria-hidden="true">
-          <span class="logo-hb-text">
-            <span class="logo-hb-name" style="color:#fff">HB Commerce</span>
-            <span class="logo-hb-tag">Consulting &amp; Services · B2B</span>
-          </span>
-        </a>
-        <span class="auth-visual-kicker" data-i18n="hero.kicker">Plateforme B2B</span>
-        <h1 data-i18n="auth.visual.title">La plateforme B2B des huiles alimentaires</h1>
-        <p data-i18n="auth.register.sub">Rejoignez les restaurants, hôtels et grossistes qui commandent via HB Commerce.</p>
-        <ul class="auth-benefits auth-benefits--premium">
-          <li data-i18n="auth.benefit.prices">Prix professionnels négociés</li>
-          <li data-i18n="auth.benefit.orders">Historique de commandes</li>
-          <li data-i18n="auth.benefit.invoice">Facturation et devis</li>
-          <li data-i18n="auth.benefit.support">Support commercial dédié</li>
-        </ul>
-        <a href="index.html" class="auth-back-home">← <span data-i18n="nav.home">Retour à l'accueil</span></a>
-      </aside>
-
-      <main class="auth-split-form auth-split-form--premium">
-        <div class="auth-card auth-card-premium auth-card-wide">
-          <span class="section-tag" data-i18n="register.tag">Inscription pro</span>
-
-          <nav class="register-progress" aria-label="Étapes d'inscription">
-            <div class="register-progress-step is-active" data-progress="0">
-              <span class="register-progress-num">1</span>
-              <span class="register-progress-label" data-i18n="register.step1">Identité</span>
-            </div>
-            <div class="register-progress-step" data-progress="1">
-              <span class="register-progress-num">2</span>
-              <span class="register-progress-label" data-i18n="register.step2">Société</span>
-            </div>
-            <div class="register-progress-step" data-progress="2">
-              <span class="register-progress-num">3</span>
-              <span class="register-progress-label" data-i18n="register.step3">Sécurité</span>
-            </div>
-          </nav>
-
-          <h1 data-i18n="register.form.title">Créer votre compte</h1>
-          <p class="auth-sub" id="registerStepHint" data-i18n="register.step1.hint">Vos coordonnées professionnelles.</p>
-
-          <form id="registerForm" class="auth-form" novalidate>
-            <div class="register-panels">
-              <fieldset class="register-panel is-active" data-step="0">
-                <legend data-i18n="register.step1">Identité</legend>
-                <label>
-                  <span data-i18n="register.fullName">Nom &amp; prénom</span>
-                  <input type="text" name="fullName" required autocomplete="name" data-i18n-placeholder="register.fullName.ph" placeholder="Jean Dupont">
-                </label>
-                <div class="form-row">
-                  <label>
-                    <span data-i18n="register.phone">Téléphone</span>
-                    <input type="tel" name="phone" required autocomplete="tel" placeholder="06 12 34 56 78">
-                  </label>
-                  <label>
-                    <span data-i18n="register.email">E-mail professionnel</span>
-                    <input type="email" name="email" required autocomplete="email" placeholder="vous@entreprise.fr">
-                  </label>
-                </div>
-              </fieldset>
-
-              <fieldset class="register-panel" data-step="1">
-                <legend data-i18n="register.step2">Société</legend>
-                <label>
-                  <span data-i18n="register.company">Raison sociale</span>
-                  <input type="text" name="company" required placeholder="SARL Mon Restaurant">
-                </label>
-                <label>
-                  <span data-i18n="register.address">Adresse du siège</span>
-                  <input type="text" name="address" required autocomplete="street-address" placeholder="12 rue Example, 75011 Paris">
-                </label>
-                <div class="form-row">
-                  <label>
-                    <span data-i18n="register.siren">SIREN</span>
-                    <input type="text" name="siren" required inputmode="numeric" pattern="[0-9\s]{9,14}" placeholder="123 456 789">
-                    <span class="auth-field-hint" data-i18n="register.siren.hint">9 chiffres</span>
-                  </label>
-                  <label>
-                    <span data-i18n="register.vat">N° TVA intracommunautaire</span>
-                    <input type="text" name="vatNumber" required placeholder="FR12345678901">
-                  </label>
-                </div>
-              </fieldset>
-
-              <fieldset class="register-panel" data-step="2">
-                <legend data-i18n="register.step3">Sécurité</legend>
-                <label>
-                  <span data-i18n="register.password">Mot de passe</span>
-                  <div class="auth-password-row">
-                    <input type="password" name="password" required minlength="6" autocomplete="new-password" data-i18n-placeholder="register.password.ph" placeholder="6 caractères minimum">
-                    <button type="button" class="auth-toggle-pw" data-toggle-password aria-label="Afficher">👁</button>
-                  </div>
-                </label>
-                <label>
-                  <span data-i18n="register.passwordConfirm">Confirmer le mot de passe</span>
-                  <input type="password" name="passwordConfirm" required minlength="6" autocomplete="new-password">
-                </label>
-                <p class="auth-field-hint" data-i18n="register.validation.note">Votre compte sera validé par HB Commerce avant l'accès aux tarifs professionnels.</p>
-              </fieldset>
-            </div>
-
-            <div class="register-nav">
-              <button type="button" class="btn-outline-auth" id="registerPrev" hidden data-i18n="register.back">Retour</button>
-              <button type="button" class="btn btn-primary" id="registerNext" data-i18n="register.next">Continuer</button>
-              <button type="submit" class="btn btn-primary" id="registerSubmit" hidden data-i18n="register.submit">Créer mon compte professionnel</button>
-            </div>
-            <p class="form-note" id="registerNote"></p>
-          </form>
-
-          <p class="auth-switch"><span data-i18n="register.hasAccount">Déjà inscrit ?</span> <a href="login.html" data-i18n="register.login">Connectez-vous</a></p>
-        </div>
-      </main>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/config.js"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/market-ui.js"></script>
-  <script src="js/hb-front.js?v=front-v3-20260624"></script>
-  <script src="js/register-wizard.js?v=auth-20260624"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof initI18n === 'function') initI18n();
-      const bg = document.getElementById('authPremiumBg');
-      const market = typeof getMarket === 'function' ? getMarket() : null;
-      if (bg && market?.images?.hero) {
-        bg.style.backgroundImage = `url('${market.images.hero}')`;
-      }
-    });
-  </script>
+  </main>
 </body>
 </html>

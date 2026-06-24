@@ -1,15 +1,4 @@
-/* Alertes, achats fournisseur, rupture stock */
-
-.zero-stock-msg {
-  margin: 0;
-  padding: 0.55rem 0.75rem;
-  border-radius: 8px;
-  background: #fde8e8;
-  color: #9b1c1c;
-  font-size: 0.82rem;
-  font-weight: 700;
-  border: 1px solid rgba(155, 28, 28, 0.25);
-}
+/* Alertes et badges stock */
 
 .stock-badge {
   display: inline-flex;
@@ -20,6 +9,11 @@
   padding: 0.25rem 0.55rem;
   border-radius: 999px;
   border: 1px solid transparent;
+}
+
+.stock-badge small {
+  font-weight: 600;
+  opacity: 0.85;
 }
 
 .stock-badge--in-stock {
@@ -46,7 +40,7 @@
 }
 
 .product-info-item--out-of-stock .product-info-value {
-  color: #9b1c1c;
+  color: #8a1f1f;
   font-weight: 700;
 }
 
@@ -59,46 +53,35 @@
   color: #5c4500;
 }
 
+.stock-alert-banner strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 1rem;
+}
+
 .stock-alert-banner ul {
   margin: 0.5rem 0 0;
   padding-left: 1.1rem;
 }
 
-.stock-alerts-panel {
-  margin-bottom: 1.5rem;
+.stock-alert-banner li {
+  margin: 0.2rem 0;
 }
 
-.stock-alerts-head {
+.stock-admin-cell {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.stock-alerts-tabs {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.stock-alerts-tab {
-  border: 1px solid #ddd;
-  background: #fff;
-  border-radius: 999px;
-  padding: 0.35rem 0.85rem;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-
-.stock-alerts-tab.active {
-  background: var(--fiafi-olive-dark, #2a4228);
-  color: #fff;
-  border-color: var(--fiafi-olive-dark, #2a4228);
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 88px;
 }
 
 .stock-admin-cell strong {
   font-size: 1.05rem;
+}
+
+.stock-admin-cell span {
+  font-size: 0.72rem;
+  color: var(--text-muted);
 }
 
 .stock-admin-cell--low-stock,
@@ -109,29 +92,9 @@
 .stock-alert-msg {
   display: block;
   font-size: 0.72rem;
+  font-style: normal;
   color: #a16207;
   margin-top: 0.15rem;
-}
-
-.purchase-status {
-  display: inline-block;
-  padding: 0.15rem 0.45rem;
-  border-radius: 6px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  background: #eef2ff;
-  color: #3730a3;
-}
-
-.purchase-status--transit,
-.purchase-status--shipped {
-  background: #fff7ed;
-  color: #9a3412;
-}
-
-.purchase-status--received {
-  background: #dff4e9;
-  color: #1a5c4a;
 }
 
 .stock-movements-table {
@@ -149,33 +112,3 @@
 
 .movement-purchase { color: #1a5c4a; font-weight: 700; }
 .movement-sale { color: #8a1f1f; font-weight: 700; }
-.movement-adjustment { color: #9b1c1c; font-weight: 700; }
-
-.stock-incident-badge {
-  display: inline-flex;
-  padding: 0.2rem 0.55rem;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  background: #fde8e8;
-  color: #9b1c1c;
-  border: 1px solid rgba(155, 28, 28, 0.2);
-}
-
-.stock-incident-badge--perte {
-  background: #fff2c2;
-  color: #7a5b00;
-  border-color: rgba(201, 162, 39, 0.35);
-}
-
-.stock-incident-badge--dommage {
-  background: #f3e8ff;
-  color: #6b21a8;
-  border-color: rgba(107, 33, 168, 0.25);
-}
-
-.invoice-hint {
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  margin-top: 0.25rem;
-}

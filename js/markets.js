@@ -11,7 +11,7 @@ const HB_MARKETS = {
     brochurePage: 'brochure-france.html',
     contact: {
       phone: '07 52 56 51 23',
-      email: 'hb.consulting.srv@gmail.com',
+      email: 'contact@hbconsulting.fr',
       address: 'France — distribution nationale'
     },
     images: {
@@ -36,7 +36,7 @@ const HB_MARKETS = {
     brochurePage: 'brochure-luxembourg.html',
     contact: {
       phone: '07 52 56 51 23',
-      email: 'hb.consulting.srv@gmail.com',
+      email: 'contact@hbconsulting.fr',
       address: 'Luxembourg & Grande Région'
     },
     images: {
@@ -85,11 +85,7 @@ function marketImageUrl(market, type = 'product', width = 1200) {
 function resolveMarketImage(market, type = 'product', width = 1200) {
   const m = market || getMarket();
   const local = m.images?.[type] || m.images?.product;
-  return {
-    primary: local,
-    fallback: local,
-    driveAlt: local
-  };
+  return { primary: local, fallback: local, driveAlt: local };
 }
 
 window.HB_MARKETS = HB_MARKETS;

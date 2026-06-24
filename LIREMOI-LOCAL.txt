@@ -1,0 +1,40 @@
+HB Commerce — Travail en local
+================================
+
+DEMARRAGE RAPIDE
+----------------
+Double-cliquez sur:  DEMARRER-HB-COMMERCE.bat
+
+Au premier lancement, le script:
+  1. Clone le projet depuis GitHub (hbconsultingsrv-arch/hb-commerce)
+  2. Restaure vos fichiers custom (3D, stock, logo HB Commerce)
+  3. Lance le serveur sur http://localhost:8080
+  4. Ouvre le site dans le navigateur
+
+PAGES UTILES
+------------
+  Accueil    http://localhost:8080/index.html
+  Admin      http://localhost:8080/admin.html
+  Stock      http://localhost:8080/stock.html
+  Produits   http://localhost:8080/produits.html
+
+PREREQUIS
+---------
+  - Git   https://git-scm.com
+  - Python 3   https://python.org
+
+SUPABASE (base de donnees)
+--------------------------
+  1. Copiez js/config.example.js vers js/config.js
+  2. Remplissez supabaseUrl et supabaseAnonKey
+  3. Executez supabase/migration-stock-management.sql dans Supabase SQL Editor
+
+FONCTIONNALITES AJOUTEES
+------------------------
+  - Logo et titre HB Commerce (plus FIAFI comme nom du site)
+  - Hero 3D avec effets huile + cube catalogue interactif
+  - Gestion stock: quantite, seuil alerte, page reappro, deduction auto commandes
+
+GITHUB
+------
+  https://github.com/hbconsultingsrv-arch/hb-commerce

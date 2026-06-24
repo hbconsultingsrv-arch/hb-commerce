@@ -4,20 +4,11 @@ async function initStockPage() {
 
   document.getElementById('logoutBtn')?.addEventListener('click', signOut);
 
-  const orderDate = document.querySelector('#supplierPurchaseForm [name="order_date"]');
-  if (orderDate && !orderDate.value) {
-    orderDate.value = new Date().toISOString().slice(0, 10);
-  }
-
-  if (typeof fetchAllSuppliers === 'function') {
-    adminSuppliers = await fetchAllSuppliers();
-  }
-
-  if (typeof renderSupplierPurchaseSelectors === 'function') renderSupplierPurchaseSelectors();
-  if (typeof bindAppModal === 'function') bindAppModal('stockIncidentModal');
-  if (typeof initStockAdminPanel === 'function') await initStockAdminPanel();
-  if (typeof initStockIncidentsPanel === 'function') await initStockIncidentsPanel();
+  const products = await fetchAllProducts();
+  populateStockReceiveProductSelect(products);
+  await renderStockAlertBanner();
   await renderLowStockList();
+  await loadStockMovementsTable();
 }
 
 async function renderLowStockList() {
@@ -26,21 +17,28 @@ async function renderLowStockList() {
 
   const low = await fetchLowStockProducts();
   if (!low.length) {
-    host.innerHTML = '<p class="empty-state success" style="color:var(--green)">✓ Tous les stocks sont au-dessus du seuil.</p>';
+    host.innerHTML = '<p class="empty-state success" style="color:var(--green)">✓ Tous les stocks sont au-dessus du seuil minimum.</p>';
     return;
   }
 
   host.innerHTML = `
     <div class="table-wrap">
       <table class="requests-table">
-        <thead><tr><th>Produit</th><th>Stock</th><th>Seuil</th><th>À racheter</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th>En stock</th>
+            <th>Seuil min.</th>
+            <th>À racheter</th>
+          </tr>
+        </thead>
         <tbody>
           ${low.map((p) => `
             <tr>
               <td><strong>${escapeHtml(p.name)}</strong></td>
-              <td class="stock-admin-cell--${p.stock_quantity <= 0 ? 'out-of-stock' : 'low-stock'}"><strong>${p.stock_quantity}</strong></td>
+              <td class="stock-admin-cell--low-stock"><strong>${p.stock_quantity}</strong></td>
               <td>${p.min_stock_alert}</td>
-              <td>~${p.units_to_reorder} u.</td>
+              <td><strong>~${p.units_to_reorder}</strong> unité${p.units_to_reorder > 1 ? 's' : ''}</td>
             </tr>
           `).join('')}
         </tbody>
