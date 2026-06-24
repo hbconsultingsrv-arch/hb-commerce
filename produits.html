@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Produits | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commerce.css">
+  <link rel="stylesheet" href="css/negotiation.css">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo logo-hb-brand">
+      <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="40" height="40">
+      <span class="logo-hb-text">
+        <span class="logo-hb-name">HB Commerce</span>
+        <span class="logo-hb-tag">Catalogue B2B</span>
+      </span>
+    </a>
+    <div class="nav-actions">
+      <a href="negociations.html" class="btn btn-sm btn-outline-light">Négociations</a>
+      <a href="panier.html" class="btn btn-sm btn-primary">Panier</a>
+    </div>
+  </nav>
+
+  <main class="container" style="padding:2rem 1.5rem 4rem">
+    <header class="dashboard-header">
+      <span class="section-tag">Vente en gros</span>
+      <h1>Catalogue produits</h1>
+      <p class="auth-sub">Négociez vos volumes directement depuis chaque fiche — tarifs dégressifs selon quantités.</p>
+    </header>
+    <div id="productsGrid" class="products-grid"></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin-api.js"></script>
+  <script src="js/negotiation-api.js"></script>
+  <script src="js/negotiation-modal.js"></script>
+  <script src="js/products-catalog.js"></script>
+</body>
+</html>

@@ -1,0 +1,372 @@
+/* Négociation commerciale B2B — HB Commerce */
+
+.negotiation-page {
+  background: linear-gradient(180deg, var(--cream) 0%, #f0ebe3 100%);
+}
+
+.product-negotiation-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.btn-neg-premium {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(135deg, #1a5c4a 0%, #2d5a38 50%, #c9a227 100%);
+  box-shadow: 0 4px 18px rgba(26, 92, 74, 0.28);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.btn-neg-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(201, 162, 39, 0.35);
+}
+
+.btn-neg-outline {
+  width: 100%;
+  padding: 0.55rem 1rem;
+  border: 2px solid rgba(26, 92, 74, 0.25);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--green-dark);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.btn-neg-outline:hover {
+  border-color: var(--gold);
+  background: #fff;
+}
+
+/* Modal */
+.negotiation-modal-dialog {
+  max-width: 520px;
+}
+
+.neg-product-summary {
+  background: linear-gradient(135deg, rgba(26, 92, 74, 0.06), rgba(201, 162, 39, 0.08));
+  border: 1px solid rgba(201, 162, 39, 0.2);
+  border-radius: var(--radius);
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.25rem;
+}
+
+.neg-product-summary-inner {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.neg-product-thumb {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #fff;
+  padding: 4px;
+}
+
+.neg-product-summary h3 {
+  font-family: var(--font-display);
+  color: var(--green-dark);
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+}
+
+.neg-price-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.neg-price-box {
+  padding: 0.85rem;
+  background: var(--cream);
+  border-radius: 10px;
+  border: 1px solid #e8e4dc;
+}
+
+.neg-price-box--proposed {
+  border-color: rgba(201, 162, 39, 0.4);
+  background: rgba(201, 162, 39, 0.08);
+}
+
+.neg-price-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.neg-price-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--green-dark);
+}
+
+.neg-price-box input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.neg-auto-hint {
+  padding: 0.65rem 0.85rem;
+  background: #e8f4ec;
+  border-left: 4px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.85rem;
+  color: var(--green-dark);
+  margin-bottom: 0.5rem;
+}
+
+.negotiation-form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Page négociations */
+.neg-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.neg-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.neg-kpi-card {
+  background: var(--white);
+  padding: 1.15rem 1.25rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(26, 92, 74, 0.08);
+  transition: transform 0.25s ease;
+}
+
+.neg-kpi-card:hover { transform: translateY(-2px); }
+
+.neg-kpi-card--accent {
+  background: linear-gradient(135deg, #1e3320, #2d5a38);
+  color: #fff;
+}
+
+.neg-kpi-card--accent .neg-kpi-label { color: rgba(255,255,255,0.75); }
+.neg-kpi-card--accent .neg-kpi-value { color: #e8d48a; }
+
+.neg-kpi-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.neg-kpi-value {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--green-dark);
+  margin-top: 0.25rem;
+}
+
+.neg-status {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.neg-status.en_attente { background: #eee; color: #666; }
+.neg-status.en_discussion { background: #cce5ff; color: #004085; }
+.neg-status.offre_envoyee { background: rgba(201,162,39,0.2); color: #6b5200; }
+.neg-status.acceptee { background: #d4edda; color: #155724; }
+.neg-status.refusee { background: #f8d7da; color: #721c24; }
+.neg-status.expiree { background: #e2e3e5; color: #383d41; }
+
+/* Messagerie */
+.neg-messaging {
+  position: sticky;
+  top: 5.5rem;
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 7rem);
+  overflow: hidden;
+}
+
+.neg-messaging-head {
+  padding: 1rem 1.15rem;
+  border-bottom: 1px solid #eee;
+  background: linear-gradient(135deg, rgba(26,92,74,0.04), rgba(201,162,39,0.06));
+}
+
+.neg-messaging-head h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--green-dark);
+  font-family: var(--font-display);
+}
+
+.neg-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 280px;
+}
+
+.neg-message {
+  max-width: 92%;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  animation: neg-fade 0.3s ease;
+}
+
+@keyframes neg-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.neg-message.from-client {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #1a5c4a, #2d5a38);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.neg-message.from-commercial,
+.neg-message.from-admin {
+  align-self: flex-start;
+  background: var(--cream);
+  color: var(--green-dark);
+  border: 1px solid #e8e4dc;
+  border-bottom-left-radius: 4px;
+}
+
+.neg-message.from-system {
+  align-self: center;
+  background: rgba(201, 162, 39, 0.12);
+  color: #6b5200;
+  font-size: 0.82rem;
+  text-align: center;
+  max-width: 100%;
+}
+
+.neg-message-meta {
+  font-size: 0.68rem;
+  opacity: 0.75;
+  margin-bottom: 0.25rem;
+}
+
+.neg-offer-card {
+  margin-top: 0.5rem;
+  padding: 0.6rem;
+  background: rgba(255,255,255,0.15);
+  border-radius: 8px;
+  font-size: 0.82rem;
+}
+
+.neg-message.from-commercial .neg-offer-card {
+  background: #fff;
+  border: 1px solid rgba(201, 162, 39, 0.3);
+}
+
+.neg-compose {
+  padding: 0.85rem;
+  border-top: 1px solid #eee;
+}
+
+.neg-compose textarea {
+  width: 100%;
+  min-height: 70px;
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.neg-compose-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.neg-offer-form {
+  padding: 1rem;
+  border-top: 1px solid #eee;
+  background: #fafaf8;
+}
+
+.neg-offer-form h4 {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--green-dark);
+}
+
+.neg-rules-table input[type="number"] {
+  width: 80px;
+  padding: 0.35rem;
+}
+
+.neg-notify-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: #c0392b;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  margin-left: 0.35rem;
+}
+
+@media (max-width: 960px) {
+  .neg-layout { grid-template-columns: 1fr; }
+  .neg-messaging { position: static; max-height: none; }
+  .neg-price-compare { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .neg-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
