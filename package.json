@@ -1,0 +1,23 @@
+{
+  "name": "hb-commerce",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HB Commerce B2B — plateforme et tests QA",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+    "qa:server": "node qa-runner/server.mjs",
+    "qa:run": "playwright test --reporter=json,html",
+    "serve": "python -m http.server 8080"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.1"
+  }
+}

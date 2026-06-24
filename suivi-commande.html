@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Suivez l'avancement de vos commandes HB Commerce en temps réel.">
+  <title>Suivi de commande | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commerce.css">
+  <link rel="stylesheet" href="css/order-tracking.css">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page order-tracking-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo logo-hb-brand">
+      <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="40" height="40" aria-hidden="true">
+      <span class="logo-hb-text">
+        <span class="logo-hb-name">HB Commerce</span>
+        <span class="logo-hb-tag">Consulting &amp; Services · B2B</span>
+      </span>
+    </a>
+    <div class="nav-actions">
+      <a href="compte.html" class="btn btn-sm btn-outline-light">Mon compte</a>
+      <a href="produits.html" class="btn btn-sm btn-primary">Nouvelle commande</a>
+      <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="dashboard-main container">
+    <header class="dashboard-header order-tracking-header">
+      <div>
+        <span class="section-tag">Espace client</span>
+        <h1>Suivi de commande</h1>
+        <p class="auth-sub">Consultez l'avancement de vos commandes en temps réel — de la validation à la livraison.</p>
+      </div>
+      <button type="button" id="refreshOrdersBtn" class="btn btn-sm btn-outline-dark order-tracking-refresh" aria-label="Actualiser les commandes">
+        <span class="order-tracking-refresh-icon" aria-hidden="true">↻</span>
+        Actualiser
+      </button>
+    </header>
+
+    <div id="trackingLoading" class="order-tracking-loading">
+      <div class="order-tracking-spinner" aria-hidden="true"></div>
+      <p>Chargement de vos commandes…</p>
+    </div>
+
+    <div id="trackingEmpty" class="empty-state order-tracking-empty" hidden>
+      <div class="order-tracking-empty-icon" aria-hidden="true">📦</div>
+      <h2>Aucune commande à suivre</h2>
+      <p>Vos commandes apparaîtront ici dès leur enregistrement.</p>
+      <a href="produits.html" class="btn btn-primary">Parcourir le catalogue</a>
+    </div>
+
+    <div id="trackingLayout" class="order-tracking-layout" hidden>
+      <aside class="order-tracking-list" aria-label="Liste des commandes">
+        <div class="order-tracking-list-head">
+          <h2>Mes commandes</h2>
+          <span id="ordersCount" class="order-tracking-count">0</span>
+        </div>
+        <div id="ordersList" class="order-tracking-cards"></div>
+      </aside>
+
+      <section class="order-tracking-detail" id="orderDetail" aria-label="Détail de la commande" hidden>
+        <div class="dashboard-card order-tracking-detail-card">
+          <div class="order-tracking-detail-head">
+            <div>
+              <span class="order-tracking-ref" id="detailRef">—</span>
+              <h2 id="detailTitle">Commande</h2>
+              <p class="order-tracking-meta" id="detailMeta">—</p>
+            </div>
+            <span id="detailStatusBadge" class="order-status">—</span>
+          </div>
+
+          <div class="order-tracking-products" id="detailProducts"></div>
+
+          <div class="order-tracking-timeline-wrap">
+            <h3 class="order-tracking-section-title">Progression</h3>
+            <div class="order-tracking-timeline" id="detailTimeline" role="list" aria-label="Étapes de livraison"></div>
+          </div>
+
+          <div class="order-tracking-info-grid" id="detailInfo"></div>
+
+          <div class="order-tracking-events-wrap">
+            <h3 class="order-tracking-section-title">Historique des événements</h3>
+            <ol class="order-tracking-events" id="detailEvents"></ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="order-tracking-placeholder dashboard-card" id="orderPlaceholder">
+        <div class="order-tracking-placeholder-inner">
+          <span aria-hidden="true">🫒</span>
+          <p>Sélectionnez une commande pour afficher le suivi détaillé.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin-api.js"></script>
+  <script src="js/order-tracking.js"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Réapprovisionnement stock | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=stock-20260615">
+  <link rel="stylesheet" href="css/commerce.css?v=stock-20260615">
+  <link rel="stylesheet" href="css/stock.css?v=stock-20260615">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo">
+      <img src="assets/logo.svg" alt="HB Commerce" class="logo-img" width="210" height="44">
+    </a>
+    <div class="nav-actions">
+      <a href="admin.html" class="btn btn-sm btn-outline-light">Dashboard admin</a>
+      <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="dashboard-main container">
+    <header class="dashboard-header">
+      <span class="section-tag">Stock</span>
+      <h1>Réapprovisionnement &amp; alertes</h1>
+      <p class="auth-sub">Enregistrez vos achats fournisseur, consultez les alertes stock bas et l'historique des mouvements.</p>
+    </header>
+
+    <div id="stockAlertBanner" hidden></div>
+
+    <div class="dashboard-grid">
+      <section class="dashboard-card">
+        <h2>Ajouter du stock (achat reçu)</h2>
+        <p class="auth-sub" style="margin-bottom:1rem">Quand vous rachetez un produit, indiquez la quantité reçue — le stock sera mis à jour automatiquement.</p>
+        <form id="stockReceiveForm" class="auth-form">
+          <label>
+            Produit
+            <select name="product_slug" id="stockReceiveProductSelect" required></select>
+          </label>
+          <label>
+            Quantité reçue
+            <input type="number" name="quantity" min="1" step="1" required placeholder="Ex. 120">
+          </label>
+          <label>
+            Notes (optionnel)
+            <textarea name="notes" rows="2" placeholder="N° facture fournisseur, lot, date livraison…"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Enregistrer l'entrée stock</button>
+          <p class="form-note" id="stockReceiveNote"></p>
+        </form>
+      </section>
+
+      <section class="dashboard-card">
+        <h2>Produits en alerte</h2>
+        <div id="lowStockList">
+          <p class="empty-state">Chargement…</p>
+        </div>
+      </section>
+    </div>
+
+    <section class="dashboard-card" style="margin-top:1.5rem">
+      <h2>Historique des mouvements</h2>
+      <div class="table-wrap">
+        <table class="stock-movements-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Produit</th>
+              <th>Type</th>
+              <th>Variation</th>
+              <th>Stock après</th>
+            </tr>
+          </thead>
+          <tbody id="stockMovementsBody">
+            <tr><td colspan="5">Chargement…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js?v=stock-20260615"></script>
+  <script src="js/admin-api.js?v=stock-20260615"></script>
+  <script src="js/stock.js?v=stock-20260615"></script>
+  <script src="js/stock-admin.js?v=stock-20260615"></script>
+  <script src="js/stock-page.js?v=stock-20260615"></script>
+</body>
+</html>

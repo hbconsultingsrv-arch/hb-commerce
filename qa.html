@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Qualité &amp; QA | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commerce.css">
+  <link rel="stylesheet" href="css/admin-shell.css">
+  <link rel="stylesheet" href="css/qa-shell.css">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page admin-v2 qa-app">
+  <div class="admin-app">
+    <aside class="admin-sidebar" id="qaSidebar">
+      <a href="index.html" class="admin-sidebar-brand logo-hb-brand">
+        <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="36" height="36">
+        <span class="logo-hb-text">
+          <span class="logo-hb-name" style="color:#fff;font-size:0.95rem">HB Commerce</span>
+          <span class="logo-hb-tag" style="font-size:0.65rem">Module Qualité</span>
+        </span>
+      </a>
+      <nav class="admin-sidebar-nav" aria-label="Navigation QA">
+        <button type="button" class="admin-nav-item active" data-tab="dashboard">📊 Dashboard</button>
+        <button type="button" class="admin-nav-item" data-tab="exigences">📋 Exigences</button>
+        <button type="button" class="admin-nav-item" data-tab="tests">🧪 Plan de test</button>
+        <button type="button" class="admin-nav-item" data-tab="tracabilite">🔗 Traçabilité</button>
+        <button type="button" class="admin-nav-item" data-tab="rapports">📈 Rapports</button>
+      </nav>
+      <div class="admin-sidebar-footer">
+        <a href="admin.html" class="btn btn-sm btn-outline-light" style="width:100%;margin-bottom:0.5rem">Administration</a>
+        <a href="index.html" class="btn btn-sm btn-outline-light" style="width:100%;margin-bottom:0.5rem">Voir le site</a>
+        <button type="button" id="logoutBtn" class="btn btn-sm btn-primary" style="width:100%">Déconnexion</button>
+      </div>
+    </aside>
+
+    <div class="admin-shell">
+      <header class="admin-topbar">
+        <button type="button" class="admin-mobile-toggle" id="qaSidebarToggle" aria-label="Menu">☰</button>
+        <div>
+          <h1 id="qaTopbarTitle">Dashboard Qualité</h1>
+          <p id="qaTopbarSub">Exigences · Tests · Traçabilité · Rapports</p>
+        </div>
+      </header>
+
+      <main class="admin-content">
+        <!-- Dashboard -->
+        <section id="panel-dashboard" class="admin-panel">
+          <div class="qa-run-panel">
+            <div class="dashboard-card-head" style="margin-bottom:0">
+              <div>
+                <h2 style="margin:0">Exécution rapide</h2>
+                <p class="auth-sub" style="margin:0.35rem 0 0">Lance les tests Playwright (TypeScript) selon le périmètre choisi</p>
+              </div>
+              <div class="qa-run-actions">
+                <button type="button" id="runAllTestsBtn" class="btn btn-primary">▶ Tous les tests</button>
+                <button type="button" id="runFailedTestsBtn" class="btn btn-outline-dark">↻ Tests échoués</button>
+                <button type="button" id="runCriticalTestsBtn" class="btn btn-outline-dark">⚡ Tests critiques</button>
+              </div>
+            </div>
+            <div id="qaRunStatus" hidden>
+              <p id="qaRunMessage" class="form-note" style="text-align:left;margin-top:1rem"></p>
+              <div class="qa-run-progress"><div class="qa-run-progress-fill" id="qaRunProgressFill"></div></div>
+              <p id="qaRunStats" style="font-size:0.88rem;color:var(--admin-muted)"></p>
+              <pre class="qa-run-logs" id="qaRunLogs"></pre>
+            </div>
+          </div>
+
+          <div id="qaAlerts" class="qa-alerts"></div>
+
+          <div class="qa-kpi-grid" id="qaKpiGrid">
+            <div class="qa-kpi-card"><div class="qa-kpi-label">Tests total</div><div class="qa-kpi-value" id="qaKpiTotalTests">—</div></div>
+            <div class="qa-kpi-card qa-kpi-card--accent"><div class="qa-kpi-label">Taux de réussite</div><div class="qa-kpi-value" id="qaKpiSuccessRate">—</div></div>
+            <div class="qa-kpi-card"><div class="qa-kpi-label">Tests réussis</div><div class="qa-kpi-value" id="qaKpiPassed">—</div></div>
+            <div class="qa-kpi-card"><div class="qa-kpi-label">Tests échoués</div><div class="qa-kpi-value" id="qaKpiFailed">—</div></div>
+            <div class="qa-kpi-card"><div class="qa-kpi-label">Non exécutés</div><div class="qa-kpi-value" id="qaKpiPending">—</div></div>
+            <div class="qa-kpi-card"><div class="qa-kpi-label">Couverture fonctionnelle</div><div class="qa-kpi-value" id="qaKpiCoverage">—</div></div>
+            <div class="qa-kpi-card"><div class="qa-kpi-label">Exigences</div><div class="qa-kpi-value" id="qaKpiTotalReqs">—</div></div>
+            <div class="qa-kpi-card"><div class="qa-kpi-label">Développées / validées</div><div class="qa-kpi-value" id="qaKpiDeveloped">—</div></div>
+          </div>
+
+          <div class="qa-charts-grid" id="qaDashboardCharts">
+            <div class="qa-chart-card"><h3>Évolution taux de réussite</h3><div class="qa-bar-chart" id="chartSuccessTrend"></div></div>
+            <div class="qa-chart-card"><h3>Évolution couverture</h3><div class="qa-bar-chart" id="chartCoverageTrend"></div></div>
+            <div class="qa-chart-card"><h3>Répartition des erreurs</h3><div class="qa-bar-chart" id="chartErrorSplit"></div></div>
+            <div class="qa-chart-card"><h3>Tests par module</h3><div class="qa-bar-chart" id="chartTestsByModule"></div></div>
+          </div>
+
+          <div class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
+            <div class="dashboard-card-head">
+              <h2>Couverture fonctionnelle</h2>
+              <span class="form-note" id="qaCoverageGlobalNote"></span>
+            </div>
+            <div class="table-wrap">
+              <table class="requests-table">
+                <thead>
+                  <tr><th>Exigence</th><th>Développée</th><th>Testée</th><th>Couverture</th></tr>
+                </thead>
+                <tbody id="qaCoverageTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
+            <h2>Résultats des tests</h2>
+            <div class="table-wrap">
+              <table class="requests-table">
+                <thead>
+                  <tr>
+                    <th>ID Test</th>
+                    <th>Nom</th>
+                    <th>Exigence</th>
+                    <th>Statut</th>
+                    <th>Temps</th>
+                    <th>Dernière exéc.</th>
+                    <th>Résultat</th>
+                  </tr>
+                </thead>
+                <tbody id="qaResultsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
+            <h2>Historique des exécutions</h2>
+            <div class="table-wrap">
+              <table class="requests-table">
+                <thead>
+                  <tr><th>Date</th><th>Heure</th><th>Lancés</th><th>Succès</th><th>Échecs</th><th>Durée</th></tr>
+                </thead>
+                <tbody id="qaHistoryTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Exigences -->
+        <section id="panel-exigences" class="admin-panel" hidden>
+          <div class="dashboard-card dashboard-card-wide">
+            <div class="dashboard-card-head">
+              <h2>Exigences du Projet</h2>
+              <div class="dashboard-card-actions">
+                <button type="button" id="exportReqPdfBtn" class="btn btn-sm btn-outline-dark">Export PDF</button>
+                <button type="button" id="exportReqExcelBtn" class="btn btn-sm btn-outline-dark">Export Excel</button>
+                <button type="button" id="addReqBtn" class="btn btn-sm btn-primary">+ Exigence</button>
+              </div>
+            </div>
+            <div class="qa-filter-row">
+              <input type="search" id="reqSearch" placeholder="Rechercher…">
+              <select id="reqFilterStatus"><option value="">Tous statuts</option></select>
+              <select id="reqFilterCategory"><option value="">Toutes catégories</option></select>
+              <select id="reqFilterPriority"><option value="">Toutes priorités</option></select>
+              <select id="reqSort">
+                <option value="req_id">Trier : ID</option>
+                <option value="name">Trier : Nom</option>
+                <option value="priority">Trier : Priorité</option>
+                <option value="updated_at">Trier : Modification</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table class="requests-table">
+                <thead>
+                  <tr>
+                    <th data-sort="req_id">ID</th>
+                    <th data-sort="name">Nom</th>
+                    <th>Description</th>
+                    <th data-sort="priority">Priorité</th>
+                    <th data-sort="category">Catégorie</th>
+                    <th data-sort="dev_status">Statut dev.</th>
+                    <th>Responsable</th>
+                    <th>Création</th>
+                    <th>Modification</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="reqTableBody"></tbody>
+              </table>
+            </div>
+            <p class="form-note" id="reqNote"></p>
+          </div>
+        </section>
+
+        <!-- Plan de test -->
+        <section id="panel-tests" class="admin-panel" hidden>
+          <div class="dashboard-card dashboard-card-wide">
+            <div class="dashboard-card-head">
+              <h2>Plan de Test</h2>
+              <button type="button" id="addTestBtn" class="btn btn-sm btn-primary">+ Cas de test</button>
+            </div>
+            <div class="qa-filter-row">
+              <input type="search" id="testSearch" placeholder="Rechercher…">
+              <select id="testFilterType"><option value="">Tous types</option><option value="manuel">Manuel</option><option value="automatique">Automatique</option></select>
+              <select id="testFilterStatus"><option value="">Tous statuts</option></select>
+              <select id="testFilterReq"><option value="">Toutes exigences</option></select>
+            </div>
+            <div class="table-wrap">
+              <table class="requests-table">
+                <thead>
+                  <tr>
+                    <th>ID Test</th>
+                    <th>Exigence</th>
+                    <th>Titre</th>
+                    <th>Type</th>
+                    <th>Priorité</th>
+                    <th>Statut</th>
+                    <th>Dernière exéc.</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="testTableBody"></tbody>
+              </table>
+            </div>
+            <p class="form-note" id="testNote"></p>
+          </div>
+        </section>
+
+        <!-- Traçabilité -->
+        <section id="panel-tracabilite" class="admin-panel" hidden>
+          <div class="qa-kpi-grid" style="margin-bottom:1.5rem">
+            <div class="qa-kpi-card"><div class="qa-kpi-label">Couverture globale</div><div class="qa-kpi-value" id="traceCoverageGlobal">—</div></div>
+            <div class="qa-kpi-card"><div class="qa-kpi-label">Exigences</div><div class="qa-kpi-value" id="traceTotalReqs">—</div></div>
+            <div class="qa-kpi-card"><div class="qa-kpi-label">Tests</div><div class="qa-kpi-value" id="traceTotalTests">—</div></div>
+            <div class="qa-kpi-card"><div class="qa-kpi-label">Réussis</div><div class="qa-kpi-value" id="tracePassed">—</div></div>
+            <div class="qa-kpi-card"><div class="qa-kpi-label">Échoués</div><div class="qa-kpi-value" id="traceFailed">—</div></div>
+          </div>
+          <div class="dashboard-card dashboard-card-wide">
+            <h2>Matrice de traçabilité</h2>
+            <div class="table-wrap">
+              <table class="requests-table">
+                <thead>
+                  <tr><th>Exigence</th><th>Nom</th><th>Développée</th><th>Nb Tests</th><th>Couverture</th><th>Résultat</th></tr>
+                </thead>
+                <tbody id="traceTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Rapports -->
+        <section id="panel-rapports" class="admin-panel" hidden>
+          <div class="qa-kpi-grid">
+            <div class="qa-kpi-card"><div class="qa-kpi-label">Total tests</div><div class="qa-kpi-value" id="reportTotal">—</div></div>
+            <div class="qa-kpi-card"><div class="qa-kpi-label">OK</div><div class="qa-kpi-value" id="reportOk">—</div></div>
+            <div class="qa-kpi-card"><div class="qa-kpi-label">KO</div><div class="qa-kpi-value" id="reportKo">—</div></div>
+            <div class="qa-kpi-card qa-kpi-card--accent"><div class="qa-kpi-label">Couverture fonctionnelle</div><div class="qa-kpi-value" id="reportCoverage">—</div></div>
+          </div>
+          <div class="qa-charts-grid">
+            <div class="qa-chart-card"><h3>Réussite des tests</h3><div class="qa-bar-chart" id="chartSuccess"></div></div>
+            <div class="qa-chart-card"><h3>Évolution couverture</h3><div class="qa-bar-chart" id="chartCoverage"></div></div>
+            <div class="qa-chart-card"><h3>Répartition anomalies</h3><div class="qa-bar-chart" id="chartAnomalies"></div></div>
+          </div>
+          <div class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
+            <h2>Historique des exécutions</h2>
+            <div class="table-wrap">
+              <table class="requests-table">
+                <thead><tr><th>Date</th><th>Statut</th><th>Total</th><th>OK</th><th>KO</th><th>Durée</th><th>Taux</th></tr></thead>
+                <tbody id="reportRunsBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal Exigence -->
+  <div id="reqModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog">
+      <h2 id="reqModalTitle">Exigence</h2>
+      <form id="reqForm" class="auth-form">
+        <input type="hidden" name="id">
+        <label>ID <input type="text" name="req_id" placeholder="REQ-013"></label>
+        <label>Nom <input type="text" name="name" required></label>
+        <label>Description <textarea name="description" rows="3"></textarea></label>
+        <div class="form-row">
+          <label>Priorité
+            <select name="priority"><option>Critique</option><option>Haute</option><option selected>Moyenne</option><option>Basse</option></select>
+          </label>
+          <label>Catégorie <input type="text" name="category" value="Fonctionnel"></label>
+        </div>
+        <div class="form-row">
+          <label>Statut développement
+            <select name="dev_status">
+              <option value="non_commence">Non commencé</option>
+              <option value="en_cours">En cours</option>
+              <option value="developpe">Développé</option>
+              <option value="valide">Validé</option>
+            </select>
+          </label>
+          <label>Responsable <input type="text" name="owner"></label>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <button type="button" class="btn btn-outline-dark" data-close-modal>Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Test -->
+  <div id="testModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog" style="max-width:560px">
+      <h2 id="testModalTitle">Cas de test</h2>
+      <form id="testForm" class="auth-form">
+        <input type="hidden" name="id">
+        <div class="form-row">
+          <label>ID Test <input type="text" name="test_id" placeholder="TEST-015"></label>
+          <label>Exigence
+            <select name="requirement_id" id="testReqSelect"></select>
+          </label>
+        </div>
+        <label>Titre <input type="text" name="title" required></label>
+        <label>Description <textarea name="description" rows="2"></textarea></label>
+        <label>Préconditions <textarea name="preconditions" rows="2"></textarea></label>
+        <label>Étapes <textarea name="steps" rows="3"></textarea></label>
+        <label>Résultat attendu <textarea name="expected_result" rows="2"></textarea></label>
+        <div class="form-row">
+          <label>Type
+            <select name="test_type"><option value="manuel">Manuel</option><option value="automatique">Automatique</option></select>
+          </label>
+          <label>Priorité
+            <select name="priority"><option>Critique</option><option>Haute</option><option selected>Moyenne</option><option>Basse</option></select>
+          </label>
+          <label>Statut
+            <select name="status">
+              <option value="non_execute">Non exécuté</option>
+              <option value="succes">Succès</option>
+              <option value="echec">Échec</option>
+              <option value="bloque">Bloqué</option>
+            </select>
+          </label>
+        </div>
+        <label>Fichier Playwright <input type="text" name="playwright_file" placeholder="auth.spec.ts"></label>
+        <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <button type="button" class="btn btn-outline-dark" data-close-modal>Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin-api.js"></script>
+  <script src="js/qa-api.js?v=qa-v2-20260624"></script>
+  <script src="js/qa-main.js?v=qa-v2-20260624"></script>
+</body>
+</html>

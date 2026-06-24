@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 56" fill="none" role="img" aria-label="HB Commerce">
+  <rect width="340" height="56" rx="8" fill="#2a4228"/>
+  <ellipse cx="28" cy="28" rx="18" ry="20" fill="#3d5c3a"/>
+  <ellipse cx="28" cy="30" rx="10" ry="12" fill="#c9a227" opacity="0.92"/>
+  <path d="M28 18c-1.5 3.5-5 5.5-9 5.5 1.5 2.5 4 4 9 4s7.5-1.5 9-4c-4 0-7.5-2-9-5.5z" fill="#5a7d52"/>
+  <text x="54" y="24" font-family="Georgia, serif" font-size="17" font-weight="700" fill="#f5f0e6">HB Commerce</text>
+  <text x="54" y="40" font-family="Arial, sans-serif" font-size="10" fill="#c9a227" letter-spacing="0.08em">HB CONSULTING &amp; SERVICES · B2B</text>
+</svg>

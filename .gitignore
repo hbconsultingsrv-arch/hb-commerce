@@ -1,0 +1,9 @@
+node_modules/
+playwright-report/
+playwright-results.json
+test-results/
+.env
+.env.local
+js/config.js
+setup-log.txt
+*.log

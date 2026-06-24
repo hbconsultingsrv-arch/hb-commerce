@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=chat-mod-20260619">
+  <link rel="stylesheet" href="css/commerce.css?v=chat-mod-20260619">
+  <link rel="stylesheet" href="css/stock.css?v=stock-20260619">
+  <link rel="stylesheet" href="css/analytics.css?v=analytics-20260624">
+  <link rel="stylesheet" href="css/admin-roadmap.css?v=roadmap-v2-20260624">
+  <link rel="stylesheet" href="css/admin-shell.css?v=admin-v2-20260624">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page admin-v2">
+  <div class="admin-app">
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Navigation admin">
+      <div class="admin-sidebar-brand">
+        <a href="index.html" class="logo logo-hb-brand">
+          <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="36" height="36" aria-hidden="true">
+          <span class="logo-hb-text">
+            <span class="logo-hb-name">HB Commerce</span>
+            <span class="logo-hb-tag">Administration B2B</span>
+          </span>
+        </a>
+      </div>
+      <nav class="admin-sidebar-nav">
+        <button type="button" class="admin-nav-item active" data-tab="accueil"><span class="admin-nav-icon">◉</span> Tableau de bord</button>
+        <button type="button" class="admin-nav-item" data-tab="produits"><span class="admin-nav-icon">▣</span> Produits</button>
+        <button type="button" class="admin-nav-item admin-only" data-tab="fournisseurs"><span class="admin-nav-icon">◎</span> Fournisseurs</button>
+        <button type="button" class="admin-nav-item admin-only" data-tab="stock"><span class="admin-nav-icon">▤</span> Stock &amp; achats</button>
+        <button type="button" class="admin-nav-item" data-tab="commandes"><span class="admin-nav-icon">☰</span> Commandes</button>
+        <button type="button" class="admin-nav-item" data-tab="clients"><span class="admin-nav-icon">◇</span> Clients</button>
+        <button type="button" class="admin-nav-item" data-tab="prix"><span class="admin-nav-icon">€</span> Prix clients</button>
+        <button type="button" class="admin-nav-item admin-only" data-tab="analyses"><span class="admin-nav-icon">◈</span> Analyses</button>
+        <button type="button" class="admin-nav-item admin-only" data-tab="construction"><span class="admin-nav-icon">⬡</span> Construction</button>
+        <a href="qa.html" class="admin-nav-item admin-nav-link admin-only" id="adminQaNavLink"><span class="admin-nav-icon">🧪</span> Tests QA</a>
+        <button type="button" class="admin-nav-item" data-tab="chat"><span class="admin-nav-icon">✉</span> Support<span class="admin-nav-badge" id="adminChatNavBadge" hidden></span></button>
+      </nav>
+      <div class="admin-sidebar-footer">
+        <a href="super-root.html" id="superRootLink" class="btn btn-sm btn-outline-light" style="display:none">Super root</a>
+        <a href="qa.html" class="btn btn-sm btn-outline-light admin-only">Module QA</a>
+        <a href="stock.html" class="btn btn-sm btn-outline-light admin-only">Page stock</a>
+        <a href="index.html" class="btn btn-sm btn-outline-light">Voir le site</a>
+        <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light">🌙 Sombre</button>
+        <button type="button" id="logoutBtn" class="btn btn-sm btn-primary">Déconnexion</button>
+      </div>
+    </aside>
+
+    <div class="admin-shell">
+      <header class="admin-topbar">
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <button type="button" class="admin-mobile-toggle" id="adminSidebarToggle" aria-label="Menu">☰</button>
+          <div class="admin-topbar-title">
+            <h1 id="adminTopbarTitle">Tableau de bord</h1>
+            <p id="adminTopbarSub">Vue d'ensemble de l'activité HB Commerce</p>
+          </div>
+        </div>
+        <div class="admin-topbar-actions"></div>
+      </header>
+
+      <main class="admin-content">
+        <div id="stockAlertBanner" hidden></div>
+
+        <div class="admin-tabs" aria-hidden="true">
+          <button type="button" class="admin-tab" data-tab="accueil">Accueil</button>
+          <button type="button" class="admin-tab" data-tab="produits">Produits</button>
+          <button type="button" class="admin-tab admin-only" data-tab="fournisseurs">Fournisseurs</button>
+          <button type="button" class="admin-tab admin-only" data-tab="stock">Stock</button>
+          <button type="button" class="admin-tab" data-tab="commandes">Commandes</button>
+          <button type="button" class="admin-tab" data-tab="clients">Clients</button>
+          <button type="button" class="admin-tab" data-tab="prix">Prix</button>
+          <button type="button" class="admin-tab admin-only" data-tab="analyses">Analyses</button>
+          <button type="button" class="admin-tab admin-only" data-tab="construction">Construction</button>
+          <button type="button" class="admin-tab" data-tab="chat">Chat</button>
+        </div>
+
+        <section id="panel-accueil" class="admin-panel">
+          <div id="adminDashboardHost"></div>
+        </section>
+
+    <section id="panel-produits" class="admin-panel" hidden data-tab-scope>
+      <div class="section-tabs" data-section-tabs>
+        <button type="button" class="section-tab active" data-section="liste">Catalogue</button>
+        <button type="button" class="section-tab" data-section="formulaire">Ajouter / modifier</button>
+      </div>
+
+      <div data-section-panel="liste" class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Catalogue produits</h2>
+        </div>
+        <div class="admin-toolbar" id="productsToolbar">
+          <input type="search" class="admin-search-input" id="productSearchInput" placeholder="Rechercher un produit…" aria-label="Rechercher">
+          <select id="productFilterSupplier" aria-label="Filtre fournisseur"><option value="">Tous fournisseurs</option></select>
+          <select id="productFilterStatus" aria-label="Filtre statut">
+            <option value="">Tous statuts</option>
+            <option value="active">Visible</option>
+            <option value="hidden">Masqué</option>
+          </select>
+          <select id="productFilterStock" aria-label="Filtre stock">
+            <option value="">Tout stock</option>
+            <option value="ok">Stock OK</option>
+            <option value="low">Stock faible</option>
+            <option value="out">Rupture</option>
+          </select>
+          <select id="productSortBy" aria-label="Tri">
+            <option value="name">Tri : nom</option>
+            <option value="price-asc">Prix croissant</option>
+            <option value="price-desc">Prix décroissant</option>
+            <option value="stock-asc">Stock croissant</option>
+            <option value="stock-desc">Stock décroissant</option>
+            <option value="sales">Quantité vendue</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Photo</th>
+                <th>Produit / SKU</th>
+                <th>Fournisseur</th>
+                <th>Prix achat</th>
+                <th>Prix vente</th>
+                <th>Marge</th>
+                <th>Stock</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div data-section-panel="formulaire" class="dashboard-card" hidden>
+        <h2 id="productFormTitle">Ajouter un produit</h2>
+        <form id="productForm" class="auth-form" enctype="multipart/form-data">
+          <div class="form-row">
+            <label>
+              Nom du produit
+              <input type="text" name="name" required placeholder="FIAFI — Huile d'olive">
+            </label>
+            <label>
+              Slug
+              <input type="text" name="slug" placeholder="fiafi-huile-olive">
+            </label>
+          </div>
+          <label>
+            Description
+            <textarea name="description" rows="2" placeholder="Description courte du produit (optionnel)"></textarea>
+          </label>
+          <div class="form-row">
+            <label>
+              Origine
+              <input type="text" name="origin" list="productOriginList" placeholder="Tunisie" autocomplete="off">
+            </label>
+            <label>
+              Catégorie
+              <input type="text" name="category" list="productCategoryList" placeholder="huiles" autocomplete="off">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Prix de vente (€)
+              <input type="number" name="price" required min="0" step="0.01">
+            </label>
+            <label>
+              Prix d'achat (€)
+              <input type="number" name="purchase_price" min="0" step="0.01" placeholder="Coût fournisseur">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Unité
+              <input type="text" name="unit" value="litre">
+            </label>
+            <label>
+              &nbsp;
+              <span class="form-note" id="productMarginPreview"></span>
+            </label>
+          </div>
+          <label>
+            Fournisseur <span class="form-optional">(optionnel)</span>
+            <input type="text" name="supplier_name" id="productSupplierInput" list="supplierNameList" placeholder="Choisir ou saisir un fournisseur" autocomplete="off">
+            <span class="form-note">Sélectionnez dans la liste ou tapez un nouveau nom — il sera créé à l'enregistrement.</span>
+          </label>
+          <div class="form-row">
+            <label>
+              Quantité minimum
+              <input type="number" name="min_quantity" value="12" min="1">
+            </label>
+            <label>
+              Badge
+              <input type="text" name="tag" placeholder="Produit phare">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Stock dépôt (unités)
+              <input type="number" name="stock_quantity" min="0" value="0">
+            </label>
+            <label>
+              Seuil alerte
+              <input type="number" name="min_stock_alert" min="0" value="10" title="Alerte admin quand le stock atteint ce niveau">
+            </label>
+          </div>
+          <div class="product-image-upload">
+            <span class="product-image-upload-label">Image du produit</span>
+            <div class="product-image-upload-row">
+              <label class="btn btn-sm btn-outline-dark product-image-file-btn">
+                Importer une image
+                <input type="file" name="product_image" id="productImageFile" accept="image/*,.heic,.heif" hidden>
+              </label>
+              <button type="button" class="btn btn-sm btn-outline-dark" id="productImageClearBtn">Retirer</button>
+            </div>
+            <p class="form-note">JPG, PNG, WebP, GIF, SVG, HEIC… — max 10 Mo. L’image est enregistrée sur Supabase et l’URL est sauvegardée dans la fiche produit.</p>
+            <div id="productImagePreviewWrap" class="product-image-preview-wrap" hidden>
+              <img id="productImagePreview" class="product-image-preview" alt="Aperçu produit" hidden>
+            </div>
+            <label class="product-image-url-fallback">
+              Ou URL externe (optionnel)
+              <input type="url" name="image_url" placeholder="https://… (si pas d’import)">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Ordre d'affichage
+              <input type="number" name="sort_order" value="0" min="0">
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="active" checked> Produit visible
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="saveProductBtn">Ajouter</button>
+            <button type="button" class="btn btn-outline-dark" id="cancelProductBtn">Annuler</button>
+          </div>
+          <p class="form-note" id="productNote"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="panel-fournisseurs" class="admin-panel admin-only" hidden data-tab-scope>
+      <div class="section-tabs" data-section-tabs>
+        <button type="button" class="section-tab active" data-section="liste">Fournisseurs enregistrés</button>
+        <button type="button" class="section-tab" data-section="creer">Créer un fournisseur</button>
+        <button type="button" class="section-tab" data-section="commander">Commander</button>
+      </div>
+
+      <div data-section-panel="liste" class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Fournisseurs enregistrés</h2>
+          <button type="button" id="refreshSuppliersBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Société</th>
+                <th>Contact</th>
+                <th>TVA</th>
+                <th>Produits</th>
+                <th>Total achats</th>
+                <th>Statut</th>
+                <th>E-mail</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="suppliersBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div data-section-panel="creer" class="dashboard-card" hidden>
+        <h2 id="adminSupplierFormTitle">Créer un fournisseur</h2>
+        <form id="adminSupplierForm" class="auth-form">
+          <div class="form-row">
+            <label>
+              Société fournisseur
+              <input type="text" name="company" required placeholder="Nom de la société fournisseur">
+            </label>
+            <label>
+              Contact
+              <input type="text" name="full_name" required placeholder="Nom du contact">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              E-mail de connexion
+              <input type="email" name="email" required placeholder="contact@fournisseur.com">
+            </label>
+            <label>
+              Téléphone
+              <input type="tel" name="phone" placeholder="Téléphone">
+            </label>
+          </div>
+          <label>
+            Adresse
+            <input type="text" name="address" placeholder="Adresse complète">
+          </label>
+          <div class="form-row">
+            <label>
+              Pays
+              <input type="text" name="country" list="supplierCountryList" placeholder="France, Tunisie…" autocomplete="off">
+            </label>
+            <label>
+              SIREN / Identifiant
+              <input type="text" name="siren" placeholder="Identifiant légal">
+            </label>
+          </div>
+          <label>
+            Code TVA
+            <input type="text" name="vat_number" placeholder="Code TVA">
+          </label>
+          <label>
+            Mot de passe temporaire
+            <input type="password" name="password" minlength="6" required autocomplete="new-password" placeholder="Mot de passe espace fournisseur">
+          </label>
+          <label>
+            Notes internes
+            <textarea name="notes" rows="3" placeholder="Conditions, produits, remarques"></textarea>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="active" checked> Fournisseur actif
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="saveAdminSupplierBtn">Créer le fournisseur</button>
+            <button type="button" class="btn btn-outline-dark" id="cancelAdminSupplierBtn">Annuler</button>
+          </div>
+          <p class="form-note" id="adminSupplierNote"></p>
+        </form>
+      </div>
+
+      <div data-section-panel="commander" class="dashboard-card" hidden>
+        <h2>Commander auprès d'un fournisseur</h2>
+        <form id="supplierOrderForm" class="auth-form">
+          <label>
+            Fournisseur
+            <input type="text" name="supplier_name" id="supplierOrderSupplierInput" list="supplierOrderSupplierList" placeholder="Choisir ou saisir" required autocomplete="off">
+          </label>
+          <label>
+            Produit
+            <input type="text" name="product_name" id="supplierOrderProductInput" list="supplierOrderProductList" placeholder="Choisir ou saisir" required autocomplete="off">
+          </label>
+          <div class="form-row">
+            <label>
+              Quantité
+              <input type="number" name="quantity" min="1" required>
+            </label>
+            <label>
+              Arrivée prévue
+              <input type="date" name="expected_arrival_date">
+            </label>
+          </div>
+          <label>
+            Notes
+            <textarea name="notes" rows="2" placeholder="Instructions fournisseur"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Créer la commande fournisseur</button>
+          <p class="form-note" id="supplierOrderNote"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="panel-stock" class="admin-panel admin-only" hidden>
+      <div id="stockAlertsPanel"></div>
+
+      <div class="dashboard-grid">
+        <section class="dashboard-card">
+          <h2>Achat fournisseur (admin / super)</h2>
+          <p class="auth-sub invoice-hint">Enregistrez quantité, prix, date et facture. Le stock dépôt n'augmente qu'après réception au dépôt (livraison terminée).</p>
+          <form id="supplierPurchaseForm" class="auth-form" enctype="multipart/form-data">
+            <label>Fournisseur<input type="text" name="supplier_name" id="supplierPurchaseSupplierInput" list="supplierPurchaseSupplierList" placeholder="Choisir ou saisir" required autocomplete="off"></label>
+            <label>Produit<input type="text" name="product_name" id="supplierPurchaseProductInput" list="supplierPurchaseProductList" placeholder="Choisir ou saisir" required autocomplete="off"></label>
+            <div class="form-row">
+              <label>Quantité<input type="number" name="quantity" min="1" required></label>
+              <label>Prix unitaire (€)<input type="number" name="unit_price" min="0" step="0.01" required></label>
+            </div>
+            <div class="form-row">
+              <label>Date d'achat<input type="date" name="order_date" required></label>
+              <label>Arrivée prévue au dépôt<input type="date" name="expected_arrival_date"></label>
+            </div>
+            <label>Statut initial
+              <select name="initial_status">
+                <option value="requested">Demandée</option>
+                <option value="accepted">Acceptée</option>
+                <option value="in_preparation">En préparation</option>
+                <option value="shipped" selected>En transit</option>
+              </select>
+            </label>
+            <label>Lien facture (URL)<input type="url" name="invoice_url" placeholder="https://..."></label>
+            <label>Document facture (PDF, image)<input type="file" name="invoice_file" accept=".pdf,.png,.jpg,.jpeg,.webp"></label>
+            <label>Notes<textarea name="notes" rows="2" placeholder="N° commande fournisseur, conditions…"></textarea></label>
+            <button type="submit" class="btn btn-primary">Enregistrer l'achat</button>
+            <p class="form-note" id="supplierPurchaseNote"></p>
+          </form>
+        </section>
+
+        <section class="dashboard-card">
+          <h2>Réception manuelle au dépôt</h2>
+          <p class="auth-sub">Hors workflow fournisseur — ajustement direct du stock dépôt.</p>
+          <form id="stockReceiveForm" class="auth-form">
+            <label>Produit<input type="text" name="product_name" id="stockReceiveProductInput" list="stockReceiveProductList" placeholder="Choisir ou saisir" required autocomplete="off"></label>
+            <label>Quantité reçue<input type="number" name="quantity" min="1" required></label>
+            <label>Notes<textarea name="notes" rows="2"></textarea></label>
+            <button type="submit" class="btn btn-primary">Ajouter au stock</button>
+            <p class="form-note" id="stockReceiveNote"></p>
+          </form>
+        </section>
+      </div>
+
+      <section class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
+        <div class="dashboard-card-head">
+          <h2>Achats fournisseur — suivi &amp; réception dépôt</h2>
+          <button type="button" id="refreshPurchasesBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Date achat</th>
+                <th>Fournisseur</th>
+                <th>Produit</th>
+                <th>Qté</th>
+                <th>Montant</th>
+                <th>Arrivée prévue</th>
+                <th>Facture</th>
+                <th>Statut</th>
+                <th>Dépôt</th>
+              </tr>
+            </thead>
+            <tbody id="supplierPurchasesBody">
+              <tr><td colspan="9">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
+        <div class="dashboard-card-head">
+          <h2>Casse, pertes &amp; incidents</h2>
+          <button type="button" id="openStockIncidentModalBtn" class="btn btn-sm btn-primary btn-analytics-add" title="Ajouter un incident">+</button>
+        </div>
+        <p class="auth-sub">Enregistrez une casse, une perte ou un incident avec le montant perdu et ce qui s'est passé. Vous pouvez aussi retirer des unités du stock dépôt.</p>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Libellé</th>
+                <th>Montant perdu</th>
+                <th>Détails</th>
+                <th>Enregistré le</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="stockIncidentsBody">
+              <tr><td colspan="7">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
+        <h2>Historique mouvements stock</h2>
+        <div class="table-wrap">
+          <table class="stock-movements-table">
+            <thead>
+              <tr><th>Date</th><th>Produit</th><th>Type</th><th>Variation</th><th>Stock après</th></tr>
+            </thead>
+            <tbody id="stockMovementsBody"><tr><td colspan="5">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section id="panel-commandes" class="admin-panel" hidden>
+      <div class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Commandes clients</h2>
+        </div>
+        <div class="admin-toolbar">
+          <input type="search" class="admin-search-input" id="orderSearchInput" placeholder="Rechercher N°, client…">
+          <select id="orderFilterStatus" aria-label="Filtre statut">
+            <option value="">Tous statuts</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>N° commande</th>
+                <th>Client / Société</th>
+                <th>Montant</th>
+                <th>Paiement</th>
+                <th>Statut</th>
+                <th>Progression</th>
+                <th>Livraison</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersAdminBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-clients" class="admin-panel" hidden data-tab-scope>
+      <div class="section-tabs" data-section-tabs>
+        <button type="button" class="section-tab active" data-section="liste">Clients enregistrés</button>
+        <button type="button" class="section-tab admin-only" data-section="creer">Créer un client</button>
+      </div>
+
+      <div data-section-panel="liste" class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Clients enregistrés</h2>
+          <button type="button" id="refreshClientsBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Société</th>
+                <th>Statut</th>
+                <th>Contact</th>
+                <th>TVA</th>
+                <th>CA généré</th>
+                <th>Agent</th>
+                <th>E-mail</th>
+              </tr>
+            </thead>
+            <tbody id="clientsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div data-section-panel="creer" class="dashboard-card admin-only" hidden>
+        <h2>Créer un client</h2>
+        <form id="adminClientForm" class="auth-form">
+          <div class="form-row">
+            <label>
+              Société cliente
+              <input type="text" name="company" required placeholder="Nom de la société">
+            </label>
+            <label>
+              Contact
+              <input type="text" name="full_name" required placeholder="Nom du contact">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              E-mail de connexion
+              <input type="email" name="email" required placeholder="contact@societe.com">
+            </label>
+            <label>
+              Téléphone
+              <input type="tel" name="phone" placeholder="Téléphone">
+            </label>
+          </div>
+          <label>
+            Adresse
+            <input type="text" name="address" required placeholder="Adresse complète">
+          </label>
+          <div class="form-row">
+            <label>
+              SIREN
+              <input type="text" name="siren" required placeholder="9 chiffres" inputmode="numeric">
+            </label>
+            <label>
+              Code TVA
+              <input type="text" name="vat_number" required placeholder="FR...">
+            </label>
+          </div>
+          <label>
+            Agent commercial
+            <select name="commercial_agent_id" id="adminClientAgentSelect">
+              <option value="">Aucun agent assigné</option>
+            </select>
+          </label>
+          <label>
+            Mot de passe temporaire
+            <input type="password" name="password" minlength="6" required autocomplete="new-password">
+          </label>
+          <button type="submit" class="btn btn-primary">Créer le client</button>
+          <p class="form-note" id="adminClientNote"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="panel-prix" class="admin-panel" hidden>
+      <div class="dashboard-grid">
+        <div class="dashboard-card">
+          <h2>Fixer un prix personnalisé</h2>
+          <form id="adminCustomerPriceForm" class="auth-form">
+            <label>
+              Société cliente
+              <select name="profile_id" id="adminPriceClientSelect" required></select>
+            </label>
+            <label>
+              Produit
+              <select name="product_slug" id="adminPriceProductSelect" required></select>
+            </label>
+            <div class="form-row">
+              <label>
+                Catégorie client
+                <input type="text" name="client_category" placeholder="restaurant, hôtel, grossiste…">
+              </label>
+              <label>
+                Qté minimum
+                <input type="number" name="min_quantity" min="1" value="1">
+              </label>
+            </div>
+            <label>
+              Prix fixé (€)
+              <input type="number" name="price" min="0" step="0.01" required>
+            </label>
+            <p class="form-note" id="adminPriceDiscountPreview"></p>
+            <button type="submit" class="btn btn-primary">Enregistrer le tarif</button>
+            <p class="form-note" id="adminCustomerPriceNote"></p>
+          </form>
+        </div>
+        <div class="dashboard-card dashboard-card-wide">
+          <h2>Tarifs personnalisés actifs</h2>
+          <div class="table-wrap">
+            <table class="requests-table">
+              <thead>
+                <tr>
+                  <th>Société</th>
+                  <th>Catégorie</th>
+                  <th>Produit</th>
+                  <th>Prix catalogue</th>
+                  <th>Prix client</th>
+                  <th>Remise</th>
+                  <th>Qté min.</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="customerPricesBody"><tr><td colspan="8">Chargement…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-construction" class="admin-panel admin-only" hidden>
+      <div id="roadmapKpiHost"></div>
+      <div id="roadmapProgressHost"></div>
+      <div id="roadmapCategoryHost"></div>
+      <div class="roadmap-panels-grid">
+        <div id="roadmapTimelineHost"></div>
+        <div id="roadmapChartsHost"></div>
+      </div>
+
+      <div class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Fonctionnalités restantes</h2>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <button type="button" id="refreshRoadmapBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+            <button type="button" id="openRoadmapAddBtn" class="btn btn-sm btn-primary">+ Ajouter</button>
+          </div>
+        </div>
+        <p class="auth-sub">Visualisez ce qui existe déjà, ce qui est en cours et ce qu'il reste à construire. Ajoutez des tâches, notes et mettez à jour l'avancement.</p>
+
+        <div class="roadmap-toolbar">
+          <select id="roadmapFilterCategory" aria-label="Filtrer par catégorie">
+            <option value="">Toutes catégories</option>
+            <option value="frontend">Frontend</option>
+            <option value="backend">Backend</option>
+            <option value="auth">Authentification</option>
+            <option value="products">Produits</option>
+            <option value="orders">Commandes</option>
+            <option value="suppliers">Fournisseurs</option>
+            <option value="payments">Paiements</option>
+            <option value="messaging">Messagerie</option>
+            <option value="negotiation">Négociation commerciale</option>
+            <option value="dashboard">Dashboard</option>
+            <option value="qa">Tests QA</option>
+            <option value="stock">Stock &amp; achats</option>
+            <option value="legal">Pages légales</option>
+            <option value="infra">Technique</option>
+          </select>
+          <select id="roadmapFilterStatus" aria-label="Filtrer par statut">
+            <option value="">Tous statuts</option>
+            <option value="validated">Validé</option>
+            <option value="done">Développé</option>
+            <option value="in_progress">En cours</option>
+            <option value="todo">À faire</option>
+            <option value="blocked">Bloqué</option>
+          </select>
+          <select id="roadmapFilterPriority" aria-label="Filtrer par priorité">
+            <option value="">Toutes priorités</option>
+            <option value="high">Priorité haute</option>
+            <option value="medium">Priorité moyenne</option>
+            <option value="low">Priorité basse</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Catégorie</th>
+                <th>Fonctionnalité</th>
+                <th>Priorité</th>
+                <th>Statut</th>
+                <th>Mise à jour</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="roadmapItemsBody">
+              <tr><td colspan="6">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="form-note" id="roadmapPanelNote"></p>
+      </div>
+    </section>
+
+    <section id="panel-analyses" class="admin-panel admin-only" hidden>
+      <div class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Analyses financières</h2>
+          <div class="analytics-toolbar-actions">
+            <select id="analyticsPeriod" class="analytics-period-select" aria-label="Période">
+              <option value="month">30 derniers jours</option>
+              <option value="quarter">3 derniers mois</option>
+              <option value="year">12 derniers mois</option>
+              <option value="all" selected>Tout</option>
+            </select>
+            <button type="button" id="refreshAnalyticsBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+            <button type="button" id="openExpenseModalBtn" class="btn btn-sm btn-primary btn-analytics-add" title="Ajouter une dépense">+</button>
+          </div>
+        </div>
+        <p class="auth-sub" style="margin-bottom:1rem">
+          Suivi automatique des ventes clients et des achats stock fournisseur. Comparez gains et dépenses, ajoutez les frais manuels (livraison, logistique…).
+        </p>
+        <p class="form-note" id="analyticsPanelNote"></p>
+        <div id="analyticsKpis"></div>
+        <div class="analytics-section-title">
+          <h3>Journal des opérations</h3>
+        </div>
+        <div id="analyticsTableHost"></div>
+        <p class="form-note" id="analyticsNote" style="margin-top:1rem"></p>
+      </div>
+    </section>
+
+    <section id="panel-chat" class="admin-panel" hidden>
+      <div class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Chat &amp; modération</h2>
+          <button type="button" id="refreshAdminChatBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <p class="auth-sub" style="margin-bottom:1rem">Centre de support — modération, priorités et réponses rapides.</p>
+        <div class="chat-toolbar">
+          <input type="search" class="admin-search-input" id="adminChatSearch" placeholder="Rechercher une société…">
+          <select id="adminChatTicketFilter" aria-label="Filtre statut ticket">
+            <option value="">Tous tickets</option>
+            <option value="new">Nouveau</option>
+            <option value="in_progress">En cours</option>
+            <option value="waiting">En attente</option>
+            <option value="resolved">Résolu</option>
+            <option value="closed">Fermé</option>
+          </select>
+        </div>
+        <div class="chat-inbox">
+          <aside class="chat-inbox-list">
+            <div id="adminChatList" class="chat-thread-list">
+              <p class="empty-state">Chargement des conversations…</p>
+            </div>
+          </aside>
+          <div class="chat-inbox-conversation">
+            <div id="adminChatSelectedTitle" class="chat-selected-title">Sélectionnez une société</div>
+            <div id="adminChatHistory" class="chat-history">
+              <p class="empty-state">Choisissez une société dans la liste à gauche.</p>
+            </div>
+            <form id="adminChatReplyForm" class="auth-form chat-reply-form">
+              <div class="chat-quick-replies" id="adminChatQuickReplies"></div>
+              <label>
+                Statut du ticket
+                <select id="adminChatTicketStatus" disabled>
+                  <option value="new">Nouveau</option>
+                  <option value="in_progress">En cours</option>
+                  <option value="waiting">En attente</option>
+                  <option value="resolved">Résolu</option>
+                  <option value="closed">Fermé</option>
+                </select>
+              </label>
+              <label>
+                Réponse à la société
+                <textarea name="message" rows="3" required placeholder="Votre réponse" disabled></textarea>
+              </label>
+              <button type="submit" class="btn btn-primary" disabled>Répondre</button>
+              <p class="form-note" id="adminChatNote"></p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="supplierDetailModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog app-modal-dialog-wide">
+      <div class="app-modal-header">
+        <h2 id="supplierDetailTitle">Fiche fournisseur</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body" id="supplierDetailBody"></div>
+    </div>
+  </div>
+
+  <div id="stockIncidentModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog">
+      <div class="app-modal-header">
+        <h2>Ajouter casse / perte / incident</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
+        <form id="stockIncidentForm" class="auth-form">
+          <label>
+            Type d'incident
+            <select name="expense_type" required>
+              <option value="casse">Casse</option>
+              <option value="perte">Perte</option>
+              <option value="dommage">Dommage</option>
+              <option value="stock">Autre incident stock</option>
+              <option value="autre">Autre</option>
+            </select>
+          </label>
+          <label>
+            Libellé
+            <input type="text" name="label" required placeholder="Ex. Casse palette huile d'olive">
+          </label>
+          <div class="form-row">
+            <label>
+              Montant perdu (€)
+              <input type="number" name="amount" required min="0" step="0.01">
+            </label>
+            <label>
+              Date
+              <input type="date" name="expense_date" required>
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Produit concerné <span class="form-optional">(optionnel)</span>
+              <input type="text" name="product_name" list="stockReceiveProductList" placeholder="Choisir ou saisir" autocomplete="off">
+            </label>
+            <label>
+              Quantité perdue <span class="form-optional">(optionnel)</span>
+              <input type="number" name="quantity" min="1" placeholder="Unités retirées du stock">
+            </label>
+          </div>
+          <label>
+            Ce qui s'est passé
+            <textarea name="notes" rows="3" placeholder="Décrivez l'incident, la cause, les actions prises…"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Enregistrer l'incident</button>
+          <p class="form-note" id="stockIncidentNote"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="roadmapItemModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog">
+      <div class="app-modal-header">
+        <h2 id="roadmapFormTitle">Ajouter une tâche / fonctionnalité</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
+        <form id="roadmapItemForm" class="auth-form">
+          <label>
+            Catégorie
+            <select name="category" required>
+              <option value="frontend">Frontend</option>
+              <option value="backend">Backend</option>
+              <option value="auth">Authentification</option>
+              <option value="products">Produits</option>
+              <option value="orders">Commandes</option>
+              <option value="suppliers">Fournisseurs</option>
+              <option value="payments">Paiements</option>
+              <option value="messaging">Messagerie</option>
+              <option value="negotiation">Négociation commerciale</option>
+              <option value="dashboard">Dashboard</option>
+              <option value="qa">Tests QA</option>
+              <option value="stock">Stock &amp; achats</option>
+              <option value="legal">Pages légales</option>
+              <option value="infra">Technique / Supabase</option>
+              <option value="general">Général</option>
+            </select>
+          </label>
+          <label>
+            Titre / fonctionnalité
+            <input type="text" name="title" required placeholder="Ex. Export PDF factures">
+          </label>
+          <label>
+            Note / description
+            <textarea name="notes" rows="3" placeholder="Détails, ce qui manque, priorités…"></textarea>
+          </label>
+          <div class="form-row">
+            <label>
+              Statut
+              <select name="status" required>
+                <option value="todo">À faire</option>
+                <option value="in_progress">En cours</option>
+                <option value="done">Développé</option>
+                <option value="validated">Validé</option>
+                <option value="blocked">Bloqué</option>
+              </select>
+            </label>
+            <label>
+              Priorité
+              <select name="priority">
+                <option value="high">Haute</option>
+                <option value="medium" selected>Moyenne</option>
+                <option value="low">Basse</option>
+              </select>
+            </label>
+            <label>
+              Ordre d'affichage
+              <input type="number" name="sort_order" value="0" min="0" step="1">
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="saveRoadmapBtn">Ajouter</button>
+            <button type="button" class="btn btn-outline-dark" id="cancelRoadmapBtn">Annuler</button>
+          </div>
+          <p class="form-note" id="roadmapFormNote"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="analyticsExpenseModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog">
+      <div class="app-modal-header">
+        <h2>Ajouter une dépense</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
+        <form id="analyticsExpenseForm" class="auth-form">
+          <label>
+            Type
+            <select name="expense_type" required>
+              <option value="livraison">Livraison</option>
+              <option value="stock">Demande stock</option>
+              <option value="logistique">Logistique</option>
+              <option value="fournisseur">Fournisseur</option>
+              <option value="casse">Casse</option>
+              <option value="perte">Perte</option>
+              <option value="dommage">Dommage</option>
+              <option value="autre">Autre</option>
+            </select>
+          </label>
+          <label>
+            Libellé
+            <input type="text" name="label" required placeholder="Ex. Livraison commande Nice">
+          </label>
+          <div class="form-row">
+            <label>
+              Montant (€)
+              <input type="number" name="amount" required min="0" step="0.01">
+            </label>
+            <label>
+              Date
+              <input type="date" name="expense_date" required>
+            </label>
+          </div>
+          <label>
+            Notes (optionnel)
+            <textarea name="notes" rows="2" placeholder="Détails, référence facture…"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <p class="form-note" id="analyticsExpenseNote"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="trackingModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog app-modal-dialog-wide">
+      <div class="app-modal-header">
+        <h2 id="trackingModalTitle">Livraison / suivi</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
+        <form id="trackingModalForm" class="auth-form">
+          <input type="hidden" name="order_id">
+          <label>
+            Statut livraison
+            <select name="delivery_status" id="trackingDeliveryStatus"></select>
+          </label>
+          <div class="form-row">
+            <label>
+              Transporteur
+              <input type="text" name="carrier" placeholder="Transporteur">
+            </label>
+            <label>
+              N° suivi
+              <input type="text" name="tracking_number" placeholder="N° suivi">
+            </label>
+          </div>
+          <label>
+            Lien suivi
+            <input type="url" name="tracking_url" placeholder="https://...">
+          </label>
+          <div class="form-row">
+            <label>
+              Livraison estimée
+              <input type="date" name="estimated_delivery_date">
+            </label>
+            <label>
+              Date de livraison
+              <input type="datetime-local" name="delivered_at">
+            </label>
+          </div>
+          <label>
+            Notes livraison
+            <textarea name="delivery_notes" rows="3" placeholder="Notes livraison"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <p class="form-note" id="trackingModalNote"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <datalist id="supplierNameList"></datalist>
+  <datalist id="supplierOrderSupplierList"></datalist>
+  <datalist id="supplierOrderProductList"></datalist>
+  <datalist id="supplierPurchaseSupplierList"></datalist>
+  <datalist id="supplierPurchaseProductList"></datalist>
+  <datalist id="stockReceiveProductList"></datalist>
+  <datalist id="productCategoryList"></datalist>
+  <datalist id="productOriginList"></datalist>
+  <datalist id="supplierCountryList"></datalist>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js?v=chat-mod-20260619"></script>
+  <script src="js/admin-api.js?v=stock-fallback-20260623"></script>
+  <script src="js/stock.js?v=stock-fallback-20260623"></script>
+  <script src="js/stock-alerts.js?v=stock-fallback-20260623"></script>
+  <script src="js/stock-admin.js?v=stock-fallback-20260623"></script>
+  <script src="js/stock-purchases.js?v=stock-fallback-20260623"></script>
+  <script src="js/stock-incidents.js?v=stock-incidents-20260615"></script>
+  <script src="js/product-image-upload.js?v=product-img-20260624"></script>
+  <script src="js/analytics-admin.js?v=analytics-20260624"></script>
+  <script src="js/admin-utils.js?v=admin-v2-20260624"></script>
+  <script src="js/admin-combobox.js?v=combobox-20260615"></script>
+  <script src="js/admin-dashboard.js?v=admin-v2-20260624"></script>
+  <script src="js/qa-api.js?v=qa-20260624"></script>
+  <script src="js/admin-roadmap.js?v=roadmap-v2-20260624"></script>
+  <script src="js/admin-shell.js?v=admin-v2-20260624"></script>
+  <script src="js/admin.js?v=admin-v2-20260624"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+/* Alertes et badges stock */
+
+.stock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.stock-badge small {
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.stock-badge--in-stock {
+  background: #dff4e9;
+  color: #1a5c4a;
+  border-color: rgba(26, 92, 74, 0.2);
+}
+
+.stock-badge--low-stock {
+  background: #fff2c2;
+  color: #7a5b00;
+  border-color: rgba(201, 162, 39, 0.45);
+}
+
+.stock-badge--out-of-stock {
+  background: #f8dddd;
+  color: #8a1f1f;
+  border-color: rgba(192, 57, 43, 0.25);
+}
+
+.product-info-item--low-stock .product-info-value {
+  color: #7a5b00;
+  font-weight: 700;
+}
+
+.product-info-item--out-of-stock .product-info-value {
+  color: #8a1f1f;
+  font-weight: 700;
+}
+
+.stock-alert-banner {
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.15rem;
+  border-radius: 14px;
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  background: linear-gradient(135deg, #fff8e6 0%, #fff2c2 100%);
+  color: #5c4500;
+}
+
+.stock-alert-banner strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 1rem;
+}
+
+.stock-alert-banner ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.stock-alert-banner li {
+  margin: 0.2rem 0;
+}
+
+.stock-admin-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 88px;
+}
+
+.stock-admin-cell strong {
+  font-size: 1.05rem;
+}
+
+.stock-admin-cell span {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.stock-admin-cell--low-stock,
+.stock-admin-cell--out-of-stock {
+  color: #7a5b00;
+}
+
+.stock-alert-msg {
+  display: block;
+  font-size: 0.72rem;
+  font-style: normal;
+  color: #a16207;
+  margin-top: 0.15rem;
+}
+
+.stock-movements-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.stock-movements-table th,
+.stock-movements-table td {
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.movement-purchase { color: #1a5c4a; font-weight: 700; }
+.movement-sale { color: #8a1f1f; font-weight: 700; }
