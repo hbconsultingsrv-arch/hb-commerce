@@ -111,6 +111,10 @@ function isSupplierProfile(profile) {
   return profile?.role === 'supplier';
 }
 
+function isDriverProfile(profile) {
+  return profile?.role === 'livreur';
+}
+
 function isBackofficeProfile(profile) {
   return isAdminProfile(profile) || isCommercialAgentProfile(profile);
 }
@@ -121,6 +125,7 @@ async function getDefaultDashboardUrl(session) {
   if (isSuperRootProfile(profile)) return 'super-root.html';
   if (isBackofficeProfile(profile)) return 'admin.html';
   if (isSupplierProfile(profile)) return 'supplier.html';
+  if (isDriverProfile(profile)) return 'livreur.html';
   return 'compte.html';
 }
 

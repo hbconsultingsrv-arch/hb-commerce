@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Espace livreur HB Commerce — courses et livraisons assignées.">
+  <title>Espace livreur | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commerce.css">
+  <link rel="stylesheet" href="css/order-tracking.css">
+  <link rel="stylesheet" href="css/livreur.css">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page livreur-page">
+  <nav class="nav nav-simple container">
+    <a href="index.html" class="logo logo-hb-brand">
+      <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="40" height="40" aria-hidden="true">
+      <span class="logo-hb-text">
+        <span class="logo-hb-name">HB Commerce</span>
+        <span class="logo-hb-tag">Espace livreur</span>
+      </span>
+    </a>
+    <div class="nav-actions">
+      <button type="button" id="refreshDeliveriesBtn" class="btn btn-sm btn-outline-light">↻ Actualiser</button>
+      <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="dashboard-main container">
+    <header class="livreur-header">
+      <div>
+        <span class="section-tag">Logistique</span>
+        <h1>Mes livraisons</h1>
+        <p class="auth-sub" id="livreurWelcome">Courses assignées par l'administration</p>
+      </div>
+    </header>
+
+    <div class="livreur-kpi-grid" id="livreurKpi">
+      <div class="livreur-kpi"><strong id="kpiTotal">—</strong><span>Total</span></div>
+      <div class="livreur-kpi"><strong id="kpiPending">—</strong><span>À livrer</span></div>
+      <div class="livreur-kpi"><strong id="kpiTransit">—</strong><span>En route</span></div>
+      <div class="livreur-kpi"><strong id="kpiDone">—</strong><span>Livrées</span></div>
+    </div>
+
+    <div class="livreur-filters" role="group" aria-label="Filtrer les livraisons">
+      <button type="button" class="btn btn-sm btn-outline-dark active" data-livreur-filter="all">Toutes</button>
+      <button type="button" class="btn btn-sm btn-outline-dark" data-livreur-filter="pending">À livrer</button>
+      <button type="button" class="btn btn-sm btn-outline-dark" data-livreur-filter="transit">En route</button>
+      <button type="button" class="btn btn-sm btn-outline-dark" data-livreur-filter="done">Livrées</button>
+    </div>
+
+    <div id="livreurLoading" class="order-tracking-loading">
+      <div class="order-tracking-spinner" aria-hidden="true"></div>
+      <p>Chargement des courses…</p>
+    </div>
+
+    <div id="livreurEmpty" class="empty-state order-tracking-empty" hidden>
+      <div class="order-tracking-empty-icon" aria-hidden="true">🚚</div>
+      <h2>Aucune livraison assignée</h2>
+      <p>Les commandes qui vous sont confiées apparaîtront ici.</p>
+    </div>
+
+    <div id="livreurLayout" class="livreur-layout" hidden>
+      <aside>
+        <div class="dashboard-card">
+          <h2 style="margin-top:0;font-size:1rem">Courses</h2>
+          <div id="livreurList" class="livreur-list"></div>
+        </div>
+      </aside>
+      <section id="livreurDetail" class="dashboard-card livreur-detail-card" hidden>
+        <div class="order-tracking-detail-head">
+          <div>
+            <span class="order-tracking-ref" id="detailRef">—</span>
+            <h2 id="detailClient">—</h2>
+            <p class="order-tracking-meta" id="detailMeta">—</p>
+          </div>
+          <span id="detailStatusBadge" class="order-status">—</span>
+        </div>
+        <div class="livreur-address-box" id="detailAddress">—</div>
+        <ul class="livreur-products-list" id="detailProducts"></ul>
+        <div class="order-tracking-timeline" id="detailTimeline" role="list"></div>
+        <label style="display:block;margin-top:1rem">
+          Notes livraison
+          <textarea id="detailNotes" rows="2" class="auth-form" style="width:100%;margin-top:0.35rem"></textarea>
+        </label>
+        <div class="livreur-detail-actions">
+          <button type="button" id="btnEnRoute" class="btn btn-outline-dark">🚚 En route</button>
+          <button type="button" id="btnDelivered" class="btn btn-primary">✓ Marquer livrée</button>
+          <button type="button" id="btnIncident" class="btn btn-outline-dark">⚠ Incident</button>
+        </div>
+        <p class="form-note" id="livreurActionNote"></p>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/driver-api.js"></script>
+  <script src="js/livreur.js"></script>
+</body>
+</html>

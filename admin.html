@@ -31,6 +31,7 @@
         <button type="button" class="admin-nav-item active" data-tab="accueil"><span class="admin-nav-icon">◉</span> Tableau de bord</button>
         <button type="button" class="admin-nav-item" data-tab="produits"><span class="admin-nav-icon">▣</span> Produits</button>
         <button type="button" class="admin-nav-item admin-only" data-tab="fournisseurs"><span class="admin-nav-icon">◎</span> Fournisseurs</button>
+        <button type="button" class="admin-nav-item admin-only" data-tab="livreurs"><span class="admin-nav-icon">🚚</span> Livreurs</button>
         <button type="button" class="admin-nav-item admin-only" data-tab="stock"><span class="admin-nav-icon">▤</span> Stock &amp; achats</button>
         <button type="button" class="admin-nav-item" data-tab="commandes"><span class="admin-nav-icon">☰</span> Commandes</button>
         <button type="button" class="admin-nav-item" data-tab="clients"><span class="admin-nav-icon">◇</span> Clients</button>
@@ -69,6 +70,7 @@
           <button type="button" class="admin-tab" data-tab="accueil">Accueil</button>
           <button type="button" class="admin-tab" data-tab="produits">Produits</button>
           <button type="button" class="admin-tab admin-only" data-tab="fournisseurs">Fournisseurs</button>
+          <button type="button" class="admin-tab admin-only" data-tab="livreurs">Livreurs</button>
           <button type="button" class="admin-tab admin-only" data-tab="stock">Stock</button>
           <button type="button" class="admin-tab" data-tab="commandes">Commandes</button>
           <button type="button" class="admin-tab" data-tab="clients">Clients</button>
@@ -361,6 +363,43 @@
           </label>
           <button type="submit" class="btn btn-primary">Créer la commande fournisseur</button>
           <p class="form-note" id="supplierOrderNote"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="panel-livreurs" class="admin-panel admin-only" hidden data-tab-scope>
+      <div class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Livreurs enregistrés</h2>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <a href="login-livreur.html" class="btn btn-sm btn-outline-dark" target="_blank" rel="noopener">Page connexion livreur</a>
+            <button type="button" id="refreshDriversBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr><th>Nom</th><th>E-mail</th><th>Téléphone</th><th>Véhicule</th><th>Actif</th></tr>
+            </thead>
+            <tbody id="driversBody"><tr><td colspan="5">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
+        <h2>Créer un compte livreur</h2>
+        <p class="auth-sub">Le livreur pourra se connecter via <a href="login-livreur.html">login-livreur.html</a> et gérer ses courses sur <a href="livreur.html">livreur.html</a>.</p>
+        <form id="adminDriverForm" class="auth-form">
+          <div class="form-row">
+            <label>Nom complet <input type="text" name="full_name" required></label>
+            <label>Téléphone <input type="tel" name="phone"></label>
+          </div>
+          <div class="form-row">
+            <label>E-mail (connexion) <input type="email" name="email" required></label>
+            <label>Mot de passe <input type="password" name="password" minlength="6" required autocomplete="new-password"></label>
+          </div>
+          <label>Véhicule / infos <input type="text" name="vehicle_info" placeholder="Fourgon, immatriculation…"></label>
+          <button type="submit" class="btn btn-primary">Créer le livreur</button>
+          <p class="form-note" id="adminDriverNote"></p>
         </form>
       </div>
     </section>
@@ -999,6 +1038,12 @@
         <form id="trackingModalForm" class="auth-form">
           <input type="hidden" name="order_id">
           <label>
+            Livreur assigné
+            <select name="assigned_driver_id" id="trackingDriverSelect">
+              <option value="">— Non assigné —</option>
+            </select>
+          </label>
+          <label>
             Statut livraison
             <select name="delivery_status" id="trackingDeliveryStatus"></select>
           </label>
@@ -1062,6 +1107,7 @@
   <script src="js/admin-utils.js?v=admin-v2-20260624"></script>
   <script src="js/admin-combobox.js?v=combobox-20260615"></script>
   <script src="js/admin-dashboard.js?v=admin-v2-20260624"></script>
+  <script src="js/driver-api.js?v=livreur-20260625"></script>
   <script src="js/qa-api.js?v=qa-20260624"></script>
   <script src="js/admin-roadmap.js?v=roadmap-v2-20260624"></script>
   <script src="js/admin-shell.js?v=admin-v2-20260624"></script>

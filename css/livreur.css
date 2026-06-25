@@ -1,0 +1,140 @@
+/* Espace livreur — HB Commerce */
+
+.livreur-page .livreur-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.livreur-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.livreur-kpi {
+  background: var(--admin-surface, #fff);
+  border: 1px solid rgba(45, 90, 56, 0.12);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(30, 51, 32, 0.06);
+}
+
+.livreur-kpi strong {
+  display: block;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.5rem;
+  color: var(--hb-green-mid, #2d5a38);
+}
+
+.livreur-kpi span {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #666);
+}
+
+.livreur-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.livreur-filters .btn.active {
+  background: var(--hb-green-mid, #2d5a38);
+  color: #fff;
+  border-color: var(--hb-green-mid, #2d5a38);
+}
+
+.livreur-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.livreur-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.livreur-card {
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(45, 90, 56, 0.15);
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+}
+
+.livreur-card:hover,
+.livreur-card.is-active {
+  border-color: var(--hb-gold, #c9a227);
+  box-shadow: 0 6px 20px rgba(201, 162, 39, 0.15);
+}
+
+.livreur-card-ref {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--hb-gold-dark, #8a6d12);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.livreur-card h3 {
+  margin: 0.25rem 0;
+  font-size: 1rem;
+}
+
+.livreur-card-meta {
+  font-size: 0.82rem;
+  color: var(--text-muted, #666);
+}
+
+.livreur-detail-card {
+  padding: 1.5rem;
+}
+
+.livreur-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.livreur-address-box {
+  background: rgba(45, 90, 56, 0.06);
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1rem 0;
+  line-height: 1.5;
+}
+
+.livreur-products-list {
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
+}
+
+.livreur-products-list li {
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 900px) {
+  .livreur-layout { grid-template-columns: 1fr; }
+  .livreur-list { max-height: none; }
+}
