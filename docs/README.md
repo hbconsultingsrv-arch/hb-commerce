@@ -4,6 +4,7 @@ Index de la documentation projet, de l'environnement de démonstration et des pa
 
 | Document | Description |
 |----------|-------------|
+| [**Fonctionnalités et règles demandées**](FONCTIONNALITES-ET-REGLES-DEMANDEES.md) | Synthèse de toutes les demandes validées (accueil, catalogue DB, chat, demo, …) |
 | [Cahier des charges (Markdown)](CAHIER-DES-CHARGES.md) | Spécifications v1.2 avec index demo complet |
 | [Cahier des charges (Word)](cahier-des-charges-hb-commerce.docx) | Export Word v1.2 |
 | [Présentation (PowerPoint)](presentation-hb-commerce.pptx) | Synthèse projet (slides Office) |
