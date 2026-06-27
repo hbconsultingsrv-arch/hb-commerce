@@ -31,8 +31,9 @@ Les contenus de l'ancien cahier des charges, du README et des pages demo ont ét
 
 **Mot de passe :** `Test1234!`
 
-**SQL :** exécuter les migrations listées dans le [document maître §18](FONCTIONNALITES-ET-REGLES-DEMANDEES.md#18-architecture-migrations-et-déploiement), puis `supabase/seed-demo-data.sql`.
+**SQL :** exécuter les migrations listées dans le [document maître §18](FONCTIONNALITES-ET-REGLES-DEMANDEES.md#18-architecture-migrations-et-déploiement) — en priorité **`migration-livreurs-setup-complete.sql`** si livreurs/agents commandes — puis `supabase/seed-demo-data.sql`.
 
+**Connexion agent :** `agent.martin@hbcommerce.demo` → [agent.html](../agent.html)  
 **Connexion admin :** `admin@hbcommerce.demo` → [admin.html](../admin.html)
 
 ---

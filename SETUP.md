@@ -81,6 +81,20 @@ Pour activer la gestion des fournisseurs :
 -- Copier-coller le contenu de supabase/migration-suppliers.sql
 ```
 
+Pour **livreurs**, **assignation** et **commandes créées par l'agent** (script tout-en-un recommandé) :
+
+```sql
+-- Copier-coller le contenu de supabase/migration-livreurs-setup-complete.sql
+```
+
+Puis, si ce n'est pas déjà fait :
+
+```sql
+-- Copier-coller le contenu de supabase/migration-agent-commercial-capabilities.sql
+```
+
+> **Important :** n'exécutez pas `migration-agent-driver-assignment.sql` seul — la table `delivery_drivers` doit exister (voir script complet ci-dessus).
+
 Promouvez ensuite votre compte principal en super root (remplacez l'e-mail) :
 
 ```sql
@@ -106,7 +120,8 @@ Présentation : **[docs/presentation-hb-commerce.pptx](docs/presentation-hb-comm
 |--------|------|
 | `super@hbcommerce.demo` | Super root |
 | `admin@hbcommerce.demo` | Admin |
-| `agent.martin@hbcommerce.demo` | Agent commercial |
+| `agent.martin@hbcommerce.demo` | Agent commercial → `agent.html` |
+| `livreur@hbcommerce.demo` | Livreur |
 | `contact@restaurant-paris.demo` | Client |
 | `stock@fiafi-tunisie.demo` | Fournisseur |
 
@@ -149,7 +164,7 @@ La brochure originale (Arabie saoudite, arabe/anglais) a été remplacée par :
 | **France** | `brochure-france.html` | Français |
 | **Luxembourg** | `brochure-luxembourg.html` | Français + Allemand |
 
-Sur le site : sélecteur **🇫🇷 France** / **🇱🇺 Luxembourg** dans la navigation.
+Sur le site : sélecteur de **langue FR / DE / EN** dans la navigation (plus de sélecteur pays LU/FR).
 
 ### Images produit par marché
 

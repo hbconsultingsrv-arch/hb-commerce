@@ -1,7 +1,7 @@
 # Fonctionnalités et règles — HB Commerce (document maître)
 
 **Projet :** HB Commerce — HB Groupe  
-**Dernière mise à jour :** 19/06/2026  
+**Dernière mise à jour :** 30/06/2026  
 **Site demo :** https://hbconsultingsrv-arch.github.io/hb-commerce/
 
 Ce document **fusionne et remplace** le contenu fonctionnel/règles des fichiers :
@@ -24,6 +24,9 @@ Ce document **fusionne et remplace** le contenu fonctionnel/règles des fichiers
 | 1.3 | 19/06/2026 | Accueil multi-marques, fiches produit, catalogue 100 % Supabase |
 | 1.4 | 19/06/2026 | Fusion documentation fonctionnelle (ce document) |
 | 1.5 | 19/06/2026 | Espace livreur (Mohamed), assignation courses, seed demo |
+| 1.6 | 30/06/2026 | Séparation espace agent (`agent.html`) / admin RH, i18n FR·DE·EN, nav « Plus » |
+| 1.7 | 30/06/2026 | Agent : créer client, créer commande client, logistique livraison, livreur dans Super root |
+| 1.8 | 30/06/2026 | Migrations livreurs consolidées, redirection rôles métier hors `compte.html` |
 
 ---
 
@@ -62,8 +65,8 @@ HB Commerce est une plateforme **B2B de vente en gros alimentaire**, initialemen
 
 - Digitaliser le parcours professionnel : catalogue, commande, facturation, livraison
 - Relation commerciale via agents assignés et chat modéré
-- Back-office complet (admin, super root, fournisseur)
-- Site vitrine multi-marchés (France, Luxembourg)
+- Back-office complet (admin RH, super root, espace agent, fournisseur, livreur)
+- Site vitrine multi-marques ; langues UI **FR / DE / EN** (plus de sélecteur pays LU/FR dans la navigation)
 
 ---
 
@@ -71,12 +74,14 @@ HB Commerce est une plateforme **B2B de vente en gros alimentaire**, initialemen
 
 | Domaine | Fonctionnalités |
 |---------|-----------------|
-| Vitrine | Accueil HB Commerce, catalogue, brochures marché FR/LU |
+| Vitrine | Accueil HB Commerce, catalogue, brochures marché FR/LU, nav simplifiée + menu **Plus** |
 | Commerce | Panier, checkout, prix masqués avant connexion |
-| Client | Profil société, commandes, factures PDF, chat |
-| Admin | Produits, fournisseurs, stock, sociétés, prix, commandes, chat, analyses, construction |
-| Super root | Comptes internes HB uniquement |
+| Client | Profil société, commandes (y compris celles saisies par l'agent), factures PDF, chat |
+| Agent commercial | Espace dédié `agent.html` : clients assignés, **création commande**, logistique, livreur, chat, stock lecture seule |
+| Admin (RH) | Produits, fournisseurs, stock, **Équipe HB** (agents + livreurs), sociétés, commandes, chat, analyses, construction |
+| Super root | Comptes internes HB + **création livreur** ; lien vers admin pour opérations |
 | Fournisseur | Stock et commandes d'approvisionnement reçues |
+| Livreur | Courses assignées, mise à jour statuts livraison |
 
 ---
 
@@ -84,19 +89,33 @@ HB Commerce est une plateforme **B2B de vente en gros alimentaire**, initialemen
 
 | Rôle | Code | Accès principal |
 |------|------|-----------------|
-| Super root | `super_root` | Utilisateurs internes, promotion admin |
-| Admin | `admin` | Opérations catalogue, sociétés, commandes, chat, stock, analyses |
-| Agent commercial | `agent_commercial` | Clients **assignés**, chat, commandes limitées |
+| Super root | `super_root` | Utilisateurs internes (super root, admin, agent) + **livreur** ; promotion rôles |
+| Admin | `admin` | Opérations RH : catalogue, sociétés, commandes, **Équipe HB**, stock, analyses |
+| Agent commercial | `agent_commercial` | Espace **`agent.html`** : clients **assignés**, **commandes**, **logistique/livreur**, chat, prix |
 | Client | `client` | Catalogue, commandes, chat société |
 | Fournisseur | `supplier` | Stock fournisseur, commandes reçues |
-| Livreur | `livreur` | Courses assignées, mise à jour livraison |
+| Livreur | `livreur` | Courses assignées, mise à jour livraison (`livreur.html`) |
 | Société en attente | `pending_company` | Compte créé, validation admin requise |
+
+**Redirection après connexion (`getDefaultDashboardUrl`) :**
+
+| Rôle | Page d'accueil |
+|------|----------------|
+| `super_root` | `super-root.html` |
+| `admin` | `admin.html` |
+| `agent_commercial` | **`agent.html`** (plus `admin.html` pour un agent pur) |
+| `livreur` | `livreur.html` |
+| `supplier` | `supplier.html` |
+| `client` / `pending_company` | `compte.html` |
+
+Les rôles métier (**agent, livreur, fournisseur, admin, super root**) ne restent **pas** sur `compte.html` — redirection automatique.
 
 **Règles RLS (Supabase) :**
 
-- Seul le **super root** peut créer/modifier les rôles internes (`super_root`, `admin`, `agent_commercial`)
-- L'**admin** gère les sociétés clients/fournisseurs et opérations
-- Un **agent** ne voit que les clients liés via `commercial_agent_id`
+- Le **super root** crée/modifie les comptes internes (`super_root`, `admin`, `agent_commercial`) et peut créer un **livreur** (profil + fiche `delivery_drivers`)
+- L'**admin** gère les sociétés clients/fournisseurs, l'**Équipe HB** (agents + livreurs) et les opérations
+- Un **agent** ne voit que les clients liés via `commercial_agent_id` ; peut **insérer une commande** pour ces clients (migration dédiée)
+- Un **agent** peut **lire** la liste des livreurs et **assigner** un livreur sur les commandes de son périmètre
 - Un **fournisseur** ne voit que son entité (`supplier_id`)
 - Un **livreur** ne voit que les commandes où `assigned_driver_id` = son `driver_id`
 
@@ -104,36 +123,56 @@ HB Commerce est une plateforme **B2B de vente en gros alimentaire**, initialemen
 
 ## 4. Organisation des dashboards
 
-### Règle : séparation super root / admin
+### Règle : séparation RH / agent / super root
 
 | Page | Rôles | Périmètre |
 |------|-------|-----------|
-| `super-root.html` | `super_root` | **Uniquement** comptes internes HB |
-| `admin.html` | `admin`, `agent_commercial` | **Opérations** métier |
+| `super-root.html` | `super_root` | Comptes HB : super root, admin, agent, **livreur** |
+| `admin.html` | `admin`, `super_root` (RH) | Opérations **globales** : catalogue, stock, Équipe HB, analyses… |
+| **`agent.html`** | **`agent_commercial`**, admin/super (activité commerciale perso) | Portefeuille **assigné uniquement** |
 | `supplier.html` | `supplier` | Stock et approvisionnement |
 | `livreur.html` | `livreur` | Courses et statuts livraison |
 | `compte.html` | `client`, `pending_company` | Espace société cliente |
 
-Le super root **ne gère pas** le catalogue ni les commandes au quotidien.  
-L'admin **ne promeut pas** les comptes internes (réservé super root).
+- Un **agent commercial pur** est redirigé de `admin.html` vers **`agent.html`**
+- Admin / super root peuvent ouvrir **`agent.html`** pour leur propre portefeuille commercial (lien « Mon activité commerciale »)
+- Le super root **ne gère pas** le catalogue au quotidien → **`admin.html`**
+- Création **livreur** : Super root (rôle Livreur) **ou** Admin → **Équipe HB → Livreurs**
 
-### Onglets admin (`admin.html`)
+### Onglets admin (`admin.html`) — espace RH
 
 Navigation latérale + sous-onglets :
 
 | Onglet | Accès | Contenu |
 |--------|-------|---------|
-| Tableau de bord | Tous | Vue d'ensemble |
-| Produits | Tous | CRUD catalogue |
+| Tableau de bord | Admin | Vue d'ensemble |
+| Produits | Admin | CRUD catalogue |
 | Fournisseurs | Admin | Entités fournisseurs |
 | Stock & achats | Admin | Stock, commandes fournisseur |
-| Livreurs | Admin | Comptes livreurs, assignation dans suivi commande |
-| Commandes | Tous | Commandes clients |
-| Clients | Tous | Sociétés clientes |
-| Prix clients | Tous | Tarifs personnalisés |
+| **Équipe HB** | Admin | Sous-onglets **Agents commerciaux** · **Livreurs** (création + liste) |
+| Commandes | Admin | Toutes commandes clients + suivi livraison |
+| Clients | Admin | Sociétés clientes |
+| Prix clients | Admin | Tarifs personnalisés |
 | Analyses | Admin | Analyses financières |
 | Construction | Admin | Roadmap / avancement site |
-| Support (chat) | Tous | Chat par société + modération |
+| Support (chat) | Admin | Chat par société + modération |
+
+**Lien direct Équipe :** `admin.html?tab=equipe` · Livreurs : `admin.html?tab=equipe&section=livreurs`
+
+### Onglets espace agent (`agent.html`)
+
+| Onglet | Contenu |
+|--------|---------|
+| Accueil | Synthèse activité (commandes, clients, alertes stock) |
+| **Mes commandes** | Liste + sous-onglet **Créer une commande** ; statut commande ; **Suivi / livreur** |
+| Mes clients | Liste + **Créer un client** (assigné automatiquement à l'agent) |
+| Prix clients | Tarifs négociés pour le portefeuille |
+| Stock | **Lecture seule** — alertes visibles, pas de modification RH |
+| Support (chat) | Chat des sociétés assignées |
+
+**Règle commande agent :** la commande est enregistrée avec `user_id` = **client** → visible dans **`compte.html`** (client) et **`agent.html`** (agent).
+
+**Règle logistique agent :** via modale **Suivi / livreur** — date estimée, statut livraison, transporteur, suivi, **assignation livreur** (liste chargée depuis `delivery_drivers`).
 
 **Règle CSS obligatoire** (panneaux masqués) :
 
@@ -149,11 +188,12 @@ Sans cela, `display: flex` sur `.admin-panel` écrase l'attribut HTML `hidden`.
 
 | Onglet | Contenu |
 |--------|---------|
-| **Équipe** | Liste super root / admin / agents |
-| **Nouveau** | Création compte interne |
+| **Équipe** | Liste super root / admin / agents / **livreurs** |
+| **Nouveau** | Création compte — rôles : Agent commercial, Admin, Super root, **Livreur** |
 
+- **Livreur (Super root) :** champ véhicule optionnel ; crée fiche `delivery_drivers` + compte Auth
 - **Supprimé :** onglet « Modifier » dédié → modification via **bouton fin de ligne** + **modale**
-- **Aide :** bouton ouvrant `#superRootInfoModal`
+- **Aide :** bouton ouvrant `#superRootInfoModal` — renvoie vers `admin.html?tab=equipe` pour détail agents/livreurs
 
 ---
 
@@ -193,6 +233,16 @@ Contenu hero **aligné en haut** sous la navigation — **pas centré verticalem
 4. Sinon → **Autres produits**
 
 Nouvelle marque en admin = nouveau bloc automatique à l'accueil.
+
+### Navigation publique (`index.html`)
+
+| Élément | Règle |
+|---------|-------|
+| Liens principaux | Accueil, Catalogue, Services, Confiance |
+| Menu **Plus** (déroulant) | Paiement & Facturation, FAQ, Contact, Brochure |
+| Compte / Connexion | Zone droite (`site-nav-actions`) — texte non tronqué |
+| Langues | **FR · DE · EN** (`js/locale-de.js`, `js/locale-en.js`, `js/locales.js`) |
+| Pays / marché | **Plus de sélecteur LU/FR** dans la barre ; marché fixe France (`js/markets.js`) |
 
 ---
 
@@ -255,15 +305,41 @@ Sous chaque image (`index.html`, `produits.html`) :
 
 ## 10. Agents commerciaux
 
+### Espace dédié `agent.html`
+
 - Voient **uniquement** les clients avec `commercial_agent_id` = leur profil
-- Peuvent modérer le chat de leurs sociétés
-- Gèrent les commandes de leur périmètre
-- Pas d'accès aux onglets `.admin-only` (fournisseurs, stock, analyses, construction)
+- **Créer un client** (onglet Clients → Créer) — assignation automatique à l'agent
+- **Créer une commande** pour un client (onglet Commandes → Créer une commande) :
+  - Lignes produits, prix client négocié si `customer_prices`, adresse, paiement, date livraison estimée
+  - Statut initial : **Validée** (virement/chèque) ou **En attente paiement** (Stripe)
+  - Commande visible **côté client** (`compte.html`) **et agent** (`agent.html`)
+- **Logistique livraison** : bouton **Suivi / livreur** sur chaque commande
+  - Date livraison estimée, statut livraison, transporteur, n° suivi, notes
+  - **Assignation livreur** (liste `delivery_drivers`)
+  - Modification **statut commande** (validée, en préparation, expédiée, …)
+- Modération chat des sociétés assignées
+- Tarifs personnalisés pour le portefeuille
+- Stock : **consultation seule** + alertes (pas d'achat RH ni clôture alerte)
+- **Pas d'accès** aux onglets admin RH (fournisseurs, stock global, analyses, construction, Équipe HB)
+
+### Admin RH vs agent
+
+| Besoin | Où |
+|--------|-----|
+| Créer un **agent** ou **livreur** (compte) | Super root **ou** `admin.html` → Équipe HB |
+| Activité commerciale (clients, commandes) | **`agent.html`** |
+| Stock, fournisseurs, analyses | **`admin.html`** |
+
+**Migration Supabase requise (agent commandes + livreurs) :**
+
+- **`supabase/migration-livreurs-setup-complete.sql`** (recommandé, tout-en-un)
+- ou dans l'ordre : `migration-delivery-drivers.sql` → `migration-agent-driver-assignment.sql` → `migration-agent-order-create.sql`
+- + `migration-agent-commercial-capabilities.sql` (création client par agent)
 
 **Comptes demo :**
 
-- `agent.martin@hbcommerce.demo` → Le Jasmin, Traiteur Lyon
-- `agent.dubois@hbcommerce.demo` → Epicerie Bordeaux, Hotel Nice
+- `agent.martin@hbcommerce.demo` → **`agent.html`** — Le Jasmin, Traiteur Lyon
+- `agent.dubois@hbcommerce.demo` → **`agent.html`** — Epicerie Bordeaux, Hotel Nice
 
 ---
 
@@ -291,9 +367,21 @@ Sous chaque image (`index.html`, `produits.html`) :
 
 `non_preparee`, `preparation`, `prete`, `expediee`, `en_transit`, `livree`, `incident`, `retour`
 
-### Règle admin : suivi en modale
+### Règle admin / agent : suivi en modale
 
-Suivi livraison (statut, transporteur, n° suivi, URL, dates, notes) dans **`#trackingModal`** — **plus de formulaire inline** dans le tableau.
+Suivi livraison (statut, transporteur, n° suivi, URL, dates, notes, **livreur assigné**) dans **`#trackingModal`** — **plus de formulaire inline** dans le tableau.
+
+Disponible dans **`admin.html`** (toutes commandes) et **`agent.html`** (commandes du portefeuille).
+
+### Commande créée par l'agent
+
+| Champ | Règle |
+|-------|-------|
+| `orders.user_id` | UUID du **client** (pas de l'agent) |
+| Visibilité client | `fetchUserOrders(client_id)` dans `compte.html` |
+| Visibilité agent | Filtre `commercial_agent_id` sur profils clients |
+| Stock | Déduction via `admin-api-stock.js` si configuré |
+| RLS | Policies `Commercial agent insert assigned client orders` + `order_items` |
 
 ### Côté client
 
@@ -378,8 +466,8 @@ Migration associée : `supabase/migration-business-expenses.sql`
 |--------|------|------|
 | `super@hbcommerce.demo` | super_root | `super-root.html` |
 | `admin@hbcommerce.demo` | admin | `admin.html` |
-| `agent.martin@hbcommerce.demo` | agent | `admin.html` |
-| `agent.dubois@hbcommerce.demo` | agent | `admin.html` |
+| `agent.martin@hbcommerce.demo` | agent | **`agent.html`** |
+| `agent.dubois@hbcommerce.demo` | agent | **`agent.html`** |
 | `contact@restaurant-paris.demo` | client | `compte.html` |
 | `achats@traiteur-lyon.demo` | client | `compte.html` |
 | `commandes@epicerie-bdx.demo` | client | `compte.html` |
@@ -403,8 +491,9 @@ Migration associée : `supabase/migration-business-expenses.sql`
 | Connexion | `login.html` | Auth |
 | Inscription | `register.html` | Création société |
 | Espace client | `compte.html` | Commandes, chat, factures |
-| Admin | `admin.html` | Back-office |
-| Super root | `super-root.html` | Internes HB |
+| **Espace agent** | **`agent.html`** | Portefeuille commercial externe |
+| Admin (RH) | `admin.html` | Back-office global |
+| Super root | `super-root.html` | Comptes HB (+ livreur) |
 | Fournisseur | `supplier.html` | Stock |
 | Livreur | `livreur.html`, `login-livreur.html` | Courses assignées |
 | Brochure FR | `brochure-france.html` | Marché France |
@@ -437,8 +526,13 @@ Migration associée : `supabase/migration-business-expenses.sql`
 11. `migration-stock-management.sql` (+ patches/incidents si besoin)
 12. `migration-admin-enhancements.sql`
 13. `migration-product-images-storage.sql`
-14. `migration-delivery-drivers.sql` (livreurs + assignation)
-15. **`seed-demo-data.sql`**
+14. **`migration-livreurs-setup-complete.sql`** ← livreurs + agent commandes + assignation (**recommandé**)
+    - *Alternative en 3 fichiers (ordre strict) :* `migration-delivery-drivers.sql` → `migration-agent-driver-assignment.sql` → `migration-agent-order-create.sql`
+15. `migration-agent-commercial-capabilities.sql` (agent crée client assigné)
+16. `migration-profile-livreur-admin.sql` (si rôle livreur absent du CHECK)
+17. **`seed-demo-data.sql`**
+
+> **Erreur fréquente :** exécuter `migration-agent-driver-assignment.sql` **sans** avoir créé la table `delivery_drivers` → utiliser le script **§14 complet** ci-dessus.
 
 ### Module QA (branche `feature/module-qa` — Mohamed)
 
@@ -477,6 +571,9 @@ python scripts/patch-docs-demo.py
 | Prix | Masqués sans connexion client |
 | Collaborateur GitHub | Invitation manuelle si `gh` CLI absent |
 | Demo SQL | Ré-exécutable (nettoyage UUID fixes) |
+| i18n | Clés `data-i18n` ; fichiers `locales.js`, `locale-de.js`, `locale-en.js` |
+| Nav accueil | Menu **Plus** ; pas de défilement horizontal qui tronque les liens |
+| Agent commande | `user_id` = client ; policies INSERT agent sur `orders` / `order_items` |
 
 ---
 
@@ -490,6 +587,8 @@ python scripts/patch-docs-demo.py
 6. Hero accueil centré verticalement au milieu
 7. Boutons Valider/Refuser sur messages non-`pending`
 8. Super root sur opérations catalogue/commandes
+9. Agent commercial pur sur `admin.html` (utiliser `agent.html`)
+10. Exécuter `migration-agent-driver-assignment.sql` sans table `delivery_drivers`
 
 ---
 
@@ -497,16 +596,21 @@ python scripts/patch-docs-demo.py
 
 | Domaine | Fichiers |
 |---------|----------|
-| Accueil | `index.html`, `js/main.js`, `css/commerce.css` |
+| Accueil | `index.html`, `js/main.js`, `js/hb-front.js`, `css/hero-premium.css` |
+| i18n | `js/locales.js`, `js/locale-de.js`, `js/locale-en.js`, `js/market-ui.js` |
 | Catalogue | `js/products.js`, `js/fiafi-catalog.js`, `js/supabase-client.js` |
 | Fiche technique | `#productTechModal`, `js/products.js` |
-| Admin | `admin.html`, `js/admin.js`, `js/admin-roadmap.js` |
-| Super root | `super-root.html`, `js/super-root.js` |
+| Admin RH | `admin.html`, `js/admin.js`, `js/admin-roadmap.js` |
+| **Agent commercial** | **`agent.html`**, `js/agent-page.js`, `window.HB_COMMERCIAL_SPACE` |
+| Super root | `super-root.html`, `js/super-root.js`, `js/driver-api.js` |
+| Livreur | `livreur.html`, `js/livreur.js`, `js/driver-api.js` |
 | Fournisseur | `supplier.html`, `js/supplier.js` |
+| Auth / routing | `js/auth.js` (`getDefaultDashboardUrl`, `updateNavAuth`) |
 | Chat | `js/admin.js`, `migration-chat-moderation-policies.sql` |
+| Migrations livreurs | `supabase/migration-livreurs-setup-complete.sql` |
 | Demo SQL | `supabase/seed-demo-data.sql` |
-| Styles onglets | `css/style.css` |
+| Styles onglets | `css/style.css`, `css/admin-shell.css` |
 
 ---
 
-*Document maître — HB Commerce / HB Groupe*
+*Document maître v1.8 — HB Commerce / HB Groupe — 30/06/2026*

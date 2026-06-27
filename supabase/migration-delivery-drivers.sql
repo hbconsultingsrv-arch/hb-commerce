@@ -1,5 +1,7 @@
 -- HB Commerce — Livreurs & assignation livraisons
 -- Exécuter dans Supabase SQL Editor après schema.sql
+-- Ensuite : migration-agent-driver-assignment.sql et migration-agent-order-create.sql
+-- OU en une fois : migration-livreurs-setup-complete.sql
 
 -- Table livreurs
 CREATE TABLE IF NOT EXISTS delivery_drivers (

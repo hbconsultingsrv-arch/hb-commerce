@@ -2,7 +2,7 @@
 
 > **Document consolidé :** l'intégralité des fonctionnalités, règles métier et règles techniques demandées est désormais centralisée dans :
 >
-> **[FONCTIONNALITES-ET-REGLES-DEMANDEES.md](FONCTIONNALITES-ET-REGLES-DEMANDEES.md)** (document maître v1.4)
+> **[FONCTIONNALITES-ET-REGLES-DEMANDEES.md](FONCTIONNALITES-ET-REGLES-DEMANDEES.md)** (document maître **v1.8**)
 
 Ce fichier reste le point d'entrée pour l'export Word (`cahier-des-charges-hb-commerce.docx`) via `python scripts/generate-docs.py`.
 
@@ -18,19 +18,19 @@ Ce fichier reste le point d'entrée pour l'export Word (`cahier-des-charges-hb-c
 
 ### Rôles
 
-Super root · Admin · Agent commercial · Client · Fournisseur · Société en attente
+Super root · Admin · Agent commercial · Client · Fournisseur · Livreur · Société en attente
 
-### Points clés validés
+### Points clés validés (30/06/2026)
 
-- Dashboards séparés (super root = internes, admin = opérations)
-- Accueil multi-marques, catalogue 100 % Supabase
-- Fiches produit : acidité, pays, dispo, fiche technique
-- Chat modéré par société
-- Suivi livraison en modale admin
-- Demo 14 produits / 6 marques / 10 comptes
+- Dashboards séparés : **Super root** (comptes HB + livreur) · **Admin RH** · **`agent.html`** (portefeuille) · Client · Fournisseur · Livreur
+- Agent : **créer client**, **créer commande** (visible client + agent), **logistique** (dates, livreur)
+- Accueil multi-marques, catalogue 100 % Supabase, nav menu **Plus**, i18n **FR / DE / EN**
+- Chat modéré par société ; suivi livraison en modale
+- Migration livreurs : **`migration-livreurs-setup-complete.sql`** (recommandé)
+- Demo 14 produits / 6 marques / 11 comptes
 
 **Détail complet →** [FONCTIONNALITES-ET-REGLES-DEMANDEES.md](FONCTIONNALITES-ET-REGLES-DEMANDEES.md)
 
 ---
 
-*HB Groupe — 19/06/2026*
+*HB Groupe — 30/06/2026*

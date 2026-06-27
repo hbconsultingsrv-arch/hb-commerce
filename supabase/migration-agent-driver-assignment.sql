@@ -1,5 +1,6 @@
 -- HB Commerce — Agent commercial : lecture livreurs + assignation sur ses commandes
--- Exécuter après migration-delivery-drivers.sql
+-- PREREQUIS : exécuter d'abord migration-delivery-drivers.sql
+-- OU utiliser migration-livreurs-setup-complete.sql (tout-en-un)
 
 DROP POLICY IF EXISTS "Admins manage drivers" ON public.delivery_drivers;
 CREATE POLICY "Admins manage drivers"

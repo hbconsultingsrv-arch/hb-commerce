@@ -35,8 +35,10 @@ Comptes principaux : `super@hbcommerce.demo`, `admin@hbcommerce.demo`, `contact@
 | `login.html` | Connexion |
 | `register.html` | Inscription professionnelle |
 | `compte.html` | Espace client (profil + commandes) |
-| `admin.html` | Dashboard admin (produits + commandes) |
-| `super-root.html` | Dashboard super root (utilisateurs internes) |
+| `agent.html` | Espace agent commercial (clients, commandes, livraison) |
+| `admin.html` | Dashboard admin RH (produits, stock, Équipe HB, …) |
+| `super-root.html` | Dashboard super root (comptes HB + livreur) |
+| `livreur.html` | Espace livreur (courses assignées) |
 | `supplier.html` | Espace fournisseur (stock + commandes d'approvisionnement) |
 | `docs/exemples/index.html` | Hub demo et pages d'exemple |
 
@@ -48,8 +50,9 @@ Le site est hébergé sur **GitHub Pages** (gratuit). Les données passent par *
 - Profil client : nom, société, e-mail, téléphone, adresse
 - Catalogue produits dynamique
 - Commandes avec suivi de statut
-- Dashboard admin pour validation des commandes et chat sociétés
-- Dashboard super root pour gérer les accès et les prix personnalisés par client
+- Dashboard admin RH pour validation des commandes, Équipe HB et chat sociétés
+- Espace agent commercial (`agent.html`) : clients assignés, création commandes, logistique livreur
+- Dashboard super root pour gérer les accès internes (admin, agent, livreur)
 - Chat société avec historique et modération des messages
 - Gestion des fournisseurs et rattachement fournisseur/produit
 - Espace fournisseur pour gérer les stocks et les commandes d'approvisionnement
