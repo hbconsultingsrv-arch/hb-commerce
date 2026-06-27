@@ -2,7 +2,7 @@ async function isAdmin() {
   const session = await getSession();
   if (!session) return false;
   const profile = await getProfile(session.user.id);
-  return isBackofficeProfile(profile);
+  return isAdminProfile(profile);
 }
 
 async function isFullAdmin() {
@@ -15,9 +15,30 @@ async function isFullAdmin() {
 async function requireAdmin() {
   const session = await requireAuth('login.html?redirect=admin.html');
   if (!session) return null;
-  const admin = await isAdmin();
-  if (!admin) {
-    const profile = await getProfile(session.user.id);
+  const profile = await getProfile(session.user.id);
+  if (isCommercialAgentProfile(profile)) {
+    window.location.href = 'agent.html';
+    return null;
+  }
+  if (!isAdminProfile(profile)) {
+    if (isDriverProfile(profile)) {
+      window.location.href = 'livreur.html';
+    } else if (isSupplierProfile(profile)) {
+      window.location.href = 'supplier.html';
+    } else {
+      window.location.href = 'compte.html';
+    }
+    return null;
+  }
+  return session;
+}
+
+async function requireCommercialSpace() {
+  const session = await requireAuth('login.html?redirect=agent.html');
+  if (!session) return null;
+  const profile = await getProfile(session.user.id);
+  const allowed = isCommercialAgentProfile(profile) || isAdminProfile(profile);
+  if (!allowed) {
     if (isDriverProfile(profile)) {
       window.location.href = 'livreur.html';
     } else if (isSupplierProfile(profile)) {

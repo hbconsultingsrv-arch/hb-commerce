@@ -2,6 +2,13 @@
  * Dashboard accueil admin — KPIs et graphiques
  */
 
+const COMMERCIAL_TAB_TITLES = {
+  commandes: { title: 'Mes commandes', sub: 'Commandes de vos clients assignés uniquement' },
+  clients: { title: 'Mes clients', sub: 'Portefeuille commercial personnel' },
+  prix: { title: 'Prix personnalisés', sub: 'Tarifs négociés pour vos clients' },
+  chat: { title: 'Support & chat', sub: 'Messages de vos clients assignés' }
+};
+
 const ADMIN_TAB_TITLES = {
   accueil: { title: 'Tableau de bord', sub: 'Vue d\'ensemble de l\'activité HB Commerce' },
   produits: { title: 'Produits', sub: 'Catalogue, stock et tarification' },
@@ -180,7 +187,8 @@ async function loadAdminDashboard() {
 }
 
 function updateAdminTopbar(tabId) {
-  const meta = ADMIN_TAB_TITLES[tabId] || ADMIN_TAB_TITLES.accueil;
+  const titles = window.HB_COMMERCIAL_SPACE ? COMMERCIAL_TAB_TITLES : ADMIN_TAB_TITLES;
+  const meta = titles[tabId] || (window.HB_COMMERCIAL_SPACE ? COMMERCIAL_TAB_TITLES.commandes : ADMIN_TAB_TITLES.accueil);
   const title = document.getElementById('adminTopbarTitle');
   const sub = document.getElementById('adminTopbarSub');
   if (title) title.textContent = meta.title;

@@ -62,38 +62,34 @@ function initSectionTabScopes() {
 }
 
 async function initAdmin() {
-  adminSession = await requireAdmin();
+  if (window.HB_COMMERCIAL_SPACE) {
+    adminSession = await requireCommercialSpace();
+  } else {
+    adminSession = await requireAdmin();
+  }
   if (!adminSession) return;
   adminProfile = await getProfile(adminSession.user.id);
+
+  if (!window.HB_COMMERCIAL_SPACE && isCommercialAgentProfile(adminProfile)) {
+    window.location.href = 'agent.html';
+    return;
+  }
+
+  const commercialSpace = window.HB_COMMERCIAL_SPACE === true;
 
   document.getElementById('logoutBtn')?.addEventListener('click', signOut);
   const superRootLink = document.getElementById('superRootLink');
   if (superRootLink && isSuperRootProfile(adminProfile)) superRootLink.style.display = '';
-  const commercialAgent = isCommercialAgentProfile(adminProfile);
-  applyAdminRoleUi(adminProfile, commercialAgent);
+  applyAdminRoleUi(adminProfile, commercialSpace || isCommercialAgentProfile(adminProfile));
   if (!isSuperRootProfile(adminProfile)) {
     document.querySelectorAll('.super-root-only').forEach((el) => el.remove());
   }
 
   bindAdminTabs();
-  const params = new URLSearchParams(window.location.search);
-  const agentPreview = params.get('view') === 'agent' && isAdminProfile(adminProfile) && !commercialAgent;
-
-  if (agentPreview) {
-    applyAgentPreviewMode();
-    showAdminTab('commandes');
-  } else   if (commercialAgent) {
-    document.querySelectorAll('.admin-only').forEach((el) => { el.style.display = 'none'; });
-    document.querySelector('[data-tab="produits"]')?.setAttribute('hidden', '');
-    document.querySelector('[data-tab="accueil"]')?.setAttribute('hidden', '');
-    document.getElementById('panel-produits')?.setAttribute('hidden', '');
-    document.getElementById('panel-accueil')?.setAttribute('hidden', '');
-    const ordersTitle = document.getElementById('ordersPanelTitle');
-    if (ordersTitle) ordersTitle.textContent = 'Mes commandes clients';
-    const clientsTitle = document.querySelector('#panel-clients .dashboard-card-head h2');
-    if (clientsTitle) clientsTitle.textContent = 'Mes clients assignés';
+  if (commercialSpace) {
     showAdminTab('commandes');
   } else {
+    const params = new URLSearchParams(window.location.search);
     const deepTab = params.get('tab');
     const panel = deepTab ? document.getElementById(`panel-${deepTab}`) : null;
     if (deepTab && panel) {
@@ -110,7 +106,7 @@ async function initAdmin() {
     }
   }
 
-  if (!commercialAgent) {
+  if (!commercialSpace) {
     await loadSuppliersTable();
     await loadProductsTable();
     await loadAgentsTable();
@@ -135,7 +131,7 @@ async function initAdmin() {
   document.getElementById('refreshPurchasesBtn')?.addEventListener('click', () => {
     if (typeof loadSupplierPurchasesTable === 'function') loadSupplierPurchasesTable();
   });
-  if (!commercialAgent && typeof initStockAdminPanel === 'function') {
+  if (!commercialSpace && typeof initStockAdminPanel === 'function') {
     initStockAdminPanel();
   }
   document.getElementById('adminClientForm')?.addEventListener('submit', handleAdminClientSubmit);
@@ -155,8 +151,11 @@ async function initAdmin() {
   bindOrderFilters();
   bindChatEnhancements();
   bindPriceFormPreview();
-  initProductImageUpload();
+  if (typeof initProductImageUpload === 'function') initProductImageUpload();
   updateAdminNavBadges();
+  if (window.HB_COMMERCIAL_SPACE && typeof initCommercialSpacePage === 'function') {
+    await initCommercialSpacePage();
+  }
 }
 
 async function loadProductsTable() {
@@ -578,9 +577,11 @@ function applyAdminRoleUi(profile, commercialAgent) {
   if (commercialAgent) {
     if (badge) {
       badge.hidden = false;
-      badge.textContent = 'Espace agent commercial';
+      badge.textContent = window.HB_COMMERCIAL_SPACE && isAdminProfile(profile)
+        ? 'Mon activité commerciale · RH'
+        : 'Espace agent commercial';
     }
-    if (sidebarTag) sidebarTag.textContent = 'Agent commercial · B2B';
+    if (sidebarTag && !window.HB_COMMERCIAL_SPACE) sidebarTag.textContent = 'Agent commercial · B2B';
   } else if (isAdminProfile(profile)) {
     if (badge) {
       badge.hidden = false;
@@ -589,31 +590,9 @@ function applyAdminRoleUi(profile, commercialAgent) {
   }
 }
 
-function applyAgentPreviewMode() {
-  document.querySelectorAll('.admin-only').forEach((el) => { el.style.display = 'none'; });
-  document.querySelector('[data-tab="produits"]')?.setAttribute('hidden', '');
-  document.querySelector('[data-tab="accueil"]')?.setAttribute('hidden', '');
-  document.getElementById('panel-produits')?.setAttribute('hidden', '');
-  document.getElementById('panel-accueil')?.setAttribute('hidden', '');
-  const badge = document.getElementById('adminRoleBadge');
-  if (badge) {
-    badge.hidden = false;
-    badge.textContent = 'Aperçu · espace agent commercial';
-  }
-  const sidebarTag = document.querySelector('.admin-sidebar .logo-hb-tag');
-  if (sidebarTag) sidebarTag.textContent = 'Aperçu agent · B2B';
-  const host = document.querySelector('.admin-content');
-  if (host && !document.getElementById('agentPreviewBanner')) {
-    const banner = document.createElement('div');
-    banner.id = 'agentPreviewBanner';
-    banner.className = 'admin-preview-banner';
-    banner.innerHTML = `
-      <p><strong>Mode aperçu agent commercial</strong> — même interface que l'agent (commandes, clients, prix, chat).
-      <a href="admin.html?tab=equipe">Retour Équipe HB</a> ·
-      <a href="livreur.html">Espace livreur</a> ·
-      <a href="admin.html">Quitter l'aperçu</a></p>`;
-    host.prepend(banner);
-  }
+function mustScopeToAssignedClients() {
+  if (window.HB_COMMERCIAL_SPACE === true) return true;
+  return isCommercialAgentProfile(adminProfile);
 }
 
 async function loadAgentsTable() {
@@ -632,7 +611,7 @@ async function loadAgentsTable() {
         <td>${escapeHtml(a.email || '—')}</td>
         <td>${escapeHtml(a.phone || '—')}</td>
         <td>
-          <a href="admin.html?view=agent" class="btn btn-sm btn-outline-dark">Vue agent</a>
+          <a href="agent.html" class="btn btn-sm btn-outline-dark">Espace commercial</a>
           <a href="login.html" class="btn btn-sm btn-outline-dark" target="_blank" rel="noopener" title="Connexion avec le compte agent">Login</a>
         </td>
       </tr>
@@ -820,7 +799,7 @@ function bindOrderFilters() {
 }
 
 function isScopedCommercialAgent() {
-  return isCommercialAgentProfile(adminProfile);
+  return mustScopeToAssignedClients();
 }
 
 function getAgentClientProfiles(profiles = adminProfiles) {
@@ -1041,16 +1020,18 @@ async function loadClientsPanel() {
     });
 
     let clients = adminProfiles.filter((p) => ['pending_company', 'client'].includes(p.role));
-    if (isScopedCommercialAgent()) {
+    const scoped = mustScopeToAssignedClients();
+    if (scoped) {
       clients = clients.filter((p) => p.commercial_agent_id === adminProfile.id);
     }
-    const agents = isScopedCommercialAgent() ? [] : adminProfiles.filter(isCommercialAssignableProfile);
+    const agents = scoped ? [] : adminProfiles.filter(isCommercialAssignableProfile);
     renderAgentSelect(document.getElementById('adminClientAgentSelect'), agents);
+    const colCount = scoped ? 6 : 7;
     body.innerHTML = clients.length ? clients.map((profile) => `
       <tr>
         <td><strong>${escapeHtml(profile.company || '—')}</strong><br><small>${escapeHtml(profile.address || '')}</small></td>
         <td>
-          ${isCommercialAgentProfile(adminProfile) ? companyRoleLabel(profile.role) : `
+          ${scoped ? companyRoleLabel(profile.role) : `
             <select data-company-role="${profile.id}">
               ${['pending_company', 'client'].map((role) => `<option value="${role}" ${profile.role === role ? 'selected' : ''}>${companyRoleLabel(role)}</option>`).join('')}
             </select>
@@ -1059,17 +1040,16 @@ async function loadClientsPanel() {
         <td>${escapeHtml(profile.full_name || '—')}<br><small>${escapeHtml(profile.phone || '')}</small></td>
         <td>${escapeHtml(profile.vat_number || '—')}</td>
         <td><strong>${formatPrice(revenueByUser.get(profile.id) || 0)}</strong></td>
+        ${scoped ? '' : `
         <td>
-          ${isCommercialAgentProfile(adminProfile) ? escapeHtml(agentName(profile.commercial_agent_id, agents)) : `
-            <select data-assign-agent="${profile.id}">
-              <option value="">Aucun agent</option>
-              ${agents.map((agent) => `<option value="${agent.id}" ${profile.commercial_agent_id === agent.id ? 'selected' : ''}>${escapeHtml(commercialAgentLabel(agent))}</option>`).join('')}
-            </select>
-          `}
-        </td>
+          <select data-assign-agent="${profile.id}">
+            <option value="">Aucun agent</option>
+            ${agents.map((agent) => `<option value="${agent.id}" ${profile.commercial_agent_id === agent.id ? 'selected' : ''}>${escapeHtml(commercialAgentLabel(agent))}</option>`).join('')}
+          </select>
+        </td>`}
         <td>${escapeHtml(profile.email || '—')}</td>
       </tr>
-    `).join('') : '<tr><td colspan="7">Aucun client enregistré.</td></tr>';
+    `).join('') : `<tr><td colspan="${colCount}">Aucun client enregistré.</td></tr>`;
     body.querySelectorAll('[data-assign-agent]').forEach((select) => {
       select.addEventListener('change', async () => {
         await assignCommercialAgent(select.dataset.assignAgent, select.value);
@@ -1173,8 +1153,13 @@ async function loadCustomerPricesTable() {
     const products = await fetchAllProducts();
     const profileMap = new Map(profiles.map((p) => [p.id, p]));
     const productMap = new Map(products.map((p) => [p.slug, p]));
+    let prices = adminCustomerPricesCache;
+    if (mustScopeToAssignedClients()) {
+      const clientIds = new Set(getAgentClientProfiles(profiles).map((p) => p.id));
+      prices = prices.filter((row) => clientIds.has(row.profile_id));
+    }
 
-    body.innerHTML = adminCustomerPricesCache.length ? adminCustomerPricesCache.map((row) => {
+    body.innerHTML = prices.length ? prices.map((row) => {
       const catalog = productMap.get(row.product_slug);
       const catalogPrice = catalog?.price ?? 0;
       const discount = catalogPrice > 0 ? ((catalogPrice - row.price) / catalogPrice * 100) : 0;
@@ -1336,7 +1321,7 @@ function chatStatusLabel(status) {
 
 function getChatEligibleProfiles(profiles) {
   const clients = profiles.filter((profile) => profile.role === 'client');
-  if (isCommercialAgentProfile(adminProfile)) {
+  if (mustScopeToAssignedClients()) {
     return clients.filter((profile) => profile.commercial_agent_id === adminProfile.id);
   }
   return clients;

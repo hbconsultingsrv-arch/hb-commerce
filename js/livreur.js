@@ -172,7 +172,21 @@ async function requireDriver() {
   if (!session) return null;
   const profile = await getProfile(session.user.id);
 
+  if (isCommercialAgentProfile(profile)) {
+    window.location.href = 'agent.html';
+    return null;
+  }
+
   if (isAdminProfile(profile)) {
+    if (profile.driver_id) {
+      showLivreurRhPersonalMode(profile);
+      livreurState.profile = profile;
+      livreurState.driverId = profile.driver_id;
+      livreurState.adminPreview = false;
+      const welcome = document.getElementById('livreurWelcome');
+      if (welcome) welcome.textContent = `Bonjour ${profile.full_name || profile.email} — vos livraisons personnelles`;
+      return session;
+    }
     showLivreurAdminPreview(profile);
     livreurState.profile = profile;
     livreurState.adminPreview = true;
@@ -196,6 +210,23 @@ async function requireDriver() {
   return session;
 }
 
+function showLivreurRhPersonalMode(profile) {
+  const banner = document.getElementById('livreurAdminBanner');
+  const adminLink = document.getElementById('livreurAdminLink');
+  if (adminLink) {
+    adminLink.hidden = false;
+    adminLink.href = 'admin.html';
+    adminLink.textContent = '← Administration RH';
+  }
+  if (banner) {
+    banner.hidden = false;
+    banner.innerHTML = `
+      <p>Vous consultez vos <strong>livraisons personnelles</strong> (${escapeHtml(profile.full_name || profile.email)}).
+      <a href="admin.html">Administration RH</a> ·
+      <a href="agent.html">Mon activité commerciale</a></p>`;
+  }
+}
+
 function showLivreurAdminPreview(profile) {
   const banner = document.getElementById('livreurAdminBanner');
   const adminLink = document.getElementById('livreurAdminLink');
@@ -211,7 +242,7 @@ function showLivreurAdminPreview(profile) {
       Pour tester : <a href="login-livreur.html">connexion livreur</a>
       (demo <code>livreur@hbcommerce.demo</code> / <code>Test1234!</code>).
       <a href="admin.html?tab=equipe">Retour Équipe HB</a> ·
-      <a href="admin.html?view=agent">Vue agent commercial</a></p>`;
+      <a href="agent.html">Mon activité commerciale</a></p>`;
   }
 }
 

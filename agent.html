@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espace commercial | HB Commerce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commerce.css">
+  <link rel="stylesheet" href="css/admin-shell.css?v=commercial-20260627">
+  <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page admin-v2 commercial-space">
+  <div class="admin-app">
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Navigation commercial">
+      <div class="admin-sidebar-brand">
+        <a href="index.html" class="logo logo-hb-brand">
+          <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="36" height="36" aria-hidden="true">
+          <span class="logo-hb-text">
+            <span class="logo-hb-name">HB Commerce</span>
+            <span class="logo-hb-tag">Espace commercial</span>
+          </span>
+        </a>
+      </div>
+      <nav class="admin-sidebar-nav">
+        <button type="button" class="admin-nav-item active" data-tab="commandes"><span class="admin-nav-icon">☰</span> Mes commandes</button>
+        <button type="button" class="admin-nav-item" data-tab="clients"><span class="admin-nav-icon">◇</span> Mes clients</button>
+        <button type="button" class="admin-nav-item" data-tab="prix"><span class="admin-nav-icon">€</span> Prix clients</button>
+        <button type="button" class="admin-nav-item" data-tab="chat"><span class="admin-nav-icon">✉</span> Support<span class="admin-nav-badge" id="adminChatNavBadge" hidden></span></button>
+      </nav>
+      <div class="admin-sidebar-footer">
+        <a href="admin.html" id="agentRhAdminLink" class="btn btn-sm btn-outline-light" hidden>Administration RH</a>
+        <a href="super-root.html" id="agentRhSuperLink" class="btn btn-sm btn-outline-light" hidden>Super root</a>
+        <a href="livreur.html" id="agentLivreurLink" class="btn btn-sm btn-outline-light" hidden>Mes livraisons</a>
+        <a href="index.html" class="btn btn-sm btn-outline-light">Voir le site</a>
+        <button type="button" id="logoutBtn" class="btn btn-sm btn-primary">Déconnexion</button>
+      </div>
+    </aside>
+
+    <div class="admin-shell">
+      <header class="admin-topbar">
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <button type="button" class="admin-mobile-toggle" id="adminSidebarToggle" aria-label="Menu">☰</button>
+          <div class="admin-topbar-title">
+            <h1 id="adminTopbarTitle">Mes commandes</h1>
+            <p id="adminTopbarSub">Uniquement vos clients et commandes assignés — pas l'administration globale</p>
+            <p id="adminRoleBadge" class="admin-role-badge">Espace commercial externe</p>
+          </div>
+        </div>
+      </header>
+
+      <main class="admin-content">
+        <div id="commercialScopeBanner" class="admin-preview-banner" hidden></div>
+
+        <section id="panel-commandes" class="admin-panel">
+          <div class="dashboard-card dashboard-card-wide">
+            <div class="dashboard-card-head">
+              <h2 id="ordersPanelTitle">Mes commandes clients</h2>
+            </div>
+            <div class="admin-toolbar">
+              <input type="search" class="admin-search-input" id="orderSearchInput" placeholder="Rechercher N°, client…">
+              <select id="orderFilterStatus" aria-label="Filtre statut">
+                <option value="">Tous statuts</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table class="requests-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>N° commande</th>
+                    <th>Client / Société</th>
+                    <th>Montant</th>
+                    <th>Paiement</th>
+                    <th>Statut</th>
+                    <th>Progression</th>
+                    <th>Livreur</th>
+                    <th>Livraison</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersAdminBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="panel-clients" class="admin-panel" hidden>
+          <div class="dashboard-card dashboard-card-wide">
+            <div class="dashboard-card-head">
+              <h2>Mes clients assignés</h2>
+              <button type="button" id="refreshClientsBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+            </div>
+            <div class="table-wrap">
+              <table class="requests-table">
+                <thead>
+                  <tr>
+                    <th>Société</th>
+                    <th>Statut</th>
+                    <th>Contact</th>
+                    <th>TVA</th>
+                    <th>CA généré</th>
+                    <th>E-mail</th>
+                  </tr>
+                </thead>
+                <tbody id="clientsBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="panel-prix" class="admin-panel" hidden>
+          <div class="dashboard-grid">
+            <div class="dashboard-card">
+              <h2>Fixer un prix personnalisé</h2>
+              <form id="adminCustomerPriceForm" class="auth-form">
+                <label>Société cliente<select name="profile_id" id="adminPriceClientSelect" required></select></label>
+                <label>Produit<select name="product_slug" id="adminPriceProductSelect" required></select></label>
+                <div class="form-row">
+                  <label>Catégorie client<input type="text" name="client_category" placeholder="restaurant, hôtel…"></label>
+                  <label>Qté minimum<input type="number" name="min_quantity" min="1" value="1"></label>
+                </div>
+                <label>Prix fixé (€)<input type="number" name="price" min="0" step="0.01" required></label>
+                <p class="form-note" id="adminPriceDiscountPreview"></p>
+                <button type="submit" class="btn btn-primary">Enregistrer le tarif</button>
+                <p class="form-note" id="adminCustomerPriceNote"></p>
+              </form>
+            </div>
+            <div class="dashboard-card dashboard-card-wide">
+              <h2>Tarifs personnalisés actifs</h2>
+              <div class="table-wrap">
+                <table class="requests-table">
+                  <thead>
+                    <tr><th>Société</th><th>Catégorie</th><th>Produit</th><th>Prix catalogue</th><th>Prix client</th><th>Remise</th><th>Qté min.</th><th></th></tr>
+                  </thead>
+                  <tbody id="customerPricesBody"><tr><td colspan="8">Chargement…</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="panel-chat" class="admin-panel" hidden>
+          <div class="dashboard-card dashboard-card-wide">
+            <div class="dashboard-card-head">
+              <h2>Chat &amp; support</h2>
+              <button type="button" id="refreshAdminChatBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+            </div>
+            <div class="chat-toolbar">
+              <input type="search" class="admin-search-input" id="adminChatSearch" placeholder="Rechercher une société…">
+              <select id="adminChatTicketFilter" aria-label="Filtre statut ticket">
+                <option value="">Tous tickets</option>
+                <option value="new">Nouveau</option>
+                <option value="in_progress">En cours</option>
+                <option value="waiting">En attente</option>
+                <option value="resolved">Résolu</option>
+                <option value="closed">Fermé</option>
+              </select>
+            </div>
+            <div class="chat-inbox">
+              <aside class="chat-inbox-list">
+                <div id="adminChatList" class="chat-thread-list"><p class="empty-state">Chargement…</p></div>
+              </aside>
+              <div class="chat-inbox-conversation">
+                <div id="adminChatSelectedTitle" class="chat-selected-title">Sélectionnez une société</div>
+                <div id="adminChatHistory" class="chat-history"><p class="empty-state">Choisissez une société.</p></div>
+                <form id="adminChatReplyForm" class="auth-form chat-reply-form">
+                  <div class="chat-quick-replies" id="adminChatQuickReplies"></div>
+                  <label>Statut du ticket<select id="adminChatTicketStatus" disabled>
+                    <option value="new">Nouveau</option><option value="in_progress">En cours</option>
+                    <option value="waiting">En attente</option><option value="resolved">Résolu</option><option value="closed">Fermé</option>
+                  </select></label>
+                  <label>Réponse<textarea name="message" rows="3" required placeholder="Votre réponse" disabled></textarea></label>
+                  <button type="submit" class="btn btn-primary" disabled>Répondre</button>
+                  <p class="form-note" id="adminChatNote"></p>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="trackingModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog app-modal-dialog-wide">
+      <div class="app-modal-header">
+        <h2 id="trackingModalTitle">Livraison / suivi</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
+        <form id="trackingModalForm" class="auth-form">
+          <input type="hidden" name="order_id">
+          <label>Livreur assigné<select name="assigned_driver_id" id="trackingDriverSelect"><option value="">— Non assigné —</option></select></label>
+          <label>Statut livraison<select name="delivery_status" id="trackingDeliveryStatus"></select></label>
+          <div class="form-row">
+            <label>Transporteur<input type="text" name="carrier" placeholder="Transporteur"></label>
+            <label>N° suivi<input type="text" name="tracking_number" placeholder="N° suivi"></label>
+          </div>
+          <label>Lien suivi<input type="url" name="tracking_url" placeholder="https://..."></label>
+          <div class="form-row">
+            <label>Livraison estimée<input type="date" name="estimated_delivery_date"></label>
+            <label>Date de livraison<input type="datetime-local" name="delivered_at"></label>
+          </div>
+          <label>Notes livraison<textarea name="delivery_notes" rows="3"></textarea></label>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <p class="form-note" id="trackingModalNote"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin-api.js"></script>
+  <script src="js/driver-api.js"></script>
+  <script src="js/admin-utils.js"></script>
+  <script src="js/admin-dashboard.js"></script>
+  <script src="js/admin-shell.js"></script>
+  <script>window.HB_COMMERCIAL_SPACE = true;</script>
+  <script src="js/admin.js"></script>
+  <script src="js/agent-page.js"></script>
+</body>
+</html>

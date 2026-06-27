@@ -123,7 +123,8 @@ async function getDefaultDashboardUrl(session) {
   if (!session?.user?.id) return 'compte.html';
   const profile = await getProfile(session.user.id);
   if (isSuperRootProfile(profile)) return 'super-root.html';
-  if (isBackofficeProfile(profile)) return 'admin.html';
+  if (isAdminProfile(profile)) return 'admin.html';
+  if (isCommercialAgentProfile(profile)) return 'agent.html';
   if (isSupplierProfile(profile)) return 'supplier.html';
   if (isDriverProfile(profile)) return 'livreur.html';
   return 'compte.html';

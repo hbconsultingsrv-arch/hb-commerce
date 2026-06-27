@@ -269,7 +269,14 @@
 }
 
 .admin-v2 .section-tab {
+  background: var(--admin-surface);
   border-color: var(--admin-border);
+  color: var(--admin-text);
+}
+
+.admin-v2 .section-tab:hover:not(.active) {
+  background: var(--admin-border);
+  border-color: var(--admin-accent-light);
   color: var(--admin-text);
 }
 
