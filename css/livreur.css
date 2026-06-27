@@ -1,5 +1,31 @@
 /* Espace livreur — HB Commerce */
 
+.livreur-role-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.75rem auto 0;
+  padding-bottom: 0.25rem;
+}
+
+.livreur-role-tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid rgba(45, 90, 56, 0.18);
+  color: var(--text-muted, #666);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.livreur-role-tab.is-active {
+  background: var(--hb-green-mid, #2d5a38);
+  border-color: var(--hb-green-mid, #2d5a38);
+  color: #fff;
+}
+
 .livreur-page .livreur-header {
   display: flex;
   flex-wrap: wrap;

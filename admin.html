@@ -32,7 +32,7 @@
         <button type="button" class="admin-nav-item" data-tab="produits"><span class="admin-nav-icon">▣</span> Produits</button>
         <button type="button" class="admin-nav-item admin-only" data-tab="fournisseurs"><span class="admin-nav-icon">◎</span> Fournisseurs</button>
         <button type="button" class="admin-nav-item admin-only" data-tab="stock"><span class="admin-nav-icon">▤</span> Stock &amp; achats</button>
-        <button type="button" class="admin-nav-item admin-only" data-tab="livreurs"><span class="admin-nav-icon">⛟</span> Livreurs</button>
+        <button type="button" class="admin-nav-item admin-only" data-tab="equipe"><span class="admin-nav-icon">👥</span> Équipe HB</button>
         <button type="button" class="admin-nav-item" data-tab="commandes"><span class="admin-nav-icon">☰</span> Commandes</button>
         <button type="button" class="admin-nav-item" data-tab="clients"><span class="admin-nav-icon">◇</span> Clients</button>
         <button type="button" class="admin-nav-item" data-tab="prix"><span class="admin-nav-icon">€</span> Prix clients</button>
@@ -56,6 +56,7 @@
           <div class="admin-topbar-title">
             <h1 id="adminTopbarTitle">Tableau de bord</h1>
             <p id="adminTopbarSub">Vue d'ensemble de l'activité HB Commerce</p>
+            <p id="adminRoleBadge" class="admin-role-badge" hidden></p>
           </div>
         </div>
         <div class="admin-topbar-actions"></div>
@@ -69,7 +70,7 @@
           <button type="button" class="admin-tab" data-tab="produits">Produits</button>
           <button type="button" class="admin-tab admin-only" data-tab="fournisseurs">Fournisseurs</button>
           <button type="button" class="admin-tab admin-only" data-tab="stock">Stock</button>
-          <button type="button" class="admin-tab admin-only" data-tab="livreurs">Livreurs</button>
+          <button type="button" class="admin-tab admin-only" data-tab="equipe">Équipe</button>
           <button type="button" class="admin-tab" data-tab="commandes">Commandes</button>
           <button type="button" class="admin-tab" data-tab="clients">Clients</button>
           <button type="button" class="admin-tab" data-tab="prix">Prix</button>
@@ -365,8 +366,44 @@
       </div>
     </section>
 
-    <section id="panel-livreurs" class="admin-panel admin-only" hidden data-tab-scope>
-      <div class="dashboard-card dashboard-card-wide">
+    <section id="panel-equipe" class="admin-panel admin-only" hidden data-tab-scope>
+      <div class="section-tabs" data-section-tabs>
+        <button type="button" class="section-tab active" data-section="agents">Agents commerciaux</button>
+        <button type="button" class="section-tab" data-section="livreurs">Livreurs</button>
+      </div>
+
+      <div data-section-panel="agents" class="dashboard-card dashboard-card-wide">
+        <div class="dashboard-card-head">
+          <h2>Agents commerciaux</h2>
+          <button type="button" id="refreshAgentsBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+        </div>
+        <p class="auth-sub">Les agents accèdent à <strong>admin.html</strong> (commandes, clients assignés, prix, chat). Connexion via <a href="login.html">login.html</a>.</p>
+        <div class="table-wrap">
+          <table class="requests-table">
+            <thead>
+              <tr><th>Nom</th><th>E-mail</th><th>Téléphone</th><th>Espace</th></tr>
+            </thead>
+            <tbody id="agentsBody"><tr><td colspan="4">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+        <div style="margin-top:1.5rem">
+          <h3>Créer un agent commercial</h3>
+          <form id="adminAgentForm" class="auth-form">
+            <div class="form-row">
+              <label>Nom complet <input type="text" name="full_name" required></label>
+              <label>Téléphone <input type="tel" name="phone"></label>
+            </div>
+            <div class="form-row">
+              <label>E-mail (connexion) <input type="email" name="email" required></label>
+              <label>Mot de passe <input type="password" name="password" minlength="6" required autocomplete="new-password"></label>
+            </div>
+            <button type="submit" class="btn btn-primary">Créer l'agent commercial</button>
+            <p class="form-note" id="adminAgentNote"></p>
+          </form>
+        </div>
+      </div>
+
+      <div data-section-panel="livreurs" class="dashboard-card dashboard-card-wide" hidden>
         <div class="dashboard-card-head">
           <h2>Livreurs enregistrés</h2>
           <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
@@ -374,6 +411,7 @@
             <button type="button" id="refreshDriversBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
           </div>
         </div>
+        <p class="auth-sub">Les livreurs accèdent à <strong>livreur.html</strong> (onglet Mes livraisons). Connexion via <a href="login-livreur.html">login-livreur.html</a> ou <a href="login.html">login.html</a>.</p>
         <div class="table-wrap">
           <table class="requests-table">
             <thead>
@@ -382,23 +420,22 @@
             <tbody id="driversBody"><tr><td colspan="5">Chargement…</td></tr></tbody>
           </table>
         </div>
-      </div>
-      <div class="dashboard-card dashboard-card-wide" style="margin-top:1.5rem">
-        <h2>Créer un compte livreur</h2>
-        <p class="auth-sub">Le livreur pourra se connecter via <a href="login-livreur.html">login-livreur.html</a> et gérer ses courses sur <a href="livreur.html">livreur.html</a>.</p>
-        <form id="adminDriverForm" class="auth-form">
-          <div class="form-row">
-            <label>Nom complet <input type="text" name="full_name" required></label>
-            <label>Téléphone <input type="tel" name="phone"></label>
-          </div>
-          <div class="form-row">
-            <label>E-mail (connexion) <input type="email" name="email" required></label>
-            <label>Mot de passe <input type="password" name="password" minlength="6" required autocomplete="new-password"></label>
-          </div>
-          <label>Véhicule / infos <input type="text" name="vehicle_info" placeholder="Fourgon, immatriculation…"></label>
-          <button type="submit" class="btn btn-primary">Créer le livreur</button>
-          <p class="form-note" id="adminDriverNote"></p>
-        </form>
+        <div style="margin-top:1.5rem">
+          <h3>Créer un compte livreur</h3>
+          <form id="adminDriverForm" class="auth-form">
+            <div class="form-row">
+              <label>Nom complet <input type="text" name="full_name" required></label>
+              <label>Téléphone <input type="tel" name="phone"></label>
+            </div>
+            <div class="form-row">
+              <label>E-mail (connexion) <input type="email" name="email" required></label>
+              <label>Mot de passe <input type="password" name="password" minlength="6" required autocomplete="new-password"></label>
+            </div>
+            <label>Véhicule / infos <input type="text" name="vehicle_info" placeholder="Fourgon, immatriculation…"></label>
+            <button type="submit" class="btn btn-primary">Créer le livreur</button>
+            <p class="form-note" id="adminDriverNote"></p>
+          </form>
+        </div>
       </div>
     </section>
 

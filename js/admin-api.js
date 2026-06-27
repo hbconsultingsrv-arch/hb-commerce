@@ -18,7 +18,13 @@ async function requireAdmin() {
   const admin = await isAdmin();
   if (!admin) {
     const profile = await getProfile(session.user.id);
-    window.location.href = isSupplierProfile(profile) ? 'supplier.html' : 'compte.html';
+    if (isDriverProfile(profile)) {
+      window.location.href = 'livreur.html';
+    } else if (isSupplierProfile(profile)) {
+      window.location.href = 'supplier.html';
+    } else {
+      window.location.href = 'compte.html';
+    }
     return null;
   }
   return session;

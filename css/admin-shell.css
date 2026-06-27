@@ -175,6 +175,20 @@
   color: var(--admin-muted);
 }
 
+.admin-role-badge {
+  display: inline-block;
+  margin: 0.35rem 0 0;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(201, 162, 39, 0.15);
+  color: var(--hb-gold, #c9a227);
+  border: 1px solid rgba(201, 162, 39, 0.35);
+}
+
 .admin-topbar-actions {
   display: flex;
   align-items: center;

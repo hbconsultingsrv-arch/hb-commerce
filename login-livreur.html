@@ -20,7 +20,7 @@
         <p class="form-note" id="loginNote"></p>
       </form>
       <p class="form-note" style="margin-top:1rem">
-        <a href="login.html">Connexion client / admin</a> · <a href="index.html">Retour au site</a>
+        <a href="login.html">Connexion client / agent / admin</a> · <a href="index.html">Retour au site</a>
       </p>
     </div>
   </main>
@@ -37,8 +37,7 @@
         const { session } = await signIn(fd.get('email'), fd.get('password'));
         const profile = await getProfile(session.user.id);
         if (!isDriverProfile(profile)) {
-          await signOut();
-          showAlert(note, 'Ce compte n\'est pas un accès livreur. Utilisez la connexion standard.');
+          window.location.href = await getDefaultDashboardUrl(session);
           return;
         }
         window.location.href = 'livreur.html';

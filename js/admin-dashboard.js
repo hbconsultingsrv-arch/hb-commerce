@@ -7,7 +7,7 @@ const ADMIN_TAB_TITLES = {
   produits: { title: 'Produits', sub: 'Catalogue, stock et tarification' },
   fournisseurs: { title: 'Fournisseurs', sub: 'Comptes fournisseurs et commandes' },
   stock: { title: 'Stock & achats', sub: 'Dépôt, achats, casse/pertes et réceptions' },
-  livreurs: { title: 'Livreurs', sub: 'Comptes livreurs et assignation des courses' },
+  equipe: { title: 'Équipe HB', sub: 'Agents commerciaux et livreurs — création et accès aux espaces dédiés' },
   commandes: { title: 'Commandes clients', sub: 'Suivi des ventes B2B' },
   clients: { title: 'Clients', sub: 'Comptes clients et agents commerciaux' },
   prix: { title: 'Prix personnalisés', sub: 'Tarifs par société et volume' },

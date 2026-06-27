@@ -38,7 +38,10 @@ function showAdminTab(tabId) {
   if (tabId === 'construction' && typeof initRoadmapAdminPanel === 'function') {
     initRoadmapAdminPanel();
   }
-  if (tabId === 'livreurs') loadDriversTable();
+  if (tabId === 'equipe') {
+    loadAgentsTable();
+    loadDriversTable();
+  }
   if (tabId === 'prix') loadCustomerPricesTable();
 }
 
@@ -67,6 +70,7 @@ async function initAdmin() {
   const superRootLink = document.getElementById('superRootLink');
   if (superRootLink && isSuperRootProfile(adminProfile)) superRootLink.style.display = '';
   const commercialAgent = isCommercialAgentProfile(adminProfile);
+  applyAdminRoleUi(adminProfile, commercialAgent);
   if (!isSuperRootProfile(adminProfile)) {
     document.querySelectorAll('.super-root-only').forEach((el) => el.remove());
   }
@@ -87,6 +91,7 @@ async function initAdmin() {
   if (!commercialAgent) {
     await loadSuppliersTable();
     await loadProductsTable();
+    await loadAgentsTable();
     await loadDriversTable();
   }
   await loadOrdersTable();
@@ -99,7 +104,9 @@ async function initAdmin() {
   document.getElementById('cancelProductBtn')?.addEventListener('click', resetProductForm);
   document.getElementById('adminSupplierForm')?.addEventListener('submit', handleAdminSupplierSubmit);
   document.getElementById('adminDriverForm')?.addEventListener('submit', handleAdminDriverSubmit);
+  document.getElementById('adminAgentForm')?.addEventListener('submit', handleAdminAgentSubmit);
   document.getElementById('refreshDriversBtn')?.addEventListener('click', loadDriversTable);
+  document.getElementById('refreshAgentsBtn')?.addEventListener('click', loadAgentsTable);
   document.getElementById('cancelAdminSupplierBtn')?.addEventListener('click', resetAdminSupplierForm);
   document.getElementById('refreshSuppliersBtn')?.addEventListener('click', loadSuppliersTable);
   document.getElementById('supplierOrderForm')?.addEventListener('submit', handleSupplierOrderSubmit);
@@ -541,6 +548,68 @@ function resetAdminSupplierForm() {
   document.getElementById('adminSupplierFormTitle').textContent = 'Créer un fournisseur';
   document.getElementById('saveAdminSupplierBtn').textContent = 'Créer le fournisseur';
   activateSectionTab('panel-fournisseurs', 'liste');
+}
+
+function applyAdminRoleUi(profile, commercialAgent) {
+  const badge = document.getElementById('adminRoleBadge');
+  const sidebarTag = document.querySelector('.admin-sidebar .logo-hb-tag');
+  if (commercialAgent) {
+    if (badge) {
+      badge.hidden = false;
+      badge.textContent = 'Espace agent commercial';
+    }
+    if (sidebarTag) sidebarTag.textContent = 'Agent commercial · B2B';
+  } else if (isAdminProfile(profile)) {
+    if (badge) {
+      badge.hidden = false;
+      badge.textContent = isSuperRootProfile(profile) ? 'Super root · Administration' : 'Administration HB Commerce';
+    }
+  }
+}
+
+async function loadAgentsTable() {
+  const body = document.getElementById('agentsBody');
+  if (!body) return;
+  try {
+    if (!adminProfiles.length) adminProfiles = await fetchAllProfiles();
+    const agents = adminProfiles.filter((p) => p.role === 'agent_commercial');
+    if (!agents.length) {
+      body.innerHTML = '<tr><td colspan="4" class="empty-state">Aucun agent — créez un compte ci-dessous.</td></tr>';
+      return;
+    }
+    body.innerHTML = agents.map((a) => `
+      <tr>
+        <td><strong>${escapeHtml(a.full_name || a.email)}</strong></td>
+        <td>${escapeHtml(a.email || '—')}</td>
+        <td>${escapeHtml(a.phone || '—')}</td>
+        <td><a href="admin.html" class="btn btn-sm btn-outline-dark">admin.html</a></td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    body.innerHTML = `<tr><td colspan="4">${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+async function handleAdminAgentSubmit(e) {
+  e.preventDefault();
+  const note = document.getElementById('adminAgentNote');
+  const fd = new FormData(e.target);
+  try {
+    await createInternalUser({
+      email: fd.get('email'),
+      password: fd.get('password'),
+      fullName: fd.get('full_name'),
+      phone: fd.get('phone'),
+      role: 'agent_commercial'
+    });
+    e.target.reset();
+    showAlert(note, 'Agent commercial créé. Connexion : login.html → espace admin (commandes, clients).', 'success');
+    adminProfiles = await fetchAllProfiles();
+    await loadAgentsTable();
+    await loadClientsPanel();
+  } catch (err) {
+    showAlert(note, typeof mapAuthError === 'function' ? mapAuthError(err) : err.message);
+  }
 }
 
 async function loadDriversTable() {
