@@ -417,11 +417,13 @@ Réponses **admin / agent / super_root** : publiées directement (pas de modéra
 Onglet **Construction** (admin uniquement) :
 
 - Barre de progression (% terminé / en cours / à faire)
+- **Rapport tests E2E Selenium** (taux de réussite, suites, scénarios) — source `tests/reports/latest.json`
 - Tableau tâches par catégorie : Site public, Admin, Auth, Stock, Pages légales, Technique, Général
 - Statuts : `done`, `in_progress`, `todo`
 - Actions : Ajouter, Modifier, Marquer terminé, Supprimer
 
-**Fichiers :** `js/admin-roadmap.js`, panneau `#panel-construction`  
+**Fichiers :** `js/admin-roadmap.js`, `js/admin-qa-report.js`, panneau `#panel-construction`  
+**Tests :** `docs/TESTS-E2E-SCENARIOS.md`, `python tests/run_tests.py`  
 **Migration Supabase :** `supabase/migration-site-roadmap.sql` (sinon mode local `localStorage`)
 
 ---
@@ -534,9 +536,12 @@ Migration associée : `supabase/migration-business-expenses.sql`
 
 > **Erreur fréquente :** exécuter `migration-agent-driver-assignment.sql` **sans** avoir créé la table `delivery_drivers` → utiliser le script **§14 complet** ci-dessus.
 
-### Module QA (branche `feature/module-qa` — Mohamed)
+### Module QA / tests E2E (Selenium Python)
 
-Tests Playwright, interface `qa.html`, exigences et couverture. Nécessite `npm install` + migrations `migration-qa-management.sql`. Voir `docs/QA-MODULE.md` sur cette branche.
+Tests automatisés Selenium + pytest, scénarios documentés dans **`docs/TESTS-E2E-SCENARIOS.md`**.  
+Rapport affiché sous **Admin → Construction**. CI : `.github/workflows/e2e-tests.yml`.
+
+*(Ancien module Playwright sur branche `feature/module-qa` — remplacé par cette implémentation.)*
 
 ---
 

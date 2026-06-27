@@ -17,6 +17,7 @@ Les contenus de l'ancien cahier des charges, du README et des pages demo ont ét
 
 | Document | Description |
 |----------|-------------|
+| [Tests E2E — scénarios Selenium](TESTS-E2E-SCENARIOS.md) | Flux logiques, lancement, CI, rapport Construction |
 | [Cahier des charges (résumé)](CAHIER-DES-CHARGES.md) | Pointeur vers le document maître + résumé exécutif |
 | [Cahier des charges (Word)](cahier-des-charges-hb-commerce.docx) | Export Office |
 | [Présentation (PowerPoint)](presentation-hb-commerce.pptx) | Slides |

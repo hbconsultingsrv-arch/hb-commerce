@@ -296,6 +296,7 @@ function bindRoadmapPanel() {
 async function initRoadmapAdminPanel() {
   bindRoadmapPanel();
   await loadRoadmapItems();
+  if (typeof loadQaReport === 'function') await loadQaReport();
 }
 
 window.initRoadmapAdminPanel = initRoadmapAdminPanel;
