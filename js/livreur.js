@@ -171,8 +171,16 @@ async function requireDriver() {
   const session = await requireAuth('login-livreur.html');
   if (!session) return null;
   const profile = await getProfile(session.user.id);
+
+  if (isAdminProfile(profile)) {
+    showLivreurAdminPreview(profile);
+    livreurState.profile = profile;
+    livreurState.adminPreview = true;
+    return session;
+  }
+
   if (!isDriverProfile(profile)) {
-    window.location.href = 'compte.html';
+    window.location.href = await getDefaultDashboardUrl(session);
     return null;
   }
   if (!profile.driver_id) {
@@ -182,9 +190,29 @@ async function requireDriver() {
   }
   livreurState.profile = profile;
   livreurState.driverId = profile.driver_id;
+  livreurState.adminPreview = false;
   const welcome = document.getElementById('livreurWelcome');
   if (welcome) welcome.textContent = `Bonjour ${profile.full_name || profile.email} — vos courses du jour`;
   return session;
+}
+
+function showLivreurAdminPreview(profile) {
+  const banner = document.getElementById('livreurAdminBanner');
+  const adminLink = document.getElementById('livreurAdminLink');
+  if (adminLink) adminLink.hidden = false;
+  const welcome = document.getElementById('livreurWelcome');
+  if (welcome) {
+    welcome.textContent = 'Mode administration — connectez-vous avec un compte livreur pour voir les courses assignées.';
+  }
+  if (banner) {
+    banner.hidden = false;
+    banner.innerHTML = `
+      <p><strong>Aperçu espace livreur</strong> (${escapeHtml(profile.full_name || profile.email)}).
+      Pour tester : <a href="login-livreur.html">connexion livreur</a>
+      (demo <code>livreur@hbcommerce.demo</code> / <code>Test1234!</code>).
+      <a href="admin.html?tab=equipe">Retour Équipe HB</a> ·
+      <a href="admin.html?view=agent">Vue agent commercial</a></p>`;
+  }
 }
 
 function bindLivreurUi() {
@@ -213,8 +241,13 @@ function bindLivreurUi() {
 async function initLivreurPage() {
   bindLivreurUi();
   if (!(await requireDriver())) return;
-  await loadDeliveries();
-  setInterval(loadDeliveries, 60000);
+  if (!livreurState.adminPreview) {
+    await loadDeliveries();
+    setInterval(loadDeliveries, 60000);
+  } else {
+    document.getElementById('livreurLoading')?.setAttribute('hidden', '');
+    document.getElementById('livreurEmpty')?.removeAttribute('hidden');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', initLivreurPage);

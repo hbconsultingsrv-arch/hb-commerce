@@ -26,6 +26,19 @@
   color: #fff;
 }
 
+.livreur-admin-banner {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: rgba(201, 162, 39, 0.12);
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  font-size: 0.9rem;
+}
+
+.livreur-admin-banner p {
+  margin: 0;
+}
+
 .livreur-page .livreur-header {
   display: flex;
   flex-wrap: wrap;

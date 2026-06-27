@@ -76,24 +76,46 @@ async function initAdmin() {
   }
 
   bindAdminTabs();
-  if (commercialAgent) {
+  const params = new URLSearchParams(window.location.search);
+  const agentPreview = params.get('view') === 'agent' && isAdminProfile(adminProfile) && !commercialAgent;
+
+  if (agentPreview) {
+    applyAgentPreviewMode();
+    showAdminTab('commandes');
+  } else   if (commercialAgent) {
     document.querySelectorAll('.admin-only').forEach((el) => { el.style.display = 'none'; });
     document.querySelector('[data-tab="produits"]')?.setAttribute('hidden', '');
     document.querySelector('[data-tab="accueil"]')?.setAttribute('hidden', '');
     document.getElementById('panel-produits')?.setAttribute('hidden', '');
     document.getElementById('panel-accueil')?.setAttribute('hidden', '');
+    const ordersTitle = document.getElementById('ordersPanelTitle');
+    if (ordersTitle) ordersTitle.textContent = 'Mes commandes clients';
+    const clientsTitle = document.querySelector('#panel-clients .dashboard-card-head h2');
+    if (clientsTitle) clientsTitle.textContent = 'Mes clients assignés';
     showAdminTab('commandes');
   } else {
-    showAdminTab('accueil');
-    loadAdminDashboard();
+    const deepTab = params.get('tab');
+    const panel = deepTab ? document.getElementById(`panel-${deepTab}`) : null;
+    if (deepTab && panel) {
+      showAdminTab(deepTab);
+      if (deepTab === 'equipe') {
+        const section = params.get('section');
+        if (section === 'livreurs' || section === 'agents') {
+          activateSectionTab('panel-equipe', section);
+        }
+      }
+    } else {
+      showAdminTab('accueil');
+      loadAdminDashboard();
+    }
   }
 
   if (!commercialAgent) {
     await loadSuppliersTable();
     await loadProductsTable();
     await loadAgentsTable();
-    await loadDriversTable();
   }
+  await loadDriversTable();
   await loadOrdersTable();
   await loadClientsPanel();
   await loadAdminPricePanel();
@@ -567,6 +589,33 @@ function applyAdminRoleUi(profile, commercialAgent) {
   }
 }
 
+function applyAgentPreviewMode() {
+  document.querySelectorAll('.admin-only').forEach((el) => { el.style.display = 'none'; });
+  document.querySelector('[data-tab="produits"]')?.setAttribute('hidden', '');
+  document.querySelector('[data-tab="accueil"]')?.setAttribute('hidden', '');
+  document.getElementById('panel-produits')?.setAttribute('hidden', '');
+  document.getElementById('panel-accueil')?.setAttribute('hidden', '');
+  const badge = document.getElementById('adminRoleBadge');
+  if (badge) {
+    badge.hidden = false;
+    badge.textContent = 'Aperçu · espace agent commercial';
+  }
+  const sidebarTag = document.querySelector('.admin-sidebar .logo-hb-tag');
+  if (sidebarTag) sidebarTag.textContent = 'Aperçu agent · B2B';
+  const host = document.querySelector('.admin-content');
+  if (host && !document.getElementById('agentPreviewBanner')) {
+    const banner = document.createElement('div');
+    banner.id = 'agentPreviewBanner';
+    banner.className = 'admin-preview-banner';
+    banner.innerHTML = `
+      <p><strong>Mode aperçu agent commercial</strong> — même interface que l'agent (commandes, clients, prix, chat).
+      <a href="admin.html?tab=equipe">Retour Équipe HB</a> ·
+      <a href="livreur.html">Espace livreur</a> ·
+      <a href="admin.html">Quitter l'aperçu</a></p>`;
+    host.prepend(banner);
+  }
+}
+
 async function loadAgentsTable() {
   const body = document.getElementById('agentsBody');
   if (!body) return;
@@ -582,7 +631,10 @@ async function loadAgentsTable() {
         <td><strong>${escapeHtml(a.full_name || a.email)}</strong></td>
         <td>${escapeHtml(a.email || '—')}</td>
         <td>${escapeHtml(a.phone || '—')}</td>
-        <td><a href="admin.html" class="btn btn-sm btn-outline-dark">admin.html</a></td>
+        <td>
+          <a href="admin.html?view=agent" class="btn btn-sm btn-outline-dark">Vue agent</a>
+          <a href="login.html" class="btn btn-sm btn-outline-dark" target="_blank" rel="noopener" title="Connexion avec le compte agent">Login</a>
+        </td>
       </tr>
     `).join('');
   } catch (err) {
@@ -618,7 +670,7 @@ async function loadDriversTable() {
   try {
     adminDriversCache = await fetchDeliveryDrivers();
     if (!adminDriversCache.length) {
-      body.innerHTML = '<tr><td colspan="5" class="empty-state">Aucun livreur — créez un compte ci-dessous.</td></tr>';
+      body.innerHTML = '<tr><td colspan="6" class="empty-state">Aucun livreur — créez un compte ci-dessous.</td></tr>';
       return;
     }
     body.innerHTML = adminDriversCache.map((d) => `
@@ -628,11 +680,15 @@ async function loadDriversTable() {
         <td>${escapeHtml(d.phone || '—')}</td>
         <td>${escapeHtml(d.vehicle_info || '—')}</td>
         <td>${d.active !== false ? 'Oui' : 'Non'}</td>
+        <td>
+          <a href="livreur.html" class="btn btn-sm btn-outline-dark">Mes livraisons</a>
+          <a href="login-livreur.html" class="btn btn-sm btn-outline-dark" target="_blank" rel="noopener">Login</a>
+        </td>
       </tr>
     `).join('');
     populateTrackingDriverSelect();
   } catch (err) {
-    body.innerHTML = `<tr><td colspan="5">${escapeHtml(err.message)}</td></tr>`;
+    body.innerHTML = `<tr><td colspan="6">${escapeHtml(err.message)}</td></tr>`;
   }
 }
 
@@ -763,6 +819,37 @@ function bindOrderFilters() {
   document.getElementById('orderFilterStatus')?.addEventListener('change', renderOrdersTableBody);
 }
 
+function isScopedCommercialAgent() {
+  return isCommercialAgentProfile(adminProfile);
+}
+
+function getAgentClientProfiles(profiles = adminProfiles) {
+  return profiles.filter((p) =>
+    p.role === 'client' && p.commercial_agent_id === adminProfile?.id
+  );
+}
+
+function scopeProfilesForCurrentRole(profiles) {
+  if (!isScopedCommercialAgent()) return profiles;
+  return profiles.filter((p) =>
+    p.id === adminProfile.id
+    || (p.role === 'client' && p.commercial_agent_id === adminProfile.id)
+  );
+}
+
+function getVisibleOrders() {
+  if (!isScopedCommercialAgent()) return adminOrders;
+  const clientIds = new Set(getAgentClientProfiles().map((p) => p.id));
+  return adminOrders.filter((order) => clientIds.has(order.user_id));
+}
+
+function resolveDriverLabel(order) {
+  if (order.assigned_driver?.full_name) return order.assigned_driver.full_name;
+  if (!order.assigned_driver_id) return '—';
+  const cached = adminDriversCache.find((d) => d.id === order.assigned_driver_id);
+  return cached?.full_name || 'Livreur assigné';
+}
+
 function filterOrders(orders) {
   const q = (document.getElementById('orderSearchInput')?.value || '').trim().toLowerCase();
   const status = document.getElementById('orderFilterStatus')?.value || '';
@@ -779,12 +866,14 @@ function filterOrders(orders) {
 function renderOrdersTableBody() {
   const body = document.getElementById('ordersAdminBody');
   if (!body) return;
-  const orders = filterOrders(adminOrders);
+  const orders = filterOrders(getVisibleOrders());
+  const canManageAllOrders = !isScopedCommercialAgent();
 
   body.innerHTML = orders.map((order) => {
     const profile = adminProfiles.find((p) => p.id === order.user_id);
     const ref = formatOrderReference(order, adminOrders);
     const deliveryLabel = DELIVERY_STATUS_LABELS[order.delivery_status || 'non_preparee'] || 'Non préparée';
+    const driverLabel = resolveDriverLabel(order);
     return `
       <tr>
         <td>${formatDate(order.created_at)}</td>
@@ -793,17 +882,19 @@ function renderOrdersTableBody() {
         <td><strong>${formatPrice(order.total)}</strong></td>
         <td>${order.payment_method || '—'}</td>
         <td>
+          ${canManageAllOrders ? `
           <select data-order="${order.id}" class="order-status-select">
             ${Object.entries(ORDER_STATUS_LABELS).map(([k, v]) =>
               `<option value="${k}" ${order.status === k ? 'selected' : ''}>${v}</option>`
             ).join('')}
-          </select>
+          </select>` : `<span>${escapeHtml(ORDER_STATUS_LABELS[order.status] || order.status)}</span>`}
         </td>
         <td>${renderOrderProgress(order.status)}</td>
+        <td><strong>${escapeHtml(driverLabel)}</strong></td>
         <td>
           <div class="tracking-cell">
             <span class="tracking-status">${escapeHtml(deliveryLabel)}</span>
-            <button type="button" class="btn btn-sm btn-outline-dark" data-open-tracking="${order.id}">Suivi</button>
+            <button type="button" class="btn btn-sm btn-outline-dark" data-open-tracking="${order.id}">Suivi / livreur</button>
           </div>
         </td>
         <td>
@@ -812,7 +903,7 @@ function renderOrdersTableBody() {
         </td>
       </tr>
     `;
-  }).join('') || '<tr><td colspan="9">Aucune commande.</td></tr>';
+  }).join('') || `<tr><td colspan="10">Aucune commande${isScopedCommercialAgent() ? ' pour vos clients assignés' : ''}.</td></tr>`;
 
   body.querySelectorAll('.order-status-select').forEach((select) => {
     select.addEventListener('change', async () => {
@@ -845,6 +936,7 @@ function renderOrdersTableBody() {
 async function loadOrdersTable() {
   adminOrders = await fetchAllOrders();
   if (!adminProfiles.length) adminProfiles = await fetchAllProfiles();
+  adminProfiles = scopeProfilesForCurrentRole(adminProfiles);
   renderOrdersTableBody();
 }
 
@@ -941,14 +1033,18 @@ async function loadClientsPanel() {
   if (!body) return;
   try {
     adminProfiles = await fetchAllProfiles();
+    adminProfiles = scopeProfilesForCurrentRole(adminProfiles);
     if (!adminOrders.length) adminOrders = await fetchAllOrders();
     const revenueByUser = new Map();
-    adminOrders.filter((o) => o.status !== 'annulee').forEach((o) => {
+    getVisibleOrders().filter((o) => o.status !== 'annulee').forEach((o) => {
       revenueByUser.set(o.user_id, (revenueByUser.get(o.user_id) || 0) + (parseFloat(o.total) || 0));
     });
 
-    const clients = adminProfiles.filter((p) => ['pending_company', 'client'].includes(p.role));
-    const agents = adminProfiles.filter(isCommercialAssignableProfile);
+    let clients = adminProfiles.filter((p) => ['pending_company', 'client'].includes(p.role));
+    if (isScopedCommercialAgent()) {
+      clients = clients.filter((p) => p.commercial_agent_id === adminProfile.id);
+    }
+    const agents = isScopedCommercialAgent() ? [] : adminProfiles.filter(isCommercialAssignableProfile);
     renderAgentSelect(document.getElementById('adminClientAgentSelect'), agents);
     body.innerHTML = clients.length ? clients.map((profile) => `
       <tr>
@@ -1052,8 +1148,11 @@ async function loadAdminPricePanel() {
   const clientSelect = document.getElementById('adminPriceClientSelect');
   const productSelect = document.getElementById('adminPriceProductSelect');
   if (!clientSelect || !productSelect) return;
-  const profiles = adminProfiles.length ? adminProfiles : await fetchAllProfiles();
-  const clients = profiles.filter((p) => p.role === 'client');
+  const profiles = adminProfiles.length ? adminProfiles : scopeProfilesForCurrentRole(await fetchAllProfiles());
+  let clients = profiles.filter((p) => p.role === 'client');
+  if (isScopedCommercialAgent()) {
+    clients = clients.filter((p) => p.commercial_agent_id === adminProfile.id);
+  }
   clientSelect.innerHTML = clients.map((client) => `<option value="${client.id}">${escapeHtml(profileLabel(client))}</option>`).join('');
   const products = await fetchAllProducts();
   productSelect.innerHTML = products.map((product) => `<option value="${product.slug}" data-catalog-price="${product.price}">${escapeHtml(product.name || product.slug)}</option>`).join('');
@@ -1070,7 +1169,7 @@ async function loadCustomerPricesTable() {
   if (!body) return;
   try {
     adminCustomerPricesCache = await fetchCustomerPrices();
-    const profiles = adminProfiles.length ? adminProfiles : await fetchAllProfiles();
+    const profiles = scopeProfilesForCurrentRole(adminProfiles.length ? adminProfiles : await fetchAllProfiles());
     const products = await fetchAllProducts();
     const profileMap = new Map(profiles.map((p) => [p.id, p]));
     const productMap = new Map(products.map((p) => [p.slug, p]));

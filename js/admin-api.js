@@ -469,6 +469,11 @@ async function deleteProduct(id) {
 async function fetchAllOrders() {
   const sb = getSupabase();
   if (!sb) return [];
+  const withDriver = await sb
+    .from('orders')
+    .select('*, order_items(*), assigned_driver:delivery_drivers!orders_assigned_driver_id_fkey(id, full_name, email)')
+    .order('created_at', { ascending: false });
+  if (!withDriver.error) return withDriver.data || [];
   const { data, error } = await sb
     .from('orders')
     .select('*, order_items(*)')

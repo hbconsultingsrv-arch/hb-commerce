@@ -42,6 +42,9 @@
       </nav>
       <div class="admin-sidebar-footer">
         <a href="super-root.html" id="superRootLink" class="btn btn-sm btn-outline-light" style="display:none">Super root</a>
+        <a href="admin.html?tab=equipe" class="btn btn-sm btn-outline-light admin-only">Équipe HB</a>
+        <a href="admin.html?view=agent" class="btn btn-sm btn-outline-light admin-only">Vue agent commercial</a>
+        <a href="livreur.html" class="btn btn-sm btn-outline-light admin-only">Espace livreur</a>
         <a href="stock.html" class="btn btn-sm btn-outline-light admin-only">Page stock</a>
         <a href="index.html" class="btn btn-sm btn-outline-light">Voir le site</a>
         <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light">🌙 Sombre</button>
@@ -367,6 +370,12 @@
     </section>
 
     <section id="panel-equipe" class="admin-panel admin-only" hidden data-tab-scope>
+      <div class="role-space-links">
+        <a href="admin.html?view=agent" class="btn btn-sm btn-outline-dark">Ouvrir la vue agent commercial</a>
+        <a href="livreur.html" class="btn btn-sm btn-outline-dark">Ouvrir l'espace livreur</a>
+        <a href="login.html" class="btn btn-sm btn-outline-dark" target="_blank" rel="noopener">Connexion agent (login)</a>
+        <a href="login-livreur.html" class="btn btn-sm btn-outline-dark" target="_blank" rel="noopener">Connexion livreur</a>
+      </div>
       <div class="section-tabs" data-section-tabs>
         <button type="button" class="section-tab active" data-section="agents">Agents commerciaux</button>
         <button type="button" class="section-tab" data-section="livreurs">Livreurs</button>
@@ -415,9 +424,9 @@
         <div class="table-wrap">
           <table class="requests-table">
             <thead>
-              <tr><th>Nom</th><th>E-mail</th><th>Téléphone</th><th>Véhicule</th><th>Actif</th></tr>
+              <tr><th>Nom</th><th>E-mail</th><th>Téléphone</th><th>Véhicule</th><th>Actif</th><th>Espace</th></tr>
             </thead>
-            <tbody id="driversBody"><tr><td colspan="5">Chargement…</td></tr></tbody>
+            <tbody id="driversBody"><tr><td colspan="6">Chargement…</td></tr></tbody>
           </table>
         </div>
         <div style="margin-top:1.5rem">
@@ -555,7 +564,7 @@
     <section id="panel-commandes" class="admin-panel" hidden>
       <div class="dashboard-card dashboard-card-wide">
         <div class="dashboard-card-head">
-          <h2>Commandes clients</h2>
+          <h2 id="ordersPanelTitle">Commandes clients</h2>
         </div>
         <div class="admin-toolbar">
           <input type="search" class="admin-search-input" id="orderSearchInput" placeholder="Rechercher N°, client…">
@@ -574,6 +583,7 @@
                 <th>Paiement</th>
                 <th>Statut</th>
                 <th>Progression</th>
+                <th>Livreur</th>
                 <th>Livraison</th>
                 <th>Actions</th>
               </tr>

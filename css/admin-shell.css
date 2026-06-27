@@ -189,6 +189,33 @@
   border: 1px solid rgba(201, 162, 39, 0.35);
 }
 
+.role-space-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.admin-preview-banner,
+.livreur-admin-banner {
+  margin: 0.75rem 0 0;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: rgba(201, 162, 39, 0.12);
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  font-size: 0.9rem;
+}
+
+.admin-preview-banner p,
+.livreur-admin-banner p {
+  margin: 0;
+}
+
+.admin-preview-banner a,
+.livreur-admin-banner a {
+  font-weight: 600;
+}
+
 .admin-topbar-actions {
   display: flex;
   align-items: center;
