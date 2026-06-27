@@ -3,8 +3,9 @@
 const HB_DEFAULT_LANG = 'fr';
 
 const HB_LANGS = {
-  fr: { native: 'Français', dir: 'ltr', market: 'fr' },
-  lu: { native: 'Français (Luxembourg)', dir: 'ltr', market: 'lu' }
+  fr: { native: 'Français', dir: 'ltr', market: 'fr', label: 'FR' },
+  de: { native: 'Deutsch', dir: 'ltr', market: 'fr', label: 'DE' },
+  lu: { native: 'Français (Luxembourg)', dir: 'ltr', market: 'lu', label: 'LU' }
 };
 
 const HB_TRANSLATIONS = {
@@ -23,6 +24,7 @@ const HB_TRANSLATIONS = {
     'nav.logout': 'Déconnexion',
     'nav.cart': 'Panier',
     'nav.market': 'Pays',
+    'nav.language': 'Langue',
     'hero.kicker': 'Plateforme B2B · HB Groupe',
     'hero.ribbon': 'Origine Tunisie',
     'hero.title': 'Distribution professionnelle agroalimentaire',
@@ -295,6 +297,7 @@ const HB_TRANSLATIONS = {
     'nav.logout': 'Déconnexion',
     'nav.cart': 'Panier',
     'nav.market': 'Pays',
+    'nav.language': 'Langue',
     'hero.kicker': 'Plateforme B2B · HB Groupe',
     'hero.ribbon': 'Origine Tunisie',
     'hero.title': 'Distribution professionnelle agroalimentaire',
@@ -579,10 +582,29 @@ function applyTranslations(root = document) {
   if (metaDesc) metaDesc.setAttribute('content', t(metaDesc.getAttribute('data-i18n-desc')));
 }
 
-function initI18n() {
+function getLang() {
+  try {
+    const stored = localStorage.getItem('hb_lang');
+    if (stored && HB_LANGS[stored]) return stored;
+  } catch (e) { /* ignore */ }
   const market = typeof getMarket === 'function' ? getMarket() : null;
-  window.HB_CURRENT_LANG = market?.lang === 'lu' ? 'lu' : 'fr';
-  document.documentElement.lang = 'fr';
+  return market?.lang === 'lu' ? 'lu' : 'fr';
+}
+
+function setLang(code) {
+  if (!HB_LANGS[code]) return;
+  try {
+    localStorage.setItem('hb_lang', code);
+  } catch (e) { /* ignore */ }
+  window.HB_CURRENT_LANG = code;
+  document.documentElement.lang = code === 'de' ? 'de' : 'fr';
+  applyTranslations();
+  if (typeof refreshLangSelectorUi === 'function') refreshLangSelectorUi();
+}
+
+function initI18n() {
+  window.HB_CURRENT_LANG = getLang();
+  document.documentElement.lang = window.HB_CURRENT_LANG === 'de' ? 'de' : 'fr';
   applyTranslations();
 }
 
@@ -590,3 +612,6 @@ document.addEventListener('DOMContentLoaded', initI18n);
 
 window.t = t;
 window.applyTranslations = applyTranslations;
+window.getLang = getLang;
+window.setLang = setLang;
+window.HB_LANGS = HB_LANGS;
