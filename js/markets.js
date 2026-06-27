@@ -57,11 +57,6 @@ const HB_MARKETS = {
 const HB_DEFAULT_MARKET = 'fr';
 
 function getMarketId() {
-  const params = new URLSearchParams(window.location.search);
-  const fromUrl = params.get('market');
-  if (fromUrl && HB_MARKETS[fromUrl]) return fromUrl;
-  const stored = localStorage.getItem('hb_market');
-  if (stored && HB_MARKETS[stored]) return stored;
   return HB_DEFAULT_MARKET;
 }
 

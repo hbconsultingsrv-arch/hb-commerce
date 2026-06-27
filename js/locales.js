@@ -5,8 +5,7 @@ const HB_DEFAULT_LANG = 'fr';
 const HB_LANGS = {
   fr: { native: 'Français', dir: 'ltr', market: 'fr', label: 'FR' },
   en: { native: 'English', dir: 'ltr', market: 'fr', label: 'EN' },
-  de: { native: 'Deutsch', dir: 'ltr', market: 'fr', label: 'DE' },
-  lu: { native: 'Français (Luxembourg)', dir: 'ltr', market: 'lu', label: 'LU' }
+  de: { native: 'Deutsch', dir: 'ltr', market: 'fr', label: 'DE' }
 };
 
 const HB_TRANSLATIONS = {
@@ -596,8 +595,7 @@ function getLang() {
     const stored = localStorage.getItem('hb_lang');
     if (stored && HB_LANGS[stored]) return stored;
   } catch (e) { /* ignore */ }
-  const market = typeof getMarket === 'function' ? getMarket() : null;
-  return market?.lang === 'lu' ? 'lu' : 'fr';
+  return HB_DEFAULT_LANG;
 }
 
 function setLang(code) {
