@@ -14,6 +14,9 @@ let adminPurchasePriceMap = new Map();
 let adminSupplierOrdersCache = [];
 let adminCustomerPricesCache = [];
 let adminDriversCache = [];
+let agentOrderProductsCache = [];
+let agentOrderClientPrices = new Map();
+let agentOrderFormReady = false;
 
 function showAdminTab(tabId) {
   if (!tabId) return;
@@ -41,6 +44,9 @@ function showAdminTab(tabId) {
   if (tabId === 'equipe') {
     loadAgentsTable();
     loadDriversTable();
+  }
+  if (tabId === 'commandes' && window.HB_COMMERCIAL_SPACE) {
+    initAgentOrderForm();
   }
   if (tabId === 'prix') loadCustomerPricesTable();
   if (tabId === 'accueil' && window.HB_COMMERCIAL_SPACE) loadCommercialHomeDashboard();
@@ -113,7 +119,7 @@ async function initAdmin() {
     await loadProductsTable();
     await loadAgentsTable();
   }
-  await loadDriversTable();
+  await loadDriversCache();
   await loadOrdersTable();
   await loadClientsPanel();
   await loadAdminPricePanel();
@@ -140,6 +146,8 @@ async function initAdmin() {
   document.getElementById('refreshClientsBtn')?.addEventListener('click', loadClientsPanel);
   document.getElementById('refreshCommercialStockBtn')?.addEventListener('click', loadCommercialStockPanel);
   document.getElementById('adminCustomerPriceForm')?.addEventListener('submit', handleAdminCustomerPriceSubmit);
+  document.getElementById('agentOrderForm')?.addEventListener('submit', handleAgentOrderSubmit);
+  document.getElementById('agentOrderAddLine')?.addEventListener('click', () => addAgentOrderLine());
   bindSectionTabs();
   initSectionTabScopes();
   bindAppModal('trackingModal');
@@ -648,11 +656,21 @@ async function handleAdminAgentSubmit(e) {
   }
 }
 
-async function loadDriversTable() {
-  const body = document.getElementById('driversBody');
-  if (!body || typeof fetchDeliveryDrivers !== 'function') return;
+async function loadDriversCache() {
+  if (typeof fetchDeliveryDrivers !== 'function') return;
   try {
     adminDriversCache = await fetchDeliveryDrivers();
+    populateTrackingDriverSelect();
+  } catch (err) {
+    console.warn('delivery_drivers:', err.message);
+  }
+}
+
+async function loadDriversTable() {
+  const body = document.getElementById('driversBody');
+  await loadDriversCache();
+  if (!body) return;
+  try {
     if (!adminDriversCache.length) {
       body.innerHTML = '<tr><td colspan="6" class="empty-state">Aucun livreur — créez un compte ci-dessous.</td></tr>';
       return;
@@ -670,7 +688,6 @@ async function loadDriversTable() {
         </td>
       </tr>
     `).join('');
-    populateTrackingDriverSelect();
   } catch (err) {
     body.innerHTML = `<tr><td colspan="6">${escapeHtml(err.message)}</td></tr>`;
   }
@@ -851,7 +868,6 @@ function renderOrdersTableBody() {
   const body = document.getElementById('ordersAdminBody');
   if (!body) return;
   const orders = filterOrders(getVisibleOrders());
-  const canManageAllOrders = !isScopedCommercialAgent();
 
   body.innerHTML = orders.map((order) => {
     const profile = adminProfiles.find((p) => p.id === order.user_id);
@@ -866,12 +882,11 @@ function renderOrdersTableBody() {
         <td><strong>${formatPrice(order.total)}</strong></td>
         <td>${order.payment_method || '—'}</td>
         <td>
-          ${canManageAllOrders ? `
           <select data-order="${order.id}" class="order-status-select">
             ${Object.entries(ORDER_STATUS_LABELS).map(([k, v]) =>
               `<option value="${k}" ${order.status === k ? 'selected' : ''}>${v}</option>`
             ).join('')}
-          </select>` : `<span>${escapeHtml(ORDER_STATUS_LABELS[order.status] || order.status)}</span>`}
+          </select>
         </td>
         <td>${renderOrderProgress(order.status)}</td>
         <td><strong>${escapeHtml(driverLabel)}</strong></td>
@@ -993,6 +1008,181 @@ function toDatetimeLocal(value) {
 
 function toIsoOrNull(value) {
   return value ? new Date(value).toISOString() : null;
+}
+
+function resolveAgentProductPrice(productSlug) {
+  if (agentOrderClientPrices.has(productSlug)) {
+    return agentOrderClientPrices.get(productSlug);
+  }
+  const product = agentOrderProductsCache.find((p) => p.slug === productSlug);
+  return product ? Number(product.price) : 0;
+}
+
+function updateAgentOrderLinePrice(row) {
+  const select = row.querySelector('.agent-order-product');
+  const priceInput = row.querySelector('.agent-order-price');
+  if (!select || !priceInput || !select.value) return;
+  priceInput.value = resolveAgentProductPrice(select.value).toFixed(2);
+  updateAgentOrderTotal();
+}
+
+function updateAgentOrderTotal() {
+  const totalEl = document.getElementById('agentOrderTotal');
+  if (!totalEl) return;
+  let total = 0;
+  document.querySelectorAll('.agent-order-line').forEach((row) => {
+    const qty = parseInt(row.querySelector('.agent-order-qty')?.value, 10) || 0;
+    const price = parseFloat(row.querySelector('.agent-order-price')?.value) || 0;
+    total += qty * price;
+  });
+  totalEl.textContent = typeof formatPrice === 'function' ? formatPrice(total) : `${total.toFixed(2)} €`;
+}
+
+function buildAgentOrderProductOptions(selectedSlug = '') {
+  return agentOrderProductsCache.map((product) =>
+    `<option value="${escapeHtml(product.slug)}" ${product.slug === selectedSlug ? 'selected' : ''}>${escapeHtml(product.name)}</option>`
+  ).join('');
+}
+
+function addAgentOrderLine() {
+  const container = document.getElementById('agentOrderLines');
+  if (!container) return;
+  const row = document.createElement('div');
+  row.className = 'agent-order-line form-row';
+  row.innerHTML = `
+    <label>Produit
+      <select class="agent-order-product" required>
+        <option value="">— Choisir —</option>
+        ${buildAgentOrderProductOptions()}
+      </select>
+    </label>
+    <label>Quantité<input type="number" class="agent-order-qty" min="1" value="1" required></label>
+    <label>Prix unitaire (€)<input type="number" class="agent-order-price" min="0" step="0.01" required></label>
+    <button type="button" class="btn btn-sm btn-outline-dark agent-order-remove">Retirer</button>
+  `;
+  row.querySelector('.agent-order-remove')?.addEventListener('click', () => {
+    row.remove();
+    updateAgentOrderTotal();
+  });
+  row.querySelector('.agent-order-product')?.addEventListener('change', () => updateAgentOrderLinePrice(row));
+  row.querySelector('.agent-order-qty')?.addEventListener('input', updateAgentOrderTotal);
+  row.querySelector('.agent-order-price')?.addEventListener('input', updateAgentOrderTotal);
+  container.appendChild(row);
+}
+
+function buildAgentOrderItems() {
+  const items = [];
+  document.querySelectorAll('.agent-order-line').forEach((row) => {
+    const slug = row.querySelector('.agent-order-product')?.value;
+    const product = agentOrderProductsCache.find((p) => p.slug === slug);
+    const quantity = parseInt(row.querySelector('.agent-order-qty')?.value, 10);
+    const price = parseFloat(row.querySelector('.agent-order-price')?.value);
+    if (!product || !quantity || quantity < 1 || Number.isNaN(price)) return;
+    items.push({
+      id: product.slug,
+      name: product.name,
+      quantity,
+      price,
+      unit: product.unit || 'unité'
+    });
+  });
+  return items;
+}
+
+async function refreshAgentOrderClientContext() {
+  const clientSelect = document.getElementById('agentOrderClientSelect');
+  const addressInput = document.getElementById('agentOrderAddressInput');
+  if (!clientSelect) return;
+
+  const clientId = clientSelect.value;
+  agentOrderClientPrices = new Map();
+  if (clientId) {
+    const prices = await fetchCustomerPrices(clientId);
+    prices.forEach((row) => agentOrderClientPrices.set(row.product_slug, Number(row.price)));
+    const client = adminProfiles.find((p) => p.id === clientId);
+    if (addressInput && client?.address) addressInput.value = client.address;
+  }
+  document.querySelectorAll('.agent-order-line').forEach((row) => updateAgentOrderLinePrice(row));
+  updateAgentOrderTotal();
+}
+
+async function initAgentOrderForm() {
+  const form = document.getElementById('agentOrderForm');
+  if (!form || !window.HB_COMMERCIAL_SPACE) return;
+
+  if (!adminProfiles.length) adminProfiles = await fetchAllProfiles();
+  adminProfiles = scopeProfilesForCurrentRole(adminProfiles);
+
+  const clientSelect = document.getElementById('agentOrderClientSelect');
+  const clients = getAgentClientProfiles();
+  if (clientSelect) {
+    clientSelect.innerHTML = clients.length
+      ? clients.map((client) => `<option value="${client.id}">${escapeHtml(profileLabel(client))}</option>`).join('')
+      : '<option value="">Aucun client assigné</option>';
+    clientSelect.disabled = !clients.length;
+  }
+
+  if (!agentOrderProductsCache.length) {
+    agentOrderProductsCache = (await fetchAllProducts()).filter((p) => p.active !== false);
+  }
+
+  if (!agentOrderFormReady) {
+    clientSelect?.addEventListener('change', refreshAgentOrderClientContext);
+    agentOrderFormReady = true;
+  }
+
+  const linesHost = document.getElementById('agentOrderLines');
+  if (linesHost && !linesHost.querySelector('.agent-order-line')) {
+    addAgentOrderLine();
+  }
+
+  await refreshAgentOrderClientContext();
+}
+
+async function handleAgentOrderSubmit(e) {
+  e.preventDefault();
+  const note = document.getElementById('agentOrderNote');
+  const fd = new FormData(e.target);
+  const clientId = fd.get('client_user_id');
+  const allowedIds = new Set(getAgentClientProfiles().map((p) => p.id));
+
+  if (!clientId || !allowedIds.has(clientId)) {
+    showAlert(note, 'Sélectionnez un client de votre portefeuille.');
+    return;
+  }
+
+  const items = buildAgentOrderItems();
+  if (!items.length) {
+    showAlert(note, 'Ajoutez au moins un produit valide.');
+    return;
+  }
+
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const paymentMethod = fd.get('payment_method') || 'virement';
+  const status = paymentMethod === 'stripe' ? 'en_attente_paiement' : 'validee';
+
+  try {
+    const order = await createOrder({
+      userId: clientId,
+      items,
+      total,
+      paymentMethod,
+      notes: fd.get('notes') || '',
+      shippingAddress: fd.get('shipping_address') || '',
+      estimatedDeliveryDate: fd.get('estimated_delivery_date') || null,
+      status
+    });
+    showAlert(note, `Commande ${formatOrderReference(order, [...adminOrders, order])} créée — visible côté client et agent.`, 'success');
+    e.target.reset();
+    document.getElementById('agentOrderLines').innerHTML = '';
+    addAgentOrderLine();
+    await refreshAgentOrderClientContext();
+    adminOrders = await fetchAllOrders();
+    await loadOrdersTable();
+    activateSectionTab('panel-commandes', 'liste');
+  } catch (err) {
+    showAlert(note, err.message);
+  }
 }
 
 function profileLabel(profile) {

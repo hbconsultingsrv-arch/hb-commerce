@@ -1,21 +1,60 @@
 let superRootProfiles = [];
 
-const INTERNAL_ROLES = ['agent_commercial', 'admin', 'super_root'];
+const TEAM_ROLES = ['agent_commercial', 'admin', 'super_root', 'livreur'];
 
-const INTERNAL_ROLE_LABELS = {
+const TEAM_ROLE_LABELS = {
   agent_commercial: 'Agent commercial',
   admin: 'Admin',
-  super_root: 'Super root'
+  super_root: 'Super root',
+  livreur: 'Livreur'
 };
 
-function isInternalProfile(profile) {
+function isTeamProfile(profile) {
   if (!profile) return false;
   if (['client', 'supplier', 'pending_company'].includes(profile.role)) return false;
-  return INTERNAL_ROLES.includes(profile.role);
+  return TEAM_ROLES.includes(profile.role);
 }
 
 function personLabel(profile) {
   return profile?.full_name || profile?.email || 'Utilisateur';
+}
+
+function toggleInternalVehicleField(role) {
+  const wrap = document.getElementById('internalVehicleWrap');
+  if (!wrap) return;
+  wrap.hidden = role !== 'livreur';
+}
+
+async function applyTeamRoleChange(profileId, newRole) {
+  const profile = superRootProfiles.find((p) => p.id === profileId);
+  if (!profile) throw new Error('Profil introuvable.');
+
+  if (newRole === 'livreur') {
+    if (profile.driver_id) {
+      await updateProfileAsSuperRoot(profileId, {
+        role: 'livreur',
+        company: 'Livreur HB Commerce'
+      });
+      return;
+    }
+    const driver = await createDeliveryDriver({
+      full_name: profile.full_name || profile.email || 'Livreur',
+      email: profile.email || '',
+      phone: profile.phone || '',
+      vehicle_info: '',
+      active: true
+    });
+    await updateProfileAsSuperRoot(profileId, {
+      role: 'livreur',
+      driver_id: driver.id,
+      company: 'Livreur HB Commerce'
+    });
+    return;
+  }
+
+  const fields = { role: newRole, company: 'HB Commerce' };
+  if (profile.role === 'livreur') fields.driver_id = null;
+  await updateProfileAsSuperRoot(profileId, fields);
 }
 
 function showSuperRootSection(sectionId) {
@@ -49,9 +88,13 @@ async function initSuperRoot() {
   document.getElementById('internalUserForm')?.addEventListener('submit', handleInternalUserSubmit);
   document.getElementById('profileEditForm')?.addEventListener('submit', handleProfileEditSubmit);
   document.getElementById('resetProfileEditBtn')?.addEventListener('click', resetProfileEditForm);
+  document.getElementById('internalRoleSelect')?.addEventListener('change', (e) => {
+    toggleInternalVehicleField(e.target.value);
+  });
   bindAppModal('superRootInfoModal');
   bindAppModal('profileEditModal');
   bindSuperRootTabs();
+  toggleInternalVehicleField(document.getElementById('internalRoleSelect')?.value || 'agent_commercial');
   showSuperRootSection('equipe');
   await loadSuperRootData();
 }
@@ -60,7 +103,7 @@ async function loadSuperRootData() {
   try {
     superRootProfiles = typeof fetchInternalProfiles === 'function'
       ? await fetchInternalProfiles()
-      : (await fetchAllProfiles()).filter(isInternalProfile);
+      : (await fetchAllProfiles()).filter(isTeamProfile);
     renderProfilesTable();
   } catch (err) {
     showAlert(document.getElementById('profilesNote'), err.message);
@@ -78,14 +121,14 @@ function renderProfilesTable() {
       <td>${escapeHtml(profile.phone || '—')}</td>
       <td>
         <select data-role-profile="${profile.id}">
-          ${INTERNAL_ROLES.map((role) => `
-            <option value="${role}" ${profile.role === role ? 'selected' : ''}>${INTERNAL_ROLE_LABELS[role]}</option>
+          ${TEAM_ROLES.map((role) => `
+            <option value="${role}" ${profile.role === role ? 'selected' : ''}>${TEAM_ROLE_LABELS[role]}</option>
           `).join('')}
         </select>
       </td>
       <td><button type="button" class="btn btn-sm btn-outline-dark" data-edit-profile="${profile.id}">Modifier</button></td>
     </tr>
-  `).join('') : '<tr><td colspan="5">Aucun utilisateur interne HB Commerce.</td></tr>';
+  `).join('') : '<tr><td colspan="5">Aucun utilisateur HB Commerce.</td></tr>';
 
   body.querySelectorAll('[data-edit-profile]').forEach((btn) => {
     btn.addEventListener('click', () => editProfile(btn.dataset.editProfile));
@@ -95,17 +138,18 @@ function renderProfilesTable() {
     select.addEventListener('change', async () => {
       const note = document.getElementById('profilesNote');
       const newRole = select.value;
-      if (!INTERNAL_ROLES.includes(newRole)) {
-        showAlert(note, 'Seuls les rôles internes HB Commerce sont autorisés ici.');
+      if (!TEAM_ROLES.includes(newRole)) {
+        showAlert(note, 'Rôle non autorisé.');
         await loadSuperRootData();
         return;
       }
       try {
-        await updateProfileRole(select.dataset.roleProfile, newRole);
+        await applyTeamRoleChange(select.dataset.roleProfile, newRole);
         showAlert(note, 'Rôle mis à jour.', 'success');
         await loadSuperRootData();
       } catch (err) {
         showAlert(note, err.message);
+        await loadSuperRootData();
       }
     });
   });
@@ -116,7 +160,7 @@ function resetProfileEditForm() {
   if (!form) return;
   form.reset();
   form.elements.id.value = '';
-  document.getElementById('profileEditTitle').textContent = 'Modifier un utilisateur interne';
+  document.getElementById('profileEditTitle').textContent = 'Modifier un utilisateur HB Commerce';
   showAlert(document.getElementById('profileEditNote'), '');
 }
 
@@ -124,16 +168,37 @@ async function handleInternalUserSubmit(e) {
   e.preventDefault();
   const note = document.getElementById('internalUserNote');
   const fd = new FormData(e.target);
+  const role = fd.get('internal_role');
   try {
-    await createInternalUser({
-      email: fd.get('email'),
-      password: fd.get('password'),
-      fullName: fd.get('full_name'),
-      phone: fd.get('phone'),
-      role: fd.get('internal_role')
-    });
-    showAlert(note, 'Utilisateur interne HB Commerce créé.', 'success');
+    if (role === 'livreur') {
+      const driver = await createDeliveryDriver({
+        full_name: fd.get('full_name'),
+        email: fd.get('email'),
+        phone: fd.get('phone') || '',
+        vehicle_info: fd.get('vehicle_info') || '',
+        active: true
+      });
+      await createDriverUser({
+        driverId: driver.id,
+        email: fd.get('email'),
+        password: fd.get('password'),
+        fullName: fd.get('full_name'),
+        phone: fd.get('phone'),
+        vehicleInfo: fd.get('vehicle_info')
+      });
+      showAlert(note, 'Livreur créé. Connexion : login-livreur.html ou login.html', 'success');
+    } else {
+      await createInternalUser({
+        email: fd.get('email'),
+        password: fd.get('password'),
+        fullName: fd.get('full_name'),
+        phone: fd.get('phone'),
+        role
+      });
+      showAlert(note, 'Utilisateur HB Commerce créé.', 'success');
+    }
     e.target.reset();
+    toggleInternalVehicleField('agent_commercial');
     showSuperRootSection('equipe');
     await loadSuperRootData();
   } catch (err) {
@@ -167,20 +232,23 @@ async function handleProfileEditSubmit(e) {
   }
 
   const role = fd.get('role');
-  if (!INTERNAL_ROLES.includes(role)) {
-    showAlert(note, 'Seuls les rôles internes HB Commerce sont autorisés ici.');
+  if (!TEAM_ROLES.includes(role)) {
+    showAlert(note, 'Rôle non autorisé.');
     return;
   }
 
+  const profile = superRootProfiles.find((p) => p.id === profileId);
+
   try {
     await updateProfileAsSuperRoot(profileId, {
-      company: 'HB Commerce',
       full_name: fd.get('full_name') || '',
       email: fd.get('email') || '',
-      phone: fd.get('phone') || '',
-      role
+      phone: fd.get('phone') || ''
     });
-    showAlert(note, 'Utilisateur interne mis à jour.', 'success');
+    if (profile && profile.role !== role) {
+      await applyTeamRoleChange(profileId, role);
+    }
+    showAlert(note, 'Utilisateur mis à jour.', 'success');
     resetProfileEditForm();
     closeAppModal('profileEditModal');
     showSuperRootSection('equipe');

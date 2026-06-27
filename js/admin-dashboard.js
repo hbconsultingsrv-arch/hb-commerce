@@ -4,7 +4,7 @@
 
 const COMMERCIAL_TAB_TITLES = {
   accueil: { title: 'Accueil', sub: 'Synthèse commandes, messages et alertes stock' },
-  commandes: { title: 'Mes commandes', sub: 'Commandes de vos clients assignés uniquement' },
+  commandes: { title: 'Mes commandes', sub: 'Créer, suivre et planifier les livraisons de vos clients' },
   clients: { title: 'Mes clients', sub: 'Portefeuille commercial personnel' },
   prix: { title: 'Prix personnalisés', sub: 'Tarifs négociés pour vos clients' },
   stock: { title: 'État du stock', sub: 'Disponibilité dépôt et alertes — lecture seule' },

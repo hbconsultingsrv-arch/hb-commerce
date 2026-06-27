@@ -56,7 +56,7 @@
             <button type="button" id="refreshProfilesBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
           </div>
         </div>
-        <p class="auth-sub" style="margin-bottom:1rem">Uniquement les comptes internes : super root, admin et agents commerciaux. Les sociétés clientes et fournisseurs sont gérées dans le dashboard admin.</p>
+        <p class="auth-sub" style="margin-bottom:1rem">Comptes HB Commerce : super root, admin, agents commerciaux et livreurs. Les sociétés clientes et fournisseurs sont gérées dans le dashboard admin.</p>
         <div class="table-wrap">
           <table class="requests-table">
             <thead>
@@ -75,14 +75,15 @@
       </div>
 
       <div data-section-panel="nouveau" class="dashboard-card" hidden>
-        <h2>Nouvel utilisateur interne</h2>
+        <h2>Nouvel utilisateur HB Commerce</h2>
         <form id="internalUserForm" class="auth-form">
           <label>
-            Profil interne
-            <select name="internal_role" required>
+            Rôle
+            <select name="internal_role" id="internalRoleSelect" required>
               <option value="agent_commercial">Agent commercial</option>
               <option value="admin">Admin</option>
               <option value="super_root">Super root</option>
+              <option value="livreur">Livreur</option>
             </select>
           </label>
           <div class="form-row">
@@ -105,7 +106,11 @@
               <input type="password" name="password" minlength="6" required autocomplete="new-password">
             </label>
           </div>
-          <button type="submit" class="btn btn-primary">Créer l'utilisateur interne</button>
+          <label id="internalVehicleWrap" hidden>
+            Véhicule / infos
+            <input type="text" name="vehicle_info" placeholder="Fourgon, immatriculation…">
+          </label>
+          <button type="submit" class="btn btn-primary">Créer le compte</button>
           <p class="form-note" id="internalUserNote"></p>
         </form>
       </div>
@@ -120,7 +125,7 @@
         <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
       </div>
       <div class="app-modal-body">
-        <p>Cet espace sert uniquement à gérer les <strong>comptes internes HB Commerce</strong> : super root, admin et agents commerciaux.</p>
+        <p>Cet espace sert à gérer les <strong>comptes HB Commerce</strong> : super root, admin, agents commerciaux et livreurs.</p>
         <ul>
           <li><strong>Équipe</strong> — liste des utilisateurs, changement de rôle et modification via le bouton en fin de ligne.</li>
           <li><strong>Nouveau</strong> — création d'un compte interne avec mot de passe temporaire.</li>
@@ -162,11 +167,12 @@
               <input type="tel" name="phone" placeholder="Téléphone">
             </label>
             <label>
-              Rôle interne
+              Rôle
               <select name="role" required>
                 <option value="agent_commercial">Agent commercial</option>
                 <option value="admin">Admin</option>
                 <option value="super_root">Super root</option>
+                <option value="livreur">Livreur</option>
               </select>
             </label>
           </div>
@@ -184,7 +190,8 @@
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js?v=tabs-20260619c"></script>
-  <script src="js/admin-api.js?v=tabs-20260619c"></script>
-  <script src="js/super-root.js?v=tabs-20260619c"></script>
+  <script src="js/admin-api.js?v=team-livreur-20260630"></script>
+  <script src="js/driver-api.js?v=livreur-20260625"></script>
+  <script src="js/super-root.js?v=team-livreur-20260630"></script>
 </body>
 </html>

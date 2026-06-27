@@ -86,7 +86,7 @@ async function fetchInternalProfiles() {
   const { data, error } = await sb
     .from('profiles')
     .select('*')
-    .in('role', ['agent_commercial', 'admin', 'super_root'])
+    .in('role', ['agent_commercial', 'admin', 'super_root', 'livreur'])
     .order('full_name', { ascending: true });
   if (error) throw error;
   return (data || []).filter((profile) => !['client', 'supplier', 'pending_company'].includes(profile.role));
@@ -643,18 +643,18 @@ async function moderateChatMessage(id, status, moderatorId) {
   return data;
 }
 
-async function createOrder({ userId, items, total, paymentMethod, notes, shippingAddress, estimatedDeliveryDate }) {
+async function createOrder({ userId, items, total, paymentMethod, notes, shippingAddress, estimatedDeliveryDate, status }) {
   const sb = getSupabase();
   if (!sb) throw new Error(configErrorMessage());
 
-  const status = paymentMethod === 'stripe' ? 'en_attente_paiement' : 'en_attente';
+  const orderStatus = status || (paymentMethod === 'stripe' ? 'en_attente_paiement' : 'en_attente');
 
   const { data: order, error: orderError } = await sb
     .from('orders')
     .insert({
       user_id: userId,
       total,
-      status,
+      status: orderStatus,
       payment_method: paymentMethod,
       notes,
       shipping_address: shippingAddress,

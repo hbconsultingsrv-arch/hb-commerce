@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/commerce.css">
-  <link rel="stylesheet" href="css/admin-shell.css?v=commercial-20260629">
+  <link rel="stylesheet" href="css/admin-shell.css?v=commercial-20260630">
   <link rel="stylesheet" href="css/stock.css">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
@@ -62,8 +62,13 @@
           <div id="commercialDashboardHost"><p class="empty-state">Chargement…</p></div>
         </section>
 
-        <section id="panel-commandes" class="admin-panel" hidden>
-          <div class="dashboard-card dashboard-card-wide">
+        <section id="panel-commandes" class="admin-panel" hidden data-tab-scope>
+          <div class="section-tabs" data-section-tabs>
+            <button type="button" class="section-tab active" data-section="liste">Mes commandes</button>
+            <button type="button" class="section-tab" data-section="creer">Créer une commande</button>
+          </div>
+
+          <div data-section-panel="liste" class="dashboard-card dashboard-card-wide">
             <div class="dashboard-card-head">
               <h2 id="ordersPanelTitle">Mes commandes clients</h2>
             </div>
@@ -92,6 +97,33 @@
                 <tbody id="ordersAdminBody"></tbody>
               </table>
             </div>
+          </div>
+
+          <div data-section-panel="creer" class="dashboard-card dashboard-card-wide" hidden>
+            <div class="dashboard-card-head">
+              <h2>Créer une commande client</h2>
+            </div>
+            <p class="auth-sub">La commande est enregistrée au nom du client et apparaît dans son espace <strong>Mon compte</strong> et dans vos commandes.</p>
+            <form id="agentOrderForm" class="auth-form">
+              <label>Société cliente<select name="client_user_id" id="agentOrderClientSelect" required></select></label>
+              <label>Adresse de livraison<input type="text" name="shipping_address" id="agentOrderAddressInput" required placeholder="Adresse complète"></label>
+              <div id="agentOrderLines" class="agent-order-lines"></div>
+              <button type="button" id="agentOrderAddLine" class="btn btn-sm btn-outline-dark">+ Ajouter un produit</button>
+              <div class="form-row" style="margin-top:1rem">
+                <label>Mode de paiement
+                  <select name="payment_method" required>
+                    <option value="virement">Virement</option>
+                    <option value="cheque">Chèque</option>
+                    <option value="stripe">Carte (Stripe)</option>
+                  </select>
+                </label>
+                <label>Livraison estimée<input type="date" name="estimated_delivery_date" id="agentOrderDeliveryDate"></label>
+              </div>
+              <label>Notes commande<textarea name="notes" rows="2" placeholder="Instructions, référence devis…"></textarea></label>
+              <p class="form-note"><strong>Total :</strong> <span id="agentOrderTotal">0,00 €</span></p>
+              <button type="submit" class="btn btn-primary">Créer la commande</button>
+              <p class="form-note" id="agentOrderNote"></p>
+            </form>
           </div>
         </section>
 
@@ -277,6 +309,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/admin-api.js"></script>
+  <script src="js/admin-api-stock.js"></script>
   <script src="js/driver-api.js"></script>
   <script src="js/admin-utils.js"></script>
   <script src="js/admin-dashboard.js"></script>
