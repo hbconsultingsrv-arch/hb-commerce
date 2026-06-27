@@ -6,6 +6,7 @@ const COMMERCIAL_TAB_TITLES = {
   commandes: { title: 'Mes commandes', sub: 'Commandes de vos clients assignés uniquement' },
   clients: { title: 'Mes clients', sub: 'Portefeuille commercial personnel' },
   prix: { title: 'Prix personnalisés', sub: 'Tarifs négociés pour vos clients' },
+  stock: { title: 'État du stock', sub: 'Disponibilité dépôt et alertes — lecture seule' },
   chat: { title: 'Support & chat', sub: 'Messages de vos clients assignés' }
 };
 

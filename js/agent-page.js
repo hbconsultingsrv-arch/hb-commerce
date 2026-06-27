@@ -1,6 +1,12 @@
 /**
  * Espace commercial — page dédiée (agents externes + activité commerciale RH)
  */
+function setAgentFooterLink(el, visible) {
+  if (!el) return;
+  el.hidden = !visible;
+  el.style.display = visible ? '' : 'none';
+}
+
 async function initCommercialSpacePage() {
   const profile = adminProfile;
   if (!profile) return;
@@ -10,9 +16,9 @@ async function initCommercialSpacePage() {
   const livreurLink = document.getElementById('agentLivreurLink');
   const banner = document.getElementById('commercialScopeBanner');
 
-  if (isAdminProfile(profile) && rhAdmin) rhAdmin.hidden = false;
-  if (isSuperRootProfile(profile) && rhSuper) rhSuper.hidden = false;
-  if (profile.driver_id && livreurLink) livreurLink.hidden = false;
+  setAgentFooterLink(rhAdmin, isAdminProfile(profile));
+  setAgentFooterLink(rhSuper, isSuperRootProfile(profile));
+  setAgentFooterLink(livreurLink, Boolean(profile.driver_id));
 
   if (banner && isAdminProfile(profile)) {
     banner.hidden = false;

@@ -2,9 +2,11 @@
  * Zone alertes stock — en cours / clos (admin & super)
  */
 
-async function renderStockAlertsPanel(hostId = 'stockAlertsPanel') {
+async function renderStockAlertsPanel(hostId = 'stockAlertsPanel', options = {}) {
   const host = document.getElementById(hostId);
   if (!host || typeof fetchStockAlerts !== 'function') return;
+
+  const readOnly = options.readOnly === true || window.HB_COMMERCIAL_SPACE === true;
 
   const [openAlerts, closedAlerts] = await Promise.all([
     fetchStockAlerts('open'),
@@ -25,7 +27,7 @@ async function renderStockAlertsPanel(hostId = 'stockAlertsPanel') {
         </div>
       </div>
       <div class="stock-alerts-body" data-alerts-panel="open">
-        ${renderAlertsList(openAlerts, true)}
+        ${renderAlertsList(openAlerts, !readOnly)}
       </div>
       <div class="stock-alerts-body" data-alerts-panel="closed" hidden>
         ${renderAlertsList(closedAlerts.slice(0, 50), false)}
@@ -44,17 +46,19 @@ async function renderStockAlertsPanel(hostId = 'stockAlertsPanel') {
     });
   });
 
-  host.querySelectorAll('[data-close-alert]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      try {
-        await closeStockAlert(btn.dataset.closeAlert);
-        await renderStockAlertsPanel(hostId);
-        if (typeof renderStockAlertBanner === 'function') await renderStockAlertBanner();
-      } catch (err) {
-        alert(err.message || 'Erreur');
-      }
+  if (!readOnly) {
+    host.querySelectorAll('[data-close-alert]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        try {
+          await closeStockAlert(btn.dataset.closeAlert);
+          await renderStockAlertsPanel(hostId, options);
+          if (typeof renderStockAlertBanner === 'function') await renderStockAlertBanner();
+        } catch (err) {
+          alert(err.message || 'Erreur');
+        }
+      });
     });
-  });
+  }
 }
 
 function renderAlertsList(alerts, showClose) {

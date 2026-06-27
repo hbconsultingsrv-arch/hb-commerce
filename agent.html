@@ -9,7 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/commerce.css">
-  <link rel="stylesheet" href="css/admin-shell.css?v=commercial-20260627">
+  <link rel="stylesheet" href="css/admin-shell.css?v=commercial-20260628">
+  <link rel="stylesheet" href="css/stock.css">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
 <body class="dashboard-page admin-v2 commercial-space">
@@ -28,6 +29,7 @@
         <button type="button" class="admin-nav-item active" data-tab="commandes"><span class="admin-nav-icon">☰</span> Mes commandes</button>
         <button type="button" class="admin-nav-item" data-tab="clients"><span class="admin-nav-icon">◇</span> Mes clients</button>
         <button type="button" class="admin-nav-item" data-tab="prix"><span class="admin-nav-icon">€</span> Prix clients</button>
+        <button type="button" class="admin-nav-item" data-tab="stock"><span class="admin-nav-icon">▤</span> Stock<span class="admin-nav-badge" id="agentStockNavBadge" hidden></span></button>
         <button type="button" class="admin-nav-item" data-tab="chat"><span class="admin-nav-icon">✉</span> Support<span class="admin-nav-badge" id="adminChatNavBadge" hidden></span></button>
       </nav>
       <div class="admin-sidebar-footer">
@@ -53,6 +55,7 @@
 
       <main class="admin-content">
         <div id="commercialScopeBanner" class="admin-preview-banner" hidden></div>
+        <div id="stockAlertBanner" hidden></div>
 
         <section id="panel-commandes" class="admin-panel">
           <div class="dashboard-card dashboard-card-wide">
@@ -87,8 +90,13 @@
           </div>
         </section>
 
-        <section id="panel-clients" class="admin-panel" hidden>
-          <div class="dashboard-card dashboard-card-wide">
+        <section id="panel-clients" class="admin-panel" hidden data-tab-scope>
+          <div class="section-tabs" data-section-tabs>
+            <button type="button" class="section-tab active" data-section="liste">Mes clients</button>
+            <button type="button" class="section-tab" data-section="creer">Créer un client</button>
+          </div>
+
+          <div data-section-panel="liste" class="dashboard-card dashboard-card-wide">
             <div class="dashboard-card-head">
               <h2>Mes clients assignés</h2>
               <button type="button" id="refreshClientsBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
@@ -106,6 +114,52 @@
                   </tr>
                 </thead>
                 <tbody id="clientsBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div data-section-panel="creer" class="dashboard-card" hidden>
+            <h2>Créer un client</h2>
+            <p class="auth-sub">Le client sera automatiquement assigné à votre portefeuille commercial.</p>
+            <form id="adminClientForm" class="auth-form">
+              <div class="form-row">
+                <label>Société cliente<input type="text" name="company" required placeholder="Nom de la société"></label>
+                <label>Contact<input type="text" name="full_name" required placeholder="Nom du contact"></label>
+              </div>
+              <div class="form-row">
+                <label>E-mail de connexion<input type="email" name="email" required placeholder="contact@societe.com"></label>
+                <label>Téléphone<input type="tel" name="phone" placeholder="Téléphone"></label>
+              </div>
+              <label>Adresse<input type="text" name="address" required placeholder="Adresse complète"></label>
+              <div class="form-row">
+                <label>SIREN<input type="text" name="siren" required placeholder="9 chiffres" inputmode="numeric"></label>
+                <label>Code TVA<input type="text" name="vat_number" required placeholder="FR..."></label>
+              </div>
+              <label>Mot de passe temporaire<input type="password" name="password" minlength="6" required autocomplete="new-password"></label>
+              <button type="submit" class="btn btn-primary">Créer le client</button>
+              <p class="form-note" id="adminClientNote"></p>
+            </form>
+          </div>
+        </section>
+
+        <section id="panel-stock" class="admin-panel" hidden>
+          <div id="commercialStockAlertsHost"></div>
+          <div class="dashboard-card dashboard-card-wide">
+            <div class="dashboard-card-head">
+              <h2>Disponibilité dépôt</h2>
+              <button type="button" id="refreshCommercialStockBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+            </div>
+            <p class="auth-sub">Consultation seule — pour réapprovisionner ou clôturer une alerte, contactez l'administration RH.</p>
+            <div class="table-wrap">
+              <table class="requests-table">
+                <thead>
+                  <tr>
+                    <th>Produit</th>
+                    <th>Stock dépôt</th>
+                    <th>Prix catalogue</th>
+                  </tr>
+                </thead>
+                <tbody id="commercialStockBody"><tr><td colspan="3">Chargement…</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -222,6 +276,8 @@
   <script src="js/admin-utils.js"></script>
   <script src="js/admin-dashboard.js"></script>
   <script src="js/admin-shell.js"></script>
+  <script src="js/stock.js"></script>
+  <script src="js/stock-alerts.js"></script>
   <script>window.HB_COMMERCIAL_SPACE = true;</script>
   <script src="js/admin.js"></script>
   <script src="js/agent-page.js"></script>

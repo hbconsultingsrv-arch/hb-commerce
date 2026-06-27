@@ -43,6 +43,7 @@ function showAdminTab(tabId) {
     loadDriversTable();
   }
   if (tabId === 'prix') loadCustomerPricesTable();
+  if (tabId === 'stock' && window.HB_COMMERCIAL_SPACE) loadCommercialStockPanel();
 }
 
 function bindAdminTabs() {
@@ -136,6 +137,7 @@ async function initAdmin() {
   }
   document.getElementById('adminClientForm')?.addEventListener('submit', handleAdminClientSubmit);
   document.getElementById('refreshClientsBtn')?.addEventListener('click', loadClientsPanel);
+  document.getElementById('refreshCommercialStockBtn')?.addEventListener('click', loadCommercialStockPanel);
   document.getElementById('adminCustomerPriceForm')?.addEventListener('submit', handleAdminCustomerPriceSubmit);
   bindSectionTabs();
   initSectionTabScopes();
@@ -155,6 +157,7 @@ async function initAdmin() {
   updateAdminNavBadges();
   if (window.HB_COMMERCIAL_SPACE && typeof initCommercialSpacePage === 'function') {
     await initCommercialSpacePage();
+    await loadCommercialStockPanel();
   }
 }
 
@@ -1096,10 +1099,46 @@ function agentName(agentId, agents) {
   return agent ? commercialAgentLabel(agent) : 'Aucun agent';
 }
 
+async function loadCommercialStockPanel() {
+  const body = document.getElementById('commercialStockBody');
+  if (!body) return;
+  try {
+    const products = await fetchAllProducts();
+    const visible = products.filter((p) => p.active !== false);
+    body.innerHTML = visible.length ? visible.map((p) => `
+      <tr>
+        <td><strong>${escapeHtml(p.name || p.slug)}</strong><br><small>${escapeHtml(p.slug || '')}</small></td>
+        <td>${getStockPill(p)}</td>
+        <td>${formatPrice(p.price)}</td>
+      </tr>
+    `).join('') : '<tr><td colspan="3">Aucun produit actif.</td></tr>';
+
+    if (typeof renderStockAlertsPanel === 'function') {
+      await renderStockAlertsPanel('commercialStockAlertsHost', { readOnly: true });
+    }
+    if (typeof renderStockAlertBanner === 'function') {
+      await renderStockAlertBanner();
+    }
+
+    const open = typeof fetchStockAlerts === 'function' ? await fetchStockAlerts('open') : [];
+    const badge = document.getElementById('agentStockNavBadge');
+    if (badge) {
+      badge.textContent = open.length || '';
+      badge.hidden = !open.length;
+    }
+  } catch (err) {
+    body.innerHTML = `<tr><td colspan="3">${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
 async function handleAdminClientSubmit(e) {
   e.preventDefault();
   const note = document.getElementById('adminClientNote');
   const fd = new FormData(e.target);
+  let commercialAgentId = fd.get('commercial_agent_id');
+  if (mustScopeToAssignedClients()) {
+    commercialAgentId = adminProfile.id;
+  }
   try {
     await createClientUser({
       email: fd.get('email'),
@@ -1110,7 +1149,7 @@ async function handleAdminClientSubmit(e) {
       company: fd.get('company'),
       siren: fd.get('siren'),
       vatNumber: fd.get('vat_number'),
-      commercialAgentId: fd.get('commercial_agent_id')
+      commercialAgentId: commercialAgentId || null
     });
     e.target.reset();
     showAlert(note, 'Client créé.', 'success');

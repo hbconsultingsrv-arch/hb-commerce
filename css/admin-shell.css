@@ -37,6 +37,10 @@
   color: var(--admin-text);
 }
 
+.admin-v2 [hidden] {
+  display: none !important;
+}
+
 .admin-app {
   display: flex;
   min-height: 100vh;
