@@ -43,6 +43,7 @@ function showAdminTab(tabId) {
     loadDriversTable();
   }
   if (tabId === 'prix') loadCustomerPricesTable();
+  if (tabId === 'accueil' && window.HB_COMMERCIAL_SPACE) loadCommercialHomeDashboard();
   if (tabId === 'stock' && window.HB_COMMERCIAL_SPACE) loadCommercialStockPanel();
 }
 
@@ -88,7 +89,7 @@ async function initAdmin() {
 
   bindAdminTabs();
   if (commercialSpace) {
-    showAdminTab('commandes');
+    showAdminTab('accueil');
   } else {
     const params = new URLSearchParams(window.location.search);
     const deepTab = params.get('tab');
@@ -157,6 +158,7 @@ async function initAdmin() {
   updateAdminNavBadges();
   if (window.HB_COMMERCIAL_SPACE && typeof initCommercialSpacePage === 'function') {
     await initCommercialSpacePage();
+    await loadCommercialHomeDashboard();
     await loadCommercialStockPanel();
   }
 }
@@ -1097,6 +1099,135 @@ function renderAgentSelect(select, agents) {
 function agentName(agentId, agents) {
   const agent = agents.find((p) => p.id === agentId);
   return agent ? commercialAgentLabel(agent) : 'Aucun agent';
+}
+
+async function loadCommercialHomeDashboard() {
+  const host = document.getElementById('commercialDashboardHost');
+  if (!host) return;
+  host.innerHTML = '<p class="empty-state">Chargement du récapitulatif…</p>';
+
+  try {
+    if (!adminOrders.length) adminOrders = await fetchAllOrders();
+    if (!adminProfiles.length) adminProfiles = await fetchAllProfiles();
+
+    const orders = getVisibleOrders();
+    const pendingOrders = orders.filter((o) =>
+      ['en_attente', 'validee', 'en_attente_paiement'].includes(o.status)
+    );
+    const inProgress = orders.filter((o) =>
+      ['payee', 'en_preparation', 'expediee'].includes(o.status)
+    );
+    const clients = getAgentClientProfiles(adminProfiles);
+
+    const now = new Date();
+    const revenueMonth = orders
+      .filter((o) => {
+        if (o.status === 'annulee') return false;
+        const d = new Date(o.created_at);
+        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+      })
+      .reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
+
+    let pendingChat = 0;
+    let unreadThreads = [];
+    try {
+      const messages = await fetchChatMessages();
+      const summaries = buildChatSummaries(getChatEligibleProfiles(adminProfiles), messages);
+      pendingChat = summaries.reduce((sum, item) => sum + item.pendingCount, 0);
+      unreadThreads = summaries.filter((item) => item.pendingCount > 0).slice(0, 5);
+    } catch { /* ignore chat errors on home */ }
+
+    let stockAlerts = [];
+    try {
+      if (typeof fetchStockAlerts === 'function') {
+        stockAlerts = await fetchStockAlerts('open');
+      }
+    } catch { /* ignore */ }
+
+    const pendingPreview = pendingOrders.slice(0, 4).map((order) => {
+      const customer = adminProfiles.find((p) => p.id === order.user_id);
+      return `<li><strong>${escapeHtml(formatOrderReference(order, adminOrders))}</strong> — ${escapeHtml(customer?.company || customer?.full_name || 'Client')} · ${escapeHtml(ORDER_STATUS_LABELS[order.status] || order.status)}</li>`;
+    }).join('');
+
+    const chatPreviewList = unreadThreads.map(({ profile, pendingCount, lastMessage }) =>
+      `<li><strong>${escapeHtml(profileLabel(profile))}</strong> — ${pendingCount} message${pendingCount > 1 ? 's' : ''} · ${escapeHtml(chatPreview(lastMessage))}</li>`
+    ).join('');
+
+    const stockPreviewList = stockAlerts.slice(0, 5).map((alert) =>
+      `<li>${escapeHtml(alert.message || alert.product_name || alert.product_slug)}</li>`
+    ).join('');
+
+    host.innerHTML = `
+      <div class="dash-kpi-grid">
+        <article class="dash-kpi-card dash-kpi-card--accent">
+          <span class="dash-kpi-label">CA du mois (mes clients)</span>
+          <strong class="dash-kpi-value">${formatPrice(revenueMonth)}</strong>
+        </article>
+        <article class="dash-kpi-card">
+          <span class="dash-kpi-label">Mes clients</span>
+          <strong class="dash-kpi-value dash-kpi-value--ok">${clients.length}</strong>
+        </article>
+        <article class="dash-kpi-card">
+          <span class="dash-kpi-label">Commandes en attente</span>
+          <strong class="dash-kpi-value dash-kpi-value--warn">${pendingOrders.length}</strong>
+          <button type="button" class="btn btn-sm btn-outline-dark commercial-home-link" data-goto-tab="commandes">Voir</button>
+        </article>
+        <article class="dash-kpi-card">
+          <span class="dash-kpi-label">En cours / expédiées</span>
+          <strong class="dash-kpi-value">${inProgress.length}</strong>
+        </article>
+        <article class="dash-kpi-card">
+          <span class="dash-kpi-label">Messages non lus</span>
+          <strong class="dash-kpi-value dash-kpi-value--warn">${pendingChat}</strong>
+          <button type="button" class="btn btn-sm btn-outline-dark commercial-home-link" data-goto-tab="chat">Répondre</button>
+        </article>
+        <article class="dash-kpi-card">
+          <span class="dash-kpi-label">Alertes stock</span>
+          <strong class="dash-kpi-value dash-kpi-value--warn">${stockAlerts.length}</strong>
+          <button type="button" class="btn btn-sm btn-outline-dark commercial-home-link" data-goto-tab="stock">Consulter</button>
+        </article>
+      </div>
+
+      <div class="commercial-home-grid">
+        <section class="dashboard-card">
+          <div class="dashboard-card-head">
+            <h2>Commandes à traiter</h2>
+            <button type="button" class="btn btn-sm btn-outline-dark commercial-home-link" data-goto-tab="commandes">Toutes</button>
+          </div>
+          ${pendingOrders.length
+            ? `<ul class="commercial-home-list">${pendingPreview}${pendingOrders.length > 4 ? `<li>… et ${pendingOrders.length - 4} autre(s)</li>` : ''}</ul>`
+            : '<p class="empty-state">Aucune commande en attente pour vos clients.</p>'}
+        </section>
+
+        <section class="dashboard-card">
+          <div class="dashboard-card-head">
+            <h2>Messages clients</h2>
+            <button type="button" class="btn btn-sm btn-outline-dark commercial-home-link" data-goto-tab="chat">Ouvrir le chat</button>
+          </div>
+          ${unreadThreads.length
+            ? `<ul class="commercial-home-list">${chatPreviewList}</ul>`
+            : '<p class="empty-state">Aucun message client en attente de réponse.</p>'}
+        </section>
+
+        <section class="dashboard-card dashboard-card-wide">
+          <div class="dashboard-card-head">
+            <h2>Alertes stock dépôt</h2>
+            <button type="button" class="btn btn-sm btn-outline-dark commercial-home-link" data-goto-tab="stock">État du stock</button>
+          </div>
+          ${stockAlerts.length
+            ? `<ul class="commercial-home-list">${stockPreviewList}${stockAlerts.length > 5 ? `<li>… et ${stockAlerts.length - 5} autre(s) alerte(s)</li>` : ''}</ul>`
+            : '<p class="empty-state">Aucune alerte stock active — disponibilité OK.</p>'}
+          <p class="form-note">Lecture seule : contactez l'administration RH pour réapprovisionner.</p>
+        </section>
+      </div>
+    `;
+
+    host.querySelectorAll('[data-goto-tab]').forEach((btn) => {
+      btn.addEventListener('click', () => showAdminTab(btn.dataset.gotoTab));
+    });
+  } catch (err) {
+    host.innerHTML = `<p class="form-note error">${escapeHtml(err.message)}</p>`;
+  }
 }
 
 async function loadCommercialStockPanel() {

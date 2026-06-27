@@ -3,6 +3,7 @@
  */
 
 const COMMERCIAL_TAB_TITLES = {
+  accueil: { title: 'Accueil', sub: 'Synthèse commandes, messages et alertes stock' },
   commandes: { title: 'Mes commandes', sub: 'Commandes de vos clients assignés uniquement' },
   clients: { title: 'Mes clients', sub: 'Portefeuille commercial personnel' },
   prix: { title: 'Prix personnalisés', sub: 'Tarifs négociés pour vos clients' },
@@ -189,7 +190,7 @@ async function loadAdminDashboard() {
 
 function updateAdminTopbar(tabId) {
   const titles = window.HB_COMMERCIAL_SPACE ? COMMERCIAL_TAB_TITLES : ADMIN_TAB_TITLES;
-  const meta = titles[tabId] || (window.HB_COMMERCIAL_SPACE ? COMMERCIAL_TAB_TITLES.commandes : ADMIN_TAB_TITLES.accueil);
+  const meta = titles[tabId] || (window.HB_COMMERCIAL_SPACE ? COMMERCIAL_TAB_TITLES.accueil : ADMIN_TAB_TITLES.accueil);
   const title = document.getElementById('adminTopbarTitle');
   const sub = document.getElementById('adminTopbarSub');
   if (title) title.textContent = meta.title;

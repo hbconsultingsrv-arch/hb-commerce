@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/commerce.css">
-  <link rel="stylesheet" href="css/admin-shell.css?v=commercial-20260628">
+  <link rel="stylesheet" href="css/admin-shell.css?v=commercial-20260629">
   <link rel="stylesheet" href="css/stock.css">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
@@ -26,7 +26,8 @@
         </a>
       </div>
       <nav class="admin-sidebar-nav">
-        <button type="button" class="admin-nav-item active" data-tab="commandes"><span class="admin-nav-icon">☰</span> Mes commandes</button>
+        <button type="button" class="admin-nav-item active" data-tab="accueil"><span class="admin-nav-icon">◉</span> Accueil</button>
+        <button type="button" class="admin-nav-item" data-tab="commandes"><span class="admin-nav-icon">☰</span> Mes commandes</button>
         <button type="button" class="admin-nav-item" data-tab="clients"><span class="admin-nav-icon">◇</span> Mes clients</button>
         <button type="button" class="admin-nav-item" data-tab="prix"><span class="admin-nav-icon">€</span> Prix clients</button>
         <button type="button" class="admin-nav-item" data-tab="stock"><span class="admin-nav-icon">▤</span> Stock<span class="admin-nav-badge" id="agentStockNavBadge" hidden></span></button>
@@ -46,8 +47,8 @@
         <div style="display:flex;align-items:center;gap:0.75rem">
           <button type="button" class="admin-mobile-toggle" id="adminSidebarToggle" aria-label="Menu">☰</button>
           <div class="admin-topbar-title">
-            <h1 id="adminTopbarTitle">Mes commandes</h1>
-            <p id="adminTopbarSub">Uniquement vos clients et commandes assignés — pas l'administration globale</p>
+            <h1 id="adminTopbarTitle">Accueil</h1>
+            <p id="adminTopbarSub">Synthèse de votre activité commerciale</p>
             <p id="adminRoleBadge" class="admin-role-badge">Espace commercial externe</p>
           </div>
         </div>
@@ -57,7 +58,11 @@
         <div id="commercialScopeBanner" class="admin-preview-banner" hidden></div>
         <div id="stockAlertBanner" hidden></div>
 
-        <section id="panel-commandes" class="admin-panel">
+        <section id="panel-accueil" class="admin-panel">
+          <div id="commercialDashboardHost"><p class="empty-state">Chargement…</p></div>
+        </section>
+
+        <section id="panel-commandes" class="admin-panel" hidden>
           <div class="dashboard-card dashboard-card-wide">
             <div class="dashboard-card-head">
               <h2 id="ordersPanelTitle">Mes commandes clients</h2>

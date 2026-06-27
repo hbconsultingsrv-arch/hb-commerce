@@ -364,6 +364,39 @@
 .dash-kpi-value--warn { color: #c0392b; }
 .dash-kpi-value--ok { color: #2d6a3e; }
 
+.commercial-home-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.commercial-home-grid .dashboard-card-wide {
+  grid-column: 1 / -1;
+}
+
+.commercial-home-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--admin-text);
+}
+
+.commercial-home-list li + li {
+  margin-top: 0.45rem;
+}
+
+.dash-kpi-card .commercial-home-link {
+  margin-top: 0.65rem;
+}
+
+@media (max-width: 900px) {
+  .commercial-home-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-v2.admin-dark .dash-kpi-value--warn { color: #ff8a80; }
+
 .dash-charts-grid {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
