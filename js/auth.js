@@ -292,7 +292,23 @@ async function updateNavAuth() {
 
   if (session) {
     if (loginLink) loginLink.style.display = 'none';
-    if (accountLink) accountLink.style.display = '';
+    if (accountLink) {
+      accountLink.style.display = '';
+      accountLink.href = await getDefaultDashboardUrl(session);
+      const profile = await getProfile(session.user.id);
+      if (isCommercialAgentProfile(profile)) {
+        accountLink.setAttribute('data-i18n', 'nav.agentSpace');
+      } else if (isDriverProfile(profile)) {
+        accountLink.setAttribute('data-i18n', 'nav.driverSpace');
+      } else if (isSupplierProfile(profile)) {
+        accountLink.setAttribute('data-i18n', 'nav.supplierSpace');
+      } else if (isAdminProfile(profile)) {
+        accountLink.setAttribute('data-i18n', 'nav.adminSpace');
+      } else {
+        accountLink.setAttribute('data-i18n', 'nav.account');
+      }
+      if (typeof t === 'function') accountLink.textContent = t(accountLink.getAttribute('data-i18n'));
+    }
     if (logoutBtn) logoutBtn.style.display = '';
     if (adminLink) {
       let admin = false;

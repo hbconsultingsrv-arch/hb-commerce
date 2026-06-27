@@ -2,9 +2,13 @@ async function initDashboard() {
   const session = await requireAuth();
   if (!session) return;
 
-  bindDashboardTabs('#compteTabs .admin-tab');
-
   const profile = await getProfile(session.user.id);
+  if (profile && !['client', 'pending_company'].includes(profile.role)) {
+    window.location.href = await getDefaultDashboardUrl(session);
+    return;
+  }
+
+  bindDashboardTabs('#compteTabs .admin-tab');
   const welcomeName = document.getElementById('welcomeName');
   if (welcomeName) welcomeName.textContent = profile?.full_name || session.user.email;
 

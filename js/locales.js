@@ -4,6 +4,7 @@ const HB_DEFAULT_LANG = 'fr';
 
 const HB_LANGS = {
   fr: { native: 'Français', dir: 'ltr', market: 'fr', label: 'FR' },
+  en: { native: 'English', dir: 'ltr', market: 'fr', label: 'EN' },
   de: { native: 'Deutsch', dir: 'ltr', market: 'fr', label: 'DE' },
   lu: { native: 'Français (Luxembourg)', dir: 'ltr', market: 'lu', label: 'LU' }
 };
@@ -20,6 +21,10 @@ const HB_TRANSLATIONS = {
     'nav.trust': 'Confiance',
     'nav.brochure': 'Brochure',
     'nav.account': 'Mon compte',
+    'nav.agentSpace': 'Espace commercial',
+    'nav.driverSpace': 'Mes livraisons',
+    'nav.supplierSpace': 'Espace fournisseur',
+    'nav.adminSpace': 'Administration',
     'nav.login': 'Connexion',
     'nav.logout': 'Déconnexion',
     'nav.cart': 'Panier',
@@ -293,6 +298,10 @@ const HB_TRANSLATIONS = {
     'nav.trust': 'Confiance',
     'nav.brochure': 'Brochure',
     'nav.account': 'Mon compte',
+    'nav.agentSpace': 'Espace commercial',
+    'nav.driverSpace': 'Mes livraisons',
+    'nav.supplierSpace': 'Espace fournisseur',
+    'nav.adminSpace': 'Administration',
     'nav.login': 'Connexion',
     'nav.logout': 'Déconnexion',
     'nav.cart': 'Panier',
@@ -597,14 +606,14 @@ function setLang(code) {
     localStorage.setItem('hb_lang', code);
   } catch (e) { /* ignore */ }
   window.HB_CURRENT_LANG = code;
-  document.documentElement.lang = code === 'de' ? 'de' : 'fr';
+  document.documentElement.lang = ['de', 'en'].includes(code) ? code : 'fr';
   applyTranslations();
   if (typeof refreshLangSelectorUi === 'function') refreshLangSelectorUi();
 }
 
 function initI18n() {
   window.HB_CURRENT_LANG = getLang();
-  document.documentElement.lang = window.HB_CURRENT_LANG === 'de' ? 'de' : 'fr';
+  document.documentElement.lang = ['de', 'en'].includes(window.HB_CURRENT_LANG) ? window.HB_CURRENT_LANG : 'fr';
   applyTranslations();
 }
 
