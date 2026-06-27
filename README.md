@@ -1,6 +1,6 @@
 # HB Commerce — Commerce alimentaire en gros
 
-Site e-commerce professionnel pour **HB Commerce**, filiale de **HB Consulting & Services**.  
+Site e-commerce professionnel pour **HB Commerce**, filiale du holding **HB Groupe**.  
 Vente en gros de produits alimentaires avec espace client, commandes en ligne et paiement.
 
 **Premier produit :** FIAFI — Huile d'olive extra vierge (origine Tunisie)

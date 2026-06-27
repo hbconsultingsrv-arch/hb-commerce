@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion livreur | HB Commerce</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/commerce.css">
+</head>
+<body class="auth-page">
+  <main class="auth-main container">
+    <div class="auth-card">
+      <span class="section-tag">Logistique</span>
+      <h1>Connexion livreur</h1>
+      <p class="auth-sub">Accédez à vos courses et mettez à jour les livraisons en temps réel.</p>
+      <form id="loginForm" class="auth-form">
+        <label>E-mail professionnel <input type="email" name="email" required autocomplete="username"></label>
+        <label>Mot de passe <input type="password" name="password" required minlength="6" autocomplete="current-password"></label>
+        <button type="submit" class="btn btn-primary">Accéder à mes livraisons</button>
+        <p class="form-note" id="loginNote"></p>
+      </form>
+      <p class="form-note" style="margin-top:1rem">
+        <a href="login.html">Connexion client / admin</a> · <a href="index.html">Retour au site</a>
+      </p>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const note = document.getElementById('loginNote');
+      const fd = new FormData(e.target);
+      try {
+        const { session } = await signIn(fd.get('email'), fd.get('password'));
+        const profile = await getProfile(session.user.id);
+        if (!isDriverProfile(profile)) {
+          await signOut();
+          showAlert(note, 'Ce compte n\'est pas un accès livreur. Utilisez la connexion standard.');
+          return;
+        }
+        window.location.href = 'livreur.html';
+      } catch (err) {
+        showAlert(note, typeof mapAuthError === 'function' ? mapAuthError(err) : err.message);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -143,7 +143,7 @@ function downloadInvoice(order, profile) {
   <div class="grid">
     <section>
       <h2>HB Commerce</h2>
-      <p>HB Consulting &amp; Services<br>France</p>
+      <p>HB Groupe<br>France</p>
     </section>
     <section>
       <h2>Client</h2>

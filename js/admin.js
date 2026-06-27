@@ -13,6 +13,7 @@ let adminProductSalesMap = new Map();
 let adminPurchasePriceMap = new Map();
 let adminSupplierOrdersCache = [];
 let adminCustomerPricesCache = [];
+let adminDriversCache = [];
 
 function showAdminTab(tabId) {
   if (!tabId) return;
@@ -37,6 +38,7 @@ function showAdminTab(tabId) {
   if (tabId === 'construction' && typeof initRoadmapAdminPanel === 'function') {
     initRoadmapAdminPanel();
   }
+  if (tabId === 'livreurs') loadDriversTable();
   if (tabId === 'prix') loadCustomerPricesTable();
 }
 
@@ -85,6 +87,7 @@ async function initAdmin() {
   if (!commercialAgent) {
     await loadSuppliersTable();
     await loadProductsTable();
+    await loadDriversTable();
   }
   await loadOrdersTable();
   await loadClientsPanel();
@@ -95,6 +98,8 @@ async function initAdmin() {
   productForm?.addEventListener('submit', handleProductSubmit);
   document.getElementById('cancelProductBtn')?.addEventListener('click', resetProductForm);
   document.getElementById('adminSupplierForm')?.addEventListener('submit', handleAdminSupplierSubmit);
+  document.getElementById('adminDriverForm')?.addEventListener('submit', handleAdminDriverSubmit);
+  document.getElementById('refreshDriversBtn')?.addEventListener('click', loadDriversTable);
   document.getElementById('cancelAdminSupplierBtn')?.addEventListener('click', resetAdminSupplierForm);
   document.getElementById('refreshSuppliersBtn')?.addEventListener('click', loadSuppliersTable);
   document.getElementById('supplierOrderForm')?.addEventListener('submit', handleSupplierOrderSubmit);
@@ -538,6 +543,69 @@ function resetAdminSupplierForm() {
   activateSectionTab('panel-fournisseurs', 'liste');
 }
 
+async function loadDriversTable() {
+  const body = document.getElementById('driversBody');
+  if (!body || typeof fetchDeliveryDrivers !== 'function') return;
+  try {
+    adminDriversCache = await fetchDeliveryDrivers();
+    if (!adminDriversCache.length) {
+      body.innerHTML = '<tr><td colspan="5" class="empty-state">Aucun livreur — créez un compte ci-dessous.</td></tr>';
+      return;
+    }
+    body.innerHTML = adminDriversCache.map((d) => `
+      <tr>
+        <td><strong>${escapeHtml(d.full_name)}</strong></td>
+        <td>${escapeHtml(d.email || '—')}</td>
+        <td>${escapeHtml(d.phone || '—')}</td>
+        <td>${escapeHtml(d.vehicle_info || '—')}</td>
+        <td>${d.active !== false ? 'Oui' : 'Non'}</td>
+      </tr>
+    `).join('');
+    populateTrackingDriverSelect();
+  } catch (err) {
+    body.innerHTML = `<tr><td colspan="5">${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+async function handleAdminDriverSubmit(e) {
+  e.preventDefault();
+  const note = document.getElementById('adminDriverNote');
+  const fd = new FormData(e.target);
+  try {
+    const driver = await createDeliveryDriver({
+      full_name: fd.get('full_name'),
+      email: fd.get('email'),
+      phone: fd.get('phone') || '',
+      vehicle_info: fd.get('vehicle_info') || '',
+      active: true
+    });
+    await createDriverUser({
+      driverId: driver.id,
+      email: fd.get('email'),
+      password: fd.get('password'),
+      fullName: fd.get('full_name'),
+      phone: fd.get('phone'),
+      vehicleInfo: fd.get('vehicle_info')
+    });
+    e.target.reset();
+    showAlert(note, 'Livreur et compte créés. Connexion : login-livreur.html', 'success');
+    await loadDriversTable();
+  } catch (err) {
+    showAlert(note, typeof mapAuthError === 'function' ? mapAuthError(err) : err.message);
+  }
+}
+
+function populateTrackingDriverSelect() {
+  const select = document.getElementById('trackingDriverSelect');
+  if (!select) return;
+  const cur = select.value;
+  select.innerHTML = '<option value="">— Non assigné —</option>' +
+    adminDriversCache.filter((d) => d.active !== false).map((d) =>
+      `<option value="${d.id}">${escapeHtml(d.full_name)}</option>`
+    ).join('');
+  if (cur) select.value = cur;
+}
+
 async function handleAdminSupplierSubmit(e) {
   e.preventDefault();
   const note = document.getElementById('adminSupplierNote');
@@ -724,7 +792,11 @@ function openTrackingModal(orderId) {
   const form = document.getElementById('trackingModalForm');
   if (!order || !form) return;
 
+  populateTrackingDriverSelect();
   form.elements.order_id.value = order.id;
+  if (form.elements.assigned_driver_id) {
+    form.elements.assigned_driver_id.value = order.assigned_driver_id || '';
+  }
   form.elements.delivery_status.value = order.delivery_status || 'non_preparee';
   form.elements.carrier.value = order.carrier || '';
   form.elements.tracking_number.value = order.tracking_number || '';
@@ -748,6 +820,7 @@ async function handleTrackingModalSubmit(e) {
   }
 
   try {
+    const driverId = fd.get('assigned_driver_id') || null;
     await updateOrderTracking(orderId, {
       delivery_status: fd.get('delivery_status'),
       carrier: fd.get('carrier') || null,
@@ -755,7 +828,8 @@ async function handleTrackingModalSubmit(e) {
       tracking_url: fd.get('tracking_url') || null,
       estimated_delivery_date: fd.get('estimated_delivery_date') || null,
       delivered_at: toIsoOrNull(fd.get('delivered_at')),
-      delivery_notes: fd.get('delivery_notes') || null
+      delivery_notes: fd.get('delivery_notes') || null,
+      assigned_driver_id: driverId || null
     });
     showAlert(note, 'Suivi livraison enregistré.', 'success');
     closeAppModal('trackingModal');

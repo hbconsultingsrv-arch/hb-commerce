@@ -1,6 +1,7 @@
 -- HB Commerce — Jeu de données de demonstration
 -- =============================================================
 -- PREREQUIS : executer d'abord supabase/schema.sql (+ migrations si base existante)
+--             dont migration-delivery-drivers.sql pour l'espace livreur
 --
 -- IMPORTANT : le site (accueil, catalogue, panier) lit UNIQUEMENT la table products.
 -- Executer ce script est obligatoire pour afficher la demo multi-marques en ligne.
@@ -18,6 +19,7 @@
 --   direction@hotel-nice.demo      → client (Hotel Riviera) — agent Dubois
 --   inscription@nouvelle-societe.demo → pending_company
 --   stock@fiafi-tunisie.demo       → supplier (FIAFI Tunisie)
+--   livreur@hbcommerce.demo        → livreur (Youssef Ben Ammar)
 --
 -- Catalogue demo (produits actifs) :
 --   6 x FIAFI (huile d'olive)
@@ -52,6 +54,8 @@ declare
   v_client4 uuid := 'a0000001-0001-4001-8001-000000000014';
   v_pending uuid := 'a0000001-0001-4001-8001-000000000015';
   v_supusr  uuid := 'a0000001-0001-4001-8001-000000000021';
+  v_driver  uuid := 'a0000001-0001-4001-8001-000000000031';
+  v_driver_ent uuid := 'd0000001-0001-4001-8001-000000000001';
   v_supplier uuid := 'b0000001-0001-4001-8001-000000000001';
   v_supplier2 uuid := 'b0000001-0001-4001-8001-000000000002';
   v_supplier3 uuid := 'b0000001-0001-4001-8001-000000000003';
@@ -80,16 +84,17 @@ begin
   delete from public.product_stocks where supplier_id in (v_supplier, v_supplier2, v_supplier3);
   delete from public.profiles where id in (
     v_super, v_admin, v_agent1, v_agent2,
-    v_client1, v_client2, v_client3, v_client4, v_pending, v_supusr
+    v_client1, v_client2, v_client3, v_client4, v_pending, v_supusr, v_driver
   );
   delete from auth.identities where user_id in (
     v_super, v_admin, v_agent1, v_agent2,
-    v_client1, v_client2, v_client3, v_client4, v_pending, v_supusr
+    v_client1, v_client2, v_client3, v_client4, v_pending, v_supusr, v_driver
   );
   delete from auth.users where id in (
     v_super, v_admin, v_agent1, v_agent2,
-    v_client1, v_client2, v_client3, v_client4, v_pending, v_supusr
+    v_client1, v_client2, v_client3, v_client4, v_pending, v_supusr, v_driver
   );
+  delete from public.delivery_drivers where id = v_driver_ent;
   delete from public.suppliers where id in (v_supplier, v_supplier2, v_supplier3);
 
   -- -------------------------------------------------------------------------
@@ -163,7 +168,8 @@ begin
     (v_instance_id, v_client3, 'authenticated', 'authenticated', 'commandes@epicerie-bdx.demo',      v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Pierre Durand","company":"Epicerie Bordeaux Sud"}', now(), now(), '', '', '', '', false, false),
     (v_instance_id, v_client4, 'authenticated', 'authenticated', 'direction@hotel-nice.demo',        v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Isabelle Moreau","company":"Hotel Riviera Nice"}', now(), now(), '', '', '', '', false, false),
     (v_instance_id, v_pending, 'authenticated', 'authenticated', 'inscription@nouvelle-societe.demo', v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Nouveau Contact","company":"Societe En Attente SAS"}', now(), now(), '', '', '', '', false, false),
-    (v_instance_id, v_supusr,  'authenticated', 'authenticated', 'stock@fiafi-tunisie.demo',         v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Karim Ben Salah","company":"FIAFI Tunisie"}', now(), now(), '', '', '', '', false, false);
+    (v_instance_id, v_supusr,  'authenticated', 'authenticated', 'stock@fiafi-tunisie.demo',         v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Karim Ben Salah","company":"FIAFI Tunisie"}', now(), now(), '', '', '', '', false, false),
+    (v_instance_id, v_driver,  'authenticated', 'authenticated', 'livreur@hbcommerce.demo',        v_pwd, now(), now(), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Youssef Ben Ammar","company":"Livreur HB Commerce"}', now(), now(), '', '', '', '', false, false);
 
   -- id = user_id obligatoire pour que Supabase Auth accepte la connexion
   insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
@@ -171,22 +177,35 @@ begin
     jsonb_build_object('sub', u.id::text, 'email', u.email, 'email_verified', true),
     'email', u.id::text, now(), now(), now()
   from auth.users u
-  where u.id in (v_super, v_admin, v_agent1, v_agent2, v_client1, v_client2, v_client3, v_client4, v_pending, v_supusr);
+  where u.id in (v_super, v_admin, v_agent1, v_agent2, v_client1, v_client2, v_client3, v_client4, v_pending, v_supusr, v_driver);
+
+  insert into public.delivery_drivers (
+    id, full_name, email, phone, vehicle_info, active, notes
+  ) values (
+    v_driver_ent,
+    'Youssef Ben Ammar',
+    'livreur@hbcommerce.demo',
+    '+33 6 55 55 55 55',
+    'Fourgon Renault Master — AB-123-CD',
+    true,
+    'Livreur demo Ile-de-France / Rhone-Alpes'
+  );
 
   -- Profils (le trigger handle_new_user a deja cree des profils basiques — on les met a jour)
   insert into public.profiles (
-    id, email, full_name, phone, address, company, siren, vat_number, role, commercial_agent_id, supplier_id
+    id, email, full_name, phone, address, company, siren, vat_number, role, commercial_agent_id, supplier_id, driver_id
   ) values
-    (v_super,   'super@hbcommerce.demo',           'Super Root HB',      '+33 1 00 00 01', '10 rue du Commerce, Paris',       'HB Commerce',              null,       null,          'super_root',       null,     null),
-    (v_admin,   'admin@hbcommerce.demo',           'Admin HB Commerce',  '+33 1 00 00 02', '10 rue du Commerce, Paris',       'HB Commerce',              null,       null,          'admin',            null,     null),
-    (v_agent1,  'agent.martin@hbcommerce.demo',    'Jean Martin',        '+33 6 11 11 11 11', '10 rue du Commerce, Paris',    'HB Commerce',              null,       null,          'agent_commercial', null,     null),
-    (v_agent2,  'agent.dubois@hbcommerce.demo',    'Sophie Dubois',      '+33 6 22 22 22 22', '10 rue du Commerce, Paris',    'HB Commerce',              null,       null,          'agent_commercial', null,     null),
-    (v_client1, 'contact@restaurant-paris.demo',   'Ahmed Benali',       '+33 1 44 00 00 01', '12 avenue de la Republique, 75011 Paris', 'Restaurant Le Jasmin', '832123456', 'FR45832123456', 'client', v_agent1, null),
-    (v_client2, 'achats@traiteur-lyon.demo',       'Marie Leroy',        '+33 4 78 00 00 02', '45 rue Merciere, 69002 Lyon',     'Traiteur Lyon Gourmet',    '801234567', 'FR80801234567', 'client', v_agent1, null),
-    (v_client3, 'commandes@epicerie-bdx.demo',     'Pierre Durand',      '+33 5 56 00 00 03', '8 cours Victor Hugo, 33000 Bordeaux', 'Epicerie Bordeaux Sud', '902345678', 'FR90902345678', 'client', v_agent2, null),
-    (v_client4, 'direction@hotel-nice.demo',       'Isabelle Moreau',    '+33 4 93 00 00 04', '15 promenade des Anglais, 06000 Nice', 'Hotel Riviera Nice',  '753456789', 'FR75753456789', 'client', v_agent2, null),
-    (v_pending, 'inscription@nouvelle-societe.demo','Nouveau Contact',    '+33 1 99 99 99 99', '1 rue Test, 75001 Paris',         'Societe En Attente SAS',   '999888777', 'FR99988877766', 'pending_company', null, null),
-    (v_supusr,  'stock@fiafi-tunisie.demo',        'Karim Ben Salah',    '+216 71 000 000',   'Zone industrielle Mornag, Tunisie', 'FIAFI Tunisie',        '000123456', 'TN000123456',   'supplier', null, v_supplier)
+    (v_super,   'super@hbcommerce.demo',           'Super Root HB',      '+33 1 00 00 01', '10 rue du Commerce, Paris',       'HB Commerce',              null,       null,          'super_root',       null,     null, null),
+    (v_admin,   'admin@hbcommerce.demo',           'Admin HB Commerce',  '+33 1 00 00 02', '10 rue du Commerce, Paris',       'HB Commerce',              null,       null,          'admin',            null,     null, null),
+    (v_agent1,  'agent.martin@hbcommerce.demo',    'Jean Martin',        '+33 6 11 11 11 11', '10 rue du Commerce, Paris',    'HB Commerce',              null,       null,          'agent_commercial', null,     null, null),
+    (v_agent2,  'agent.dubois@hbcommerce.demo',    'Sophie Dubois',      '+33 6 22 22 22 22', '10 rue du Commerce, Paris',    'HB Commerce',              null,       null,          'agent_commercial', null,     null, null),
+    (v_client1, 'contact@restaurant-paris.demo',   'Ahmed Benali',       '+33 1 44 00 00 01', '12 avenue de la Republique, 75011 Paris', 'Restaurant Le Jasmin', '832123456', 'FR45832123456', 'client', v_agent1, null, null),
+    (v_client2, 'achats@traiteur-lyon.demo',       'Marie Leroy',        '+33 4 78 00 00 02', '45 rue Merciere, 69002 Lyon',     'Traiteur Lyon Gourmet',    '801234567', 'FR80801234567', 'client', v_agent1, null, null),
+    (v_client3, 'commandes@epicerie-bdx.demo',     'Pierre Durand',      '+33 5 56 00 00 03', '8 cours Victor Hugo, 33000 Bordeaux', 'Epicerie Bordeaux Sud', '902345678', 'FR90902345678', 'client', v_agent2, null, null),
+    (v_client4, 'direction@hotel-nice.demo',       'Isabelle Moreau',    '+33 4 93 00 00 04', '15 promenade des Anglais, 06000 Nice', 'Hotel Riviera Nice',  '753456789', 'FR75753456789', 'client', v_agent2, null, null),
+    (v_pending, 'inscription@nouvelle-societe.demo','Nouveau Contact',    '+33 1 99 99 99 99', '1 rue Test, 75001 Paris',         'Societe En Attente SAS',   '999888777', 'FR99988877766', 'pending_company', null, null, null),
+    (v_supusr,  'stock@fiafi-tunisie.demo',        'Karim Ben Salah',    '+216 71 000 000',   'Zone industrielle Mornag, Tunisie', 'FIAFI Tunisie',        '000123456', 'TN000123456',   'supplier', null, v_supplier, null),
+    (v_driver,  'livreur@hbcommerce.demo',         'Youssef Ben Ammar',  '+33 6 55 55 55 55', '10 rue du Commerce, Paris',       'Livreur HB Commerce',  null,       null,          'livreur',  null,     null, v_driver_ent)
   on conflict (id) do update set
     email = excluded.email,
     full_name = excluded.full_name,
@@ -197,7 +216,8 @@ begin
     vat_number = excluded.vat_number,
     role = excluded.role,
     commercial_agent_id = excluded.commercial_agent_id,
-    supplier_id = excluded.supplier_id;
+    supplier_id = excluded.supplier_id,
+    driver_id = excluded.driver_id;
 
   -- -------------------------------------------------------------------------
   -- Catalogue demo : huiles (FIAFI, TOUNSI) + autres produits alimentaires
@@ -337,22 +357,22 @@ begin
   insert into public.orders (
     id, user_id, total, status, payment_method, shipping_address,
     delivery_status, carrier, tracking_number, tracking_url,
-    estimated_delivery_date, delivered_at, delivery_notes, notes, created_at
+    estimated_delivery_date, delivered_at, delivery_notes, notes, assigned_driver_id, created_at
   ) values
     (v_order1, v_client1, 153.60,  'livree',              'virement', '12 avenue de la Republique, 75011 Paris',
      'livree', 'DHL Freight', 'DHL-FR-778899', 'https://www.dhl.com/fr-fr/home/tracking.html',
-     current_date - 10, now() - interval '8 days', 'Livraison entrepot arriere', 'Commande mensuelle restaurant', now() - interval '20 days'),
+     current_date - 10, now() - interval '8 days', 'Livraison entrepot arriere', 'Commande mensuelle restaurant', null, now() - interval '20 days'),
     (v_order2, v_client1, 94.80,   'en_preparation',      'virement', '12 avenue de la Republique, 75011 Paris',
-     'preparation', null, null, null, current_date + 4, null, null, 'Reassort metallique 5L', now() - interval '3 days'),
+     'preparation', null, null, null, current_date + 4, null, null, 'Reassort metallique 5L', v_driver_ent, now() - interval '3 days'),
     (v_order3, v_client2, 246.00,  'payee',               'stripe',   '45 rue Merciere, 69002 Lyon',
-     'expediee', 'Chronopost Pro', 'CP-55667788', 'https://www.chronopost.fr/tracking-no-cms/suivi-page',
-     current_date + 2, null, 'Palette filmee', 'Commande traiteur evenementiel', now() - interval '7 days'),
+     'en_transit', 'Chronopost Pro', 'CP-55667788', 'https://www.chronopost.fr/tracking-no-cms/suivi-page',
+     current_date + 2, null, 'Palette filmee', 'Commande traiteur evenementiel', v_driver_ent, now() - interval '7 days'),
     (v_order4, v_client3, 270.00,  'validee',             'cheque',   '8 cours Victor Hugo, 33000 Bordeaux',
-     'non_preparee', null, null, null, current_date + 6, null, null, 'En attente cheque', now() - interval '2 days'),
+     'prete', null, null, null, current_date + 6, null, null, 'En attente cheque', v_driver_ent, now() - interval '2 days'),
     (v_order5, v_client4, 129.60,  'en_attente_paiement', 'virement', '15 promenade des Anglais, 06000 Nice',
-     'non_preparee', null, null, null, current_date + 8, null, null, 'Devis premium hotel', now() - interval '1 day'),
+     'non_preparee', null, null, null, current_date + 8, null, null, 'Devis premium hotel', null, now() - interval '1 day'),
     (v_order6, v_client3, 176.00,  'annulee',             'virement', '8 cours Victor Hugo, 33000 Bordeaux',
-     'retour', null, null, null, null, null, 'Annulee par le client', 'Test commande annulee', now() - interval '15 days');
+     'retour', null, null, null, null, null, 'Annulee par le client', 'Test commande annulee', null, now() - interval '15 days');
 
   insert into public.order_items (order_id, product_id, product_name, quantity, unit_price, unit) values
     (v_order1, 'fiafi-metallique-5l', 'FIAFI — Metallique 5L', 24, 4.20, 'litre'),
