@@ -97,6 +97,80 @@
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
+  min-width: 0;
+}
+
+.nav-account-link {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.nav-more-wrap {
+  position: relative;
+}
+
+.nav-more-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.2s, background 0.2s;
+}
+
+.nav-more-trigger:hover,
+.nav-more-wrap.is-open .nav-more-trigger {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.nav-more-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 240px;
+  list-style: none;
+  margin: 0;
+  padding: 0.45rem;
+  background: rgba(20, 32, 24, 0.98);
+  border: 1px solid rgba(201, 162, 39, 0.22);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  z-index: 600;
+}
+
+.nav-more-wrap.is-open .nav-more-menu {
+  display: block;
+}
+
+.nav-more-menu a {
+  display: block;
+  padding: 0.55rem 0.85rem;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.nav-more-menu a::after {
+  display: none !important;
+}
+
+.nav-more-menu a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
 }
 
 .nav-logout-btn {
@@ -840,6 +914,19 @@
     right: 0;
     background: rgba(26, 34, 28, 0.98);
     padding: 1rem;
+  }
+  .nav-more-menu {
+    position: static;
+    transform: none;
+    min-width: 0;
+    width: 100%;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0.25rem 0 0 0.75rem;
+  }
+  .nav-more-wrap:not(.is-open) .nav-more-menu {
+    display: none;
   }
   .hero-stats-row { grid-template-columns: 1fr 1fr; }
   .services-promo-grid,

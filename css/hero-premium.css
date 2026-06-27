@@ -30,13 +30,16 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 
+.hero-commerce .site-nav .logo-hb-brand {
+  flex-shrink: 0;
+}
+
 .hero-commerce .site-nav .nav-links {
-  flex: 1;
+  flex: 1 1 auto;
   justify-content: center;
   flex-wrap: nowrap;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  min-width: 0;
+  overflow: visible;
 }
 
 .hero-commerce .site-nav .nav-links::-webkit-scrollbar {
@@ -49,10 +52,9 @@
   padding: 0.4rem 0.6rem;
 }
 
-@media (max-width: 1100px) {
-  .hero-commerce .site-nav .nav-links li:nth-child(n+5):not(#navAccount):not(#navLogin):not(#navLogout) {
-    display: none;
-  }
+.hero-commerce .site-nav .nav-more-trigger {
+  font-size: 0.82rem;
+  padding: 0.4rem 0.6rem;
 }
 
 /* Hero global — surcharge commerce.css :has(.hero-hb-inner) */

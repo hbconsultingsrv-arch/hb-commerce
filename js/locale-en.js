@@ -25,6 +25,7 @@
     'nav.cart': 'Cart',
     'nav.market': 'Country',
     'nav.language': 'Language',
+    'nav.more': 'More',
     'hero.kicker': 'B2B Platform · HB Groupe',
     'hero.ribbon': 'Origin Tunisia',
     'hero.title': 'Professional food distribution',

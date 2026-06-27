@@ -25,6 +25,7 @@
     'nav.cart': 'Warenkorb',
     'nav.market': 'Land',
     'nav.language': 'Sprache',
+    'nav.more': 'Mehr',
     'hero.kicker': 'B2B-Plattform · HB Groupe',
     'hero.ribbon': 'Herkunft Tunesien',
     'hero.title': 'Professioneller Lebensmittelgroßhandel',

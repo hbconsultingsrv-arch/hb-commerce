@@ -13,8 +13,8 @@
   <link rel="stylesheet" href="css/hero-3d.css?v=hero-slider-20260624">
   <link rel="stylesheet" href="css/stock.css?v=stock-20260619">
   <link rel="stylesheet" href="css/brochure.css?v=home-20260619">
-  <link rel="stylesheet" href="css/hb-front.css?v=front-v4-20260629">
-  <link rel="stylesheet" href="css/hero-premium.css?v=hero-premium-20260624">
+  <link rel="stylesheet" href="css/hb-front.css?v=front-v5-20260630">
+  <link rel="stylesheet" href="css/hero-premium.css?v=hero-nav-20260630">
   <link rel="stylesheet" href="css/hb-b2b.css?v=b2b-20260624">
   <link rel="stylesheet" href="css/hb-site-depth.css?v=depth-20260624">
   <link rel="stylesheet" href="css/hb-theme-light.css?v=theme-20260615">
@@ -56,15 +56,23 @@
         <li><a href="#produits" data-i18n="nav.products">Catalogue</a></li>
         <li><a href="#services" data-i18n="nav.services">Services</a></li>
         <li><a href="#confiance" data-i18n="nav.trust">Confiance</a></li>
-        <li><a href="paiement-facturation.html" data-i18n="footer.payment">Paiement</a></li>
-        <li><a href="#faq" data-i18n="section.faq">FAQ</a></li>
-        <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
-        <li><a href="#" id="brochureLink" data-i18n="nav.brochure">Brochure</a></li>
-        <li id="navAccount" style="display:none"><a href="compte.html" class="nav-icon-btn nav-account-link" data-i18n="nav.account">Mon compte</a></li>
-        <li id="navAdmin" style="display:none"><a href="admin.html" class="nav-icon-btn">Admin</a></li>
-        <li id="navLogin"><a href="login.html" class="nav-icon-btn nav-account-link" data-i18n="nav.login">Connexion</a></li>
+        <li class="nav-more-wrap">
+          <button type="button" class="nav-more-trigger" aria-haspopup="menu" aria-expanded="false">
+            <span data-i18n="nav.more">Plus</span>
+            <span aria-hidden="true">▾</span>
+          </button>
+          <ul class="nav-more-menu" role="menu">
+            <li role="none"><a href="paiement-facturation.html" role="menuitem" data-i18n="footer.payment">Paiement &amp; Facturation</a></li>
+            <li role="none"><a href="#faq" role="menuitem" data-i18n="section.faq">Questions fréquentes</a></li>
+            <li role="none"><a href="#contact" role="menuitem" data-i18n="nav.contact">Contact</a></li>
+            <li role="none"><a href="#" id="brochureLink" role="menuitem" data-i18n="nav.brochure">Brochure</a></li>
+          </ul>
+        </li>
       </ul>
       <div class="site-nav-actions">
+        <a href="login.html" id="navLogin" class="nav-icon-btn nav-account-link" data-i18n="nav.login">Connexion</a>
+        <a href="compte.html" id="navAccount" class="nav-icon-btn nav-account-link" style="display:none" data-i18n="nav.account">Mon compte</a>
+        <a href="admin.html" id="navAdmin" class="nav-icon-btn" style="display:none">Admin</a>
         <a href="#" id="navLogout" class="nav-icon-btn nav-logout-btn" style="display:none" data-i18n="nav.logout">Déconnexion</a>
         <button type="button" id="siteThemeToggleBtn" class="nav-icon-btn nav-theme-toggle" aria-label="Passer en mode clair" title="Mode clair">☀️</button>
         <div id="langSelector" class="lang-switcher" aria-label="Langue"></div>
@@ -636,8 +644,8 @@
   <script src="js/hb-site-depth-bg.js?v=depth-20260624"></script>
   <script src="js/hero-cube.js?v=hero-slider-20260624"></script>
   <script src="js/main.js?v=front-v3-20260624"></script>
-  <script src="js/market-ui.js?v=front-v5-20260629"></script>
-  <script src="js/hb-front.js?v=front-v3-20260624"></script>
+  <script src="js/market-ui.js?v=front-v5-20260630"></script>
+  <script src="js/hb-front.js?v=front-v5-20260630"></script>
   <script src="js/quote-request.js?v=b2b-20260624"></script>
   <script src="js/b2b-ui.js?v=b2b-20260624"></script>
   <script src="js/theme-toggle.js?v=theme-20260615"></script>
