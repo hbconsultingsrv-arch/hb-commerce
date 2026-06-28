@@ -34,7 +34,7 @@ Comptes principaux : `super@hbcommerce.demo`, `admin@hbcommerce.demo`, `contact@
 | `checkout.html` | Finalisation et paiement |
 | `login.html` | Connexion |
 | `register.html` | Inscription professionnelle |
-| `compte.html` | Espace client (profil + commandes) |
+| `compte.html` | Espace client (profil, commandes, agent assigné, chat) |
 | `agent.html` | Espace agent commercial (clients, commandes, livraison) |
 | `admin.html` | Dashboard admin RH (produits, stock, Équipe HB, …) |
 | `super-root.html` | Dashboard super root (comptes HB + livreur) |
@@ -47,7 +47,8 @@ Comptes principaux : `super@hbcommerce.demo`, `admin@hbcommerce.demo`, `contact@
 Le site est hébergé sur **GitHub Pages** (gratuit). Les données passent par **Supabase** (gratuit) :
 
 - Authentification e-mail / mot de passe
-- Profil client : nom, société, e-mail, téléphone, adresse
+- Profil client : nom, société, e-mail, téléphone, adresse, **photo de profil (avatar)**
+- Affichage session dans la navigation (prénom + avatar après connexion)
 - Catalogue produits dynamique
 - Commandes avec suivi de statut
 - Dashboard admin RH pour validation des commandes, Équipe HB et chat sociétés
@@ -85,6 +86,7 @@ hb-commerce/
 ├── js/
 │   ├── config.js          ← clés Supabase + Stripe
 │   ├── auth.js
+│   ├── profile-avatar-upload.js
 │   ├── products.js
 │   ├── cart.js
 │   ├── checkout.js

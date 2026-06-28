@@ -27,6 +27,26 @@ async function getSession() {
   return session;
 }
 
+/** Session utilisable pour l'UI : vérifie le JWT (évite token localStorage expiré après déconnexion). */
+async function resolveNavSession() {
+  const sb = getSupabase();
+  if (!sb) return null;
+
+  const { data: { session }, error: sessionError } = await sb.auth.getSession();
+  if (sessionError || !session) return null;
+
+  const { data: { user }, error: userError } = await sb.auth.getUser();
+  if (userError || !user) {
+    console.warn('resolveNavSession: session invalide, nettoyage local', userError?.message || userError);
+    try {
+      await sb.auth.signOut({ scope: 'local' });
+    } catch (_) { /* ignore */ }
+    return null;
+  }
+
+  return session;
+}
+
 async function requireAuth(redirectTo = 'login.html') {
   const session = await getSession();
   if (!session) {
@@ -74,7 +94,15 @@ async function signUp({ email, password, fullName, phone, company, address, sire
 
 async function signOut() {
   const sb = getSupabase();
-  if (sb) await sb.auth.signOut();
+  if (sb) {
+    try {
+      await sb.auth.signOut({ scope: 'global' });
+    } catch (_) {
+      try {
+        await sb.auth.signOut({ scope: 'local' });
+      } catch (_) { /* ignore */ }
+    }
+  }
   clearSessionUserDisplay();
   window.location.href = 'index.html';
 }
@@ -119,14 +147,22 @@ function isBackofficeProfile(profile) {
   return isAdminProfile(profile) || isCommercialAgentProfile(profile);
 }
 
-async function getDefaultDashboardUrl(session) {
+async function getDefaultDashboardUrl(session, profile = undefined) {
   if (!session?.user?.id) return 'compte.html';
-  const profile = await getProfile(session.user.id);
-  if (isSuperRootProfile(profile)) return 'super-root.html';
-  if (isAdminProfile(profile)) return 'admin.html';
-  if (isCommercialAgentProfile(profile)) return 'agent.html';
-  if (isSupplierProfile(profile)) return 'supplier.html';
-  if (isDriverProfile(profile)) return 'livreur.html';
+  let userProfile = profile;
+  if (!userProfile) {
+    try {
+      userProfile = await getProfile(session.user.id);
+    } catch (err) {
+      console.warn('getDefaultDashboardUrl:', err.message);
+      return 'compte.html';
+    }
+  }
+  if (isSuperRootProfile(userProfile)) return 'super-root.html';
+  if (isAdminProfile(userProfile)) return 'admin.html';
+  if (isCommercialAgentProfile(userProfile)) return 'agent.html';
+  if (isSupplierProfile(userProfile)) return 'supplier.html';
+  if (isDriverProfile(userProfile)) return 'livreur.html';
   return 'compte.html';
 }
 
@@ -256,7 +292,7 @@ async function applySessionUserDisplay(profile, session) {
     }
   }
 
-  const dashboardUrl = await getDefaultDashboardUrl(session);
+  const dashboardUrl = await getDefaultDashboardUrl(session, userProfile);
   const subtitle = userProfile?.company && userProfile.company !== profileDisplayName(userProfile, session)
     ? userProfile.company
     : (userProfile?.email || session.user?.email || '');
@@ -438,22 +474,43 @@ function bindAppModal(modalId) {
   });
 }
 
+function syncNavLoginFallbacks(hasSession) {
+  const menuItem = document.getElementById('navLoginMenuItem');
+  if (menuItem) menuItem.hidden = !!hasSession;
+}
+
+let navAuthUpdateSeq = 0;
+
 async function updateNavAuth() {
+  const seq = ++navAuthUpdateSeq;
   const loginLink = document.getElementById('navLogin');
   const accountLink = document.getElementById('navAccount');
   const adminLink = document.getElementById('navAdmin');
   const logoutBtn = document.getElementById('navLogout');
   const cartBadge = document.getElementById('cartBadge');
 
-  const session = await getSession();
+  const session = await resolveNavSession();
+  if (seq !== navAuthUpdateSeq) return;
+
   await refreshPriceVisibility(session);
+  if (seq !== navAuthUpdateSeq) return;
 
   if (session) {
+    let profile = null;
+    try {
+      profile = await getProfile(session.user.id);
+    } catch (err) {
+      console.warn('updateNavAuth: profil inaccessible', err.message);
+    }
+    if (seq !== navAuthUpdateSeq) return;
+
+    const dashboardUrl = await getDefaultDashboardUrl(session, profile);
+    if (seq !== navAuthUpdateSeq) return;
+
     if (loginLink) loginLink.style.display = 'none';
-    const profile = await getProfile(session.user.id);
     if (accountLink) {
       accountLink.style.display = '';
-      accountLink.href = await getDefaultDashboardUrl(session);
+      accountLink.href = dashboardUrl;
       if (isCommercialAgentProfile(profile)) {
         accountLink.setAttribute('data-i18n', 'nav.agentSpace');
       } else if (isDriverProfile(profile)) {
@@ -469,7 +526,15 @@ async function updateNavAuth() {
         accountLink.textContent = t(accountLink.getAttribute('data-i18n'));
       }
     }
-    await applySessionUserDisplay(profile, session);
+    try {
+      await applySessionUserDisplay(profile, session);
+    } catch (err) {
+      console.warn('updateNavAuth: affichage session', err.message);
+    }
+    if (seq !== navAuthUpdateSeq) return;
+
+    syncNavLoginFallbacks(true);
+
     if (logoutBtn) logoutBtn.style.display = '';
     if (adminLink) {
       let admin = false;
@@ -480,11 +545,20 @@ async function updateNavAuth() {
     }
   } else {
     clearSessionUserDisplay();
-    if (loginLink) loginLink.style.display = '';
+    if (loginLink) {
+      loginLink.hidden = false;
+      loginLink.style.display = '';
+    }
     if (accountLink) accountLink.style.display = 'none';
     if (adminLink) adminLink.style.display = 'none';
     if (logoutBtn) logoutBtn.style.display = 'none';
+    syncNavLoginFallbacks(false);
   }
+
+  if (seq !== navAuthUpdateSeq) return;
+
+  document.documentElement.classList.remove('nav-auth-pending');
+  document.documentElement.classList.add(session ? 'nav-auth-session' : 'nav-auth-guest');
 
   if (cartBadge && typeof getCartCount === 'function') {
     const count = getCartCount();
@@ -542,18 +616,19 @@ function bindPasswordToggles() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  document.documentElement.classList.add('nav-auth-pending');
   bindMobileNav();
   bindPasswordToggles();
   updateNavAuth();
 
-  window.addEventListener('pageshow', (event) => {
-    if (event.persisted) updateNavAuth();
+  window.addEventListener('pageshow', () => {
+    updateNavAuth();
   });
 
   const sb = getSupabase();
   if (sb?.auth?.onAuthStateChange) {
     sb.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_OUT' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      if (event === 'SIGNED_OUT' || event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
         updateNavAuth();
       }
     });

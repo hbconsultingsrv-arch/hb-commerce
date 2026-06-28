@@ -1,7 +1,7 @@
 # Fonctionnalités et règles — HB Commerce (document maître)
 
 **Projet :** HB Commerce — HB Groupe  
-**Dernière mise à jour :** 30/06/2026  
+**Dernière mise à jour :** 19/06/2026  
 **Site demo :** https://hbconsultingsrv-arch.github.io/hb-commerce/
 
 Ce document **fusionne et remplace** le contenu fonctionnel/règles des fichiers :
@@ -27,6 +27,7 @@ Ce document **fusionne et remplace** le contenu fonctionnel/règles des fichiers
 | 1.6 | 30/06/2026 | Séparation espace agent (`agent.html`) / admin RH, i18n FR·DE·EN, nav « Plus » |
 | 1.7 | 30/06/2026 | Agent : créer client, créer commande client, logistique livraison, livreur dans Super root |
 | 1.8 | 30/06/2026 | Migrations livreurs consolidées, redirection rôles métier hors `compte.html` |
+| 1.9 | 19/06/2026 | Profil (nom + photo), agent assigné côté client, correction nav Connexion après déconnexion |
 
 ---
 
@@ -241,8 +242,13 @@ Nouvelle marque en admin = nouveau bloc automatique à l'accueil.
 | Liens principaux | Accueil, Catalogue, Services, Confiance |
 | Menu **Plus** (déroulant) | Paiement & Facturation, FAQ, Contact, Brochure |
 | Compte / Connexion | Zone droite (`site-nav-actions`) — texte non tronqué |
-| Langues | **FR · DE · EN** (`js/locale-de.js`, `js/locale-en.js`, `js/locales.js`) |
+| État connecté (vitrine) | `#navAccount` : prénom + avatar (`nav-account-link--with-avatar`) ; `#navLogout` visible ; `#navLogin` masqué |
+| État déconnecté | `#navLogin` visible (« Connexion ») ; `#navAccount`, `#navLogout` masqués ; chip `#sessionUserChip` vidé |
+| Vitrine vs dashboards | Sur `index.html`, pas de chip utilisateur dupliqué — seul `#navAccount` affiche la session |
+| Après déconnexion | `signOut()` → `clearSessionUserDisplay()` ; resync via `updateNavAuth()` + `pageshow` (bfcache) + `onAuthStateChange` |
+| i18n nav | `applyTranslations()` ne doit pas écraser les avatars ni les icônes SVG (`enhanceNavIcons`) |
 | Pays / marché | **Plus de sélecteur LU/FR** dans la barre ; marché fixe France (`js/markets.js`) |
+| Langues | **FR · DE · EN** (`js/locale-de.js`, `js/locale-en.js`, `js/locales.js`) |
 
 ---
 
@@ -383,10 +389,28 @@ Disponible dans **`admin.html`** (toutes commandes) et **`agent.html`** (command
 | Stock | Déduction via `admin-api-stock.js` si configuré |
 | RLS | Policies `Commercial agent insert assigned client orders` + `order_items` |
 
-### Côté client
+### Côté client (`compte.html`)
 
-- Suivi commandes et livraison dans `compte.html`
-- Factures téléchargeables
+| Fonction | Détail |
+|----------|--------|
+| Commandes | Suivi statut + livraison |
+| Factures | Téléchargement PDF |
+| Profil société | Formulaire `#profileForm` (nom, société, téléphone, adresse) |
+| **Photo de profil** | Upload avatar (`#profileAvatarUpload`) → Storage bucket `profile-avatars`, colonne `profiles.avatar_url` |
+| **Agent commercial assigné** | Carte `#commercialAgentContact` : nom agent + bouton « Chat avec mon agent » (`#openAgentChatBtn`) |
+| Chat société | Messages modérés ; libellés personnalisés avec le nom de l'agent si assigné |
+| En-tête accueil | `#welcomeAvatar` + `#welcomeUserName` après connexion |
+
+**Migrations Supabase :**
+
+- `migration-client-read-assigned-agent.sql` — RLS client → lecture profil agent assigné
+- `migration-profile-avatar.sql` — colonne `avatar_url` + policies Storage
+
+**Affichage session (nav + dashboards) :**
+
+- Initiales ou photo (`buildUserAvatarHtml`, `user-avatar--xs`)
+- `#sessionUserChip` sur pages back-office ; masqué sur `index.html` (évite doublon avec `#navAccount`)
+- Fonctions : `applySessionUserDisplay()`, `clearSessionUserDisplay()`, `updateNavAuth()` dans `js/auth.js`
 
 ---
 
@@ -492,7 +516,7 @@ Migration associée : `supabase/migration-business-expenses.sql`
 | Checkout | `checkout.html` | Paiement |
 | Connexion | `login.html` | Auth |
 | Inscription | `register.html` | Création société |
-| Espace client | `compte.html` | Commandes, chat, factures |
+| Espace client | `compte.html` | Commandes, chat, factures, agent assigné, photo profil |
 | **Espace agent** | **`agent.html`** | Portefeuille commercial externe |
 | Admin (RH) | `admin.html` | Back-office global |
 | Super root | `super-root.html` | Comptes HB (+ livreur) |
@@ -532,7 +556,10 @@ Migration associée : `supabase/migration-business-expenses.sql`
     - *Alternative en 3 fichiers (ordre strict) :* `migration-delivery-drivers.sql` → `migration-agent-driver-assignment.sql` → `migration-agent-order-create.sql`
 15. `migration-agent-commercial-capabilities.sql` (agent crée client assigné)
 16. `migration-profile-livreur-admin.sql` (si rôle livreur absent du CHECK)
-17. **`seed-demo-data.sql`**
+17. **`migration-fix-profiles-rls-recursion.sql`** (si erreur « infinite recursion detected in policy for relation profiles »)
+18. **`migration-client-read-assigned-agent.sql`** (carte agent commercial côté client)
+19. **`migration-profile-avatar.sql`** (photo de profil + bucket Storage)
+20. **`seed-demo-data.sql`**
 
 > **Erreur fréquente :** exécuter `migration-agent-driver-assignment.sql` **sans** avoir créé la table `delivery_drivers` → utiliser le script **§14 complet** ci-dessus.
 
@@ -577,7 +604,9 @@ python scripts/patch-docs-demo.py
 | Collaborateur GitHub | Invitation manuelle si `gh` CLI absent |
 | Demo SQL | Ré-exécutable (nettoyage UUID fixes) |
 | i18n | Clés `data-i18n` ; fichiers `locales.js`, `locale-de.js`, `locale-en.js` |
-| Nav accueil | Menu **Plus** ; pas de défilement horizontal qui tronque les liens |
+| Nav accueil | Menu **Plus** ; pas de défilement horizontal qui tronque les liens ; bouton **Connexion** toujours visible après déconnexion |
+| Profil avatar | Bucket `profile-avatars` ; migration `migration-profile-avatar.sql` obligatoire |
+| Agent client | Carte agent dans `compte.html` ; migration `migration-client-read-assigned-agent.sql` |
 | Agent commande | `user_id` = client ; policies INSERT agent sur `orders` / `order_items` |
 
 ---
@@ -610,7 +639,8 @@ python scripts/patch-docs-demo.py
 | Super root | `super-root.html`, `js/super-root.js`, `js/driver-api.js` |
 | Livreur | `livreur.html`, `js/livreur.js`, `js/driver-api.js` |
 | Fournisseur | `supplier.html`, `js/supplier.js` |
-| Auth / routing | `js/auth.js` (`getDefaultDashboardUrl`, `updateNavAuth`) |
+| Espace client | `compte.html`, `js/dashboard.js`, `js/profile-avatar-upload.js` |
+| Auth / routing | `js/auth.js` (`getDefaultDashboardUrl`, `updateNavAuth`, `clearSessionUserDisplay`, `applySessionUserDisplay`) |
 | Chat | `js/admin.js`, `migration-chat-moderation-policies.sql` |
 | Migrations livreurs | `supabase/migration-livreurs-setup-complete.sql` |
 | Demo SQL | `supabase/seed-demo-data.sql` |
@@ -618,4 +648,4 @@ python scripts/patch-docs-demo.py
 
 ---
 
-*Document maître v1.8 — HB Commerce / HB Groupe — 30/06/2026*
+*Document maître v1.9 — HB Commerce / HB Groupe — 19/06/2026*

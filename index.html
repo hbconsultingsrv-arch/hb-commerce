@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="css/hero-3d.css?v=hero-mobile-20260628">
   <link rel="stylesheet" href="css/stock.css?v=stock-20260619">
   <link rel="stylesheet" href="css/brochure.css?v=home-20260619">
-  <link rel="stylesheet" href="css/hb-front.css?v=front-v5-20260630">
+  <link rel="stylesheet" href="css/hb-front.css?v=nav-auth-fix3-20260619">
   <link rel="stylesheet" href="css/hero-premium.css?v=hero-mobile-20260628">
   <link rel="stylesheet" href="css/hb-b2b.css?v=b2b-20260624">
   <link rel="stylesheet" href="css/hb-site-depth.css?v=depth-20260624">
@@ -63,6 +63,7 @@
           </button>
           <ul class="nav-more-menu" role="menu">
             <li role="none"><a href="paiement-facturation.html" role="menuitem" data-i18n="footer.payment">Paiement &amp; Facturation</a></li>
+            <li role="none" id="navLoginMenuItem"><a href="login.html" id="navLoginMenu" role="menuitem" data-i18n="nav.login">Connexion</a></li>
             <li role="none"><a href="#faq" role="menuitem" data-i18n="section.faq">Questions fréquentes</a></li>
             <li role="none"><a href="#contact" role="menuitem" data-i18n="nav.contact">Contact</a></li>
             <li role="none"><a href="#" id="brochureLink" role="menuitem" data-i18n="nav.brochure">Brochure</a></li>
@@ -71,16 +72,18 @@
       </ul>
       <div class="site-nav-actions">
         <div id="sessionUserChip" class="session-user-chip-host" hidden></div>
-        <a href="login.html" id="navLogin" class="nav-icon-btn nav-account-link" data-i18n="nav.login">Connexion</a>
-        <a href="compte.html" id="navAccount" class="nav-icon-btn nav-account-link" style="display:none" data-i18n="nav.account">Mon compte</a>
-        <a href="admin.html" id="navAdmin" class="nav-icon-btn" style="display:none">Admin</a>
-        <a href="#" id="navLogout" class="nav-icon-btn nav-logout-btn" style="display:none" data-i18n="nav.logout">Déconnexion</a>
         <button type="button" id="siteThemeToggleBtn" class="nav-icon-btn nav-theme-toggle" aria-label="Passer en mode clair" title="Mode clair">☀️</button>
         <div id="langSelector" class="lang-switcher" aria-label="Langue"></div>
         <a href="panier.html" class="nav-icon-btn nav-icon-btn--cart nav-cart-link">
           <span data-i18n="nav.cart">Panier</span>
           <span id="cartBadge" class="cart-badge" style="display:none">0</span>
         </a>
+        <div class="site-nav-auth-group" id="navAuthGroup">
+          <a href="login.html" id="navLogin" class="nav-icon-btn nav-account-link" data-i18n="nav.login">Connexion</a>
+          <a href="compte.html" id="navAccount" class="nav-icon-btn nav-account-link" style="display:none" data-i18n="nav.account">Mon compte</a>
+          <a href="admin.html" id="navAdmin" class="nav-icon-btn" style="display:none">Admin</a>
+          <a href="#" id="navLogout" class="nav-icon-btn nav-logout-btn" style="display:none" data-i18n="nav.logout">Déconnexion</a>
+        </div>
       </div>
     </nav>
 
@@ -636,7 +639,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js?v=nav-auth-fix-20260619"></script>
+  <script src="js/auth.js?v=nav-auth-fix3-20260619"></script>
   <script src="js/cart.js"></script>
   <script src="js/products.js?v=supabase-fix-20260619"></script>
   <script src="js/stock.js?v=stock-20260619"></script>

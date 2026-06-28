@@ -101,10 +101,36 @@
   overflow: visible;
 }
 
+.site-nav-auth-group {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
 .nav-account-link,
 #navLogin,
 .nav-logout-btn {
   flex-shrink: 0;
+}
+
+html.nav-auth-pending #navAccount,
+html.nav-auth-pending #navLogout,
+html.nav-auth-pending #navAdmin {
+  display: none !important;
+}
+
+html.nav-auth-guest #navLogin,
+html.nav-auth-guest #navLoginMenuItem {
+  display: inline-flex !important;
+}
+
+html.nav-auth-guest #navLoginMenuItem {
+  display: list-item !important;
+}
+
+html.nav-auth-session #navLoginMenuItem {
+  display: none !important;
 }
 
 .nav-account-link {

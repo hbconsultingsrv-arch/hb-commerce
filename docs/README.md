@@ -32,10 +32,17 @@ Les contenus de l'ancien cahier des charges, du README et des pages demo ont ét
 
 **Mot de passe :** `Test1234!`
 
-**SQL :** exécuter les migrations listées dans le [document maître §18](FONCTIONNALITES-ET-REGLES-DEMANDEES.md#18-architecture-migrations-et-déploiement) — en priorité **`migration-livreurs-setup-complete.sql`** si livreurs/agents commandes — puis `supabase/seed-demo-data.sql`.
+**SQL :** exécuter les migrations listées dans le [document maître §18](FONCTIONNALITES-ET-REGLES-DEMANDEES.md#18-architecture-migrations-et-déploiement) — en priorité **`migration-livreurs-setup-complete.sql`**, puis **`migration-client-read-assigned-agent.sql`** et **`migration-profile-avatar.sql`** si agent client / avatar — puis `supabase/seed-demo-data.sql`.
+
+**Nouveautés récentes (v1.9) :**
+
+- Photo de profil + nom dans la navigation après connexion
+- Carte « Mon agent commercial » dans `compte.html`
+- Bouton **Connexion** restauré après déconnexion (nav + bfcache)
 
 **Connexion agent :** `agent.martin@hbcommerce.demo` → [agent.html](../agent.html)  
-**Connexion admin :** `admin@hbcommerce.demo` → [admin.html](../admin.html)
+**Connexion admin :** `admin@hbcommerce.demo` → [admin.html](../admin.html)  
+**Connexion client :** `contact@restaurant-paris.demo` → [compte.html](../compte.html)
 
 ---
 

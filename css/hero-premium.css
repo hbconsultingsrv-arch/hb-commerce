@@ -60,6 +60,23 @@
 .hero-commerce .site-nav .site-nav-actions {
   flex-shrink: 0;
   overflow: visible;
+  gap: 0.4rem;
+}
+
+.hero-commerce .site-nav .site-nav-auth-group {
+  flex-shrink: 0;
+}
+
+@media (max-width: 1320px) {
+  .hero-commerce .site-nav .nav-links a,
+  .hero-commerce .site-nav .nav-more-trigger {
+    font-size: 0.76rem;
+    padding: 0.35rem 0.45rem;
+  }
+
+  .hero-commerce .site-nav .logo-hb-name {
+    font-size: 0.95rem;
+  }
 }
 
 /* Hero global — surcharge commerce.css :has(.hero-hb-inner) */

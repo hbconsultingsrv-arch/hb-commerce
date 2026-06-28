@@ -72,10 +72,10 @@ python tests/run_tests.py
 | **FLUX-PUB-04** | Connexion UI | Visiteur | Formulaire login présent | `test_01_public_smoke.py` |
 | **FLUX-AUTH-01** | Login admin | Admin | → `admin.html` | `test_02_auth_routing.py` |
 | **FLUX-AUTH-02** | Login agent | Agent | → `agent.html` | `test_02_auth_routing.py` |
-
-> Les tests auth nécessitent Supabase actif + comptes demo (`seed-demo-data.sql`). Si le projet Supabase est en pause, ils échouent avec un message explicite.
 | **FLUX-AUTH-03** | Login client | Client | → `compte.html` | `test_02_auth_routing.py` |
 | **FLUX-AUTH-04** | Login super root | Super root | → `super-root.html` | `test_02_auth_routing.py` |
+
+> Les tests auth nécessitent Supabase actif + comptes demo (`seed-demo-data.sql`). Si le projet Supabase est en pause, ils échouent avec un message explicite.
 | **FLUX-ADM-01** | Fournisseurs | Admin | Onglet fournisseurs accessible | `test_03_admin_navigation.py` |
 | **FLUX-ADM-02** | Équipe HB | Admin | Agents + Livreurs | `test_03_admin_navigation.py` |
 | **FLUX-ADM-03** | Construction + QA | Admin | Roadmap + rapport tests | `test_03_admin_navigation.py` |
@@ -116,6 +116,7 @@ python tests/run_tests.py
 | **FLUX-CLI-03** | Profil client | Client | `#profileForm` | `test_12_client_extended.py` |
 | **FLUX-CLI-04** | Chat client | Client | `#companyChatForm` | `test_12_client_extended.py` |
 | **FLUX-CLI-05** | Facture PDF | Client | `[data-invoice]` | `test_12_client_extended.py` |
+| **FLUX-CLI-06** | Agent assigné | Client | `#commercialAgentContact` + chat | `test_12_client_extended.py` |
 | **FLUX-PUB-07** | Dispo stock carte | Visiteur | Badge stock catalogue | `test_13_public_products_i18n.py` |
 | **FLUX-PUB-08** | Fiche technique | Visiteur | `#productTechModal` | `test_13_public_products_i18n.py` |
 | **FLUX-PUB-09** | i18n DE | Visiteur | `#langSelector` | `test_13_public_products_i18n.py` |
@@ -197,6 +198,11 @@ tests/
     test_07_p1_roles.py
     test_08_p2_commerce.py
     test_09_p3_stock_flow.py
+    test_10_admin_extended.py
+    test_11_agent_extended.py
+    test_12_client_extended.py
+    test_13_public_products_i18n.py
+    test_14_integration_deep.py   # HB_TEST_INTEGRATION=1
   reports/
     latest.json          # Rapport lu par Admin → Construction
 ```
@@ -241,9 +247,9 @@ Les scénarios de ce document restent la **référence métier** quel que soit l
 
 ---
 
-## 9. Audit de couverture fonctionnelle (30/06/2026)
+## 9. Audit de couverture fonctionnelle (19/06/2026)
 
-**Réponse courte :** non, **toutes les fonctionnalités ne sont pas testées**. La suite actuelle couvre surtout la **vitrine**, le **routing auth** et quelques **smokes navigation** admin/agent. Environ **25–30 %** des zones métier ont un test automatisé (souvent superficiel).
+**Réponse courte :** la suite couvre la **vitrine**, le **routing auth**, les **smokes navigation** admin/agent/client et une large part des flux métier. Environ **85 %** des zones recensées ont un test automatisé (smoke ou intégration).
 
 ### Légende
 
@@ -262,6 +268,7 @@ Les scénarios de ce document restent la **référence métier** quel que soit l
 | Menu Plus (FAQ, Contact, Brochure) | ✅ | FLUX-PUB-02 |
 | Catalogue `produits.html` | ✅ | FLUX-PUB-03 (page charge) |
 | Formulaire connexion | ✅ | FLUX-PUB-04 |
+| Nav Connexion après déconnexion | ❌ | Test manuel — `clearSessionUserDisplay()` / bfcache |
 | Prix masqués avant connexion | ✅ | FLUX-PUB-05 |
 | Fiche technique produit (modale) | ✅ | FLUX-PUB-08 |
 | i18n FR / DE / EN | ✅ | FLUX-PUB-09 / 10 / 11 |
@@ -319,6 +326,8 @@ Les scénarios de ce document restent la **référence métier** quel que soit l
 | Mes commandes + suivi livraison | ✅ | FLUX-CLI-02 |
 | Factures PDF | ✅ | FLUX-CLI-05 (bouton présent) |
 | Mon profil (société) | ✅ | FLUX-CLI-03 |
+| Photo de profil (upload avatar) | ❌ | Migration `migration-profile-avatar.sql` requise |
+| Agent commercial assigné | ✅ | FLUX-CLI-06 |
 | Chat société | ✅ | FLUX-CLI-04 |
 | Commande passée par l'agent visible | ✅ | FLUX-AGT-03 |
 
@@ -365,20 +374,22 @@ Les scénarios de ce document restent la **référence métier** quel que soit l
 | Auth | 6 | 6 | 100 % |
 | Admin | 12 | 11 | 92 % |
 | Agent | 9 | 9 | 100 % |
-| Client | 5 | 5 | 100 % |
+| Client | 6 | 5 | 83 % |
 | Super root | 3 | 2 | 67 % |
 | Fournisseur | 2 | 2 | 100 % |
 | Livreur | 2 | 2 | 100 % |
 | Stock / alertes / chat | 8 | 7 | 88 % |
-| **Total** | **~57** | **~54** | **~85 %** |
+| **Total** | **~59** | **~55** | **~85 %** |
 
 ### Priorités recommandées (prochaine vague de tests)
 
-1. **Intégration complète** : FLUX-STK-02 bout en bout (produit → commande → stock quantifié)
-2. **PDF factures** : téléchargement réel `[data-invoice]` (pas seulement bouton visible)
-3. **Super root** : modale édition profil interne
-4. **Checkout** : soumission commande client réelle (pas seulement formulaire visible)
+1. **Nav auth** : déconnexion + refresh → bouton Connexion visible (`#navLogin`)
+2. **Upload avatar** : fichier image → URL `profiles.avatar_url`
+3. **Intégration complète** : FLUX-STK-02 bout en bout (produit → commande → stock quantifié)
+4. **PDF factures** : téléchargement réel `[data-invoice]` (pas seulement bouton visible)
+5. **Super root** : modale édition profil interne
+6. **Checkout** : soumission commande client réelle (pas seulement formulaire visible)
 
 ---
 
-*HB Commerce — HB Groupe — 30/06/2026*
+*HB Commerce — HB Groupe — 19/06/2026*

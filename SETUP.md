@@ -95,6 +95,13 @@ Puis, si ce n'est pas déjà fait :
 -- Copier-coller le contenu de supabase/migration-fix-profiles-rls-recursion.sql
 ```
 
+Pour la **carte agent commercial** côté client et la **photo de profil** :
+
+```sql
+-- Copier-coller le contenu de supabase/migration-client-read-assigned-agent.sql
+-- Copier-coller le contenu de supabase/migration-profile-avatar.sql
+```
+
 > **Important :** n'exécutez pas `migration-agent-driver-assignment.sql` seul — la table `delivery_drivers` doit exister (voir script complet ci-dessus).
 
 Promouvez ensuite votre compte principal en super root (remplacez l'e-mail) :
@@ -156,6 +163,7 @@ Présentation : **[docs/presentation-hb-commerce.pptx](docs/presentation-hb-comm
 | Ajouter au panier | Catalogue |
 | Passer commande | `checkout.html` (connexion requise) |
 | Suivre les commandes | `compte.html` |
+| Photo de profil + agent assigné | `compte.html` (upload avatar, carte `#commercialAgentContact`) |
 
 ## Brochures par marché (France & Luxembourg)
 
