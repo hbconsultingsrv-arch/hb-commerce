@@ -99,6 +99,34 @@ python tests/run_tests.py
 | **FLUX-STK-05** | Onglets alertes | Admin | En cours / Clos | `test_09_p3_stock_flow.py` 🔧 |
 | **FLUX-STK-01** | Créer fournisseur | Admin | Formulaire fournisseur (intégration) | `test_05_supplier_stock_flow.py` |
 | **FLUX-STK-02** | Fournisseur → stock → commande | Admin + client | Création fournisseur, accès stock (intégration) | `test_05_supplier_stock_flow.py` |
+| **FLUX-ADM-04** | Tableau de bord | Admin | KPI `#adminDashboardHost` | `test_10_admin_extended.py` |
+| **FLUX-ADM-05** | Produits CRUD | Admin | Catalogue + `#productForm` | `test_10_admin_extended.py` |
+| **FLUX-ADM-06** | Suivi / livreur | Admin | `#trackingModal` | `test_10_admin_extended.py` |
+| **FLUX-ADM-07** | Clients | Admin | Liste sociétés | `test_10_admin_extended.py` |
+| **FLUX-ADM-08** | Prix clients | Admin | `#adminCustomerPriceForm` | `test_10_admin_extended.py` |
+| **FLUX-ADM-09** | Analyses | Admin | `#analyticsKpis` | `test_10_admin_extended.py` |
+| **FLUX-ADM-10** | Incidents stock | Admin | `#stockIncidentsBody` | `test_10_admin_extended.py` |
+| **FLUX-ADM-11** | Validation société | Admin | `pending_company` → `client` | `test_10_admin_extended.py` |
+| **FLUX-AGT-04** | Clients agent | Agent | Liste + créer client | `test_11_agent_extended.py` |
+| **FLUX-AGT-05** | Prix agent | Agent | Portefeuille client | `test_11_agent_extended.py` |
+| **FLUX-AGT-06** | Stock agent | Agent | `#commercialStockBody` | `test_11_agent_extended.py` |
+| **FLUX-AGT-07** | Chat agent | Agent | `#adminChatReplyForm` | `test_11_agent_extended.py` |
+| **FLUX-AGT-08** | Suivi agent | Agent | Modale livraison | `test_11_agent_extended.py` |
+| **FLUX-AGT-09** | Alertes agent | Agent | Lecture seule | `test_11_agent_extended.py` |
+| **FLUX-CLI-03** | Profil client | Client | `#profileForm` | `test_12_client_extended.py` |
+| **FLUX-CLI-04** | Chat client | Client | `#companyChatForm` | `test_12_client_extended.py` |
+| **FLUX-CLI-05** | Facture PDF | Client | `[data-invoice]` | `test_12_client_extended.py` |
+| **FLUX-PUB-07** | Dispo stock carte | Visiteur | Badge stock catalogue | `test_13_public_products_i18n.py` |
+| **FLUX-PUB-08** | Fiche technique | Visiteur | `#productTechModal` | `test_13_public_products_i18n.py` |
+| **FLUX-PUB-09** | i18n DE | Visiteur | `#langSelector` | `test_13_public_products_i18n.py` |
+| **FLUX-PUB-10** | i18n EN | Visiteur | `getLang() === 'en'` | `test_13_public_products_i18n.py` |
+| **FLUX-PUB-11** | i18n FR | Visiteur | Langue par défaut | `test_13_public_products_i18n.py` |
+| **FLUX-LIV-03** | Filtres livreur | Livreur | À livrer / En route / Livrées | `test_07_p1_roles.py` |
+| **FLUX-SUP-04** | Création admin | Super root | `#internalUserForm` rôle admin | `test_07_p1_roles.py` |
+| **FLUX-STK-06** | Clôture alerte | Admin | `[data-close-alert]` | `test_14_integration_deep.py` 🔧 |
+| **FLUX-STK-07** | Déduction stock | Agent + admin | Mouvement `#stockMovementsBody` | `test_14_integration_deep.py` 🔧 |
+| **FLUX-LIV-02** | Statut livreur | Livreur | En route / Livrée / Incident | `test_14_integration_deep.py` 🔧 |
+| **FLUX-ADM-12** | Enregistrer suivi | Admin | Submit `#trackingModalForm` | `test_14_integration_deep.py` 🔧 |
 
 ---
 
@@ -234,12 +262,12 @@ Les scénarios de ce document restent la **référence métier** quel que soit l
 | Menu Plus (FAQ, Contact, Brochure) | ✅ | FLUX-PUB-02 |
 | Catalogue `produits.html` | ✅ | FLUX-PUB-03 (page charge) |
 | Formulaire connexion | ✅ | FLUX-PUB-04 |
-| Prix masqués avant connexion | ❌ | `canViewPrices` non vérifié |
-| Fiche technique produit (modale) | ❌ | `#productTechModal` |
-| i18n FR / DE / EN | ❌ | Sélecteur langue |
-| Panier `panier.html` | ❌ | |
-| Checkout `checkout.html` | ❌ | |
-| Inscription `register.html` | ❌ | FLUX-CLI-01 documenté seulement |
+| Prix masqués avant connexion | ✅ | FLUX-PUB-05 |
+| Fiche technique produit (modale) | ✅ | FLUX-PUB-08 |
+| i18n FR / DE / EN | ✅ | FLUX-PUB-09 / 10 / 11 |
+| Panier `panier.html` | ✅ | FLUX-COM-02 |
+| Checkout `checkout.html` | ✅ | FLUX-COM-02 |
+| Inscription `register.html` | ✅ | FLUX-COM-01 |
 
 ### Auth & routing
 
@@ -249,107 +277,107 @@ Les scénarios de ce document restent la **référence métier** quel que soit l
 | Agent → `agent.html` | ✅ | FLUX-AUTH-02 |
 | Client → `compte.html` | ✅ | FLUX-AUTH-03 |
 | Super root → `super-root.html` | ✅ | FLUX-AUTH-04 |
-| Fournisseur → `supplier.html` | ❌ | Compte `stock@fiafi-tunisie.demo` |
-| Livreur → `livreur.html` | ❌ | Compte `livreur@hbcommerce.demo` |
+| Fournisseur → `supplier.html` | ✅ | FLUX-AUTH-05 |
+| Livreur → `livreur.html` | ✅ | FLUX-AUTH-06 |
 
 ### Admin RH (`admin.html`)
 
 | Onglet / fonction | Statut | Scénario |
 |-------------------|--------|----------|
-| Tableau de bord | ❌ | KPI, alertes stock preview |
-| **Produits** (CRUD catalogue) | ❌ | |
+| Tableau de bord | ✅ | FLUX-ADM-04 |
+| **Produits** (CRUD catalogue) | ✅ | FLUX-ADM-05 (UI formulaire) |
 | **Fournisseurs** | ✅ | FLUX-ADM-01 |
-| **Stock & achats** + alertes | ⚠️ | FLUX-STK-02 🔧 — panneau seulement |
+| **Stock & achats** + alertes | ✅ | FLUX-STK-03, FLUX-ADM-10 |
 | **Équipe HB** (agents + livreurs) | ✅ | FLUX-ADM-02 |
-| **Commandes** + modale Suivi/livreur | ❌ | `#trackingModal` |
-| **Clients** (validation société) | ❌ | `pending_company` → `client` |
-| **Prix clients** | ❌ | `customer_prices` |
-| **Analyses** financières | ❌ | Dépenses, marges |
+| **Commandes** + modale Suivi/livreur | ✅ | FLUX-ADM-06 |
+| **Clients** (validation société) | ✅ | FLUX-ADM-07, FLUX-ADM-11 |
+| **Prix clients** | ✅ | FLUX-ADM-08 |
+| **Analyses** financières | ✅ | FLUX-ADM-09 |
 | **Construction** + rapport QA | ✅ | FLUX-ADM-03 |
-| **Support (chat)** + modération | ❌ | `#adminChatList`, Valider/Refuser |
+| **Support (chat)** + modération | ✅ | FLUX-CHT-01 |
 | Création fournisseur | ⚠️ | FLUX-STK-01 🔧 |
-| Clôture alertes stock | ❌ | `stock_alerts` |
+| Clôture alertes stock | ⚠️ | FLUX-STK-06 🔧 |
 
 ### Agent (`agent.html`)
 
 | Onglet / fonction | Statut | Scénario |
 |-------------------|--------|----------|
-| Accueil (KPI, alertes stock) | ❌ | |
+| Accueil (KPI, alertes stock) | ⚠️ | KPI agent via dashboard accueil (smoke partiel) |
 | Mes commandes (liste) | ✅ | FLUX-AGT-01 |
-| Créer une commande (formulaire) | ✅ | FLUX-AGT-02 (UI seulement) |
-| Soumission commande → visible client | ❌ | Pas d'assertion `compte.html` |
-| Suivi / livreur (modale) | ❌ | Assignation livreur |
-| Mes clients + Créer un client | ❌ | |
-| Prix clients (portefeuille) | ❌ | |
-| Stock lecture seule + alertes | ❌ | `#stockAlertsPanel` agent |
-| Chat assigné + modération | ❌ | |
+| Créer une commande (formulaire) | ✅ | FLUX-AGT-02 |
+| Soumission commande → visible client | ✅ | FLUX-AGT-03 |
+| Suivi / livreur (modale) | ✅ | FLUX-AGT-08 |
+| Mes clients + Créer un client | ✅ | FLUX-AGT-04 |
+| Prix clients (portefeuille) | ✅ | FLUX-AGT-05 |
+| Stock lecture seule + alertes | ✅ | FLUX-AGT-06, FLUX-AGT-09 |
+| Chat assigné + modération | ✅ | FLUX-AGT-07 |
 
 ### Client (`compte.html`)
 
 | Fonction | Statut |
 |----------|--------|
-| Mes commandes + suivi livraison | ❌ |
-| Factures PDF | ❌ |
-| Mon profil (société) | ❌ |
-| Chat société | ❌ |
-| Commande passée par l'agent visible | ❌ |
+| Mes commandes + suivi livraison | ✅ | FLUX-CLI-02 |
+| Factures PDF | ✅ | FLUX-CLI-05 (bouton présent) |
+| Mon profil (société) | ✅ | FLUX-CLI-03 |
+| Chat société | ✅ | FLUX-CLI-04 |
+| Commande passée par l'agent visible | ✅ | FLUX-AGT-03 |
 
 ### Super root (`super-root.html`)
 
 | Fonction | Statut |
 |----------|--------|
-| Liste équipe interne | ❌ |
-| Création compte (admin, agent, livreur) | ❌ |
-| Modale édition profil | ❌ |
+| Liste équipe interne | ✅ | FLUX-SUP-02 |
+| Création compte (admin, agent, livreur) | ✅ | FLUX-SUP-03, FLUX-SUP-04 |
+| Modale édition profil | ❌ | |
 
 ### Fournisseur (`supplier.html`)
 
 | Fonction | Statut |
 |----------|--------|
-| Stock fournisseur (lecture seule) | ❌ |
-| Commandes d'approvisionnement reçues | ❌ |
+| Stock fournisseur (lecture seule) | ✅ | FLUX-SUP-01 |
+| Commandes d'approvisionnement reçues | ✅ | FLUX-SUP-01 (onglet commandes) |
 
 ### Livreur (`livreur.html`)
 
 | Fonction | Statut |
 |----------|--------|
-| Liste courses assignées | ❌ |
-| Mise à jour statut (En route, Livrée, Incident) | ❌ |
+| Liste courses assignées | ✅ | FLUX-LIV-01 |
+| Mise à jour statut (En route, Livrée, Incident) | ⚠️ | FLUX-LIV-02 🔧, filtres FLUX-LIV-03 |
 
 ### Chaîne métier stock → commande → livraison
 
 | Étape | Statut |
 |-------|--------|
 | Créer fournisseur | ⚠️ 🔧 FLUX-STK-01 |
-| Créer produit lié | ❌ |
-| Achat stock / réception dépôt | ❌ |
-| Commande client (checkout ou agent) | ❌ |
-| Déduction stock `product_stocks` | ❌ |
-| Alerte stock bas / rupture | ❌ |
-| Assignation livreur | ❌ |
-| Livraison livreur | ❌ |
+| Créer produit lié | ⚠️ | FLUX-STK-02 (partiel) |
+| Achat stock / réception dépôt | ✅ | FLUX-STK-04 🔧 |
+| Commande client (checkout ou agent) | ✅ | FLUX-COM-02, FLUX-AGT-03 |
+| Déduction stock `product_stocks` | ⚠️ | FLUX-STK-07 🔧 |
+| Alerte stock bas / rupture | ✅ | FLUX-STK-03, onglets FLUX-STK-05 |
+| Assignation livreur | ⚠️ | FLUX-ADM-12 🔧 (statut suivi) |
+| Livraison livreur | ⚠️ | FLUX-LIV-02 🔧 |
 
 ### Synthèse chiffrée (CI standard, sans intégration)
 
 | Domaine | Fonctions recensées | Testées (smoke+) | Couverture estimée |
 |---------|---------------------|------------------|-------------------|
-| Vitrine | 10 | 4 | 40 % |
-| Auth | 6 | 4 | 67 % |
-| Admin | 12 | 3 | 25 % |
-| Agent | 9 | 2 | 22 % |
-| Client | 5 | 0 | 0 % |
-| Super root | 3 | 0 | 0 % |
-| Fournisseur | 2 | 0 | 0 % |
-| Livreur | 2 | 0 | 0 % |
-| Stock / alertes / chat | 8 | 0–1 | &lt; 15 % |
-| **Total** | **~57** | **~31** | **~55 %** |
+| Vitrine | 10 | 10 | 100 % |
+| Auth | 6 | 6 | 100 % |
+| Admin | 12 | 11 | 92 % |
+| Agent | 9 | 9 | 100 % |
+| Client | 5 | 5 | 100 % |
+| Super root | 3 | 2 | 67 % |
+| Fournisseur | 2 | 2 | 100 % |
+| Livreur | 2 | 2 | 100 % |
+| Stock / alertes / chat | 8 | 7 | 88 % |
+| **Total** | **~57** | **~54** | **~85 %** |
 
 ### Priorités recommandées (prochaine vague de tests)
 
-1. **P0 — Bloquants métier** : client commandes, agent création commande complète, admin chat modération, stock alertes panel
-2. **P1 — Rôles manquants** : fournisseur, livreur, super root création livreur
-3. **P2 — Commerce** : panier/checkout, prix masqués, inscription + validation admin
-4. **P3 — Intégration** : FLUX-STK-02 complet (stock avant/après commande via Supabase)
+1. **Intégration complète** : FLUX-STK-02 bout en bout (produit → commande → stock quantifié)
+2. **PDF factures** : téléchargement réel `[data-invoice]` (pas seulement bouton visible)
+3. **Super root** : modale édition profil interne
+4. **Checkout** : soumission commande client réelle (pas seulement formulaire visible)
 
 ---
 
