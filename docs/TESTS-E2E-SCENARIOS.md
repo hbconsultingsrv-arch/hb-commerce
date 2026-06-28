@@ -2,7 +2,7 @@
 
 **Outil principal :** Selenium + Python + pytest  
 **Rapport :** `tests/reports/latest.json` — affiché dans **Admin → Construction**  
-**CI :** GitHub Actions `.github/workflows/e2e-tests.yml` (à chaque push / PR sur `main`)
+**CI :** GitHub Actions `.github/workflows/e2e-tests.yml` (push / PR sur `main`, ou **Run workflow** manuel)
 
 ---
 
@@ -53,6 +53,12 @@ python tests/run_tests.py
 ```
 
 > À n'utiliser que sur une base de **démonstration**, jamais en production réelle.
+
+### Relancer la CI (sans machine locale)
+
+1. GitHub → **Actions** → workflow **Tests E2E Selenium**
+2. **Run workflow** → branche `main` → **Run workflow**
+3. Consulter les logs ou l'artefact `e2e-report` ; le rapport est aussi publié sur `main` (bloc **Admin → Construction**)
 
 ---
 
@@ -159,7 +165,7 @@ Après chaque exécution, `tests/reports/latest.json` contient :
 
 **Admin → Construction** : bloc « Tests E2E automatisés » sous la barre d'avancement du site.
 
-Le workflow GitHub Actions met à jour ce JSON sur `main` après chaque push.
+Le workflow GitHub Actions met à jour ce JSON sur `main` après chaque push ou exécution manuelle (**Run workflow**).
 
 ---
 
