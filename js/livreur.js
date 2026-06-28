@@ -271,7 +271,9 @@ function bindLivreurUi() {
 
 async function initLivreurPage() {
   bindLivreurUi();
-  if (!(await requireDriver())) return;
+  const session = await requireDriver();
+  if (!session) return;
+  await applySessionUserDisplay(livreurState.profile, session);
   if (!livreurState.adminPreview) {
     await loadDeliveries();
     setInterval(loadDeliveries, 60000);

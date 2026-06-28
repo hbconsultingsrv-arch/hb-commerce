@@ -1196,3 +1196,36 @@
     align-items: flex-start;
   }
 }
+
+.profile-avatar-upload {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(26, 92, 74, 0.12);
+}
+
+.profile-avatar-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.profile-avatar-preview-wrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+
+.profile-avatar-preview {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(201, 162, 39, 0.45);
+}
+
+.profile-avatar-upload-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}

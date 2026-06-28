@@ -11,6 +11,8 @@ async function initSupplierSpace() {
     return;
   }
 
+  await applySessionUserDisplay(supplierProfile, supplierSession);
+
   document.getElementById('logoutBtn')?.addEventListener('click', signOut);
   document.getElementById('refreshSupplierStockBtn')?.addEventListener('click', loadSupplierStock);
   document.getElementById('refreshSupplierOrdersBtn')?.addEventListener('click', loadSupplierOrders);

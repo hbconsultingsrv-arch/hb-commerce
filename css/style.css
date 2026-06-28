@@ -932,3 +932,102 @@ body.modal-open {
   .chat-inbox { grid-template-columns: 1fr; }
   .chat-thread-list { max-height: 240px; }
 }
+
+.user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #1a5c4a, #2d6a3e);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.user-avatar--xs { width: 28px; height: 28px; font-size: 0.65rem; }
+.user-avatar--sm { width: 40px; height: 40px; font-size: 0.8rem; }
+.user-avatar--lg { width: 72px; height: 72px; font-size: 1.25rem; }
+
+.user-avatar--initials {
+  border: 2px solid rgba(201, 162, 39, 0.45);
+}
+
+.session-user-chip-host {
+  display: flex;
+  align-items: center;
+}
+
+.session-user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.35rem 0.75rem 0.35rem 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: inherit;
+  text-decoration: none;
+  max-width: min(280px, 42vw);
+}
+
+.dashboard-page .session-user-chip {
+  background: rgba(26, 92, 74, 0.06);
+  border-color: rgba(26, 92, 74, 0.14);
+}
+
+.admin-v2 .session-user-chip {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.session-user-chip-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.session-user-chip-name {
+  font-size: 0.92rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-user-chip-meta {
+  font-size: 0.75rem;
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-account-link--with-avatar {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.dashboard-welcome-user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-welcome-avatar .user-avatar--lg {
+  width: 80px;
+  height: 80px;
+}
+
+@media (max-width: 640px) {
+  .session-user-chip-meta { display: none; }
+  .dashboard-welcome-user { align-items: flex-start; }
+}

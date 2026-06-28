@@ -143,6 +143,122 @@ async function updateProfile(userId, fields) {
   return data;
 }
 
+function profileDisplayName(profile, session) {
+  return (profile?.full_name || profile?.company || session?.user?.email || 'Utilisateur').trim();
+}
+
+function profileInitials(name) {
+  const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '?';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function resolveProfileAvatarUrl(profile, session) {
+  const url = (profile?.avatar_url || session?.user?.user_metadata?.avatar_url || '').trim();
+  return url || null;
+}
+
+function buildUserAvatarHtml(profile, session, sizeClass = '') {
+  const name = profileDisplayName(profile, session);
+  const avatarUrl = resolveProfileAvatarUrl(profile, session);
+  const initials = profileInitials(name);
+  const classes = ['user-avatar', sizeClass].filter(Boolean).join(' ');
+  if (avatarUrl) {
+    return `<span class="${classes}" data-user-avatar><img src="${escapeHtml(avatarUrl)}" alt="" loading="lazy"></span>`;
+  }
+  return `<span class="${classes} user-avatar--initials" aria-hidden="true">${escapeHtml(initials)}</span>`;
+}
+
+function bindUserAvatarFallbacks(root = document) {
+  root.querySelectorAll('[data-user-avatar] img').forEach((img) => {
+    if (img.dataset.fallbackBound === '1') return;
+    img.dataset.fallbackBound = '1';
+    img.addEventListener('error', () => {
+      const avatar = img.closest('.user-avatar');
+      if (!avatar) return;
+      const name = avatar.closest('.session-user-chip')?.querySelector('.session-user-chip-name')?.textContent
+        || document.getElementById('welcomeName')?.textContent
+        || '?';
+      avatar.classList.add('user-avatar--initials');
+      avatar.removeAttribute('data-user-avatar');
+      avatar.innerHTML = escapeHtml(profileInitials(name));
+    }, { once: true });
+  });
+}
+
+function renderSessionUserChip(profile, session, options = {}) {
+  const host = document.getElementById('sessionUserChip');
+  if (!host) return;
+
+  const name = profileDisplayName(profile, session);
+  const subtitle = options.subtitle || '';
+  const dashboardUrl = options.dashboardUrl || '';
+  const tag = dashboardUrl
+    ? `<a href="${escapeHtml(dashboardUrl)}" class="session-user-chip">`
+    : '<div class="session-user-chip session-user-chip--static">';
+  const tagClose = dashboardUrl ? '</a>' : '</div>';
+
+  host.hidden = false;
+  host.innerHTML = `
+    ${tag}
+      ${buildUserAvatarHtml(profile, session, 'user-avatar--sm')}
+      <span class="session-user-chip-text">
+        <strong class="session-user-chip-name">${escapeHtml(name)}</strong>
+        ${subtitle ? `<span class="session-user-chip-meta">${escapeHtml(subtitle)}</span>` : ''}
+      </span>
+    ${tagClose}
+  `;
+  bindUserAvatarFallbacks(host);
+}
+
+function applyWelcomeUserHeader(profile, session) {
+  const welcomeName = document.getElementById('welcomeName');
+  if (welcomeName) welcomeName.textContent = profileDisplayName(profile, session);
+
+  const welcomeAvatar = document.getElementById('welcomeAvatar');
+  if (welcomeAvatar) {
+    welcomeAvatar.innerHTML = buildUserAvatarHtml(profile, session, 'user-avatar--lg');
+    bindUserAvatarFallbacks(welcomeAvatar);
+  }
+}
+
+function enhanceNavAccountLink(profile, session, dashboardUrl) {
+  const accountHost = document.getElementById('navAccount');
+  if (!accountHost || accountHost.style.display === 'none') return;
+
+  const linkEl = accountHost.matches('a') ? accountHost : accountHost.querySelector('a');
+  if (!linkEl) return;
+
+  const name = profileDisplayName(profile, session);
+  const firstName = name.split(/\s+/)[0] || name;
+  if (dashboardUrl) linkEl.href = dashboardUrl;
+  linkEl.classList.add('nav-account-link--with-avatar');
+  linkEl.innerHTML = `${buildUserAvatarHtml(profile, session, 'user-avatar--xs')}<span>${escapeHtml(firstName)}</span>`;
+  bindUserAvatarFallbacks(linkEl);
+}
+
+async function applySessionUserDisplay(profile, session) {
+  if (!session) return;
+  let userProfile = profile;
+  if (!userProfile && session.user?.id) {
+    try {
+      userProfile = await getProfile(session.user.id);
+    } catch (err) {
+      console.warn('applySessionUserDisplay:', err.message);
+    }
+  }
+
+  const dashboardUrl = await getDefaultDashboardUrl(session);
+  const subtitle = userProfile?.company && userProfile.company !== profileDisplayName(userProfile, session)
+    ? userProfile.company
+    : (userProfile?.email || session.user?.email || '');
+
+  applyWelcomeUserHeader(userProfile, session);
+  renderSessionUserChip(userProfile, session, { subtitle, dashboardUrl });
+  enhanceNavAccountLink(userProfile, session, dashboardUrl);
+}
+
 function formatDate(iso) {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString('fr-FR', {
@@ -292,10 +408,10 @@ async function updateNavAuth() {
 
   if (session) {
     if (loginLink) loginLink.style.display = 'none';
+    const profile = await getProfile(session.user.id);
     if (accountLink) {
       accountLink.style.display = '';
       accountLink.href = await getDefaultDashboardUrl(session);
-      const profile = await getProfile(session.user.id);
       if (isCommercialAgentProfile(profile)) {
         accountLink.setAttribute('data-i18n', 'nav.agentSpace');
       } else if (isDriverProfile(profile)) {
@@ -307,8 +423,11 @@ async function updateNavAuth() {
       } else {
         accountLink.setAttribute('data-i18n', 'nav.account');
       }
-      if (typeof t === 'function') accountLink.textContent = t(accountLink.getAttribute('data-i18n'));
+      if (typeof t === 'function' && !accountLink.classList.contains('nav-account-link--with-avatar')) {
+        accountLink.textContent = t(accountLink.getAttribute('data-i18n'));
+      }
     }
+    await applySessionUserDisplay(profile, session);
     if (logoutBtn) logoutBtn.style.display = '';
     if (adminLink) {
       let admin = false;

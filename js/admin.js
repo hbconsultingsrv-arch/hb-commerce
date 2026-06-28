@@ -77,6 +77,7 @@ async function initAdmin() {
   }
   if (!adminSession) return;
   adminProfile = await getProfile(adminSession.user.id);
+  await applySessionUserDisplay(adminProfile, adminSession);
 
   if (!window.HB_COMMERCIAL_SPACE && isCommercialAgentProfile(adminProfile)) {
     window.location.href = 'agent.html';

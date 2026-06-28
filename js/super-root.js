@@ -96,6 +96,7 @@ async function initSuperRoot() {
   bindSuperRootTabs();
   toggleInternalVehicleField(document.getElementById('internalRoleSelect')?.value || 'agent_commercial');
   showSuperRootSection('equipe');
+  await applySessionUserDisplay(await getProfile(session.user.id), session);
   await loadSuperRootData();
 }
 

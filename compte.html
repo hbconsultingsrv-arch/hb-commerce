@@ -21,6 +21,7 @@
       </span>
     </a>
     <div class="nav-actions">
+      <div id="sessionUserChip" class="session-user-chip-host" hidden></div>
       <a href="super-root.html" id="compteSuperRootLink" class="btn btn-sm btn-primary" style="display:none">Super root</a>
       <a href="admin.html" id="compteAdminLink" class="btn btn-sm btn-primary" style="display:none">Administration</a>
       <a href="produits.html" class="btn btn-sm btn-primary">Nouvelle commande</a>
@@ -29,11 +30,14 @@
   </nav>
 
   <main class="dashboard-main container">
-    <header class="dashboard-header">
-      <div>
-        <span class="section-tag">Espace client</span>
-        <h1>Bonjour, <span id="welcomeName">—</span></h1>
-        <p class="auth-sub">Gérez vos informations et consultez l'historique de vos commandes.</p>
+    <header class="dashboard-header dashboard-header--with-user">
+      <div class="dashboard-welcome-user">
+        <div id="welcomeAvatar" class="dashboard-welcome-avatar" aria-hidden="true"></div>
+        <div>
+          <span class="section-tag">Espace client</span>
+          <h1>Bonjour, <span id="welcomeName">—</span></h1>
+          <p class="auth-sub">Gérez vos informations et consultez l'historique de vos commandes.</p>
+        </div>
       </div>
     </header>
 
@@ -86,6 +90,23 @@
     <section id="panel-profil" class="admin-panel" hidden>
       <div class="dashboard-card">
         <h2>Mes informations</h2>
+        <div class="profile-avatar-upload">
+          <span class="profile-avatar-upload-label">Photo de profil</span>
+          <div class="profile-avatar-upload-row">
+            <div id="profileAvatarPreviewWrap" class="profile-avatar-preview-wrap">
+              <span id="profileAvatarInitials" class="user-avatar user-avatar--lg user-avatar--initials">?</span>
+              <img id="profileAvatarPreview" class="profile-avatar-preview" alt="Aperçu photo de profil" hidden>
+            </div>
+            <div class="profile-avatar-upload-actions">
+              <label class="btn btn-sm btn-outline-dark profile-avatar-file-btn">
+                Choisir une photo
+                <input type="file" id="profileAvatarFile" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+              </label>
+              <button type="button" id="profileAvatarClearBtn" class="btn btn-sm btn-outline-dark">Retirer</button>
+            </div>
+          </div>
+          <p class="form-note">JPG, PNG, WebP ou GIF — max 5 Mo. Affichée dans votre espace et la navigation.</p>
+        </div>
         <form id="profileForm" class="auth-form">
           <label>
             Prénom &amp; Nom
@@ -149,6 +170,7 @@
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/profile-avatar-upload.js"></script>
   <script src="js/admin-api.js"></script>
   <script src="js/dashboard.js"></script>
 </body>

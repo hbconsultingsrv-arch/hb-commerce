@@ -2,15 +2,14 @@ async function initDashboard() {
   const session = await requireAuth();
   if (!session) return;
 
-  const profile = await getProfile(session.user.id);
+  let profile = await getProfile(session.user.id);
   if (profile && !['client', 'pending_company'].includes(profile.role)) {
     window.location.href = await getDefaultDashboardUrl(session);
     return;
   }
 
   bindDashboardTabs('#compteTabs .admin-tab');
-  const welcomeName = document.getElementById('welcomeName');
-  if (welcomeName) welcomeName.textContent = profile?.full_name || session.user.email;
+  await applySessionUserDisplay(profile, session);
 
   let commercialAgent = null;
   if (profile && typeof fetchAssignedCommercialAgent === 'function') {
@@ -24,6 +23,8 @@ async function initDashboard() {
 
   const form = document.getElementById('profileForm');
   if (form && profile) {
+    if (typeof initProfileAvatarUpload === 'function') initProfileAvatarUpload(profile, session);
+
     form.full_name.value = profile.full_name || '';
     form.email.value = profile.email || session.user.email;
     form.phone.value = profile.phone || '';
@@ -37,14 +38,27 @@ async function initDashboard() {
       const note = document.getElementById('profileNote');
       const fd = new FormData(form);
       try {
-        await updateProfile(session.user.id, {
+        let avatarUrl = profile.avatar_url || null;
+        const avatarFile = document.getElementById('profileAvatarFile')?.files?.[0];
+        if (avatarFile && typeof uploadProfileAvatar === 'function') {
+          const uploaded = await uploadProfileAvatar(avatarFile, session.user.id);
+          if (uploaded.uploadError) throw new Error(uploaded.uploadError);
+          if (uploaded.url) avatarUrl = uploaded.url;
+        } else if (document.getElementById('profileAvatarPreview')?.hidden) {
+          avatarUrl = null;
+        }
+
+        profile = await updateProfile(session.user.id, {
           full_name: fd.get('full_name'),
           phone: fd.get('phone'),
           address: fd.get('address'),
           company: fd.get('company'),
           siren: fd.get('siren'),
-          vat_number: fd.get('vat_number')
+          vat_number: fd.get('vat_number'),
+          avatar_url: avatarUrl
         });
+        await applySessionUserDisplay(profile, session);
+        if (typeof initProfileAvatarUpload === 'function') initProfileAvatarUpload(profile, session);
         showAlert(note, 'Profil mis à jour.', 'success');
       } catch (err) {
         showAlert(note, err.message);
