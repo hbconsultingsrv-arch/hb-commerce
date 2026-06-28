@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/commerce.css">
-  <link rel="stylesheet" href="css/admin-shell.css?v=commercial-20260630">
+  <link rel="stylesheet" href="css/admin-shell.css?v=admin-menu-mobile-20260628">
   <link rel="stylesheet" href="css/stock.css">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
@@ -45,7 +45,10 @@
     <div class="admin-shell">
       <header class="admin-topbar">
         <div style="display:flex;align-items:center;gap:0.75rem">
-          <button type="button" class="admin-mobile-toggle" id="adminSidebarToggle" aria-label="Menu">☰</button>
+          <button type="button" class="admin-mobile-toggle" id="adminSidebarToggle" aria-label="Ouvrir le menu de navigation" aria-expanded="false" aria-controls="adminSidebar">
+            <span class="admin-mobile-toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span class="admin-mobile-toggle-label">Menu</span>
+          </button>
           <div class="admin-topbar-title">
             <h1 id="adminTopbarTitle">Accueil</h1>
             <p id="adminTopbarSub">Synthèse de votre activité commerciale</p>

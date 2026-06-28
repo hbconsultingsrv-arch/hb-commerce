@@ -7,12 +7,23 @@ function initAdminShell() {
   const toggle = document.getElementById('adminSidebarToggle');
   const darkBtn = document.getElementById('adminDarkModeBtn');
 
-  toggle?.addEventListener('click', () => sidebar?.classList.toggle('is-open'));
+  function setSidebarOpen(open) {
+    sidebar?.classList.toggle('is-open', open);
+    document.body.classList.toggle('admin-nav-open', open);
+    if (toggle) {
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'Fermer le menu de navigation' : 'Ouvrir le menu de navigation');
+    }
+  }
+
+  toggle?.addEventListener('click', () => {
+    setSidebarOpen(!sidebar?.classList.contains('is-open'));
+  });
   document.addEventListener('click', (e) => {
     if (window.innerWidth > 768) return;
     if (!sidebar?.classList.contains('is-open')) return;
     if (e.target.closest('.admin-sidebar') || e.target.closest('#adminSidebarToggle')) return;
-    sidebar.classList.remove('is-open');
+    setSidebarOpen(false);
   });
 
   const savedDark = localStorage.getItem('hb_admin_dark') === '1';
@@ -29,7 +40,7 @@ function initAdminShell() {
   document.querySelectorAll('.admin-nav-item').forEach((btn) => {
     btn.addEventListener('click', () => {
       showAdminTab(btn.dataset.tab);
-      sidebar?.classList.remove('is-open');
+      setSidebarOpen(false);
     });
   });
 }
