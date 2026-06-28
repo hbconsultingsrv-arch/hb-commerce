@@ -932,3 +932,82 @@ body.modal-open {
   .chat-inbox { grid-template-columns: 1fr; }
   .chat-thread-list { max-height: 240px; }
 }
+
+@media (max-width: 480px) {
+  .dashboard-page .nav.nav-simple {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.65rem 0.75rem;
+    min-height: auto;
+  }
+
+  .dashboard-page .nav.nav-simple .logo-hb-brand {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .dashboard-page .nav-actions,
+  .dashboard-page .nav.nav-simple > .btn {
+    flex: 1 1 100%;
+  }
+
+  .dashboard-page .nav-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    justify-content: stretch;
+  }
+
+  .dashboard-page .nav-actions .btn,
+  .dashboard-page .nav.nav-simple > .btn {
+    flex: 1 1 calc(50% - 0.25rem);
+    min-width: 0;
+    text-align: center;
+    white-space: normal;
+    line-height: 1.25;
+    padding: 0.5rem 0.55rem;
+    font-size: 0.78rem;
+  }
+
+  .dashboard-card-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dashboard-card-head .btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .admin-tabs {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+  }
+
+  .admin-tab {
+    width: 100%;
+    text-align: center;
+  }
+
+  .table-wrap {
+    margin: 0 -0.25rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .requests-table th,
+  .requests-table td {
+    padding: 0.55rem 0.45rem;
+    font-size: 0.82rem;
+  }
+
+  .tracking-summary {
+    min-width: 0;
+  }
+
+  .auth-sub {
+    overflow-wrap: anywhere;
+  }
+}

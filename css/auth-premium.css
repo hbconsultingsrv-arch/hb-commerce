@@ -431,6 +431,28 @@
   .register-progress-label {
     font-size: 0.6rem;
   }
+
+  .register-nav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .register-nav .btn-outline-auth {
+    flex: 1 1 auto;
+    width: 100%;
+    text-align: center;
+  }
+
+  .auth-card-premium .auth-switch {
+    overflow-wrap: anywhere;
+    line-height: 1.55;
+    text-align: left;
+  }
+
+  .auth-card-premium .auth-switch a {
+    display: inline;
+    word-break: break-word;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

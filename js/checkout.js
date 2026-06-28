@@ -18,7 +18,7 @@ async function initCheckout() {
 
   if (summaryEl) {
     summaryEl.innerHTML = cart.map((item) => `
-      <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #eee">
+      <div class="checkout-summary-line">
         <span>${item.name} × ${item.quantity} ${item.unit}<br><small>${item.delivery_delay_label || ''}</small></span>
         <strong>${formatDisplayPrice(item.price * item.quantity)}</strong>
       </div>
