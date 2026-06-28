@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="css/stock.css?v=stock-20260619">
   <link rel="stylesheet" href="css/analytics.css?v=analytics-20260624">
   <link rel="stylesheet" href="css/admin-roadmap.css?v=qa-report-20260630">
-  <link rel="stylesheet" href="css/admin-shell.css?v=admin-v2-20260624">
+  <link rel="stylesheet" href="css/admin-shell.css?v=admin-menu-mobile-20260628">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
 <body class="dashboard-page admin-v2">
@@ -55,7 +55,10 @@
     <div class="admin-shell">
       <header class="admin-topbar">
         <div style="display:flex;align-items:center;gap:0.75rem">
-          <button type="button" class="admin-mobile-toggle" id="adminSidebarToggle" aria-label="Menu">☰</button>
+          <button type="button" class="admin-mobile-toggle" id="adminSidebarToggle" aria-label="Ouvrir le menu de navigation" aria-expanded="false" aria-controls="adminSidebar">
+            <span class="admin-mobile-toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span class="admin-mobile-toggle-label">Menu</span>
+          </button>
           <div class="admin-topbar-title">
             <h1 id="adminTopbarTitle">Tableau de bord</h1>
             <p id="adminTopbarSub">Vue d'ensemble de l'activité HB Commerce</p>

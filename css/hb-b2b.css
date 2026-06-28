@@ -674,6 +674,14 @@
 }
 
 @media (max-width: 640px) {
+  .btn-quote {
+    white-space: normal;
+    text-align: center;
+  }
+
+  .product-card-meta {
+    grid-template-columns: 1fr;
+  }
   .payments-grid,
   .guarantees-grid,
   .clients-grid {

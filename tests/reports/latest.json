@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-06-28T09:32:00.358743+00:00",
-  "duration_seconds": 31.79,
+  "generated_at": "2026-06-28T11:16:20.705388+00:00",
+  "duration_seconds": 125.37,
   "tool": "selenium-python-pytest",
   "base_url": "https://hbconsultingsrv-arch.github.io/hb-commerce/",
   "summary": {
-    "total": 13,
-    "passed": 13,
+    "total": 51,
+    "passed": 51,
     "failed": 0,
     "skipped": 0,
     "pass_rate": 100.0,
@@ -14,31 +14,80 @@
   "suites": [
     {
       "name": "admin",
-      "passed": 3,
+      "passed": 11,
       "failed": 0,
       "skipped": 0,
-      "total": 3
+      "total": 11
     },
     {
       "name": "agent",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "total": 9
+    },
+    {
+      "name": "auth",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "total": 6
+    },
+    {
+      "name": "chat",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "total": 1
+    },
+    {
+      "name": "client",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "total": 4
+    },
+    {
+      "name": "commerce",
       "passed": 2,
       "failed": 0,
       "skipped": 0,
       "total": 2
     },
     {
-      "name": "auth",
-      "passed": 4,
+      "name": "driver",
+      "passed": 2,
       "failed": 0,
       "skipped": 0,
-      "total": 4
+      "total": 2
     },
     {
       "name": "public",
-      "passed": 4,
+      "passed": 11,
       "failed": 0,
       "skipped": 0,
-      "total": 4
+      "total": 11
+    },
+    {
+      "name": "stock",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "total": 1
+    },
+    {
+      "name": "super",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "total": 3
+    },
+    {
+      "name": "supplier",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "total": 1
     }
   ],
   "scenarios": [
@@ -47,7 +96,7 @@
       "suite": "public",
       "name": "La page d'accueil se charge avec le titre HB Commerce.",
       "status": "passed",
-      "duration_ms": 1709,
+      "duration_ms": 649,
       "message": ""
     },
     {
@@ -55,7 +104,7 @@
       "suite": "public",
       "name": "Le menu déroulant Plus regroupe Contact, FAQ et Brochure.",
       "status": "passed",
-      "duration_ms": 918,
+      "duration_ms": 740,
       "message": ""
     },
     {
@@ -63,7 +112,7 @@
       "suite": "public",
       "name": "Le catalogue produits est accessible.",
       "status": "passed",
-      "duration_ms": 483,
+      "duration_ms": 201,
       "message": ""
     },
     {
@@ -71,7 +120,7 @@
       "suite": "public",
       "name": "La page de connexion affiche le formulaire e-mail / mot de passe.",
       "status": "passed",
-      "duration_ms": 348,
+      "duration_ms": 234,
       "message": ""
     },
     {
@@ -79,7 +128,7 @@
       "suite": "auth",
       "name": "Un admin arrive sur admin.html après connexion.",
       "status": "passed",
-      "duration_ms": 2083,
+      "duration_ms": 1548,
       "message": ""
     },
     {
@@ -87,7 +136,7 @@
       "suite": "auth",
       "name": "Un agent commercial arrive sur agent.html.",
       "status": "passed",
-      "duration_ms": 1217,
+      "duration_ms": 1082,
       "message": ""
     },
     {
@@ -95,7 +144,7 @@
       "suite": "auth",
       "name": "Un client arrive sur compte.html.",
       "status": "passed",
-      "duration_ms": 1647,
+      "duration_ms": 1048,
       "message": ""
     },
     {
@@ -103,7 +152,7 @@
       "suite": "auth",
       "name": "Le super root arrive sur super-root.html.",
       "status": "passed",
-      "duration_ms": 1655,
+      "duration_ms": 1034,
       "message": ""
     },
     {
@@ -111,7 +160,7 @@
       "suite": "admin",
       "name": "L'admin accède à l'onglet Fournisseurs.",
       "status": "passed",
-      "duration_ms": 1769,
+      "duration_ms": 2824,
       "message": ""
     },
     {
@@ -119,7 +168,7 @@
       "suite": "admin",
       "name": "L'admin accède à Équipe HB (agents et livreurs).",
       "status": "passed",
-      "duration_ms": 1209,
+      "duration_ms": 2639,
       "message": ""
     },
     {
@@ -127,7 +176,7 @@
       "suite": "admin",
       "name": "L'onglet Construction affiche le suivi et le bloc tests QA.",
       "status": "passed",
-      "duration_ms": 1220,
+      "duration_ms": 2778,
       "message": ""
     },
     {
@@ -135,7 +184,7 @@
       "suite": "agent",
       "name": "L'agent voit Mes commandes avec création et suivi livreur.",
       "status": "passed",
-      "duration_ms": 1240,
+      "duration_ms": 1716,
       "message": ""
     },
     {
@@ -143,14 +192,318 @@
       "suite": "agent",
       "name": "L'agent accède au formulaire Créer une commande.",
       "status": "passed",
-      "duration_ms": 1832,
+      "duration_ms": 1876,
+      "message": ""
+    },
+    {
+      "id": "FLUX-CLI-02",
+      "suite": "client",
+      "name": "Le client voit ses commandes dans compte.html.",
+      "status": "passed",
+      "duration_ms": 1564,
+      "message": ""
+    },
+    {
+      "id": "FLUX-AGT-03",
+      "suite": "agent",
+      "name": "L'agent crée une commande visible côté client.",
+      "status": "passed",
+      "duration_ms": 5618,
+      "message": ""
+    },
+    {
+      "id": "FLUX-CHT-01",
+      "suite": "chat",
+      "name": "L'admin accède au chat et voit la modération (Valider / Refuser).",
+      "status": "passed",
+      "duration_ms": 3854,
+      "message": ""
+    },
+    {
+      "id": "FLUX-STK-03",
+      "suite": "stock",
+      "name": "L'admin ouvre Stock & achats et voit le panneau alertes.",
+      "status": "passed",
+      "duration_ms": 3290,
+      "message": ""
+    },
+    {
+      "id": "FLUX-AUTH-05",
+      "suite": "auth",
+      "name": "Le fournisseur arrive sur supplier.html.",
+      "status": "passed",
+      "duration_ms": 1055,
+      "message": ""
+    },
+    {
+      "id": "FLUX-AUTH-06",
+      "suite": "auth",
+      "name": "Le livreur arrive sur livreur.html.",
+      "status": "passed",
+      "duration_ms": 1034,
+      "message": ""
+    },
+    {
+      "id": "FLUX-SUP-01",
+      "suite": "supplier",
+      "name": "Le fournisseur consulte stock et commandes HB.",
+      "status": "passed",
+      "duration_ms": 1103,
+      "message": ""
+    },
+    {
+      "id": "FLUX-LIV-01",
+      "suite": "driver",
+      "name": "Le livreur voit le tableau de bord courses (liste ou état vide).",
+      "status": "passed",
+      "duration_ms": 6592,
+      "message": ""
+    },
+    {
+      "id": "FLUX-SUP-02",
+      "suite": "super",
+      "name": "Le super root voit la liste de l'équipe interne.",
+      "status": "passed",
+      "duration_ms": 1285,
+      "message": ""
+    },
+    {
+      "id": "FLUX-LIV-03",
+      "suite": "driver",
+      "name": "Le livreur filtre les courses (À livrer / En route / Livrées).",
+      "status": "passed",
+      "duration_ms": 6730,
+      "message": ""
+    },
+    {
+      "id": "FLUX-SUP-04",
+      "suite": "super",
+      "name": "Le super root ouvre le formulaire de création admin.",
+      "status": "passed",
+      "duration_ms": 1161,
+      "message": ""
+    },
+    {
+      "id": "FLUX-SUP-03",
+      "suite": "super",
+      "name": "Le super root peut ouvrir le formulaire de création livreur.",
+      "status": "passed",
+      "duration_ms": 1759,
+      "message": ""
+    },
+    {
+      "id": "FLUX-PUB-05",
+      "suite": "public",
+      "name": "Les prix catalogue sont masqués (xx) avant connexion.",
+      "status": "passed",
+      "duration_ms": 598,
+      "message": ""
+    },
+    {
+      "id": "FLUX-PUB-06",
+      "suite": "public",
+      "name": "Les prix sont visibles après connexion client.",
+      "status": "passed",
+      "duration_ms": 2315,
+      "message": ""
+    },
+    {
+      "id": "FLUX-COM-01",
+      "suite": "commerce",
+      "name": "La page inscription affiche le formulaire multi-étapes.",
+      "status": "passed",
+      "duration_ms": 297,
+      "message": ""
+    },
+    {
+      "id": "FLUX-COM-02",
+      "suite": "commerce",
+      "name": "Le client avec panier accède au checkout.",
+      "status": "passed",
+      "duration_ms": 1674,
+      "message": ""
+    },
+    {
+      "id": "FLUX-ADM-04",
+      "suite": "admin",
+      "name": "Le tableau de bord affiche les KPI.",
+      "status": "passed",
+      "duration_ms": 2589,
+      "message": ""
+    },
+    {
+      "id": "FLUX-ADM-05",
+      "suite": "admin",
+      "name": "L'admin accède au catalogue produits et au formulaire CRUD.",
+      "status": "passed",
+      "duration_ms": 2864,
+      "message": ""
+    },
+    {
+      "id": "FLUX-ADM-06",
+      "suite": "admin",
+      "name": "L'admin ouvre la modale Suivi / livreur sur une commande.",
+      "status": "passed",
+      "duration_ms": 2916,
+      "message": ""
+    },
+    {
+      "id": "FLUX-ADM-07",
+      "suite": "admin",
+      "name": "L'admin voit la liste clients (pending_company et client).",
+      "status": "passed",
+      "duration_ms": 2767,
+      "message": ""
+    },
+    {
+      "id": "FLUX-ADM-08",
+      "suite": "admin",
+      "name": "L'admin accède au formulaire prix clients.",
+      "status": "passed",
+      "duration_ms": 2760,
+      "message": ""
+    },
+    {
+      "id": "FLUX-ADM-10",
+      "suite": "admin",
+      "name": "L'admin accède au panneau incidents stock.",
+      "status": "passed",
+      "duration_ms": 2678,
+      "message": ""
+    },
+    {
+      "id": "FLUX-ADM-09",
+      "suite": "admin",
+      "name": "L'admin accède aux analyses financières.",
+      "status": "passed",
+      "duration_ms": 3102,
+      "message": ""
+    },
+    {
+      "id": "FLUX-ADM-11",
+      "suite": "admin",
+      "name": "L'admin peut valider les sociétés pending_company.",
+      "status": "passed",
+      "duration_ms": 2699,
+      "message": ""
+    },
+    {
+      "id": "FLUX-AGT-04",
+      "suite": "agent",
+      "name": "L'agent voit ses clients et le formulaire Créer un client.",
+      "status": "passed",
+      "duration_ms": 1801,
+      "message": ""
+    },
+    {
+      "id": "FLUX-AGT-05",
+      "suite": "agent",
+      "name": "L'agent accède aux prix clients négociés.",
+      "status": "passed",
+      "duration_ms": 1702,
+      "message": ""
+    },
+    {
+      "id": "FLUX-AGT-06",
+      "suite": "agent",
+      "name": "L'agent consulte le stock en lecture seule.",
+      "status": "passed",
+      "duration_ms": 2230,
+      "message": ""
+    },
+    {
+      "id": "FLUX-AGT-09",
+      "suite": "agent",
+      "name": "L'agent voit les alertes stock en lecture seule.",
+      "status": "passed",
+      "duration_ms": 7018,
+      "message": ""
+    },
+    {
+      "id": "FLUX-AGT-07",
+      "suite": "agent",
+      "name": "L'agent accède au chat des sociétés assignées.",
+      "status": "passed",
+      "duration_ms": 2878,
+      "message": ""
+    },
+    {
+      "id": "FLUX-AGT-08",
+      "suite": "agent",
+      "name": "L'agent ouvre Suivi / livreur sur une commande client.",
+      "status": "passed",
+      "duration_ms": 1751,
+      "message": ""
+    },
+    {
+      "id": "FLUX-CLI-03",
+      "suite": "client",
+      "name": "Le client accède à son profil société.",
+      "status": "passed",
+      "duration_ms": 1141,
+      "message": ""
+    },
+    {
+      "id": "FLUX-CLI-04",
+      "suite": "client",
+      "name": "Le client accède au chat société.",
+      "status": "passed",
+      "duration_ms": 1142,
+      "message": ""
+    },
+    {
+      "id": "FLUX-CLI-05",
+      "suite": "client",
+      "name": "Le client voit le bouton télécharger facture sur une commande.",
+      "status": "passed",
+      "duration_ms": 1569,
+      "message": ""
+    },
+    {
+      "id": "FLUX-PUB-07",
+      "suite": "public",
+      "name": "Les cartes produits affichent la disponibilité stock.",
+      "status": "passed",
+      "duration_ms": 498,
+      "message": ""
+    },
+    {
+      "id": "FLUX-PUB-08",
+      "suite": "public",
+      "name": "La fiche technique s'ouvre depuis le catalogue.",
+      "status": "passed",
+      "duration_ms": 528,
+      "message": ""
+    },
+    {
+      "id": "FLUX-PUB-09",
+      "suite": "public",
+      "name": "Le sélecteur de langue bascule en allemand.",
+      "status": "passed",
+      "duration_ms": 1330,
+      "message": ""
+    },
+    {
+      "id": "FLUX-PUB-11",
+      "suite": "public",
+      "name": "Le français reste la langue par défaut.",
+      "status": "passed",
+      "duration_ms": 1180,
+      "message": ""
+    },
+    {
+      "id": "FLUX-PUB-10",
+      "suite": "public",
+      "name": "Le sélecteur de langue bascule en anglais.",
+      "status": "passed",
+      "duration_ms": 1312,
       "message": ""
     }
   ],
   "ci": {
-    "run_id": "28317959884",
+    "run_id": "28320377479",
     "workflow": "Tests E2E Selenium",
-    "commit": "e222e80",
+    "commit": "ba86a80",
     "branch": "main"
   }
 }
