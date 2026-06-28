@@ -574,6 +574,20 @@ async function updateOrderTracking(id, fields) {
   return data;
 }
 
+async function fetchAssignedCommercialAgent(clientProfile) {
+  const agentId = clientProfile?.commercial_agent_id;
+  if (!agentId) return null;
+  const sb = getSupabase();
+  if (!sb) return null;
+  const { data, error } = await sb
+    .from('profiles')
+    .select('id, full_name, email, phone, role')
+    .eq('id', agentId)
+    .maybeSingle();
+  if (error) throw error;
+  return data?.role === 'agent_commercial' ? data : null;
+}
+
 async function fetchChatMessages(companyId = null) {
   const sb = getSupabase();
   if (!sb) return [];

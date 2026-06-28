@@ -37,10 +37,21 @@
       </div>
     </header>
 
+    <section id="commercialAgentContact" class="commercial-agent-contact dashboard-card" hidden>
+      <div class="commercial-agent-contact-inner">
+        <div class="commercial-agent-contact-text">
+          <span class="section-tag">Votre contact commercial</span>
+          <h2 id="commercialAgentName">—</h2>
+          <p class="auth-sub" id="commercialAgentMeta"></p>
+        </div>
+        <button type="button" id="openAgentChatBtn" class="btn btn-sm btn-primary">Chat avec mon agent</button>
+      </div>
+    </section>
+
     <div class="admin-tabs" id="compteTabs">
       <button type="button" class="admin-tab active" data-tab="commandes">Mes commandes</button>
       <button type="button" class="admin-tab" data-tab="profil">Mon profil</button>
-      <button type="button" class="admin-tab" data-tab="chat">Chat</button>
+      <button type="button" class="admin-tab" data-tab="chat" id="compteChatTab">Chat</button>
     </div>
 
     <section id="panel-commandes" class="admin-panel">
@@ -115,7 +126,7 @@
     <section id="panel-chat" class="admin-panel" hidden>
       <div class="dashboard-card dashboard-card-wide">
         <div class="dashboard-card-head">
-          <h2>Chat avec HB Commerce</h2>
+          <h2 id="companyChatTitle">Chat avec HB Commerce</h2>
           <button type="button" id="refreshChatBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
         </div>
         <div id="companyChatHistory" class="chat-history">
@@ -123,7 +134,7 @@
         </div>
         <form id="companyChatForm" class="auth-form" style="margin-top:1rem">
           <label>
-            Message à l'administration
+            <span id="companyChatMessageLabel">Message à l'administration</span>
             <textarea name="message" rows="3" required placeholder="Écrivez votre message à HB Commerce"></textarea>
           </label>
           <button type="submit" class="btn btn-primary">Envoyer le message</button>

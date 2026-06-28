@@ -12,6 +12,16 @@ async function initDashboard() {
   const welcomeName = document.getElementById('welcomeName');
   if (welcomeName) welcomeName.textContent = profile?.full_name || session.user.email;
 
+  let commercialAgent = null;
+  if (profile && typeof fetchAssignedCommercialAgent === 'function') {
+    try {
+      commercialAgent = await fetchAssignedCommercialAgent(profile);
+    } catch (err) {
+      console.warn('commercial agent:', err.message);
+    }
+  }
+  renderCommercialAgentContact(commercialAgent);
+
   const form = document.getElementById('profileForm');
   if (form && profile) {
     form.full_name.value = profile.full_name || '';
@@ -42,7 +52,7 @@ async function initDashboard() {
     });
   }
 
-  await loadCompanyChat(session);
+  await loadCompanyChat(session, commercialAgent);
   const orders = await fetchUserOrders(session.user.id);
   const emptyEl = document.getElementById('ordersEmpty');
   const tableEl = document.getElementById('ordersTable');
@@ -84,6 +94,48 @@ async function initDashboard() {
   }
 
   document.getElementById('logoutBtn')?.addEventListener('click', signOut);
+}
+
+function commercialAgentDisplayName(agent) {
+  return agent?.full_name || agent?.email || 'Votre agent commercial';
+}
+
+function renderCommercialAgentContact(agent) {
+  const card = document.getElementById('commercialAgentContact');
+  const nameEl = document.getElementById('commercialAgentName');
+  const metaEl = document.getElementById('commercialAgentMeta');
+  const chatTab = document.getElementById('compteChatTab');
+  const chatTitle = document.getElementById('companyChatTitle');
+  const chatLabel = document.getElementById('companyChatMessageLabel');
+  const chatTextarea = document.querySelector('#companyChatForm textarea[name="message"]');
+
+  if (!agent) {
+    if (card) card.hidden = true;
+    return;
+  }
+
+  const agentName = commercialAgentDisplayName(agent);
+  if (card) card.hidden = false;
+  if (nameEl) nameEl.textContent = agentName;
+
+  const metaParts = ['Agent commercial HB Commerce'];
+  if (agent.email) metaParts.push(agent.email);
+  if (agent.phone) metaParts.push(agent.phone);
+  if (metaEl) metaEl.textContent = metaParts.join(' · ');
+
+  if (chatTab) chatTab.textContent = `Chat · ${agentName.split(' ')[0] || agentName}`;
+  if (chatTitle) chatTitle.textContent = `Chat avec ${agentName}`;
+  if (chatLabel) chatLabel.textContent = `Message à ${agentName}`;
+  if (chatTextarea) chatTextarea.placeholder = `Écrivez à ${agentName}…`;
+
+  const openChatBtn = document.getElementById('openAgentChatBtn');
+  if (openChatBtn && openChatBtn.dataset.bound !== '1') {
+    openChatBtn.dataset.bound = '1';
+    openChatBtn.addEventListener('click', () => {
+      document.querySelector('#compteTabs .admin-tab[data-tab="chat"]')?.click();
+      document.getElementById('panel-chat')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
 }
 
 function renderTrackingSummary(order) {
@@ -190,19 +242,27 @@ function chatStatusLabel(status) {
   return 'Validé';
 }
 
-function renderCompanyChat(messages) {
+function chatAuthorLabel(msg, commercialAgent) {
+  if (msg.author_role === 'client') return 'Votre société';
+  if (msg.author_role === 'agent_commercial') return commercialAgentDisplayName(commercialAgent);
+  if (msg.author_role === 'admin' || msg.author_role === 'super_root') return 'Administration HB Commerce';
+  return 'HB Commerce';
+}
+
+function renderCompanyChat(messages, commercialAgent) {
   const host = document.getElementById('companyChatHistory');
   if (!host) return;
 
   if (!messages.length) {
-    host.innerHTML = '<p class="empty-state">Aucun message pour le moment.</p>';
+    const agentName = commercialAgent ? commercialAgentDisplayName(commercialAgent) : 'HB Commerce';
+    host.innerHTML = `<p class="empty-state">Aucun message pour le moment. Écrivez à ${escapeHtml(agentName)} ci-dessous.</p>`;
     return;
   }
 
   host.innerHTML = messages.map((msg) => `
     <article class="chat-message ${msg.author_role === 'client' ? 'from-client' : 'from-admin'}">
       <div class="chat-meta">
-        <strong>${msg.author_role === 'client' ? 'Votre société' : 'HB Commerce'}</strong>
+        <strong>${escapeHtml(chatAuthorLabel(msg, commercialAgent))}</strong>
         <span>${formatDate(msg.created_at)}</span>
         <span class="chat-status ${msg.status}">${chatStatusLabel(msg.status)}</span>
       </div>
@@ -212,11 +272,11 @@ function renderCompanyChat(messages) {
   host.scrollTop = host.scrollHeight;
 }
 
-async function loadCompanyChat(session) {
+async function loadCompanyChat(session, commercialAgent) {
   if (typeof fetchChatMessages !== 'function') return;
   try {
     const messages = await fetchChatMessages(session.user.id);
-    renderCompanyChat(messages);
+    renderCompanyChat(messages, commercialAgent);
   } catch (err) {
     const host = document.getElementById('companyChatHistory');
     if (host) host.innerHTML = `<p class="empty-state">${escapeHtml(err.message)}</p>`;
@@ -225,7 +285,7 @@ async function loadCompanyChat(session) {
 
   document.getElementById('refreshChatBtn')?.addEventListener('click', async () => {
     try {
-      renderCompanyChat(await fetchChatMessages(session.user.id));
+      renderCompanyChat(await fetchChatMessages(session.user.id), commercialAgent);
     } catch (err) {
       showAlert(document.getElementById('companyChatNote'), err.message);
     }
@@ -246,7 +306,7 @@ async function loadCompanyChat(session) {
       });
       form.reset();
       showAlert(note, 'Message envoyé, en attente de validation.', 'success');
-      renderCompanyChat(await fetchChatMessages(session.user.id));
+      renderCompanyChat(await fetchChatMessages(session.user.id), commercialAgent);
     } catch (err) {
       showAlert(note, err.message);
     }

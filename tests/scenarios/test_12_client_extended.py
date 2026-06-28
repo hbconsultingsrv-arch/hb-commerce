@@ -36,6 +36,22 @@ def test_client_chat_panel(driver):
 
 
 @pytest.mark.suite("client")
+@pytest.mark.scenario("FLUX-CLI-06")
+def test_client_sees_assigned_commercial_agent_contact(driver):
+    """Le client voit le nom de son agent commercial et le lien chat."""
+    login_as(driver, ACCOUNTS["client"], expect_url_contains="compte.html")
+    card = WebDriverWait(driver, EXPLICIT_WAIT).until(
+        EC.visibility_of_element_located((By.ID, "commercialAgentContact"))
+    )
+    assert card.get_attribute("hidden") is None
+    name = driver.find_element(By.ID, "commercialAgentName").text.strip()
+    assert name and name != "—"
+    chat_tab = driver.find_element(By.ID, "compteChatTab")
+    assert "chat" in chat_tab.text.lower()
+    assert driver.find_element(By.ID, "openAgentChatBtn")
+
+
+@pytest.mark.suite("client")
 @pytest.mark.scenario("FLUX-CLI-05")
 def test_client_invoice_button(driver):
     """Le client voit le bouton télécharger facture sur une commande."""
