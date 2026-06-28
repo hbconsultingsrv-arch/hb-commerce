@@ -94,6 +94,8 @@ async function initAdmin() {
   }
 
   bindAdminTabs();
+  bindSectionTabs();
+  initSectionTabScopes();
   if (commercialSpace) {
     showAdminTab('accueil');
   } else {
@@ -148,8 +150,6 @@ async function initAdmin() {
   document.getElementById('adminCustomerPriceForm')?.addEventListener('submit', handleAdminCustomerPriceSubmit);
   document.getElementById('agentOrderForm')?.addEventListener('submit', handleAgentOrderSubmit);
   document.getElementById('agentOrderAddLine')?.addEventListener('click', () => addAgentOrderLine());
-  bindSectionTabs();
-  initSectionTabScopes();
   bindAppModal('trackingModal');
   bindAppModal('supplierDetailModal');
   bindAppModal('analyticsExpenseModal');
