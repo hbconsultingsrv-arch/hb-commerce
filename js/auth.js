@@ -74,8 +74,8 @@ async function signUp({ email, password, fullName, phone, company, address, sire
 
 async function signOut() {
   const sb = getSupabase();
-  if (!sb) return;
-  await sb.auth.signOut();
+  if (sb) await sb.auth.signOut();
+  clearSessionUserDisplay();
   window.location.href = 'index.html';
 }
 
@@ -191,6 +191,13 @@ function renderSessionUserChip(profile, session, options = {}) {
   const host = document.getElementById('sessionUserChip');
   if (!host) return;
 
+  // Sur la vitrine, l'utilisateur connecté est déjà affiché dans #navAccount.
+  if (document.getElementById('navAccount') && document.getElementById('navLogin')) {
+    host.hidden = true;
+    host.innerHTML = '';
+    return;
+  }
+
   const name = profileDisplayName(profile, session);
   const subtitle = options.subtitle || '';
   const dashboardUrl = options.dashboardUrl || '';
@@ -257,6 +264,41 @@ async function applySessionUserDisplay(profile, session) {
   applyWelcomeUserHeader(userProfile, session);
   renderSessionUserChip(userProfile, session, { subtitle, dashboardUrl });
   enhanceNavAccountLink(userProfile, session, dashboardUrl);
+}
+
+function resetNavAccountLink() {
+  const accountHost = document.getElementById('navAccount');
+  if (!accountHost) return;
+
+  accountHost.classList.remove('nav-account-link--with-avatar');
+  const linkEl = accountHost.matches('a') ? accountHost : accountHost.querySelector('a');
+  if (!linkEl) return;
+
+  const i18nKey = linkEl.getAttribute('data-i18n') || accountHost.getAttribute('data-i18n') || 'nav.account';
+  const label = typeof t === 'function' ? t(i18nKey) : 'Mon compte';
+  linkEl.innerHTML = `<span class="nav-account-label">${escapeHtml(label)}</span>`;
+}
+
+function resetNavLoginLink() {
+  const loginLink = document.getElementById('navLogin');
+  if (!loginLink) return;
+
+  loginLink.hidden = false;
+  loginLink.style.display = '';
+  loginLink.classList.remove('nav-account-link--with-avatar');
+  const label = typeof t === 'function' ? t(loginLink.getAttribute('data-i18n') || 'nav.login') : 'Connexion';
+  loginLink.innerHTML = `<span class="nav-account-label">${escapeHtml(label)}</span>`;
+  if (typeof window.enhanceNavIcons === 'function') window.enhanceNavIcons();
+}
+
+function clearSessionUserDisplay() {
+  const host = document.getElementById('sessionUserChip');
+  if (host) {
+    host.hidden = true;
+    host.innerHTML = '';
+  }
+  resetNavAccountLink();
+  resetNavLoginLink();
 }
 
 function formatDate(iso) {
@@ -437,6 +479,7 @@ async function updateNavAuth() {
       adminLink.style.display = admin ? '' : 'none';
     }
   } else {
+    clearSessionUserDisplay();
     if (loginLink) loginLink.style.display = '';
     if (accountLink) accountLink.style.display = 'none';
     if (adminLink) adminLink.style.display = 'none';
@@ -502,4 +545,17 @@ document.addEventListener('DOMContentLoaded', () => {
   bindMobileNav();
   bindPasswordToggles();
   updateNavAuth();
+
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) updateNavAuth();
+  });
+
+  const sb = getSupabase();
+  if (sb?.auth?.onAuthStateChange) {
+    sb.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        updateNavAuth();
+      }
+    });
+  }
 });

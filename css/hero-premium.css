@@ -57,6 +57,11 @@
   padding: 0.4rem 0.6rem;
 }
 
+.hero-commerce .site-nav .site-nav-actions {
+  flex-shrink: 0;
+  overflow: visible;
+}
+
 /* Hero global — surcharge commerce.css :has(.hero-hb-inner) */
 .hero-commerce:has(.hero-hb-inner) {
   min-height: 100vh;

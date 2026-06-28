@@ -274,11 +274,15 @@ function enhanceNavIcons() {
     cartLink.insertAdjacentHTML('afterbegin', SVG_CART);
   }
   document.querySelectorAll('.nav-account-link').forEach((accountLink) => {
+    if (accountLink.style.display === 'none' || accountLink.hidden) return;
+    if (accountLink.classList.contains('nav-account-link--with-avatar')) return;
     if (!accountLink.querySelector('svg')) {
       accountLink.insertAdjacentHTML('afterbegin', SVG_USER);
     }
   });
 }
+
+window.enhanceNavIcons = enhanceNavIcons;
 
 document.addEventListener('DOMContentLoaded', () => {
   initSiteNav();

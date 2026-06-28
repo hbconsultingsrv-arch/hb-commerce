@@ -578,7 +578,22 @@ function t(key, vars = {}) {
 
 function applyTranslations(root = document) {
   root.querySelectorAll('[data-i18n]').forEach((el) => {
-    el.textContent = t(el.getAttribute('data-i18n'));
+    if (el.classList.contains('nav-account-link--with-avatar')) return;
+    if (el.id === 'navAccount' && el.style.display !== 'none' && el.querySelector('.user-avatar')) return;
+    const text = t(el.getAttribute('data-i18n'));
+    const label = el.querySelector('.nav-account-label');
+    if (label) {
+      label.textContent = text;
+      return;
+    }
+    if (el.classList.contains('nav-icon-btn') && el.querySelector('svg')) {
+      el.appendChild(Object.assign(document.createElement('span'), {
+        className: 'nav-account-label',
+        textContent: text,
+      }));
+      return;
+    }
+    el.textContent = text;
   });
   root.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
     el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
@@ -590,6 +605,7 @@ function applyTranslations(root = document) {
   if (titleEl) document.title = t(titleEl.getAttribute('data-i18n'));
   const metaDesc = document.querySelector('meta[data-i18n-desc]');
   if (metaDesc) metaDesc.setAttribute('content', t(metaDesc.getAttribute('data-i18n-desc')));
+  if (typeof window.enhanceNavIcons === 'function') window.enhanceNavIcons();
 }
 
 function getLang() {
@@ -615,6 +631,7 @@ function initI18n() {
   window.HB_CURRENT_LANG = getLang();
   document.documentElement.lang = ['de', 'en'].includes(window.HB_CURRENT_LANG) ? window.HB_CURRENT_LANG : 'fr';
   applyTranslations();
+  if (typeof window.enhanceNavIcons === 'function') window.enhanceNavIcons();
 }
 
 document.addEventListener('DOMContentLoaded', initI18n);
