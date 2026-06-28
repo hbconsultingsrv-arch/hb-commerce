@@ -30,79 +30,88 @@ ALTER TABLE public.profiles ADD CONSTRAINT profiles_role_check CHECK (
   )
 );
 
--- ── 2. RLS delivery_drivers ─────────────────────────────────────
+-- ── 2. Helpers RLS (évitent récursion infinie sur profiles) ─────
+CREATE OR REPLACE FUNCTION public.auth_driver_id()
+RETURNS uuid
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = public
+AS $$
+  SELECT driver_id
+  FROM public.profiles
+  WHERE id = auth.uid() AND role = 'livreur'
+  LIMIT 1;
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_livreur()
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.profiles
+    WHERE id = auth.uid() AND role = 'livreur'
+  );
+$$;
+
+-- ── 3. RLS delivery_drivers ─────────────────────────────────────
 ALTER TABLE public.delivery_drivers ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Admins manage drivers" ON public.delivery_drivers;
 CREATE POLICY "Admins manage drivers"
   ON public.delivery_drivers FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles p
-      WHERE p.id = auth.uid() AND p.role IN ('admin', 'super_root')
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.profiles p
-      WHERE p.id = auth.uid() AND p.role IN ('admin', 'super_root')
-    )
-  );
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
 
 DROP POLICY IF EXISTS "Commercial agents read drivers" ON public.delivery_drivers;
 CREATE POLICY "Commercial agents read drivers"
   ON public.delivery_drivers FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles p
-      WHERE p.id = auth.uid() AND p.role = 'agent_commercial'
-    )
-  );
+  USING (public.is_commercial_agent());
 
 DROP POLICY IF EXISTS "Drivers read own row" ON public.delivery_drivers;
 CREATE POLICY "Drivers read own row"
   ON public.delivery_drivers FOR SELECT
-  USING (
-    id IN (SELECT driver_id FROM public.profiles WHERE id = auth.uid() AND role = 'livreur')
-  );
+  USING (id = public.auth_driver_id() AND public.auth_driver_id() IS NOT NULL);
 
--- ── 3. RLS livreur sur commandes ────────────────────────────────
+-- ── 4. RLS livreur sur commandes ────────────────────────────────
 DROP POLICY IF EXISTS "Driver reads assigned orders" ON public.orders;
 CREATE POLICY "Driver reads assigned orders"
   ON public.orders FOR SELECT
   USING (
-    assigned_driver_id IN (
-      SELECT driver_id FROM public.profiles WHERE id = auth.uid() AND role = 'livreur'
-    )
+    public.auth_driver_id() IS NOT NULL
+    AND assigned_driver_id = public.auth_driver_id()
   );
 
 DROP POLICY IF EXISTS "Driver updates delivery fields" ON public.orders;
 CREATE POLICY "Driver updates delivery fields"
   ON public.orders FOR UPDATE
   USING (
-    assigned_driver_id IN (
-      SELECT driver_id FROM public.profiles WHERE id = auth.uid() AND role = 'livreur'
-    )
+    public.auth_driver_id() IS NOT NULL
+    AND assigned_driver_id = public.auth_driver_id()
   )
   WITH CHECK (
-    assigned_driver_id IN (
-      SELECT driver_id FROM public.profiles WHERE id = auth.uid() AND role = 'livreur'
-    )
+    public.auth_driver_id() IS NOT NULL
+    AND assigned_driver_id = public.auth_driver_id()
   );
 
 DROP POLICY IF EXISTS "Driver reads delivery customer profiles" ON public.profiles;
 CREATE POLICY "Driver reads delivery customer profiles"
   ON public.profiles FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM public.orders o
-      JOIN public.profiles me ON me.id = auth.uid() AND me.role = 'livreur'
+    public.auth_driver_id() IS NOT NULL
+    AND EXISTS (
+      SELECT 1
+      FROM public.orders o
       WHERE o.user_id = profiles.id
-        AND o.assigned_driver_id = me.driver_id
+        AND o.assigned_driver_id = public.auth_driver_id()
     )
   );
 
--- ── 4. Agent : créer commande pour client assigné ───────────────
+-- ── 5. Agent : créer commande pour client assigné ───────────────
 DROP POLICY IF EXISTS "Commercial agent insert assigned client orders" ON public.orders;
 CREATE POLICY "Commercial agent insert assigned client orders" ON public.orders
   FOR INSERT

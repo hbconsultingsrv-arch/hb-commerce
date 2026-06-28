@@ -91,6 +91,8 @@ Puis, si ce n'est pas déjà fait :
 
 ```sql
 -- Copier-coller le contenu de supabase/migration-agent-commercial-capabilities.sql
+-- Si la connexion affiche « infinite recursion detected in policy for relation profiles » :
+-- Copier-coller le contenu de supabase/migration-fix-profiles-rls-recursion.sql
 ```
 
 > **Important :** n'exécutez pas `migration-agent-driver-assignment.sql` seul — la table `delivery_drivers` doit exister (voir script complet ci-dessus).

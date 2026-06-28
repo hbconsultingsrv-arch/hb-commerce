@@ -5,28 +5,13 @@
 DROP POLICY IF EXISTS "Admins manage drivers" ON public.delivery_drivers;
 CREATE POLICY "Admins manage drivers"
   ON public.delivery_drivers FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles p
-      WHERE p.id = auth.uid() AND p.role IN ('admin', 'super_root')
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.profiles p
-      WHERE p.id = auth.uid() AND p.role IN ('admin', 'super_root')
-    )
-  );
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
 
 DROP POLICY IF EXISTS "Commercial agents read drivers" ON public.delivery_drivers;
 CREATE POLICY "Commercial agents read drivers"
   ON public.delivery_drivers FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles p
-      WHERE p.id = auth.uid() AND p.role = 'agent_commercial'
-    )
-  );
+  USING (public.is_commercial_agent());
 
 COMMENT ON POLICY "Commercial agents read drivers" ON public.delivery_drivers IS
   'Lecture seule — assignation livreur sur commandes clients assignés';

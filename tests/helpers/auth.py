@@ -29,8 +29,17 @@ def _login_error_message(driver):
     try:
         note = driver.find_element(By.ID, "loginNote")
         text = (note.text or "").strip()
-        if text and "error" in (note.get_attribute("class") or ""):
-            return text
+        if not text:
+            return ""
+        classes = note.get_attribute("class") or ""
+        if "error" not in classes and "infinite recursion" not in text.lower():
+            return ""
+        if "infinite recursion" in text.lower():
+            return (
+                f"{text} — Exécutez supabase/migration-fix-profiles-rls-recursion.sql "
+                "dans Supabase SQL Editor."
+            )
+        return text
     except Exception:
         pass
     return ""
