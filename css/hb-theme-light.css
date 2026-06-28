@@ -43,6 +43,53 @@ html.site-theme-light .hero-pills li {
   color: var(--hb-green-mid, #2d5a38);
 }
 
+html.site-theme-light .hero-cta-row .btn-outline-light {
+  color: var(--hb-green-mid, #2d5a38);
+  border-color: rgba(45, 90, 56, 0.35);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+html.site-theme-light .hero-cta-row .btn-outline-light:hover {
+  color: var(--hb-green, #1e3d28);
+  border-color: rgba(45, 90, 56, 0.5);
+  background: rgba(45, 90, 56, 0.08);
+}
+
+html.site-theme-light .hero-cube-hint,
+html.site-theme-light .hero-promo-note {
+  color: var(--hb-muted, #6b7a6e);
+}
+
+html.site-theme-light .hero-cube-hint span {
+  color: var(--hb-gold, #c9a227);
+}
+
+html.site-theme-light .hero-stats-band .hero-stat {
+  background: rgba(45, 90, 56, 0.06);
+  border-color: rgba(45, 90, 56, 0.18);
+}
+
+html.site-theme-light .hero-stats-band .hero-stat-value {
+  color: var(--hb-green-mid, #2d5a38);
+}
+
+html.site-theme-light .hero-stats-band .hero-stat-label {
+  color: var(--hb-muted, #6b7a6e);
+}
+
+html.site-theme-light .hero-brand-pills-row a,
+html.site-theme-light .hero-brand-pills-row li {
+  background: rgba(45, 90, 56, 0.08);
+  border-color: rgba(45, 90, 56, 0.22);
+  color: var(--hb-green-mid, #2d5a38);
+}
+
+html.site-theme-light .hero-brand-pills-row a:hover {
+  background: rgba(201, 162, 39, 0.15);
+  border-color: rgba(201, 162, 39, 0.4);
+  color: var(--hb-green, #1e3d28);
+}
+
 html.site-theme-light .hero-commerce .site-nav {
   background: rgba(255, 255, 255, 0.88) !important;
   border-bottom-color: rgba(45, 90, 56, 0.12);
