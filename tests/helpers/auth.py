@@ -72,3 +72,13 @@ def login_as(driver, email, password=None, expect_url_contains=None):
     if expect_url_contains and expect_url_contains not in url:
         raise AssertionError(f"Attendu '{expect_url_contains}' dans {url}")
     return url
+
+
+def logout(driver, timeout=EXPLICIT_WAIT):
+    btn = WebDriverWait(driver, timeout).until(
+        EC.element_to_be_clickable((By.ID, "logoutBtn"))
+    )
+    btn.click()
+    WebDriverWait(driver, timeout).until(
+        lambda d: "login.html" in d.current_url or d.current_url.rstrip("/").endswith("index.html")
+    )

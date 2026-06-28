@@ -2,10 +2,9 @@
 
 import pytest
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 
-from tests.config import ACCOUNTS, EXPLICIT_WAIT
+from tests.config import ACCOUNTS
+from tests.helpers.admin_ui import open_admin_nav_tab, wait_admin_initialized
 from tests.helpers.auth import login_as
 
 
@@ -14,14 +13,10 @@ from tests.helpers.auth import login_as
 def test_admin_sidebar_fournisseurs(driver):
     """L'admin accède à l'onglet Fournisseurs."""
     login_as(driver, ACCOUNTS["admin"])
-    btn = WebDriverWait(driver, EXPLICIT_WAIT).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, '.admin-nav-item[data-tab="fournisseurs"]'))
-    )
-    btn.click()
-    panel = WebDriverWait(driver, EXPLICIT_WAIT).until(
-        EC.visibility_of_element_located((By.ID, "panel-fournisseurs"))
-    )
-    assert not panel.get_attribute("hidden")
+    wait_admin_initialized(driver)
+    open_admin_nav_tab(driver, "fournisseurs")
+    panel = driver.find_element(By.ID, "panel-fournisseurs")
+    assert panel.get_attribute("hidden") is None
 
 
 @pytest.mark.suite("admin")
@@ -29,11 +24,8 @@ def test_admin_sidebar_fournisseurs(driver):
 def test_admin_sidebar_equipe(driver):
     """L'admin accède à Équipe HB (agents et livreurs)."""
     login_as(driver, ACCOUNTS["admin"])
-    driver.find_element(By.CSS_SELECTOR, '.admin-nav-item[data-tab="equipe"]').click()
-    panel = WebDriverWait(driver, EXPLICIT_WAIT).until(
-        EC.visibility_of_element_located((By.ID, "panel-equipe"))
-    )
-    assert not panel.get_attribute("hidden")
+    wait_admin_initialized(driver)
+    panel = open_admin_nav_tab(driver, "equipe")
     tabs = panel.find_elements(By.CSS_SELECTOR, ".section-tab")
     labels = [t.text.lower() for t in tabs]
     assert any("agent" in label for label in labels)
@@ -45,9 +37,7 @@ def test_admin_sidebar_equipe(driver):
 def test_admin_construction_panel(driver):
     """L'onglet Construction affiche le suivi et le bloc tests QA."""
     login_as(driver, ACCOUNTS["admin"])
-    driver.find_element(By.CSS_SELECTOR, '.admin-nav-item[data-tab="construction"]').click()
-    WebDriverWait(driver, EXPLICIT_WAIT).until(
-        EC.visibility_of_element_located((By.ID, "panel-construction"))
-    )
+    wait_admin_initialized(driver)
+    open_admin_nav_tab(driver, "construction")
     assert driver.find_element(By.ID, "roadmapProgressHost")
     assert driver.find_element(By.ID, "qaReportHost")
