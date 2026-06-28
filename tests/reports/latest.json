@@ -1,35 +1,35 @@
 {
-  "generated_at": "2026-06-27T23:48:05.222846+00:00",
-  "duration_seconds": 406.26,
+  "generated_at": "2026-06-28T00:19:37.605500+00:00",
+  "duration_seconds": 26.68,
   "tool": "selenium-python-pytest",
   "base_url": "https://hbconsultingsrv-arch.github.io/hb-commerce/",
   "summary": {
     "total": 13,
-    "passed": 4,
-    "failed": 9,
+    "passed": 13,
+    "failed": 0,
     "skipped": 0,
-    "pass_rate": 30.8,
-    "exit_code": 1
+    "pass_rate": 100.0,
+    "exit_code": 0
   },
   "suites": [
     {
       "name": "admin",
-      "passed": 0,
-      "failed": 3,
+      "passed": 3,
+      "failed": 0,
       "skipped": 0,
       "total": 3
     },
     {
       "name": "agent",
-      "passed": 0,
-      "failed": 2,
+      "passed": 2,
+      "failed": 0,
       "skipped": 0,
       "total": 2
     },
     {
       "name": "auth",
-      "passed": 0,
-      "failed": 4,
+      "passed": 4,
+      "failed": 0,
       "skipped": 0,
       "total": 4
     },
@@ -47,7 +47,7 @@
       "suite": "public",
       "name": "La page d'accueil se charge avec le titre HB Commerce.",
       "status": "passed",
-      "duration_ms": 7574,
+      "duration_ms": 1391,
       "message": ""
     },
     {
@@ -55,7 +55,7 @@
       "suite": "public",
       "name": "Le menu déroulant Plus regroupe Contact, FAQ et Brochure.",
       "status": "passed",
-      "duration_ms": 7059,
+      "duration_ms": 1209,
       "message": ""
     },
     {
@@ -63,7 +63,7 @@
       "suite": "public",
       "name": "Le catalogue produits est accessible.",
       "status": "passed",
-      "duration_ms": 5925,
+      "duration_ms": 259,
       "message": ""
     },
     {
@@ -71,86 +71,86 @@
       "suite": "public",
       "name": "La page de connexion affiche le formulaire e-mail / mot de passe.",
       "status": "passed",
-      "duration_ms": 5372,
+      "duration_ms": 234,
       "message": ""
     },
     {
       "id": "FLUX-AUTH-01",
       "suite": "auth",
       "name": "Un admin arrive sur admin.html après connexion.",
-      "status": "failed",
-      "duration_ms": 28009,
-      "message": "E   TimeoutError: Timeout connexion — URL actuelle : https://hbconsultingsrv-arch.github.io/hb-commerce/login.html"
+      "status": "passed",
+      "duration_ms": 1712,
+      "message": ""
     },
     {
       "id": "FLUX-AUTH-02",
       "suite": "auth",
       "name": "Un agent commercial arrive sur agent.html.",
-      "status": "failed",
-      "duration_ms": 29641,
-      "message": "E   TimeoutError: Timeout connexion — URL actuelle : https://hbconsultingsrv-arch.github.io/hb-commerce/login.html"
+      "status": "passed",
+      "duration_ms": 1088,
+      "message": ""
     },
     {
       "id": "FLUX-AUTH-03",
       "suite": "auth",
       "name": "Un client arrive sur compte.html.",
-      "status": "failed",
-      "duration_ms": 28289,
-      "message": "E   TimeoutError: Timeout connexion — URL actuelle : https://hbconsultingsrv-arch.github.io/hb-commerce/login.html"
+      "status": "passed",
+      "duration_ms": 1065,
+      "message": ""
     },
     {
       "id": "FLUX-AUTH-04",
       "suite": "auth",
       "name": "Le super root arrive sur super-root.html.",
-      "status": "failed",
-      "duration_ms": 28238,
-      "message": "E   TimeoutError: Timeout connexion — URL actuelle : https://hbconsultingsrv-arch.github.io/hb-commerce/login.html"
+      "status": "passed",
+      "duration_ms": 1541,
+      "message": ""
     },
     {
       "id": "FLUX-ADM-01",
       "suite": "admin",
       "name": "L'admin accède à l'onglet Fournisseurs.",
-      "status": "failed",
-      "duration_ms": 28443,
-      "message": "E   TimeoutError: Timeout connexion — URL actuelle : https://hbconsultingsrv-arch.github.io/hb-commerce/login.html"
+      "status": "passed",
+      "duration_ms": 1174,
+      "message": ""
     },
     {
       "id": "FLUX-ADM-02",
       "suite": "admin",
       "name": "L'admin accède à Équipe HB (agents et livreurs).",
-      "status": "failed",
-      "duration_ms": 28044,
-      "message": "E   TimeoutError: Timeout connexion — URL actuelle : https://hbconsultingsrv-arch.github.io/hb-commerce/login.html"
+      "status": "passed",
+      "duration_ms": 1135,
+      "message": ""
     },
     {
       "id": "FLUX-ADM-03",
       "suite": "admin",
       "name": "L'onglet Construction affiche le suivi et le bloc tests QA.",
-      "status": "failed",
-      "duration_ms": 28656,
-      "message": "E   TimeoutError: Timeout connexion — URL actuelle : https://hbconsultingsrv-arch.github.io/hb-commerce/login.html"
+      "status": "passed",
+      "duration_ms": 1172,
+      "message": ""
     },
     {
       "id": "FLUX-AGT-01",
       "suite": "agent",
       "name": "L'agent voit Mes commandes avec création et suivi livreur.",
-      "status": "failed",
-      "duration_ms": 27873,
-      "message": "E   TimeoutError: Timeout connexion — URL actuelle : https://hbconsultingsrv-arch.github.io/hb-commerce/login.html"
+      "status": "passed",
+      "duration_ms": 1198,
+      "message": ""
     },
     {
       "id": "FLUX-AGT-02",
       "suite": "agent",
       "name": "L'agent accède au formulaire Créer une commande.",
-      "status": "failed",
-      "duration_ms": 27958,
-      "message": "E   TimeoutError: Timeout connexion — URL actuelle : https://hbconsultingsrv-arch.github.io/hb-commerce/login.html"
+      "status": "passed",
+      "duration_ms": 1220,
+      "message": ""
     }
   ],
   "ci": {
-    "run_id": "",
-    "workflow": "",
-    "commit": "5957020",
+    "run_id": "28306171296",
+    "workflow": "Tests E2E Selenium",
+    "commit": "eb01d24",
     "branch": "main"
   }
 }
