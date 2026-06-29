@@ -8,8 +8,8 @@ function setAgentNavItem(el, visible) {
   li.hidden = !visible;
 }
 
-function canAccessLivraisonFromCommercial(profile) {
-  return isAdminProfile(profile) || Boolean(profile?.driver_id);
+function canShowMesActivites(profile) {
+  return isAdminProfile(profile);
 }
 
 async function initCommercialSpacePage() {
@@ -17,11 +17,16 @@ async function initCommercialSpacePage() {
   if (!profile) return;
 
   const banner = document.getElementById('commercialScopeBanner');
+  const activitiesWrap = document.querySelector('.nav-activities-wrap');
   const livraisonItem = document.getElementById('agentActivitiesLivraisonItem');
   const backOfficeItem = document.getElementById('agentMenuBackOfficeItem');
   const backOfficeLink = document.getElementById('agentMenuBackOfficeLink');
 
-  setAgentNavItem(livraisonItem, canAccessLivraisonFromCommercial(profile));
+  if (activitiesWrap) {
+    activitiesWrap.hidden = !canShowMesActivites(profile);
+  }
+
+  setAgentNavItem(livraisonItem, canShowMesActivites(profile));
 
   if (backOfficeItem && backOfficeLink && isAdminProfile(profile)) {
     setAgentNavItem(backOfficeItem, true);

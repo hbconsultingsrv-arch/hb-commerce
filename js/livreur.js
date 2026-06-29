@@ -217,16 +217,23 @@ function setLivreurNavItem(el, visible) {
 }
 
 function configureLivreurTopNav(profile) {
+  const activitiesWrap = document.getElementById('livreurActivitiesWrap');
   const commercialItem = document.getElementById('livreurActivitiesCommercialItem');
   const backOfficeItem = document.getElementById('livreurMenuBackOfficeItem');
   const backOfficeLink = document.getElementById('livreurMenuBackOfficeLink');
   const livraisonNum = document.getElementById('livreurActivitiesLivraisonNum');
-  const showCommercial = isAdminProfile(profile);
+  const showActivities = isAdminProfile(profile);
 
-  setLivreurNavItem(commercialItem, showCommercial);
-  if (livraisonNum) livraisonNum.textContent = showCommercial ? '2' : '1';
+  if (activitiesWrap) activitiesWrap.hidden = !showActivities;
+  if (!showActivities) {
+    setLivreurNavItem(backOfficeItem, false);
+    return;
+  }
 
-  if (backOfficeItem && backOfficeLink && isAdminProfile(profile)) {
+  setLivreurNavItem(commercialItem, true);
+  if (livraisonNum) livraisonNum.textContent = '2';
+
+  if (backOfficeItem && backOfficeLink) {
     setLivreurNavItem(backOfficeItem, true);
     if (isSuperRootProfile(profile)) {
       backOfficeLink.href = 'admin.html?tab=equipe';
@@ -240,7 +247,6 @@ function configureLivreurTopNav(profile) {
 
 function showLivreurRhPersonalMode(profile) {
   const banner = document.getElementById('livreurAdminBanner');
-  configureLivreurTopNav(profile);
   if (banner) {
     banner.hidden = false;
     banner.innerHTML = `
@@ -252,7 +258,6 @@ function showLivreurRhPersonalMode(profile) {
 
 function showLivreurAdminPreview(profile) {
   const banner = document.getElementById('livreurAdminBanner');
-  configureLivreurTopNav(profile);
   const welcome = document.getElementById('livreurWelcome');
   if (welcome) {
     welcome.textContent = 'Mode administration — connectez-vous avec un compte livreur pour voir les courses assignées.';
@@ -295,6 +300,7 @@ async function initLivreurPage() {
   bindLivreurUi();
   const session = await requireDriver();
   if (!session) return;
+  configureLivreurTopNav(livreurState.profile);
   await applySessionUserDisplay(livreurState.profile, session);
   if (!livreurState.adminPreview) {
     await loadDeliveries();
