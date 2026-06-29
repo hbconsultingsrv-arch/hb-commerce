@@ -121,3 +121,17 @@ def test_admin_clients_pending_company_role(driver):
     else:
         body = driver.find_element(By.ID, "clientsBody").text.lower()
         assert "client" in body or "@" in body
+
+
+@pytest.mark.suite("admin")
+@pytest.mark.scenario("FLUX-ADM-13")
+def test_admin_shell_profile_in_sidebar(driver):
+    """Le profil utilisateur est sous le logo sidebar ; déconnexion dans la topbar."""
+    login_as(driver, ACCOUNTS["admin"])
+    wait_admin_initialized(driver)
+    chip_host = driver.find_element(By.CSS_SELECTOR, ".admin-sidebar-user #sessionUserChip")
+    assert chip_host.get_attribute("hidden") is None
+    assert driver.find_element(By.CSS_SELECTOR, ".admin-sidebar-user .session-user-chip-name")
+    logout = driver.find_element(By.CSS_SELECTOR, ".admin-topbar-actions #logoutBtn")
+    assert logout.is_displayed()
+    assert "Déconnexion" in logout.text

@@ -25,6 +25,12 @@ Vente en gros de produits alimentaires avec espace client, commandes en ligne et
 
 Comptes principaux : `super@hbcommerce.demo`, `admin@hbcommerce.demo`, `contact@restaurant-paris.demo`, `stock@fiafi-tunisie.demo` — voir [docs/README.md](docs/README.md) pour la liste complète.
 
+## Release
+
+| Tag | Date | Notes |
+|-----|------|-------|
+| **[v2.0.0](https://github.com/hbconsultingsrv-arch/hb-commerce/releases/tag/v2.0.0)** | 19/06/2026 | Première release taguée — voir [CHANGELOG.md](CHANGELOG.md) |
+
 ## Pages
 
 | Fichier | Description |
@@ -38,7 +44,7 @@ Comptes principaux : `super@hbcommerce.demo`, `admin@hbcommerce.demo`, `contact@
 | `compte.html` | Espace client (profil, commandes, agent assigné, chat) |
 | `agent.html` | Espace agent commercial (clients, commandes, livraison) |
 | `admin.html` | Dashboard admin RH (produits, stock, Équipe HB, …) |
-| `super-root.html` | Dashboard super root (comptes HB + livreur) |
+| `super-root.html` | Redirection → `admin.html?tab=equipe` (legacy) |
 | `livreur.html` | Espace livreur (courses assignées) |
 | `supplier.html` | Espace fournisseur (stock + commandes d'approvisionnement) |
 | `docs/exemples/index.html` | Hub demo et pages d'exemple |
@@ -54,7 +60,7 @@ Le site est hébergé sur **GitHub Pages** (gratuit). Les données passent par *
 - Commandes avec suivi de statut
 - Dashboard admin RH pour validation des commandes, Équipe HB et chat sociétés
 - Espace agent commercial (`agent.html`) : clients assignés, création commandes, logistique livreur
-- Dashboard super root pour gérer les accès internes (admin, agent, livreur)
+- Super root : gestion du personnel HB dans `admin.html?tab=equipe`
 - Chat société avec historique et modération des messages
 - Gestion des fournisseurs et rattachement fournisseur/produit
 - Espace fournisseur pour gérer les stocks et les commandes d'approvisionnement
@@ -95,6 +101,19 @@ hb-commerce/
 │   └── admin.js
 └── supabase/schema.sql    ← script base de données
 ```
+
+## Tests automatiques
+
+Tests E2E Selenium (Python + pytest) — CI sur chaque push `main` et tag `v*`.
+
+```bash
+pip install -r requirements-test.txt
+set HB_TEST_BASE_URL=https://hbconsultingsrv-arch.github.io/hb-commerce/
+set HB_TEST_PASSWORD=Test1234!
+python tests/run_tests.py
+```
+
+Documentation : [docs/TESTS-E2E-SCENARIOS.md](docs/TESTS-E2E-SCENARIOS.md)
 
 ## Paiement
 

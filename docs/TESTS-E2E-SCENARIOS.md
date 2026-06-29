@@ -2,7 +2,7 @@
 
 **Outil principal :** Selenium + Python + pytest  
 **Rapport :** `tests/reports/latest.json` — affiché dans **Admin → Construction**  
-**CI :** GitHub Actions `.github/workflows/e2e-tests.yml` (push / PR sur `main`, ou **Run workflow** manuel)
+**CI :** GitHub Actions `.github/workflows/e2e-tests.yml` (push / PR sur `main`, tags `v*`, ou **Run workflow** manuel)
 
 ---
 
@@ -73,7 +73,7 @@ python tests/run_tests.py
 | **FLUX-AUTH-01** | Login admin | Admin | → `admin.html` | `test_02_auth_routing.py` |
 | **FLUX-AUTH-02** | Login agent | Agent | → `agent.html` | `test_02_auth_routing.py` |
 | **FLUX-AUTH-03** | Login client | Client | → `compte.html` | `test_02_auth_routing.py` |
-| **FLUX-AUTH-04** | Login super root | Super root | → `super-root.html` | `test_02_auth_routing.py` |
+| **FLUX-AUTH-04** | Login super root | Super root | → `admin.html?tab=equipe` | `test_02_auth_routing.py` |
 
 > Les tests auth nécessitent Supabase actif + comptes demo (`seed-demo-data.sql`). Si le projet Supabase est en pause, ils échouent avec un message explicite.
 | **FLUX-ADM-01** | Fournisseurs | Admin | Onglet fournisseurs accessible | `test_03_admin_navigation.py` |
@@ -107,6 +107,7 @@ python tests/run_tests.py
 | **FLUX-ADM-09** | Analyses | Admin | `#analyticsKpis` | `test_10_admin_extended.py` |
 | **FLUX-ADM-10** | Incidents stock | Admin | `#stockIncidentsBody` | `test_10_admin_extended.py` |
 | **FLUX-ADM-11** | Validation société | Admin | `pending_company` → `client` | `test_10_admin_extended.py` |
+| **FLUX-ADM-13** | Shell admin v2 | Admin | Profil sidebar + déconnexion topbar | `test_10_admin_extended.py` |
 | **FLUX-AGT-04** | Clients agent | Agent | Liste + créer client | `test_11_agent_extended.py` |
 | **FLUX-AGT-05** | Prix agent | Agent | Portefeuille client | `test_11_agent_extended.py` |
 | **FLUX-AGT-06** | Stock agent | Agent | `#commercialStockBody` | `test_11_agent_extended.py` |
@@ -268,7 +269,7 @@ Les scénarios de ce document restent la **référence métier** quel que soit l
 | Menu Plus (FAQ, Contact, Brochure) | ✅ | FLUX-PUB-02 |
 | Catalogue `produits.html` | ✅ | FLUX-PUB-03 (page charge) |
 | Formulaire connexion | ✅ | FLUX-PUB-04 |
-| Nav Connexion après déconnexion | ❌ | Test manuel — `clearSessionUserDisplay()` / bfcache |
+| Nav Connexion après déconnexion | ✅ | FLUX-PUB-04 + auth |
 | Prix masqués avant connexion | ✅ | FLUX-PUB-05 |
 | Fiche technique produit (modale) | ✅ | FLUX-PUB-08 |
 | i18n FR / DE / EN | ✅ | FLUX-PUB-09 / 10 / 11 |
@@ -283,7 +284,7 @@ Les scénarios de ce document restent la **référence métier** quel que soit l
 | Admin → `admin.html` | ✅ | FLUX-AUTH-01 |
 | Agent → `agent.html` | ✅ | FLUX-AUTH-02 |
 | Client → `compte.html` | ✅ | FLUX-AUTH-03 |
-| Super root → `super-root.html` | ✅ | FLUX-AUTH-04 |
+| Super root → `admin.html?tab=equipe` | ✅ | FLUX-AUTH-04 |
 | Fournisseur → `supplier.html` | ✅ | FLUX-AUTH-05 |
 | Livreur → `livreur.html` | ✅ | FLUX-AUTH-06 |
 
@@ -302,6 +303,7 @@ Les scénarios de ce document restent la **référence métier** quel que soit l
 | **Analyses** financières | ✅ | FLUX-ADM-09 |
 | **Construction** + rapport QA | ✅ | FLUX-ADM-03 |
 | **Support (chat)** + modération | ✅ | FLUX-CHT-01 |
+| **Shell admin** (profil sidebar) | ✅ | FLUX-ADM-13 |
 | Création fournisseur | ⚠️ | FLUX-STK-01 🔧 |
 | Clôture alertes stock | ⚠️ | FLUX-STK-06 🔧 |
 

@@ -23,7 +23,7 @@ Les contenus de l'ancien cahier des charges, du README et des pages demo ont ét
 | [Cahier des charges (Word)](cahier-des-charges-hb-commerce.docx) | Export Office |
 | [Présentation (PowerPoint)](presentation-hb-commerce.pptx) | Slides |
 | [Présentation web](presentation/index.html) | Slides interactives |
-| [Hub demo](exemples/index.html) | Liens rapides + tableau comptes |
+| [CHANGELOG.md](../CHANGELOG.md) | Historique des versions (release **v2.0.0**) |
 
 ---
 
@@ -35,13 +35,15 @@ Les contenus de l'ancien cahier des charges, du README et des pages demo ont ét
 
 **SQL :** exécuter les migrations listées dans le [document maître §18](FONCTIONNALITES-ET-REGLES-DEMANDEES.md#18-architecture-migrations-et-déploiement) — en priorité **`migration-livreurs-setup-complete.sql`**, puis **`migration-client-read-assigned-agent.sql`** et **`migration-profile-avatar.sql`** si agent client / avatar — puis `supabase/seed-demo-data.sql`.
 
-**Nouveautés récentes (v1.9) :**
+**Nouveautés release v2.0.0 :**
 
-- Photo de profil + nom dans la navigation après connexion
-- Carte « Mon agent commercial » dans `compte.html`
-- Bouton **Connexion** restauré après déconnexion (nav + bfcache)
+- Admin shell v2 (sidebar, topbar, profil sous le logo, mode clair/sombre)
+- Super root → `admin.html?tab=equipe` (personnel + rôles)
+- Profil cliquable (`compte.html?tab=profil`) pour tous les rôles
+- Tests E2E automatisés (CI GitHub Actions)
+- Migrations RLS profiles + avatar — voir [CHANGELOG.md](../CHANGELOG.md)
 
-**Connexion agent :** `agent.martin@hbcommerce.demo` → [agent.html](../agent.html)  
+**Connexion super root :** `super@hbcommerce.demo` → [admin.html?tab=equipe](../admin.html?tab=equipe)  
 **Connexion admin :** `admin@hbcommerce.demo` → [admin.html](../admin.html)  
 **Connexion client :** `contact@restaurant-paris.demo` → [compte.html](../compte.html)
 

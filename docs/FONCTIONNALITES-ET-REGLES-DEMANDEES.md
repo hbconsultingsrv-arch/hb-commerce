@@ -28,6 +28,7 @@ Ce document **fusionne et remplace** le contenu fonctionnel/règles des fichiers
 | 1.7 | 30/06/2026 | Agent : créer client, créer commande client, logistique livraison, livreur dans Super root |
 | 1.8 | 30/06/2026 | Migrations livreurs consolidées, redirection rôles métier hors `compte.html` |
 | 1.9 | 19/06/2026 | Profil (nom + photo), agent assigné côté client, correction nav Connexion après déconnexion |
+| 2.0 | 19/06/2026 | **Release v2.0.0** — admin shell v2, super root dans admin Équipe HB, profil sidebar, tests E2E CI, migrations RLS/avatar |
 
 ---
 
@@ -102,7 +103,7 @@ HB Commerce est une plateforme **B2B de vente en gros alimentaire**, initialemen
 
 | Rôle | Page d'accueil |
 |------|----------------|
-| `super_root` | `super-root.html` |
+| `super_root` | `admin.html?tab=equipe` |
 | `admin` | `admin.html` |
 | `agent_commercial` | **`agent.html`** (plus `admin.html` pour un agent pur) |
 | `livreur` | `livreur.html` |
@@ -128,8 +129,8 @@ Les rôles métier (**agent, livreur, fournisseur, admin, super root**) ne reste
 
 | Page | Rôles | Périmètre |
 |------|-------|-----------|
-| `super-root.html` | `super_root` | Comptes HB : super root, admin, agent, **livreur** |
-| `admin.html` | `admin`, `super_root` (RH) | Opérations **globales** : catalogue, stock, Équipe HB, analyses… |
+| `admin.html?tab=equipe` | `super_root` | **Personnel HB** : super root, admin, agent, livreur — changement de rôles |
+| `admin.html` | `admin`, `super_root` | Opérations **globales** : catalogue, stock, Équipe HB (admin), analyses… |
 | **`agent.html`** | **`agent_commercial`**, admin/super (activité commerciale perso) | Portefeuille **assigné uniquement** |
 | `supplier.html` | `supplier` | Stock et approvisionnement |
 | `livreur.html` | `livreur` | Courses et statuts livraison |
@@ -150,7 +151,8 @@ Navigation latérale + sous-onglets :
 | Produits | Admin | CRUD catalogue |
 | Fournisseurs | Admin | Entités fournisseurs |
 | Stock & achats | Admin | Stock, commandes fournisseur |
-| **Équipe HB** | Admin | Sous-onglets **Agents commerciaux** · **Livreurs** (création + liste) |
+| **Équipe HB** | Admin | Sous-onglets **Agents commerciaux** · **Livreurs** |
+| **Équipe HB** | Super root | Onglet **Personnel HB** — tous rôles internes + modification des droits |
 | Commandes | Admin | Toutes commandes clients + suivi livraison |
 | Clients | Admin | Sociétés clientes |
 | Prix clients | Admin | Tarifs personnalisés |
@@ -490,7 +492,7 @@ Migration associée : `supabase/migration-business-expenses.sql`
 
 | E-mail | Rôle | Page |
 |--------|------|------|
-| `super@hbcommerce.demo` | super_root | `super-root.html` |
+| `super@hbcommerce.demo` | super_root | `admin.html?tab=equipe` |
 | `admin@hbcommerce.demo` | admin | `admin.html` |
 | `agent.martin@hbcommerce.demo` | agent | **`agent.html`** |
 | `agent.dubois@hbcommerce.demo` | agent | **`agent.html`** |

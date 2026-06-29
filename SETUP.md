@@ -108,7 +108,7 @@ Pour la **carte agent commercial** côté client et la **photo de profil** :
 -- Copier-coller le contenu de supabase/migration-super-root-bootstrap.sql
 ```
 
-> Si **Équipe HB** est vide sur `super-root.html`, exécutez aussi cette migration (ou `UPDATE public.profiles SET role = 'super_root' WHERE email = 'super@hbcommerce.demo';`).
+> Si **Équipe HB** est vide, exécutez aussi cette migration (ou `UPDATE public.profiles SET role = 'super_root' WHERE email = 'super@hbcommerce.demo';`).
 
 Promouvez ensuite votre compte principal en super root (remplacez l'e-mail) :
 
@@ -116,7 +116,7 @@ Promouvez ensuite votre compte principal en super root (remplacez l'e-mail) :
 update public.profiles set role = 'super_root' where email = 'votre-email@gmail.com';
 ```
 
-Connectez-vous → accédez à **`super-root.html`** pour gérer les accès et les prix clients.
+Connectez-vous → accédez à **`admin.html?tab=equipe`** pour gérer le personnel HB (super root, admin, agents, livreurs).
 
 Le super root peut attribuer le rôle `admin` à un compte pour valider les commandes et modérer le chat via **`admin.html`**.
 
