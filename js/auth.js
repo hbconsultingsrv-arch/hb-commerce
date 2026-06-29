@@ -246,6 +246,10 @@ function bindUserAvatarFallbacks(root = document) {
   });
 }
 
+function getProfilePageUrl() {
+  return 'compte.html?tab=profil';
+}
+
 function renderSessionUserChip(profile, session, options = {}) {
   const host = document.getElementById('sessionUserChip');
   if (!host) return;
@@ -259,21 +263,44 @@ function renderSessionUserChip(profile, session, options = {}) {
 
   const name = profileDisplayName(profile, session);
   const subtitle = options.subtitle || '';
-  const dashboardUrl = options.dashboardUrl || '';
-  const tag = dashboardUrl
-    ? `<a href="${escapeHtml(dashboardUrl)}" class="session-user-chip">`
-    : '<div class="session-user-chip session-user-chip--static">';
-  const tagClose = dashboardUrl ? '</a>' : '</div>';
-
-  host.hidden = false;
+  const profileUrl = options.profileUrl || getProfilePageUrl();
   const showSubtitle = subtitle && subtitle !== name;
-  host.innerHTML = `
-    ${tag}
-      ${buildUserAvatarHtml(profile, session, 'user-avatar--sm')}
+  const avatarHtml = buildUserAvatarHtml(profile, session, 'user-avatar--sm');
+  const textHtml = `
       <span class="session-user-chip-text">
         <strong class="session-user-chip-name">${escapeHtml(name)}</strong>
         ${showSubtitle ? `<span class="session-user-chip-meta">${escapeHtml(subtitle)}</span>` : ''}
-      </span>
+      </span>`;
+
+  if (host.classList.contains('session-user-chip-host--menu')) {
+    host.hidden = false;
+    host.innerHTML = `
+      <div class="nav-dropdown-wrap nav-profile-wrap">
+        <button type="button" class="session-user-chip nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
+          ${avatarHtml}
+          ${textHtml}
+          <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
+        </button>
+        <ul class="nav-dropdown-menu nav-profile-menu" role="menu">
+          <li role="none"><a href="${escapeHtml(profileUrl)}" role="menuitem">Mon profil</a></li>
+          <li role="none"><button type="button" id="logoutBtn" class="nav-dropdown-action" role="menuitem">Déconnexion</button></li>
+        </ul>
+      </div>`;
+    bindUserAvatarFallbacks(host);
+    bindNavDropdowns();
+    return;
+  }
+
+  const tag = profileUrl
+    ? `<a href="${escapeHtml(profileUrl)}" class="session-user-chip">`
+    : '<div class="session-user-chip session-user-chip--static">';
+  const tagClose = profileUrl ? '</a>' : '</div>';
+
+  host.hidden = false;
+  host.innerHTML = `
+    ${tag}
+      ${avatarHtml}
+      ${textHtml}
     ${tagClose}
   `;
   bindUserAvatarFallbacks(host);
@@ -322,7 +349,7 @@ async function applySessionUserDisplay(profile, session) {
     : (userProfile?.email || session.user?.email || '');
 
   applyWelcomeUserHeader(userProfile, session);
-  renderSessionUserChip(userProfile, session, { subtitle, dashboardUrl });
+  renderSessionUserChip(userProfile, session, { subtitle, profileUrl: getProfilePageUrl() });
   enhanceNavAccountLink(userProfile, session, dashboardUrl);
 }
 
@@ -624,8 +651,8 @@ function bindNavDropdowns() {
       }
     });
 
-    menu.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', () => closeAll());
+    menu.querySelectorAll('a, button[data-admin-tab], button.nav-dropdown-action').forEach((el) => {
+      el.addEventListener('click', () => closeAll());
     });
   });
 

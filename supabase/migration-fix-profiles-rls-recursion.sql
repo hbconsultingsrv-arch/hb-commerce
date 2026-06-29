@@ -1,7 +1,32 @@
 -- HB Commerce — Corriger la récursion infinie RLS sur profiles
--- Symptôme : connexion affiche « infinite recursion detected in policy for relation profiles »
--- Cause : politiques livreurs qui relisent profiles dans le USING (sans SECURITY DEFINER)
--- Exécuter dans Supabase SQL Editor après migration-livreurs-setup-complete.sql
+-- Symptôme : admin / équipe HB affiche « infinite recursion detected in policy for relation profiles »
+-- Causes :
+--   1. politique client « assigned commercial agent » qui relit profiles dans le USING
+--   2. politiques livreurs qui relisent profiles dans le USING (sans SECURITY DEFINER)
+-- Exécuter dans Supabase SQL Editor (safe à réexécuter)
+
+CREATE OR REPLACE FUNCTION public.client_assigned_agent_id()
+RETURNS uuid
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = public
+AS $$
+  SELECT commercial_agent_id
+  FROM public.profiles
+  WHERE id = auth.uid()
+  LIMIT 1;
+$$;
+
+DROP POLICY IF EXISTS "Client read assigned commercial agent" ON public.profiles;
+CREATE POLICY "Client read assigned commercial agent" ON public.profiles
+  FOR SELECT USING (
+    public.client_assigned_agent_id() IS NOT NULL
+    AND id = public.client_assigned_agent_id()
+  );
+
+COMMENT ON FUNCTION public.client_assigned_agent_id() IS
+  'Agent commercial assigné au client connecté (SECURITY DEFINER, évite récursion RLS)';
 
 CREATE OR REPLACE FUNCTION public.auth_driver_id()
 RETURNS uuid

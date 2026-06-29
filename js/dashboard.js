@@ -1,3 +1,92 @@
+function activateDashboardTab(tabId) {
+  const tab = document.querySelector(`#compteTabs [data-tab="${tabId}"]`);
+  if (!tab) return;
+  document.querySelectorAll('#compteTabs .admin-tab').forEach((t) => t.classList.remove('active'));
+  document.querySelectorAll('.admin-panel').forEach((p) => { p.hidden = true; });
+  tab.classList.add('active');
+  const panel = document.getElementById(`panel-${tabId}`);
+  if (panel) panel.hidden = false;
+}
+
+function bindProfileForm(profile, session) {
+  const form = document.getElementById('profileForm');
+  if (!form || !profile) return profile;
+
+  if (typeof initProfileAvatarUpload === 'function') initProfileAvatarUpload(profile, session);
+
+  form.full_name.value = profile.full_name || '';
+  form.email.value = profile.email || session.user.email;
+  form.phone.value = profile.phone || '';
+  form.address.value = profile.address || '';
+  if (form.company) form.company.value = profile.company || '';
+  if (form.siren) form.siren.value = profile.siren || '';
+  if (form.vat_number) form.vat_number.value = profile.vat_number || '';
+
+  if (form.dataset.bound === '1') return profile;
+  form.dataset.bound = '1';
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const note = document.getElementById('profileNote');
+    const fd = new FormData(form);
+    try {
+      let avatarUrl = profile.avatar_url || null;
+      const avatarFile = document.getElementById('profileAvatarFile')?.files?.[0];
+      if (avatarFile && typeof uploadProfileAvatar === 'function') {
+        const uploaded = await uploadProfileAvatar(avatarFile, session.user.id);
+        if (uploaded.uploadError) throw new Error(uploaded.uploadError);
+        if (uploaded.url) avatarUrl = uploaded.url;
+      } else if (document.getElementById('profileAvatarPreview')?.hidden) {
+        avatarUrl = null;
+      }
+
+      profile = await updateProfile(session.user.id, {
+        full_name: fd.get('full_name'),
+        phone: fd.get('phone'),
+        address: fd.get('address'),
+        company: fd.get('company'),
+        siren: fd.get('siren'),
+        vat_number: fd.get('vat_number'),
+        avatar_url: avatarUrl
+      });
+      await applySessionUserDisplay(profile, session);
+      if (typeof initProfileAvatarUpload === 'function') initProfileAvatarUpload(profile, session);
+      showAlert(note, 'Profil mis à jour.', 'success');
+    } catch (err) {
+      showAlert(note, err.message);
+    }
+  });
+  return profile;
+}
+
+async function initInternalProfileDashboard(profile, session) {
+  bindDashboardTabs('#compteTabs .admin-tab');
+  await applySessionUserDisplay(profile, session);
+
+  const sectionTag = document.querySelector('.dashboard-header .section-tag');
+  if (sectionTag) sectionTag.textContent = 'Mon profil';
+  const headerSub = document.querySelector('.dashboard-header .auth-sub');
+  if (headerSub) headerSub.textContent = 'Photo, coordonnées et informations personnelles.';
+
+  document.getElementById('commercialAgentContact')?.setAttribute('hidden', '');
+  document.querySelectorAll('#compteTabs .admin-tab[data-tab="commandes"], #compteTabs .admin-tab[data-tab="chat"]').forEach((el) => {
+    el.hidden = true;
+  });
+  document.querySelector('.nav-actions a[href="produits.html"]')?.setAttribute('hidden', '');
+
+  const adminLink = document.getElementById('compteAdminLink');
+  if (adminLink && typeof isAdmin === 'function' && await isAdmin()) {
+    adminLink.style.display = '';
+  }
+  const superRootLink = document.getElementById('compteSuperRootLink');
+  if (superRootLink && typeof isSuperRoot === 'function' && await isSuperRoot()) {
+    superRootLink.style.display = '';
+  }
+
+  bindProfileForm(profile, session);
+  activateDashboardTab('profil');
+  document.getElementById('logoutBtn')?.addEventListener('click', signOut);
+}
+
 async function initDashboard() {
   const session = await requireAuth();
   if (!session) return;
@@ -9,7 +98,14 @@ async function initDashboard() {
     console.warn('initDashboard: profil inaccessible', err.message);
   }
 
+  const requestedTab = new URLSearchParams(window.location.search).get('tab');
+  const profileFocus = requestedTab === 'profil';
+
   if (!isClientDashboardRole(profile, session)) {
+    if (profileFocus) {
+      await initInternalProfileDashboard(profile, session);
+      return;
+    }
     window.location.href = await getDefaultDashboardUrl(session, profile);
     return;
   }
@@ -27,50 +123,7 @@ async function initDashboard() {
   }
   renderCommercialAgentContact(commercialAgent);
 
-  const form = document.getElementById('profileForm');
-  if (form && profile) {
-    if (typeof initProfileAvatarUpload === 'function') initProfileAvatarUpload(profile, session);
-
-    form.full_name.value = profile.full_name || '';
-    form.email.value = profile.email || session.user.email;
-    form.phone.value = profile.phone || '';
-    form.address.value = profile.address || '';
-    if (form.company) form.company.value = profile.company || '';
-    if (form.siren) form.siren.value = profile.siren || '';
-    if (form.vat_number) form.vat_number.value = profile.vat_number || '';
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const note = document.getElementById('profileNote');
-      const fd = new FormData(form);
-      try {
-        let avatarUrl = profile.avatar_url || null;
-        const avatarFile = document.getElementById('profileAvatarFile')?.files?.[0];
-        if (avatarFile && typeof uploadProfileAvatar === 'function') {
-          const uploaded = await uploadProfileAvatar(avatarFile, session.user.id);
-          if (uploaded.uploadError) throw new Error(uploaded.uploadError);
-          if (uploaded.url) avatarUrl = uploaded.url;
-        } else if (document.getElementById('profileAvatarPreview')?.hidden) {
-          avatarUrl = null;
-        }
-
-        profile = await updateProfile(session.user.id, {
-          full_name: fd.get('full_name'),
-          phone: fd.get('phone'),
-          address: fd.get('address'),
-          company: fd.get('company'),
-          siren: fd.get('siren'),
-          vat_number: fd.get('vat_number'),
-          avatar_url: avatarUrl
-        });
-        await applySessionUserDisplay(profile, session);
-        if (typeof initProfileAvatarUpload === 'function') initProfileAvatarUpload(profile, session);
-        showAlert(note, 'Profil mis à jour.', 'success');
-      } catch (err) {
-        showAlert(note, err.message);
-      }
-    });
-  }
+  profile = bindProfileForm(profile, session) || profile;
 
   await loadCompanyChat(session, commercialAgent);
   const orders = await fetchUserOrders(session.user.id);
@@ -112,6 +165,8 @@ async function initDashboard() {
   if (superRootLink && typeof isSuperRoot === 'function' && await isSuperRoot()) {
     superRootLink.style.display = '';
   }
+
+  if (requestedTab === 'profil') activateDashboardTab('profil');
 
   document.getElementById('logoutBtn')?.addEventListener('click', signOut);
 }

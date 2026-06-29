@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="css/stock.css?v=stock-20260619">
   <link rel="stylesheet" href="css/analytics.css?v=analytics-20260624">
   <link rel="stylesheet" href="css/admin-roadmap.css?v=qa-report-20260630">
-  <link rel="stylesheet" href="css/admin-shell.css?v=admin-topbar-20260619">
+  <link rel="stylesheet" href="css/admin-shell.css?v=admin-menu-20260619">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
 <body class="dashboard-page admin-v2">
@@ -40,9 +40,6 @@
         <button type="button" class="admin-nav-item admin-only" data-tab="construction"><span class="admin-nav-icon">⬡</span> Construction</button>
         <button type="button" class="admin-nav-item" data-tab="chat"><span class="admin-nav-icon">✉</span> Support<span class="admin-nav-badge" id="adminChatNavBadge" hidden></span></button>
       </nav>
-      <div class="admin-sidebar-footer admin-sidebar-footer--minimal">
-        <a href="index.html" class="btn btn-sm btn-outline-light">Voir le site</a>
-      </div>
     </aside>
 
     <div class="admin-shell">
@@ -60,7 +57,6 @@
         </div>
         <div class="admin-topbar-actions">
           <div class="admin-topbar-toolbar admin-only" aria-label="Raccourcis administration">
-            <button type="button" class="btn btn-sm btn-outline-light" data-admin-tab="equipe">Équipe HB</button>
             <div class="nav-dropdown-wrap nav-activities-wrap">
               <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
                 Mes activités <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
@@ -70,11 +66,19 @@
                 <li role="none"><a href="livreur.html" role="menuitem"><span class="nav-dropdown-num">2</span> Livraison</a></li>
               </ul>
             </div>
-            <button type="button" class="btn btn-sm btn-outline-light" data-admin-tab="stock">Stock</button>
-            <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light" title="Mode clair / sombre">🌙 Sombre</button>
+            <div class="nav-dropdown-wrap nav-admin-menu-wrap">
+              <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
+                Menu <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
+              </button>
+              <ul class="nav-dropdown-menu" role="menu">
+                <li role="none"><button type="button" class="nav-dropdown-action" data-admin-tab="equipe" role="menuitem">Équipe HB</button></li>
+                <li role="none"><button type="button" class="nav-dropdown-action" data-admin-tab="stock" role="menuitem">Stock</button></li>
+                <li role="none"><button type="button" class="nav-dropdown-action" id="adminDarkModeBtn" role="menuitem" title="Mode clair / sombre">🌙 Sombre</button></li>
+                <li role="none"><a href="index.html" role="menuitem">Voir le site</a></li>
+              </ul>
+            </div>
           </div>
-          <div id="sessionUserChip" class="session-user-chip-host" hidden></div>
-          <button type="button" id="logoutBtn" class="btn btn-sm btn-primary">Déconnexion</button>
+          <div id="sessionUserChip" class="session-user-chip-host session-user-chip-host--menu" hidden></div>
         </div>
       </header>
 
@@ -383,12 +387,6 @@
     </section>
 
     <section id="panel-equipe" class="admin-panel admin-only" hidden data-tab-scope>
-      <div class="role-space-links">
-        <a href="agent.html" class="btn btn-sm btn-outline-dark">Ouvrir mon espace commercial</a>
-        <a href="livreur.html" class="btn btn-sm btn-outline-dark">Ouvrir l'espace livreur</a>
-        <a href="login.html" class="btn btn-sm btn-outline-dark" target="_blank" rel="noopener">Connexion agent (login)</a>
-        <a href="login-livreur.html" class="btn btn-sm btn-outline-dark" target="_blank" rel="noopener">Connexion livreur</a>
-      </div>
       <div class="section-tabs" data-section-tabs>
         <button type="button" class="section-tab active" data-section="agents">Agents commerciaux</button>
         <button type="button" class="section-tab" data-section="livreurs">Livreurs</button>
@@ -1114,8 +1112,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js?v=admin-topbar-20260619"></script>
-  <script src="js/admin-api.js?v=admin-topbar-20260619"></script>
+  <script src="js/auth.js?v=admin-menu-20260619"></script>
+  <script src="js/admin-api.js?v=admin-menu-20260619"></script>
   <script src="js/driver-api.js?v=livreur-20260625"></script>
   <script src="js/stock.js?v=stock-fallback-20260623"></script>
   <script src="js/stock-alerts.js?v=stock-fallback-20260623"></script>

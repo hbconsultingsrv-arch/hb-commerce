@@ -272,6 +272,51 @@
   min-width: 220px;
 }
 
+.admin-topbar-toolbar .nav-dropdown-menu .nav-dropdown-action {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+}
+
+.admin-topbar-toolbar .nav-dropdown-menu .nav-dropdown-action:hover,
+.admin-topbar-toolbar .nav-dropdown-menu .nav-dropdown-action.is-active {
+  background: rgba(201, 162, 39, 0.14);
+}
+
+.nav-profile-wrap {
+  display: inline-flex;
+}
+
+.nav-profile-wrap .session-user-chip.nav-dropdown-trigger {
+  border: 1px solid var(--admin-border);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.nav-profile-wrap .nav-dropdown-caret {
+  margin-left: 0.15rem;
+  opacity: 0.75;
+  font-size: 0.72rem;
+}
+
+.nav-profile-menu {
+  min-width: 210px;
+  right: 0;
+  left: auto;
+}
+
+.session-user-chip-host--menu {
+  flex-shrink: 0;
+}
+
 .admin-v2 .admin-topbar .btn-outline-light {
   color: var(--admin-text);
   border-color: var(--admin-border);
