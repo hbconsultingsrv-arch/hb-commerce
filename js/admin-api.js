@@ -97,6 +97,19 @@ async function fetchInternalProfiles() {
   return (data || []).filter((profile) => !['client', 'supplier', 'pending_company'].includes(profile.role));
 }
 
+async function bootstrapDemoSuperRoot() {
+  const sb = getSupabase();
+  if (!sb) return null;
+  const { data, error } = await sb.rpc('bootstrap_demo_super_root');
+  if (error) {
+    if (error.message?.includes('bootstrap_demo_super_root') || error.code === 'PGRST202') {
+      return { ok: false, reason: 'rpc_missing' };
+    }
+    throw error;
+  }
+  return data;
+}
+
 async function updateProfileRole(profileId, role) {
   const sb = getSupabase();
   if (!sb) throw new Error(configErrorMessage());

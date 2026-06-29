@@ -100,14 +100,63 @@ async function initSuperRoot() {
   await loadSuperRootData();
 }
 
-async function loadSuperRootData() {
+async function ensureSuperRootTeamAccess(session) {
+  let profile = null;
   try {
+    profile = await getProfile(session.user.id);
+  } catch (err) {
+    console.warn('ensureSuperRootTeamAccess:', err.message);
+  }
+  if (profile?.role === 'super_root') return true;
+
+  if (typeof bootstrapDemoSuperRoot === 'function') {
+    try {
+      const result = await bootstrapDemoSuperRoot();
+      if (result?.ok) {
+        try {
+          profile = await getProfile(session.user.id);
+        } catch (_) { /* ignore */ }
+        return profile?.role === 'super_root';
+      }
+    } catch (err) {
+      console.warn('bootstrapDemoSuperRoot:', err.message);
+    }
+  }
+  return profile?.role === 'super_root';
+}
+
+async function loadSuperRootData() {
+  const note = document.getElementById('profilesNote');
+  try {
+    const session = await getSession();
+    if (session) await ensureSuperRootTeamAccess(session);
+
     superRootProfiles = typeof fetchInternalProfiles === 'function'
       ? await fetchInternalProfiles()
       : (await fetchAllProfiles()).filter(isTeamProfile);
     renderProfilesTable();
+
+    if (!superRootProfiles.length && note) {
+      showAlert(
+        note,
+        'Liste vide : exécutez supabase/seed-demo-data.sql puis migration-super-root-bootstrap.sql dans Supabase, ou : UPDATE public.profiles SET role = \'super_root\' WHERE email = \'super@hbcommerce.demo\';',
+        'error'
+      );
+    } else if (note && note.classList.contains('error')) {
+      showAlert(note, '');
+    }
   } catch (err) {
-    showAlert(document.getElementById('profilesNote'), err.message);
+    const msg = err.message || String(err);
+    if (note) {
+      showAlert(
+        note,
+        msg.includes('recursion')
+          ? `${msg} — Exécutez supabase/migration-fix-profiles-rls-recursion.sql`
+          : msg,
+        'error'
+      );
+    }
+    renderProfilesTable();
   }
 }
 
@@ -129,7 +178,10 @@ function renderProfilesTable() {
       </td>
       <td><button type="button" class="btn btn-sm btn-outline-dark" data-edit-profile="${profile.id}">Modifier</button></td>
     </tr>
-  `).join('') : '<tr><td colspan="5">Aucun utilisateur HB Commerce.</td></tr>';
+  `).join('') : `<tr><td colspan="5">
+      Aucun utilisateur HB Commerce trouvé.
+      <br><small>Vérifiez seed-demo-data.sql et le rôle super_root sur votre compte (voir message sous le tableau).</small>
+    </td></tr>`;
 
   body.querySelectorAll('[data-edit-profile]').forEach((btn) => {
     btn.addEventListener('click', () => editProfile(btn.dataset.editProfile));

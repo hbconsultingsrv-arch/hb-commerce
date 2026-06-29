@@ -104,6 +104,12 @@ Pour la **carte agent commercial** côté client et la **photo de profil** :
 
 > **Important :** n'exécutez pas `migration-agent-driver-assignment.sql` seul — la table `delivery_drivers` doit exister (voir script complet ci-dessus).
 
+```sql
+-- Copier-coller le contenu de supabase/migration-super-root-bootstrap.sql
+```
+
+> Si **Équipe HB** est vide sur `super-root.html`, exécutez aussi cette migration (ou `UPDATE public.profiles SET role = 'super_root' WHERE email = 'super@hbcommerce.demo';`).
+
 Promouvez ensuite votre compte principal en super root (remplacez l'e-mail) :
 
 ```sql
