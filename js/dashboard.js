@@ -8,6 +8,27 @@ function activateDashboardTab(tabId) {
   if (panel) panel.hidden = false;
 }
 
+async function applyCompteBackOfficeLink() {
+  const link = document.getElementById('compteBackOfficeLink');
+  if (!link) return;
+  if (typeof isSuperRoot === 'function' && await isSuperRoot()) {
+    link.href = 'admin.html?tab=equipe';
+    link.style.display = '';
+    return;
+  }
+  if (typeof isAdmin === 'function' && await isAdmin()) {
+    link.href = 'admin.html';
+    link.style.display = '';
+    return;
+  }
+  link.style.display = 'none';
+}
+
+function isStorageBucketMissingError(message) {
+  const text = String(message || '').toLowerCase();
+  return text.includes('bucket not found') || text.includes('bucket introuvable');
+}
+
 function bindProfileForm(profile, session) {
   const form = document.getElementById('profileForm');
   if (!form || !profile) return profile;
@@ -30,11 +51,19 @@ function bindProfileForm(profile, session) {
     const fd = new FormData(form);
     try {
       let avatarUrl = profile.avatar_url || null;
+      let avatarWarning = '';
       const avatarFile = document.getElementById('profileAvatarFile')?.files?.[0];
       if (avatarFile && typeof uploadProfileAvatar === 'function') {
         const uploaded = await uploadProfileAvatar(avatarFile, session.user.id);
-        if (uploaded.uploadError) throw new Error(uploaded.uploadError);
-        if (uploaded.url) avatarUrl = uploaded.url;
+        if (uploaded.uploadError) {
+          if (isStorageBucketMissingError(uploaded.uploadError)) {
+            avatarWarning = 'Photo non enregistrée : exécutez supabase/migration-profile-avatar.sql dans Supabase.';
+          } else {
+            throw new Error(uploaded.uploadError);
+          }
+        } else if (uploaded.url) {
+          avatarUrl = uploaded.url;
+        }
       } else if (document.getElementById('profileAvatarPreview')?.hidden) {
         avatarUrl = null;
       }
@@ -50,7 +79,8 @@ function bindProfileForm(profile, session) {
       });
       await applySessionUserDisplay(profile, session);
       if (typeof initProfileAvatarUpload === 'function') initProfileAvatarUpload(profile, session);
-      showAlert(note, 'Profil mis à jour.', 'success');
+      const message = avatarWarning ? `Profil mis à jour. ${avatarWarning}` : 'Profil mis à jour.';
+      showAlert(note, message, avatarWarning ? 'error' : 'success');
     } catch (err) {
       showAlert(note, err.message);
     }
@@ -73,14 +103,7 @@ async function initInternalProfileDashboard(profile, session) {
   });
   document.querySelector('.nav-actions a[href="produits.html"]')?.setAttribute('hidden', '');
 
-  const adminLink = document.getElementById('compteAdminLink');
-  if (adminLink && typeof isAdmin === 'function' && await isAdmin()) {
-    adminLink.style.display = '';
-  }
-  const superRootLink = document.getElementById('compteSuperRootLink');
-  if (superRootLink && typeof isSuperRoot === 'function' && await isSuperRoot()) {
-    superRootLink.style.display = '';
-  }
+  await applyCompteBackOfficeLink();
 
   bindProfileForm(profile, session);
   activateDashboardTab('profil');
@@ -157,16 +180,9 @@ async function initDashboard() {
     bindInvoiceButtons(orders, profile);
   }
 
-  const adminLink = document.getElementById('compteAdminLink');
-  if (adminLink && await isAdmin()) {
-    adminLink.style.display = '';
-  }
-  const superRootLink = document.getElementById('compteSuperRootLink');
-  if (superRootLink && typeof isSuperRoot === 'function' && await isSuperRoot()) {
-    superRootLink.style.display = '';
-  }
-
   if (requestedTab === 'profil') activateDashboardTab('profil');
+
+  await applyCompteBackOfficeLink();
 
   document.getElementById('logoutBtn')?.addEventListener('click', signOut);
 }
