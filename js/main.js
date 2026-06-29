@@ -50,6 +50,7 @@ async function initHomeProducts() {
     ? renderHomeBrandCatalog(products)
     : products.map(renderProductCard).join('');
   bindProductCardEvents(catalogHost, null, products);
+  if (typeof bindBrandImageFallbacks === 'function') bindBrandImageFallbacks(catalogHost);
 
   if (typeof populateCatalogFilters === 'function') populateCatalogFilters(products);
   if (typeof updateHeroStats === 'function') updateHeroStats(products);

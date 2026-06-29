@@ -474,8 +474,83 @@ const HB_BRAND_META = {
     tagline: 'Huile d\'olive — gamme TOUNSI',
     origin: 'Tunisie',
     accent: 'tounsi'
+  },
+  'CAP BON': {
+    slug: 'cap-bon',
+    tagline: 'Épicerie tunisienne — harissa et spécialités',
+    origin: 'Tunisie',
+    accent: 'default',
+    image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80'
+  },
+  OASIS: {
+    slug: 'oasis',
+    tagline: 'Fruits secs — dattes Deglet Nour',
+    origin: 'Tunisie',
+    accent: 'default',
+    image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=800&q=80'
+  },
+  MONCEF: {
+    slug: 'moncef',
+    tagline: 'Couscous et semoules — restauration collective',
+    origin: 'Tunisie',
+    accent: 'default',
+    image: 'https://images.unsplash.com/photo-1598866594230-a7c127049e09?w=800&q=80'
+  },
+  'LES MOULINS': {
+    slug: 'les-moulins',
+    tagline: 'Huiles et friture professionnelle',
+    origin: 'Tunisie',
+    accent: 'default',
+    image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=80'
+  },
+  MOULIN: {
+    slug: 'moulin',
+    tagline: 'Épicerie fine — confitures',
+    origin: 'Tunisie',
+    accent: 'default',
+    image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800&q=80'
   }
 };
+
+function defaultProductImageFallback() {
+  if (typeof getFiafiImageUrl === 'function') return getFiafiImageUrl(600);
+  return window.FIAFI_IMAGES?.product || window.HB_BRANDING?.images?.thumb || 'images/prenium.PNG';
+}
+
+function resolveBrandHeroImage(brand, products) {
+  const meta = getBrandMeta(brand);
+  if (meta.image) return meta.image;
+
+  if (products?.length) {
+    for (const product of products) {
+      const url = (product.image_url || '').trim();
+      if (url && !isStaleFiafiImage(url)) return url;
+    }
+    const sample = products.find((p) => p.tag) || products[0];
+    if (sample) {
+      const resolved = resolveProductImage(sample);
+      const fallback = defaultProductImageFallback();
+      if (resolved && resolved !== fallback) return resolved;
+    }
+  }
+
+  return defaultProductImageFallback();
+}
+
+function bindBrandImageFallbacks(root = document) {
+  const globalFallback = defaultProductImageFallback();
+  root.querySelectorAll('.brand-block-thumb, .hero-promo-brand img').forEach((img) => {
+    if (img.dataset.fallbackBound === '1') return;
+    img.dataset.fallbackBound = '1';
+    const primaryFallback = img.dataset.fallbackSrc || globalFallback;
+    img.addEventListener('error', () => {
+      const next = img.dataset.fallbackSrc && img.src !== img.dataset.fallbackSrc
+        ? img.dataset.fallbackSrc
+        : globalFallback;
+      if (img.src !== next) img.src = next;
+    });
+  });
+}
 
 function getProductBrand(product) {
   const name = product?.name || '';
@@ -516,15 +591,15 @@ function renderBrandBlock(brand, products, options = {}) {
   const meta = getBrandMeta(brand);
   const limit = options.limit || products.length;
   const slice = products.slice(0, limit);
-  const heroProduct = products.find((p) => p.tag) || products[0];
-  const heroImg = heroProduct ? resolveProductImage(heroProduct) : (FIAFI_IMAGES?.product || 'images/prenium.PNG');
+  const heroImg = resolveBrandHeroImage(brand, products);
+  const imgFallback = escapeHtml(meta.image || defaultProductImageFallback());
   const countLabel = `${products.length} format${products.length > 1 ? 's' : ''}`;
 
   return `
     <section class="brand-block brand-block--${meta.accent}" id="marque-${meta.slug}">
       <header class="brand-block-head">
         <div class="brand-block-intro">
-          <img class="brand-block-thumb" src="${heroImg}" alt="${escapeHtml(brand)}" loading="lazy">
+          <img class="brand-block-thumb" src="${escapeHtml(heroImg)}" data-fallback-src="${imgFallback}" alt="${escapeHtml(brand)}" loading="lazy" onerror="if(this.dataset.fallbackSrc&&this.src!==this.dataset.fallbackSrc){this.onerror=null;this.src=this.dataset.fallbackSrc}">
           <div>
             <span class="brand-block-label">Marque</span>
             <h3 class="brand-block-title">${escapeHtml(brand)}</h3>
@@ -571,11 +646,11 @@ function renderHeroPromoBrands(products) {
   }
   return groups.map(([brand, list]) => {
     const meta = getBrandMeta(brand);
-    const sample = list[0];
-    const img = sample ? resolveProductImage(sample) : (FIAFI_IMAGES?.product || 'images/prenium.PNG');
+    const img = resolveBrandHeroImage(brand, list);
+    const imgFallback = escapeHtml(meta.image || defaultProductImageFallback());
     return `
       <a href="#marque-${meta.slug}" class="hero-promo-brand hero-promo-brand--${meta.accent}">
-        <img src="${img}" alt="${escapeHtml(brand)}" loading="lazy">
+        <img src="${escapeHtml(img)}" data-fallback-src="${imgFallback}" alt="${escapeHtml(brand)}" loading="lazy" onerror="if(this.dataset.fallbackSrc&&this.src!==this.dataset.fallbackSrc){this.onerror=null;this.src=this.dataset.fallbackSrc}">
         <span class="hero-promo-brand-name">${escapeHtml(brand)}</span>
         <span class="hero-promo-brand-count">${list.length} produit${list.length > 1 ? 's' : ''}</span>
       </a>

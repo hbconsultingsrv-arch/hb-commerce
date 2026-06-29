@@ -14,10 +14,11 @@ function buildHeroCubeItems(products) {
 
   return groups.map(([brand, list]) => {
     const meta = typeof getBrandMeta === 'function' ? getBrandMeta(brand) : {};
-    const sample = list[0];
-    const img = sample && typeof resolveProductImage === 'function'
-      ? resolveProductImage(sample)
-      : fallback;
+    const img = typeof resolveBrandHeroImage === 'function'
+      ? resolveBrandHeroImage(brand, list)
+      : (list[0] && typeof resolveProductImage === 'function'
+        ? resolveProductImage(list[0])
+        : fallback);
     const slug = meta.slug || brand.toLowerCase().replace(/\s+/g, '-');
     return {
       brand,
