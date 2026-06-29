@@ -86,27 +86,27 @@ async function requireSuperRoot() {
   return session;
 }
 
-async function fetchAllProfiles() {
+async function fetchProfilesQuery(buildQuery) {
   const sb = getSupabase();
   if (!sb) return [];
-  const { data, error } = await sb
-    .from('profiles')
-    .select('*')
-    .order('created_at', { ascending: false });
+  const baseSelect = 'id,email,full_name,phone,company,role,driver_id,commercial_agent_id,created_at,updated_at';
+  let { data, error } = await buildQuery(sb.from('profiles').select(`${baseSelect},avatar_url`));
+  if (error && typeof isAvatarUrlColumnMissingError === 'function' && isAvatarUrlColumnMissingError(error)) {
+    ({ data, error } = await buildQuery(sb.from('profiles').select(baseSelect)));
+  }
   if (error) throw error;
   return data || [];
 }
 
+async function fetchAllProfiles() {
+  return fetchProfilesQuery((query) => query.order('created_at', { ascending: false }));
+}
+
 async function fetchInternalProfiles() {
-  const sb = getSupabase();
-  if (!sb) return [];
-  const { data, error } = await sb
-    .from('profiles')
-    .select('*')
+  const rows = await fetchProfilesQuery((query) => query
     .in('role', ['agent_commercial', 'admin', 'super_root', 'livreur'])
-    .order('full_name', { ascending: true });
-  if (error) throw error;
-  return (data || []).filter((profile) => !['client', 'supplier', 'pending_company'].includes(profile.role));
+    .order('full_name', { ascending: true }));
+  return rows.filter((profile) => !['client', 'supplier', 'pending_company'].includes(profile.role));
 }
 
 async function bootstrapDemoSuperRoot() {

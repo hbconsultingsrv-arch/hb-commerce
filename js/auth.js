@@ -110,21 +110,30 @@ async function signOut() {
 async function getProfile(userId) {
   const sb = getSupabase();
   if (!sb) return null;
-  const { data, error } = await sb
+  const baseSelect = 'id,email,full_name,phone,company,role,driver_id,commercial_agent_id,created_at,updated_at';
+  let { data, error } = await sb
     .from('profiles')
-    .select('*')
+    .select(`${baseSelect},avatar_url`)
     .eq('id', userId)
     .maybeSingle();
+  if (error && isAvatarUrlColumnMissingError(error)) {
+    ({ data, error } = await sb
+      .from('profiles')
+      .select(baseSelect)
+      .eq('id', userId)
+      .maybeSingle());
+  }
   if (error) throw error;
   return data;
 }
 
-function isAdminProfile(profile) {
-  return profile?.role === 'admin' || profile?.role === 'super_root';
+function isAdminProfile(profile, session = null) {
+  const role = resolveProfileRole(profile, session);
+  return role === 'admin' || role === 'super_root';
 }
 
-function isSuperRootProfile(profile) {
-  return profile?.role === 'super_root';
+function isSuperRootProfile(profile, session = null) {
+  return resolveProfileRole(profile, session) === 'super_root';
 }
 
 function isCommercialAgentProfile(profile) {
@@ -281,8 +290,13 @@ function getStaffChipSubtitle(profile, session) {
 }
 
 function getSessionChipSubtitle(profile, session) {
-  if (document.body.classList.contains('livreur-page') || document.body.classList.contains('commercial-space')) {
-    return getStaffChipSubtitle(profile, session);
+  if (
+    document.body.classList.contains('livreur-page')
+    || document.body.classList.contains('commercial-space')
+    || document.body.classList.contains('admin-v2')
+  ) {
+    const staffSub = getStaffChipSubtitle(profile, session);
+    if (staffSub) return staffSub;
   }
   const name = profileDisplayName(profile, session);
   if (profile?.company && profile.company !== name) return profile.company;
@@ -380,6 +394,13 @@ async function applySessionUserDisplay(profile, session) {
     } catch (err) {
       console.warn('applySessionUserDisplay:', err.message);
     }
+  }
+  if (!userProfile) {
+    userProfile = {
+      id: session.user?.id,
+      email: session.user?.email,
+      full_name: session.user?.user_metadata?.full_name || session.user?.email?.split('@')[0] || 'Utilisateur',
+    };
   }
 
   const dashboardUrl = await getDefaultDashboardUrl(session, userProfile);

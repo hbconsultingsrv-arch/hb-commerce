@@ -114,6 +114,16 @@
   color: rgba(255, 255, 255, 0.92);
 }
 
+.admin-sidebar-user .user-avatar {
+  flex-shrink: 0;
+}
+
+.admin-sidebar-user .user-avatar--initials {
+  background: linear-gradient(135deg, #2d5a38, #1e3320);
+  border-color: rgba(201, 162, 39, 0.55);
+  color: #fff;
+}
+
 .admin-sidebar-user .session-user-chip-meta {
   opacity: 0.78;
 }

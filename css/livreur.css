@@ -37,6 +37,16 @@
   opacity: 0.78;
 }
 
+.livreur-nav-brand .user-avatar {
+  flex-shrink: 0;
+}
+
+.livreur-nav-brand .user-avatar--initials {
+  background: linear-gradient(135deg, #2d5a38, #1e3320);
+  border-color: rgba(201, 162, 39, 0.55);
+  color: #fff;
+}
+
 .livreur-nav-brand .nav-profile-menu {
   left: 0;
   right: auto;

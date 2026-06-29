@@ -18,6 +18,26 @@ let agentOrderProductsCache = [];
 let agentOrderClientPrices = new Map();
 let agentOrderFormReady = false;
 
+function isSuperRootAdmin() {
+  return resolveProfileRole(adminProfile, adminSession) === 'super_root';
+}
+
+async function loadEquipePanel() {
+  const superRoot = isSuperRootAdmin();
+  const superPanel = document.getElementById('superRootPanel');
+  const adminEquipe = document.getElementById('adminEquipePanel');
+  if (superRoot) {
+    if (superPanel) superPanel.hidden = false;
+    if (adminEquipe) adminEquipe.hidden = true;
+    if (typeof initSuperRootTeamPanel === 'function') await initSuperRootTeamPanel();
+    return;
+  }
+  if (superPanel) superPanel.hidden = true;
+  if (adminEquipe) adminEquipe.hidden = false;
+  await loadAgentsTable();
+  await loadDriversTable();
+}
+
 function showAdminTab(tabId) {
   if (!tabId) return;
   document.querySelectorAll('.admin-tab, .admin-nav-item').forEach((t) => {
@@ -45,12 +65,7 @@ function showAdminTab(tabId) {
     initRoadmapAdminPanel();
   }
   if (tabId === 'equipe') {
-    if (isSuperRootProfile(adminProfile)) {
-      if (typeof initSuperRootTeamPanel === 'function') initSuperRootTeamPanel();
-    } else {
-      loadAgentsTable();
-      loadDriversTable();
-    }
+    void loadEquipePanel();
   }
   if (tabId === 'commandes' && window.HB_COMMERCIAL_SPACE) {
     initAgentOrderForm();
@@ -93,7 +108,16 @@ async function initAdmin() {
     adminSession = await requireAdmin();
   }
   if (!adminSession) return;
-  adminProfile = await getProfile(adminSession.user.id);
+  try {
+    adminProfile = await getProfile(adminSession.user.id);
+  } catch (err) {
+    console.warn('initAdmin getProfile:', err.message);
+    adminProfile = {
+      id: adminSession.user.id,
+      email: adminSession.user.email,
+      full_name: adminSession.user.user_metadata?.full_name || adminSession.user.email?.split('@')[0] || 'Utilisateur',
+    };
+  }
   if (resolveProfileRole(adminProfile, adminSession) === 'super_root' && typeof bootstrapDemoSuperRoot === 'function') {
     try {
       await bootstrapDemoSuperRoot();
@@ -113,7 +137,7 @@ async function initAdmin() {
 
   document.getElementById('logoutBtn')?.addEventListener('click', signOut);
   applyAdminRoleUi(adminProfile, commercialSpace || isCommercialAgentProfile(adminProfile));
-  if (isSuperRootProfile(adminProfile)) {
+  if (isSuperRootAdmin()) {
     const superPanel = document.getElementById('superRootPanel');
     const adminEquipe = document.getElementById('adminEquipePanel');
     if (superPanel) superPanel.hidden = false;
@@ -134,7 +158,7 @@ async function initAdmin() {
     const panel = deepTab ? document.getElementById(`panel-${deepTab}`) : null;
     if (deepTab && panel) {
       showAdminTab(deepTab);
-      if (deepTab === 'equipe' && !isSuperRootProfile(adminProfile)) {
+      if (deepTab === 'equipe' && !isSuperRootAdmin()) {
         const section = params.get('section');
         if (section === 'livreurs' || section === 'agents') {
           activateSectionTab('panel-equipe', section);
@@ -149,7 +173,7 @@ async function initAdmin() {
   if (!commercialSpace) {
     await loadSuppliersTable();
     await loadProductsTable();
-    if (!isSuperRootProfile(adminProfile)) {
+    if (!isSuperRootAdmin()) {
       await loadAgentsTable();
     } else if (typeof initSuperRootTeamPanel === 'function') {
       await initSuperRootTeamPanel();
@@ -649,6 +673,7 @@ function mustScopeToAssignedClients() {
 async function loadAgentsTable() {
   const body = document.getElementById('agentsBody');
   if (!body) return;
+  body.innerHTML = '<tr><td colspan="4">Chargement…</td></tr>';
   try {
     if (!adminProfiles.length) {
       try {
@@ -658,7 +683,11 @@ async function loadAgentsTable() {
         adminProfiles = [];
       }
       if (!adminProfiles.length && typeof fetchInternalProfiles === 'function') {
-        adminProfiles = await fetchInternalProfiles();
+        try {
+          adminProfiles = await fetchInternalProfiles();
+        } catch (err) {
+          console.warn('fetchInternalProfiles:', err.message);
+        }
       }
     }
     const agents = adminProfiles.filter((p) => p.role === 'agent_commercial');
