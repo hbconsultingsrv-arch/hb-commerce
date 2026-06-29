@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="css/stock.css?v=stock-20260619">
   <link rel="stylesheet" href="css/analytics.css?v=analytics-20260624">
   <link rel="stylesheet" href="css/admin-roadmap.css?v=qa-report-20260630">
-  <link rel="stylesheet" href="css/admin-shell.css?v=admin-equipe-20260619">
+  <link rel="stylesheet" href="css/admin-shell.css?v=admin-sidebar-user-20260619">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
 <body class="dashboard-page admin-v2">
@@ -26,6 +26,9 @@
             <span class="logo-hb-tag">Administration B2B</span>
           </span>
         </a>
+      </div>
+      <div class="admin-sidebar-user">
+        <div id="sessionUserChip" class="session-user-chip-host session-user-chip-host--menu session-user-chip-host--sidebar" hidden></div>
       </div>
       <nav class="admin-sidebar-nav">
         <button type="button" class="admin-nav-item active" data-tab="accueil"><span class="admin-nav-icon">◉</span> Tableau de bord</button>
@@ -77,7 +80,6 @@
             </div>
             <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light" title="Mode clair / sombre">🌙 Sombre</button>
           </div>
-          <div id="sessionUserChip" class="session-user-chip-host session-user-chip-host--menu" hidden></div>
           <button type="button" id="logoutBtn" class="btn btn-sm btn-primary">Déconnexion</button>
         </div>
       </header>
