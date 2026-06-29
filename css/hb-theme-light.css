@@ -64,15 +64,18 @@ html.site-theme-light .hero-cube-hint span {
   color: var(--hb-gold, #c9a227);
 }
 
-html.site-theme-light .hero-promo-label {
-  color: var(--hb-green, #1e3d28);
+html.site-theme-light .hero-commerce .hero-cube-header .hero-promo-label {
+  color: #0f2318 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
+  font-weight: 800;
 }
 
-html.site-theme-light .hero-cube-counter {
-  color: var(--hb-green, #1e3d28);
-  background: rgba(255, 255, 255, 0.85);
-  border-color: rgba(201, 162, 39, 0.5);
-  box-shadow: 0 2px 8px rgba(30, 61, 40, 0.08);
+html.site-theme-light .hero-commerce .hero-cube-header .hero-cube-counter {
+  color: #0f2318 !important;
+  background: #ffffff !important;
+  border: 2px solid #b8921f !important;
+  box-shadow: 0 2px 12px rgba(30, 61, 40, 0.16) !important;
+  font-weight: 800;
 }
 
 html.site-theme-light .hero-stats-band .hero-stat {
