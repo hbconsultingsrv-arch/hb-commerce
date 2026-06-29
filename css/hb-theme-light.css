@@ -109,6 +109,35 @@ html.site-theme-light .site-nav .nav-links a:hover {
   background: rgba(45, 90, 56, 0.08);
 }
 
+html.site-theme-light .site-nav .nav-more-trigger {
+  color: var(--hb-green-mid, #2d5a38);
+}
+
+html.site-theme-light .site-nav .nav-more-trigger:hover,
+html.site-theme-light .site-nav .nav-more-wrap.is-open .nav-more-trigger {
+  color: var(--hb-green, #1e3d28);
+  background: rgba(45, 90, 56, 0.08);
+}
+
+html.site-theme-light .nav-more-menu {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(45, 90, 56, 0.18);
+  box-shadow: 0 12px 40px rgba(30, 61, 40, 0.12);
+}
+
+html.site-theme-light .nav-more-menu a {
+  color: var(--hb-green-mid, #2d5a38);
+}
+
+html.site-theme-light .nav-more-menu a:hover {
+  background: rgba(45, 90, 56, 0.08);
+  color: var(--hb-green, #1e3d28);
+}
+
+html.site-theme-light .site-nav .nav-toggle span {
+  background: var(--hb-green-mid, #2d5a38);
+}
+
 html.site-theme-light .nav-icon-btn {
   border-color: rgba(45, 90, 56, 0.2);
   background: rgba(45, 90, 56, 0.06);
