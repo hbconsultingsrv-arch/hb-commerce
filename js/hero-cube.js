@@ -65,6 +65,9 @@ function initHeroBrandCube(products) {
   let dragStartX = 0;
   let dragging = false;
   let moved = false;
+  let pointerStartOnSlide = null;
+  let pointerId = null;
+  let suppressViewportClick = false;
   let autoTimer = null;
   let paused = false;
   const fallback = window.FIAFI_IMAGES?.product || 'images/prenium.PNG';
@@ -151,6 +154,24 @@ function initHeroBrandCube(products) {
     }, ms);
   }
 
+  function slideAtPoint(x, y) {
+    const el = document.elementFromPoint(x, y);
+    return el?.closest('.hero-cube-slide') || null;
+  }
+
+  function followSlideLink(slide) {
+    const href = slide?.getAttribute('href');
+    if (!href) return;
+    if (href.startsWith('#')) {
+      const target = document.querySelector(href);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+    }
+    window.location.href = href;
+  }
+
   btnPrev?.addEventListener('click', (e) => {
     e.stopPropagation();
     prev();
@@ -164,8 +185,9 @@ function initHeroBrandCube(products) {
   });
 
   viewport.addEventListener('click', (e) => {
-    if (moved) return;
-    if (e.target.closest('.hero-cube-nav, .hero-cube-slide')) return;
+    if (moved || suppressViewportClick) return;
+    const slide = e.target.closest('.hero-cube-slide') || slideAtPoint(e.clientX, e.clientY);
+    if (slide) return;
     const rect = viewport.getBoundingClientRect();
     if (e.clientX - rect.left > rect.width / 2) next();
     else prev();
@@ -174,42 +196,68 @@ function initHeroBrandCube(products) {
 
   viewport.addEventListener('pointerdown', (e) => {
     if (e.button !== 0 || e.target.closest('.hero-cube-nav')) return;
+    pointerStartOnSlide = e.target.closest('.hero-cube-slide');
+    pointerId = e.pointerId;
     dragging = true;
     moved = false;
     dragStartX = e.clientX;
     viewport.classList.add('is-dragging');
     track.classList.remove('is-snap-transition');
-    viewport.setPointerCapture(e.pointerId);
+    if (!pointerStartOnSlide) {
+      viewport.setPointerCapture(e.pointerId);
+    }
     stopAuto();
   });
 
   viewport.addEventListener('pointermove', (e) => {
     if (!dragging) return;
     const dx = e.clientX - dragStartX;
-    if (Math.abs(dx) > 8) moved = true;
+    if (Math.abs(dx) > 8) {
+      moved = true;
+      if (pointerId != null && !viewport.hasPointerCapture(pointerId)) {
+        viewport.setPointerCapture(pointerId);
+      }
+    }
     dragOffsetPx = dx;
     updateTrackPosition(false);
   });
 
-  viewport.addEventListener('pointerup', () => {
+  viewport.addEventListener('pointerup', (e) => {
     if (!dragging) return;
     dragging = false;
     const dx = dragOffsetPx;
+    const startedOnSlide = pointerStartOnSlide;
     dragOffsetPx = 0;
+    pointerStartOnSlide = null;
+    if (pointerId != null && viewport.hasPointerCapture(pointerId)) {
+      viewport.releasePointerCapture(pointerId);
+    }
+    pointerId = null;
     viewport.classList.remove('is-dragging');
     if (Math.abs(dx) > 50) {
       if (dx < 0) next();
       else prev();
+    } else if (!moved && startedOnSlide && e.pointerType !== 'touch') {
+      suppressViewportClick = true;
+      followSlideLink(startedOnSlide);
     } else {
       updateTrackPosition(true);
     }
-    setTimeout(() => { moved = false; }, 50);
+    setTimeout(() => {
+      moved = false;
+      suppressViewportClick = false;
+    }, 50);
     pauseAuto();
   });
 
-  viewport.addEventListener('pointercancel', () => {
+  viewport.addEventListener('pointercancel', (e) => {
     dragging = false;
     dragOffsetPx = 0;
+    pointerStartOnSlide = null;
+    if (pointerId != null && viewport.hasPointerCapture(pointerId)) {
+      viewport.releasePointerCapture(pointerId);
+    }
+    pointerId = null;
     viewport.classList.remove('is-dragging');
     updateTrackPosition(true);
     startAuto();
