@@ -103,7 +103,9 @@ function initSectionTabScopes() {
 }
 
 async function initAdmin() {
-  if (window.HB_COMMERCIAL_SPACE) {
+  const commercialSpace = window.HB_COMMERCIAL_SPACE === true;
+
+  if (commercialSpace) {
     adminSession = await requireCommercialSpace();
   } else {
     adminSession = await requireAdmin();
@@ -111,38 +113,31 @@ async function initAdmin() {
   if (!adminSession) return;
 
   bindLogoutButton(document.getElementById('logoutBtn'));
-  await applySessionUserDisplay(null, adminSession);
+  void applySessionUserDisplay(null, adminSession);
 
   try {
-    adminProfile = await getProfile(adminSession.user.id);
+    adminProfile = await getProfileSafe(adminSession.user.id);
   } catch (err) {
     console.warn('initAdmin getProfile:', err.message);
-    adminProfile = {
-      id: adminSession.user.id,
-      email: adminSession.user.email,
-      full_name: adminSession.user.user_metadata?.full_name || adminSession.user.email?.split('@')[0] || 'Utilisateur',
-    };
+  }
+  if (!adminProfile) {
+    adminProfile = buildSessionFallbackProfile(adminSession);
   }
   if (resolveProfileRole(adminProfile, adminSession) === 'super_root' && typeof bootstrapDemoSuperRoot === 'function') {
     try {
       await bootstrapDemoSuperRoot();
-      try {
-        adminProfile = await getProfile(adminSession.user.id);
-      } catch (reloadErr) {
-        console.warn('initAdmin reload profile:', reloadErr.message);
-      }
+      const reloaded = await getProfileSafe(adminSession.user.id);
+      if (reloaded) adminProfile = reloaded;
     } catch (err) {
       console.warn('bootstrapDemoSuperRoot:', err.message);
     }
   }
   await applySessionUserDisplay(adminProfile, adminSession);
 
-  if (!window.HB_COMMERCIAL_SPACE && isCommercialAgentProfile(adminProfile, adminSession)) {
+  if (!commercialSpace && isCommercialAgentProfile(adminProfile, adminSession)) {
     window.location.href = 'agent.html';
     return;
   }
-
-  const commercialSpace = window.HB_COMMERCIAL_SPACE === true;
 
   applyAdminRoleUi(adminProfile, commercialSpace || isCommercialAgentProfile(adminProfile, adminSession));
   if (isSuperRootAdmin()) {
@@ -158,8 +153,13 @@ async function initAdmin() {
   bindAdminQuickTabs();
   bindSectionTabs();
   initSectionTabScopes();
+
   if (commercialSpace) {
     showAdminTab('accueil');
+    void loadCommercialHomeDashboard();
+    if (typeof initCommercialSpacePage === 'function') {
+      void initCommercialSpacePage();
+    }
   } else {
     const params = new URLSearchParams(window.location.search);
     const deepTab = params.get('tab');
@@ -178,20 +178,24 @@ async function initAdmin() {
     }
   }
 
-  if (!commercialSpace) {
-    await loadSuppliersTable();
-    await loadProductsTable();
-    if (!isSuperRootAdmin()) {
-      await loadAgentsTable();
-    } else if (typeof initSuperRootTeamPanel === 'function') {
-      await initSuperRootTeamPanel();
+  try {
+    if (!commercialSpace) {
+      await loadSuppliersTable();
+      await loadProductsTable();
+      if (!isSuperRootAdmin()) {
+        await loadAgentsTable();
+      } else if (typeof initSuperRootTeamPanel === 'function') {
+        await initSuperRootTeamPanel();
+      }
     }
+    await loadDriversCache();
+    await loadOrdersTable();
+    await loadClientsPanel();
+    await loadAdminPricePanel();
+    await loadAdminChatPanel();
+  } catch (err) {
+    console.warn('initAdmin chargement panneaux:', err.message);
   }
-  await loadDriversCache();
-  await loadOrdersTable();
-  await loadClientsPanel();
-  await loadAdminPricePanel();
-  await loadAdminChatPanel();
 
   const productForm = document.getElementById('productForm');
   productForm?.addEventListener('submit', handleProductSubmit);
@@ -230,10 +234,8 @@ async function initAdmin() {
   bindPriceFormPreview();
   if (typeof initProductImageUpload === 'function') initProductImageUpload();
   updateAdminNavBadges();
-  if (window.HB_COMMERCIAL_SPACE && typeof initCommercialSpacePage === 'function') {
-    await initCommercialSpacePage();
-    await loadCommercialHomeDashboard();
-    await loadCommercialStockPanel();
+  if (commercialSpace) {
+    void loadCommercialStockPanel();
   }
 }
 

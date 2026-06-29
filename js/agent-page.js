@@ -25,26 +25,20 @@ async function initCommercialSpacePage() {
   const banner = document.getElementById('commercialScopeBanner');
   const staffAccueil = document.getElementById('agentStaffAccueil');
   const activitiesWrap = document.getElementById('agentActivitiesWrap');
-  const menuWrap = document.getElementById('agentMenuWrap');
+  const adminAccueilLink = document.getElementById('agentAdminAccueilLink');
+  const voirSiteLink = document.getElementById('agentVoirSiteLink');
   const livraisonItem = document.getElementById('agentActivitiesLivraisonItem');
-  const backOfficeItem = document.getElementById('agentMenuBackOfficeItem');
-  const backOfficeLink = document.getElementById('agentMenuBackOfficeLink');
   const isStaff = !canShowMesActivites(profile);
 
   setTopNavBlock(staffAccueil, isStaff);
   setTopNavBlock(activitiesWrap, !isStaff);
-  setTopNavBlock(menuWrap, !isStaff);
+  setTopNavBlock(adminAccueilLink, !isStaff);
+  setTopNavBlock(voirSiteLink, !isStaff);
   setAgentNavItem(livraisonItem, !isStaff);
 
-  if (backOfficeItem && backOfficeLink && !isStaff) {
-    setAgentNavItem(backOfficeItem, true);
-    if (isSuperRootProfile(profile)) {
-      backOfficeLink.href = 'admin.html?tab=equipe';
-      backOfficeLink.textContent = 'Équipe HB';
-    } else {
-      backOfficeLink.href = 'admin.html';
-      backOfficeLink.textContent = 'Administration RH';
-    }
+  if (adminAccueilLink && !isStaff) {
+    adminAccueilLink.href = isSuperRootProfile(profile) ? 'admin.html?tab=equipe' : 'admin.html';
+    adminAccueilLink.textContent = isSuperRootProfile(profile) ? 'Accueil Équipe HB' : 'Accueil RH';
   }
 
   if (banner && !isStaff) {

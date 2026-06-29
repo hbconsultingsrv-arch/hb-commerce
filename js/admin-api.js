@@ -48,10 +48,24 @@ async function requireAdmin() {
 async function requireCommercialSpace() {
   const session = await requireAuth('login.html?redirect=agent.html');
   if (!session) return null;
-  const profile = await getProfile(session.user.id);
-  const allowed = isCommercialAgentProfile(profile) || isAdminProfile(profile);
+
+  const quickRole = resolveProfileRole(null, session);
+  if (['agent_commercial', 'admin', 'super_root'].includes(quickRole)) {
+    return session;
+  }
+
+  let profile = null;
+  try {
+    profile = typeof getProfileSafe === 'function'
+      ? await getProfileSafe(session.user.id)
+      : await getProfile(session.user.id);
+  } catch (err) {
+    console.warn('requireCommercialSpace:', err.message);
+  }
+
+  const allowed = isCommercialAgentProfile(profile, session) || isAdminProfile(profile, session);
   if (!allowed) {
-    if (isDriverProfile(profile)) {
+    if (isDriverProfile(profile, session)) {
       window.location.href = 'livreur.html';
     } else if (isSupplierProfile(profile)) {
       window.location.href = 'supplier.html';

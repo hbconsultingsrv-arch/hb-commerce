@@ -63,15 +63,8 @@
                 <li role="none" id="agentActivitiesLivraisonItem" hidden><a href="livreur.html" id="agentActivitiesLivraisonLink" role="menuitem"><span class="nav-dropdown-num">2</span> Livraison</a></li>
               </ul>
             </div>
-            <div class="nav-dropdown-wrap nav-admin-menu-wrap hb-admin-topnav admin-only" id="agentMenuWrap" hidden>
-              <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
-                Menu <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
-              </button>
-              <ul class="nav-dropdown-menu" role="menu">
-                <li role="none" class="admin-only" id="agentMenuBackOfficeItem" hidden><a href="admin.html" id="agentMenuBackOfficeLink" role="menuitem">Administration RH</a></li>
-                <li role="none"><a href="index.html" role="menuitem">Voir le site</a></li>
-              </ul>
-            </div>
+            <a href="admin.html" class="btn btn-sm btn-outline-light hb-admin-topnav admin-only" id="agentAdminAccueilLink" hidden>Accueil RH</a>
+            <a href="index.html" class="btn btn-sm btn-outline-light hb-admin-topnav admin-only" id="agentVoirSiteLink" hidden>Voir le site</a>
             <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light" title="Mode clair / sombre">🌙 Sombre</button>
           </div>
           <button type="button" id="logoutBtn" class="btn btn-sm btn-primary">Déconnexion</button>
@@ -331,7 +324,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js?v=logout-chip-fix-20260623"></script>
+  <script src="js/auth.js?v=profile-boot-20260623"></script>
   <script src="js/admin-api.js"></script>
   <script src="js/admin-api-stock.js"></script>
   <script src="js/driver-api.js"></script>
@@ -341,7 +334,7 @@
   <script src="js/stock.js"></script>
   <script src="js/stock-alerts.js"></script>
   <script>window.HB_COMMERCIAL_SPACE = true;</script>
-  <script src="js/admin.js"></script>
+  <script src="js/admin.js?v=profile-boot-20260623"></script>
   <script src="js/agent-page.js?v=agent-nav-20260621"></script>
 </body>
 </html>

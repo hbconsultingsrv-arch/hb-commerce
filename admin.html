@@ -31,7 +31,7 @@
         </div>
       </div>
       <nav class="admin-sidebar-nav">
-        <button type="button" class="admin-nav-item active" data-tab="accueil"><span class="admin-nav-icon">◉</span> Tableau de bord</button>
+        <button type="button" class="admin-nav-item active" data-tab="accueil"><span class="admin-nav-icon">◉</span> Accueil</button>
         <button type="button" class="admin-nav-item" data-tab="produits"><span class="admin-nav-icon">▣</span> Produits</button>
         <button type="button" class="admin-nav-item admin-only" data-tab="fournisseurs"><span class="admin-nav-icon">◎</span> Fournisseurs</button>
         <button type="button" class="admin-nav-item admin-only" data-tab="stock"><span class="admin-nav-icon">▤</span> Stock &amp; achats</button>
@@ -53,7 +53,7 @@
             <span class="admin-mobile-toggle-label">Menu</span>
           </button>
           <div class="admin-topbar-title">
-            <h1 id="adminTopbarTitle">Tableau de bord</h1>
+            <h1 id="adminTopbarTitle">Accueil</h1>
             <p id="adminTopbarSub">Vue d'ensemble de l'activité HB Commerce</p>
             <p id="adminRoleBadge" class="admin-role-badge" hidden></p>
           </div>
@@ -69,15 +69,9 @@
                 <li role="none"><a href="livreur.html" role="menuitem"><span class="nav-dropdown-num">2</span> Livraison</a></li>
               </ul>
             </div>
-            <div class="nav-dropdown-wrap nav-admin-menu-wrap">
-              <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
-                Menu <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
-              </button>
-              <ul class="nav-dropdown-menu" role="menu">
-                <li role="none"><button type="button" class="nav-dropdown-action" data-admin-tab="stock" role="menuitem">Stock</button></li>
-                <li role="none"><a href="index.html" role="menuitem">Voir le site</a></li>
-              </ul>
-            </div>
+            <button type="button" class="btn btn-sm btn-outline-light" data-admin-tab="accueil">Accueil</button>
+            <button type="button" class="btn btn-sm btn-outline-light" data-admin-tab="stock">Stock</button>
+            <a href="index.html" class="btn btn-sm btn-outline-light">Voir le site</a>
             <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light" title="Mode clair / sombre">🌙 Sombre</button>
           </div>
           <button type="button" id="logoutBtn" class="btn btn-sm btn-primary">Déconnexion</button>
@@ -1232,7 +1226,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js?v=logout-chip-fix-20260623"></script>
+  <script src="js/auth.js?v=profile-boot-20260623"></script>
   <script src="js/admin-api.js?v=profile-chip-fix-20260622"></script>
   <script src="js/driver-api.js?v=livreur-20260625"></script>
   <script src="js/stock.js?v=stock-fallback-20260623"></script>
@@ -1249,6 +1243,6 @@
   <script src="js/admin-qa-report.js?v=qa-report-20260630"></script>
   <script src="js/admin-shell.js?v=admin-equipe-20260619"></script>
   <script src="js/super-root.js?v=admin-equipe-20260619"></script>
-  <script src="js/admin.js?v=logout-chip-fix-20260623"></script>
+  <script src="js/admin.js?v=profile-boot-20260623"></script>
 </body>
 </html>

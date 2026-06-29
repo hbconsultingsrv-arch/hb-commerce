@@ -145,6 +145,31 @@ async function getProfile(userId) {
   return data;
 }
 
+function buildSessionFallbackProfile(session) {
+  return {
+    id: session?.user?.id,
+    email: session?.user?.email,
+    full_name: session?.user?.user_metadata?.full_name
+      || session?.user?.email?.split('@')[0]
+      || 'Utilisateur',
+  };
+}
+
+async function getProfileSafe(userId, timeoutMs = 8000) {
+  if (!userId) return null;
+  try {
+    return await Promise.race([
+      getProfile(userId),
+      new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Profil — délai dépassé')), timeoutMs);
+      }),
+    ]);
+  } catch (err) {
+    console.warn('getProfileSafe:', err.message);
+    return null;
+  }
+}
+
 function isAdminProfile(profile, session = null) {
   const role = resolveProfileRole(profile, session);
   return role === 'admin' || role === 'super_root';
@@ -407,27 +432,21 @@ function enhanceNavAccountLink(profile, session, dashboardUrl) {
 
 async function applySessionUserDisplay(profile, session) {
   if (!session) return;
-  let userProfile = profile;
-  if (!userProfile && session.user?.id) {
-    try {
-      userProfile = await getProfile(session.user.id);
-    } catch (err) {
-      console.warn('applySessionUserDisplay:', err.message);
-    }
-  }
-  if (!userProfile) {
-    userProfile = {
-      id: session.user?.id,
-      email: session.user?.email,
-      full_name: session.user?.user_metadata?.full_name || session.user?.email?.split('@')[0] || 'Utilisateur',
-    };
+
+  let userProfile = profile || buildSessionFallbackProfile(session);
+  let subtitle = getSessionChipSubtitle(userProfile, session);
+  applyWelcomeUserHeader(userProfile, session);
+  renderSessionUserChip(userProfile, session, { subtitle, profileUrl: getProfilePageUrl() });
+
+  if (!profile && session.user?.id) {
+    const fetched = await getProfileSafe(session.user.id);
+    if (fetched) userProfile = fetched;
   }
 
   const dashboardUrl = await getDefaultDashboardUrl(session, userProfile);
-  const subtitle = getSessionChipSubtitle(userProfile, session);
-
-  applyWelcomeUserHeader(userProfile, session);
+  subtitle = getSessionChipSubtitle(userProfile, session);
   renderSessionUserChip(userProfile, session, { subtitle, profileUrl: getProfilePageUrl() });
+  applyWelcomeUserHeader(userProfile, session);
   enhanceNavAccountLink(userProfile, session, dashboardUrl);
 }
 
@@ -624,15 +643,8 @@ async function updateNavAuth() {
   await refreshPriceVisibility(session);
   if (seq !== navAuthUpdateSeq) return;
 
-  const dedicatedShell = isDedicatedBackOfficeShell();
-
   if (session) {
-    let profile = null;
-    try {
-      profile = await getProfile(session.user.id);
-    } catch (err) {
-      console.warn('updateNavAuth: profil inaccessible', err.message);
-    }
+    let profile = await getProfileSafe(session.user.id);
     if (seq !== navAuthUpdateSeq) return;
 
     const dashboardUrl = await getDefaultDashboardUrl(session, profile);
@@ -657,14 +669,12 @@ async function updateNavAuth() {
         accountLink.textContent = t(accountLink.getAttribute('data-i18n'));
       }
     }
-    if (!dedicatedShell) {
-      try {
-        await applySessionUserDisplay(profile, session);
-      } catch (err) {
-        console.warn('updateNavAuth: affichage session', err.message);
-      }
-      if (seq !== navAuthUpdateSeq) return;
+    try {
+      await applySessionUserDisplay(profile, session);
+    } catch (err) {
+      console.warn('updateNavAuth: affichage session', err.message);
     }
+    if (seq !== navAuthUpdateSeq) return;
 
     syncNavLoginFallbacks(true);
 
@@ -677,7 +687,7 @@ async function updateNavAuth() {
       adminLink.style.display = admin ? '' : 'none';
     }
   } else {
-    if (!dedicatedShell) clearSessionUserDisplay();
+    clearSessionUserDisplay();
     if (loginLink) {
       loginLink.hidden = false;
       loginLink.style.display = '';

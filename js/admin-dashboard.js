@@ -12,7 +12,7 @@ const COMMERCIAL_TAB_TITLES = {
 };
 
 const ADMIN_TAB_TITLES = {
-  accueil: { title: 'Tableau de bord', sub: 'Vue d\'ensemble de l\'activité HB Commerce' },
+  accueil: { title: 'Accueil', sub: 'Vue d\'ensemble de l\'activité HB Commerce' },
   produits: { title: 'Produits', sub: 'Catalogue, stock et tarification' },
   fournisseurs: { title: 'Fournisseurs', sub: 'Comptes fournisseurs et commandes' },
   stock: { title: 'Stock & achats', sub: 'Dépôt, achats, casse/pertes et réceptions' },
