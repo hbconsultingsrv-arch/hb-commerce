@@ -1242,6 +1242,22 @@
   position: relative;
   width: 72px;
   height: 72px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.profile-avatar-preview-wrap .user-avatar,
+.profile-avatar-preview-wrap .profile-avatar-preview {
+  position: absolute;
+  inset: 0;
+  width: 72px;
+  height: 72px;
+  margin: 0;
+}
+
+.profile-avatar-preview-wrap .user-avatar--initials {
+  z-index: 1;
 }
 
 .profile-avatar-preview {
@@ -1250,6 +1266,12 @@
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid rgba(201, 162, 39, 0.45);
+  z-index: 2;
+  display: block;
+}
+
+.profile-avatar-preview[hidden] {
+  display: none !important;
 }
 
 .profile-avatar-upload-actions {

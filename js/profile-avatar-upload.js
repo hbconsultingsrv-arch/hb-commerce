@@ -61,11 +61,19 @@ function setProfileAvatarPreview(src) {
     preview.src = src;
     preview.hidden = false;
     wrap.hidden = false;
-    if (initials) initials.hidden = true;
+    if (initials) {
+      initials.hidden = true;
+      initials.setAttribute('aria-hidden', 'true');
+    }
+    preview.removeAttribute('aria-hidden');
   } else {
     preview.removeAttribute('src');
     preview.hidden = true;
-    if (initials) initials.hidden = false;
+    if (initials) {
+      initials.hidden = false;
+      initials.removeAttribute('aria-hidden');
+    }
+    preview.setAttribute('aria-hidden', 'true');
   }
 }
 
