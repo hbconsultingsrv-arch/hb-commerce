@@ -34,6 +34,7 @@ async function loadEquipePanel() {
   }
   if (superPanel) superPanel.hidden = true;
   if (adminEquipe) adminEquipe.hidden = false;
+  adminProfiles = [];
   await loadAgentsTable();
   await loadDriversTable();
 }
@@ -108,6 +109,10 @@ async function initAdmin() {
     adminSession = await requireAdmin();
   }
   if (!adminSession) return;
+
+  bindLogoutButton(document.getElementById('logoutBtn'));
+  await applySessionUserDisplay(null, adminSession);
+
   try {
     adminProfile = await getProfile(adminSession.user.id);
   } catch (err) {
@@ -121,22 +126,25 @@ async function initAdmin() {
   if (resolveProfileRole(adminProfile, adminSession) === 'super_root' && typeof bootstrapDemoSuperRoot === 'function') {
     try {
       await bootstrapDemoSuperRoot();
-      adminProfile = await getProfile(adminSession.user.id);
+      try {
+        adminProfile = await getProfile(adminSession.user.id);
+      } catch (reloadErr) {
+        console.warn('initAdmin reload profile:', reloadErr.message);
+      }
     } catch (err) {
       console.warn('bootstrapDemoSuperRoot:', err.message);
     }
   }
   await applySessionUserDisplay(adminProfile, adminSession);
 
-  if (!window.HB_COMMERCIAL_SPACE && isCommercialAgentProfile(adminProfile)) {
+  if (!window.HB_COMMERCIAL_SPACE && isCommercialAgentProfile(adminProfile, adminSession)) {
     window.location.href = 'agent.html';
     return;
   }
 
   const commercialSpace = window.HB_COMMERCIAL_SPACE === true;
 
-  document.getElementById('logoutBtn')?.addEventListener('click', signOut);
-  applyAdminRoleUi(adminProfile, commercialSpace || isCommercialAgentProfile(adminProfile));
+  applyAdminRoleUi(adminProfile, commercialSpace || isCommercialAgentProfile(adminProfile, adminSession));
   if (isSuperRootAdmin()) {
     const superPanel = document.getElementById('superRootPanel');
     const adminEquipe = document.getElementById('adminEquipePanel');

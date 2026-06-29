@@ -292,7 +292,7 @@ function bindLivreurUi() {
   });
 
   document.getElementById('refreshDeliveriesBtn')?.addEventListener('click', loadDeliveries);
-  document.getElementById('logoutBtn')?.addEventListener('click', signOut);
+  bindLogoutButton(document.getElementById('logoutBtn'));
   document.getElementById('btnEnRoute')?.addEventListener('click', () =>
     applyDeliveryUpdate({ delivery_status: 'en_transit' })
   );

@@ -37,11 +37,8 @@ async function resolveNavSession() {
 
   const { data: { user }, error: userError } = await sb.auth.getUser();
   if (userError || !user) {
-    console.warn('resolveNavSession: session invalide, nettoyage local', userError?.message || userError);
-    try {
-      await sb.auth.signOut({ scope: 'local' });
-    } catch (_) { /* ignore */ }
-    return null;
+    console.warn('resolveNavSession: getUser indisponible, session locale conservee', userError?.message || userError);
+    return session;
   }
 
   return session;
@@ -93,18 +90,39 @@ async function signUp({ email, password, fullName, phone, company, address, sire
 }
 
 async function signOut() {
-  const sb = getSupabase();
-  if (sb) {
-    try {
-      await sb.auth.signOut({ scope: 'global' });
-    } catch (_) {
-      try {
-        await sb.auth.signOut({ scope: 'local' });
-      } catch (_) { /* ignore */ }
-    }
-  }
   clearSessionUserDisplay();
-  window.location.href = 'index.html';
+  try {
+    const sb = getSupabase();
+    if (sb?.auth) {
+      try {
+        await sb.auth.signOut({ scope: 'global' });
+      } catch (_) {
+        try {
+          await sb.auth.signOut({ scope: 'local' });
+        } catch (_) { /* ignore */ }
+      }
+    }
+  } catch (err) {
+    console.warn('signOut:', err.message);
+  } finally {
+    window.location.replace('index.html');
+  }
+}
+
+function bindLogoutButton(button) {
+  if (!button || button.dataset.logoutBound === '1') return;
+  button.dataset.logoutBound = '1';
+  button.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    void signOut();
+  });
+}
+
+function isDedicatedBackOfficeShell() {
+  return document.body.classList.contains('admin-v2')
+    || document.body.classList.contains('livreur-page')
+    || document.body.classList.contains('commercial-space');
 }
 
 async function getProfile(userId) {
@@ -136,20 +154,20 @@ function isSuperRootProfile(profile, session = null) {
   return resolveProfileRole(profile, session) === 'super_root';
 }
 
-function isCommercialAgentProfile(profile) {
-  return profile?.role === 'agent_commercial';
+function isCommercialAgentProfile(profile, session = null) {
+  return resolveProfileRole(profile, session) === 'agent_commercial';
 }
 
-function isCommercialAssignableProfile(profile) {
-  return ['agent_commercial', 'admin', 'super_root'].includes(profile?.role);
+function isCommercialAssignableProfile(profile, session = null) {
+  return ['agent_commercial', 'admin', 'super_root'].includes(resolveProfileRole(profile, session));
 }
 
 function isSupplierProfile(profile) {
   return profile?.role === 'supplier';
 }
 
-function isDriverProfile(profile) {
-  return profile?.role === 'livreur';
+function isDriverProfile(profile, session = null) {
+  return resolveProfileRole(profile, session) === 'livreur';
 }
 
 function isBackofficeProfile(profile) {
@@ -166,12 +184,14 @@ const DEMO_ROLE_BY_EMAIL = {
 };
 
 function resolveProfileRole(profile, session) {
+  const email = (profile?.email || session?.user?.email || '').trim().toLowerCase();
+  if (Object.prototype.hasOwnProperty.call(DEMO_ROLE_BY_EMAIL, email)) {
+    return DEMO_ROLE_BY_EMAIL[email];
+  }
   const role = profile?.role
     || session?.user?.app_metadata?.role
     || session?.user?.user_metadata?.role;
-  if (role) return role;
-  const email = (profile?.email || session?.user?.email || '').trim().toLowerCase();
-  return DEMO_ROLE_BY_EMAIL[email] || null;
+  return role || null;
 }
 
 function isClientDashboardRole(profile, session) {
@@ -604,6 +624,8 @@ async function updateNavAuth() {
   await refreshPriceVisibility(session);
   if (seq !== navAuthUpdateSeq) return;
 
+  const dedicatedShell = isDedicatedBackOfficeShell();
+
   if (session) {
     let profile = null;
     try {
@@ -635,12 +657,14 @@ async function updateNavAuth() {
         accountLink.textContent = t(accountLink.getAttribute('data-i18n'));
       }
     }
-    try {
-      await applySessionUserDisplay(profile, session);
-    } catch (err) {
-      console.warn('updateNavAuth: affichage session', err.message);
+    if (!dedicatedShell) {
+      try {
+        await applySessionUserDisplay(profile, session);
+      } catch (err) {
+        console.warn('updateNavAuth: affichage session', err.message);
+      }
+      if (seq !== navAuthUpdateSeq) return;
     }
-    if (seq !== navAuthUpdateSeq) return;
 
     syncNavLoginFallbacks(true);
 
@@ -653,7 +677,7 @@ async function updateNavAuth() {
       adminLink.style.display = admin ? '' : 'none';
     }
   } else {
-    clearSessionUserDisplay();
+    if (!dedicatedShell) clearSessionUserDisplay();
     if (loginLink) {
       loginLink.hidden = false;
       loginLink.style.display = '';
@@ -677,7 +701,7 @@ async function updateNavAuth() {
 
   logoutBtn?.addEventListener('click', (e) => {
     e.preventDefault();
-    signOut();
+    void signOut();
   }, { once: true });
 }
 
@@ -777,6 +801,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindMobileNav();
   bindPasswordToggles();
   bindNavDropdowns();
+  bindLogoutButton(document.getElementById('logoutBtn'));
   updateNavAuth();
 
   window.addEventListener('pageshow', () => {
