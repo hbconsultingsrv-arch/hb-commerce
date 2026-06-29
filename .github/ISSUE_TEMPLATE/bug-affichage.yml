@@ -1,0 +1,88 @@
+name: Bug d'affichage (mobile / tablette / desktop)
+description: Problème visuel — texte coupé, bouton invisible, menu difficile à trouver…
+title: "[Affichage] "
+labels:
+  - bug
+  - mobile
+body:
+  - type: markdown
+    value: |
+      Merci de décrire le problème d'affichage le plus précisément possible.
+      Une **capture d'écran** aide beaucoup l'équipe à corriger rapidement.
+
+  - type: input
+    id: page
+    attributes:
+      label: Page concernée
+      description: URL ou nom du fichier HTML
+      placeholder: "ex. admin.html, index.html, produits.html"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: Appareil
+      options:
+        - iPhone
+        - Android
+        - iPad / tablette
+        - Ordinateur portable
+        - Grand écran
+        - Autre
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Navigateur
+      placeholder: "ex. Safari iOS 18, Chrome Android, Firefox"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Mode d'affichage
+      options:
+        - Mode sombre
+        - Mode clair
+        - Les deux / je ne sais pas
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Que voyez-vous ?
+      description: Décrivez le bug — qu'est-ce qui est coupé, caché ou mal aligné ?
+      placeholder: |
+        Exemple : Sur iPhone, le bouton Menu de l'admin est trop petit et je ne le vois pas à côté du titre.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Que devriez-vous voir ?
+      placeholder: "Exemple : Un gros bouton vert « Menu » en haut à gauche."
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Capture d'écran
+      description: Glissez-déposez une image dans le commentaire après avoir créé l'issue, ou collez un lien ici.
+      placeholder: "(optionnel — vous pourrez ajouter l'image après la création)"
+    validations:
+      required: false
+
+  - type: input
+    id: reporter
+    attributes:
+      label: Votre prénom (optionnel)
+      placeholder: "ex. Lucas"
+    validations:
+      required: false

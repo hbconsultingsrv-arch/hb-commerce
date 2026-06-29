@@ -10,6 +10,7 @@ Vente en gros de produits alimentaires avec espace client, commandes en ligne et
 | Document | Lien |
 |----------|------|
 | Index documentation | [docs/README.md](docs/README.md) |
+| **Guide équipe familiale** | [docs/GUIDE-EQUIPE-FAMILLE.md](docs/GUIDE-EQUIPE-FAMILLE.md) |
 | Cahier des charges (Markdown) | [docs/CAHIER-DES-CHARGES.md](docs/CAHIER-DES-CHARGES.md) |
 | Cahier des charges (Word) | [docs/cahier-des-charges-hb-commerce.docx](docs/cahier-des-charges-hb-commerce.docx) |
 | Présentation (PowerPoint) | [docs/presentation-hb-commerce.pptx](docs/presentation-hb-commerce.pptx) |

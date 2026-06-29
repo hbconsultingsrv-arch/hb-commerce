@@ -1,0 +1,77 @@
+name: Bug fonctionnel
+description: Quelque chose ne fonctionne pas — connexion, panier, commande, admin…
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    value: |
+      Décrivez ce qui ne marche pas. Indiquez les étapes pour reproduire le problème.
+
+  - type: input
+    id: page
+    attributes:
+      label: Page concernée
+      placeholder: "ex. login.html, checkout.html, admin.html"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Étapes pour reproduire
+      description: Numérotez chaque étape
+      placeholder: |
+        1. Aller sur login.html
+        2. Entrer mon e-mail et mot de passe
+        3. Cliquer sur « Se connecter »
+        4. → Message d'erreur « Failed to fetch »
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportement attendu
+      placeholder: "Exemple : Je devrais arriver sur mon compte."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportement observé
+      placeholder: "Exemple : Rien ne se passe / message d'erreur rouge."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: account
+    attributes:
+      label: Type de compte utilisé
+      options:
+        - Client
+        - Admin
+        - Agent commercial
+        - Livreur
+        - Fournisseur
+        - Compte demo
+        - Pas connecté
+        - Autre
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Navigateur / appareil
+      placeholder: "ex. Chrome sur Windows, Safari iPhone"
+    validations:
+      required: false
+
+  - type: input
+    id: reporter
+    attributes:
+      label: Votre prénom (optionnel)
+    validations:
+      required: false

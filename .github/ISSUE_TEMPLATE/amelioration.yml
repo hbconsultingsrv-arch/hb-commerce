@@ -1,0 +1,44 @@
+name: Idée d'amélioration
+description: Proposer une nouvelle fonctionnalité ou une amélioration du site
+title: "[Idée] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: Votre idée
+      description: Expliquez ce que vous aimeriez ajouter ou améliorer
+      placeholder: "Exemple : Ajouter un bouton pour télécharger la facture en PDF depuis Mon compte."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: page
+    attributes:
+      label: Page ou zone concernée
+      options:
+        - Accueil (index.html)
+        - Catalogue (produits.html)
+        - Panier / Commande
+        - Mon compte
+        - Admin
+        - Agent commercial
+        - Autre
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Pourquoi c'est utile ?
+      placeholder: "Exemple : Les clients professionnels veulent archiver leurs factures."
+    validations:
+      required: false
+
+  - type: input
+    id: reporter
+    attributes:
+      label: Votre prénom (optionnel)
+    validations:
+      required: false

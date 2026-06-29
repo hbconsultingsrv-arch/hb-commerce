@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Guide équipe familiale
+    url: https://github.com/hbconsultingsrv-arch/hb-commerce/blob/main/docs/GUIDE-EQUIPE-FAMILLE.md
+    about: Comment configurer GitHub, Cursor et Supabase pour toute la famille
+  - name: Site en ligne (demo)
+    url: https://hbconsultingsrv-arch.github.io/hb-commerce/
+    about: Tester le site déployé sur GitHub Pages
