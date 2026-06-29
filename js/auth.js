@@ -642,17 +642,24 @@ function bindNavDropdowns() {
     if (!trigger || !menu) return;
 
     trigger.addEventListener('click', (event) => {
+      event.preventDefault();
       event.stopPropagation();
-      const open = !wrap.classList.contains('is-open');
+      const willOpen = !wrap.classList.contains('is-open');
       closeAll();
-      if (open) {
+      if (willOpen) {
         wrap.classList.add('is-open');
         trigger.setAttribute('aria-expanded', 'true');
       }
     });
 
     menu.querySelectorAll('a, button[data-admin-tab], button.nav-dropdown-action').forEach((el) => {
-      el.addEventListener('click', () => closeAll());
+      el.addEventListener('click', () => {
+        closeAll();
+        const links = document.querySelector('.nav-links');
+        links?.classList.remove('is-open', 'open');
+        document.querySelector('.nav-toggle')?.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('nav-open');
+      });
     });
   });
 

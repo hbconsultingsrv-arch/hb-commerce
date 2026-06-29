@@ -168,8 +168,8 @@ html.nav-auth-session #navLoginMenuItem {
   display: none;
   position: absolute;
   top: calc(100% + 0.35rem);
-  left: 50%;
-  transform: translateX(-50%);
+  right: 0;
+  left: auto;
   min-width: 240px;
   list-style: none;
   margin: 0;
@@ -178,10 +178,15 @@ html.nav-auth-session #navLoginMenuItem {
   border: 1px solid rgba(201, 162, 39, 0.22);
   border-radius: 12px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
-  z-index: 600;
+  z-index: 1200;
 }
 
 .nav-more-wrap.is-open .nav-more-menu {
+  display: block;
+}
+
+.nav-more-wrap.is-open .nav-more-menu,
+.nav-more-wrap.is-open .nav-more-menu li {
   display: block;
 }
 

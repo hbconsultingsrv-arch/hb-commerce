@@ -5,47 +5,6 @@
 const SVG_CART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M6 6L5 3H2"/></svg>';
 const SVG_USER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
-function initNavMoreDropdown() {
-  const wraps = document.querySelectorAll('.nav-more-wrap');
-  if (!wraps.length) return;
-
-  const closeAll = () => {
-    wraps.forEach((wrap) => {
-      wrap.classList.remove('is-open');
-      wrap.querySelector('.nav-more-trigger')?.setAttribute('aria-expanded', 'false');
-    });
-  };
-
-  wraps.forEach((wrap) => {
-    const trigger = wrap.querySelector('.nav-more-trigger');
-    const menu = wrap.querySelector('.nav-more-menu');
-    if (!trigger || !menu) return;
-
-    trigger.addEventListener('click', (event) => {
-      event.stopPropagation();
-      const open = !wrap.classList.contains('is-open');
-      closeAll();
-      if (open) {
-        wrap.classList.add('is-open');
-        trigger.setAttribute('aria-expanded', 'true');
-      }
-    });
-
-    menu.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', () => {
-        closeAll();
-        document.querySelector('.nav-links')?.classList.remove('is-open');
-        document.querySelector('.nav-toggle')?.setAttribute('aria-expanded', 'false');
-      });
-    });
-  });
-
-  document.addEventListener('click', closeAll);
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeAll();
-  });
-}
-
 function initSiteNav() {
   const nav = document.querySelector('.site-nav, .hero-commerce .nav');
   if (!nav) return;
@@ -286,7 +245,6 @@ window.enhanceNavIcons = enhanceNavIcons;
 
 document.addEventListener('DOMContentLoaded', () => {
   initSiteNav();
-  initNavMoreDropdown();
   initHeroParallax();
   initCatalogFilters();
   initContactForm();
