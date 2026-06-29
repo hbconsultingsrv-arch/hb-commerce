@@ -189,6 +189,15 @@ async function getDefaultDashboardUrl(session, profile = undefined) {
   return 'compte.html';
 }
 
+function isAvatarUrlColumnMissingError(error) {
+  const msg = String(error?.message || error || '').toLowerCase();
+  return msg.includes('avatar_url') && (
+    msg.includes('schema cache')
+    || msg.includes('could not find')
+    || msg.includes('column')
+  );
+}
+
 async function updateProfile(userId, fields) {
   const sb = getSupabase();
   if (!sb) throw new Error(configErrorMessage());
@@ -198,8 +207,22 @@ async function updateProfile(userId, fields) {
     .eq('id', userId)
     .select()
     .single();
-  if (error) throw error;
-  return data;
+  if (!error) return data;
+
+  if (isAvatarUrlColumnMissingError(error) && Object.prototype.hasOwnProperty.call(fields, 'avatar_url')) {
+    const { avatar_url: _ignored, ...rest } = fields;
+    const retry = await sb
+      .from('profiles')
+      .update(rest)
+      .eq('id', userId)
+      .select()
+      .single();
+    if (retry.error) throw retry.error;
+    retry.data._avatarColumnMissing = true;
+    return retry.data;
+  }
+
+  throw error;
 }
 
 function profileDisplayName(profile, session) {

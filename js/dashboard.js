@@ -29,6 +29,10 @@ function isStorageBucketMissingError(message) {
   return text.includes('bucket not found') || text.includes('bucket introuvable');
 }
 
+function profileAvatarMigrationHint() {
+  return 'Photo non disponible : exécutez supabase/migration-profile-avatar.sql dans Supabase.';
+}
+
 function bindProfileForm(profile, session) {
   const form = document.getElementById('profileForm');
   if (!form || !profile) return profile;
@@ -57,7 +61,7 @@ function bindProfileForm(profile, session) {
         const uploaded = await uploadProfileAvatar(avatarFile, session.user.id);
         if (uploaded.uploadError) {
           if (isStorageBucketMissingError(uploaded.uploadError)) {
-            avatarWarning = 'Photo non enregistrée : exécutez supabase/migration-profile-avatar.sql dans Supabase.';
+            avatarWarning = profileAvatarMigrationHint();
           } else {
             throw new Error(uploaded.uploadError);
           }
@@ -68,15 +72,23 @@ function bindProfileForm(profile, session) {
         avatarUrl = null;
       }
 
-      profile = await updateProfile(session.user.id, {
+      const profileFields = {
         full_name: fd.get('full_name'),
         phone: fd.get('phone'),
         address: fd.get('address'),
         company: fd.get('company'),
         siren: fd.get('siren'),
         vat_number: fd.get('vat_number'),
-        avatar_url: avatarUrl
-      });
+      };
+      if (avatarUrl !== profile.avatar_url) {
+        profileFields.avatar_url = avatarUrl;
+      }
+
+      profile = await updateProfile(session.user.id, profileFields);
+      if (profile?._avatarColumnMissing) {
+        avatarWarning = avatarWarning || profileAvatarMigrationHint();
+        delete profile._avatarColumnMissing;
+      }
       await applySessionUserDisplay(profile, session);
       if (typeof initProfileAvatarUpload === 'function') initProfileAvatarUpload(profile, session);
       const message = avatarWarning ? `Profil mis à jour. ${avatarWarning}` : 'Profil mis à jour.';
@@ -101,7 +113,8 @@ async function initInternalProfileDashboard(profile, session) {
   document.querySelectorAll('#compteTabs .admin-tab[data-tab="commandes"], #compteTabs .admin-tab[data-tab="chat"]').forEach((el) => {
     el.hidden = true;
   });
-  document.querySelector('.nav-actions a[href="produits.html"]')?.setAttribute('hidden', '');
+  const orderLink = document.querySelector('.nav-actions a[href="produits.html"]');
+  if (orderLink) orderLink.style.display = 'none';
 
   await applyCompteBackOfficeLink();
 
