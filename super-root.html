@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=tabs-20260619c">
+  <link rel="stylesheet" href="css/style.css?v=nav-activities-20260619">
   <link rel="stylesheet" href="css/commerce.css?v=tabs-20260619c">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
@@ -20,12 +20,19 @@
         <span class="logo-hb-tag">HB Groupe · B2B</span>
       </span>
     </a>
-    <div class="nav-actions">
+    <div class="nav-actions nav-actions--compact">
       <div id="sessionUserChip" class="session-user-chip-host" hidden></div>
-      <a href="admin.html?tab=equipe" class="btn btn-sm btn-outline-light">Équipe HB</a>
-      <a href="agent.html" class="btn btn-sm btn-outline-light">Mon activité commerciale</a>
-      <a href="livreur.html" class="btn btn-sm btn-outline-light">Espace livreur</a>
-      <a href="admin.html" class="btn btn-sm btn-primary">Administration opérationnelle</a>
+      <a href="admin.html?tab=equipe" class="btn btn-sm btn-outline-light nav-action-link">Équipe HB</a>
+      <div class="nav-dropdown-wrap nav-activities-wrap">
+        <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
+          Mes activités <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
+        </button>
+        <ul class="nav-dropdown-menu" role="menu">
+          <li role="none"><a href="agent.html" role="menuitem"><span class="nav-dropdown-num">1</span> Commercial</a></li>
+          <li role="none"><a href="livreur.html" role="menuitem"><span class="nav-dropdown-num">2</span> Livraison</a></li>
+        </ul>
+      </div>
+      <a href="admin.html" class="btn btn-sm btn-primary nav-action-link" title="Administration opérationnelle">Administration</a>
       <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
     </div>
   </nav>
@@ -37,8 +44,8 @@
       <p class="auth-sub">Gérez uniquement les comptes internes HB Commerce. Les sociétés, produits, prix et chat sont dans le dashboard admin.</p>
       <div class="role-space-links" style="margin-top:1rem">
         <a href="admin.html?tab=equipe" class="btn btn-sm btn-outline-dark">Admin → Équipe HB (agents &amp; livreurs)</a>
-        <a href="agent.html" class="btn btn-sm btn-outline-dark">Mon espace commercial</a>
-        <a href="livreur.html" class="btn btn-sm btn-outline-dark">Aperçu espace livreur</a>
+        <a href="agent.html" class="btn btn-sm btn-outline-dark">1 · Commercial</a>
+        <a href="livreur.html" class="btn btn-sm btn-outline-dark">2 · Livraison</a>
       </div>
     </header>
 
@@ -190,7 +197,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js?v=tabs-20260619c"></script>
+  <script src="js/auth.js?v=nav-activities-20260619"></script>
   <script src="js/admin-api.js?v=team-livreur-20260630"></script>
   <script src="js/driver-api.js?v=livreur-20260625"></script>
   <script src="js/super-root.js?v=team-livreur-20260630"></script>

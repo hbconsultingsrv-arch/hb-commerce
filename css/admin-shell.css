@@ -144,6 +144,23 @@
   font-size: 0.82rem;
 }
 
+.admin-sidebar-footer .nav-dropdown-wrap {
+  width: 100%;
+}
+
+.admin-sidebar-footer .nav-dropdown-trigger {
+  width: 100%;
+  justify-content: center;
+}
+
+.admin-sidebar-footer .nav-dropdown-menu {
+  bottom: calc(100% + 0.35rem);
+  top: auto;
+  left: 0;
+  right: 0;
+  min-width: 0;
+}
+
 .admin-shell {
   flex: 1;
   margin-left: var(--admin-sidebar-w);

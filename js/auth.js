@@ -266,12 +266,13 @@ function renderSessionUserChip(profile, session, options = {}) {
   const tagClose = dashboardUrl ? '</a>' : '</div>';
 
   host.hidden = false;
+  const showSubtitle = subtitle && subtitle !== name;
   host.innerHTML = `
     ${tag}
       ${buildUserAvatarHtml(profile, session, 'user-avatar--sm')}
       <span class="session-user-chip-text">
         <strong class="session-user-chip-name">${escapeHtml(name)}</strong>
-        ${subtitle ? `<span class="session-user-chip-meta">${escapeHtml(subtitle)}</span>` : ''}
+        ${showSubtitle ? `<span class="session-user-chip-meta">${escapeHtml(subtitle)}</span>` : ''}
       </span>
     ${tagClose}
   `;
@@ -595,6 +596,47 @@ async function updateNavAuth() {
   }, { once: true });
 }
 
+function bindNavDropdowns() {
+  const wraps = document.querySelectorAll('.nav-dropdown-wrap, .nav-more-wrap');
+  if (!wraps.length) return;
+
+  const closeAll = () => {
+    wraps.forEach((wrap) => {
+      wrap.classList.remove('is-open');
+      wrap.querySelector('.nav-dropdown-trigger, .nav-more-trigger')?.setAttribute('aria-expanded', 'false');
+    });
+  };
+
+  wraps.forEach((wrap) => {
+    if (wrap.dataset.bound === '1') return;
+    wrap.dataset.bound = '1';
+    const trigger = wrap.querySelector('.nav-dropdown-trigger, .nav-more-trigger');
+    const menu = wrap.querySelector('.nav-dropdown-menu, .nav-more-menu');
+    if (!trigger || !menu) return;
+
+    trigger.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const open = !wrap.classList.contains('is-open');
+      closeAll();
+      if (open) {
+        wrap.classList.add('is-open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    menu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => closeAll());
+    });
+  });
+
+  if (document.documentElement.dataset.navDropdownBound === '1') return;
+  document.documentElement.dataset.navDropdownBound = '1';
+  document.addEventListener('click', closeAll);
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeAll();
+  });
+}
+
 function bindMobileNav() {
   const toggle = document.querySelector('.nav-toggle');
   const links = document.querySelector('.nav-links');
@@ -642,6 +684,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.documentElement.classList.add('nav-auth-pending');
   bindMobileNav();
   bindPasswordToggles();
+  bindNavDropdowns();
   updateNavAuth();
 
   window.addEventListener('pageshow', () => {
