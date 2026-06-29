@@ -306,7 +306,6 @@ function renderSessionUserChip(profile, session, options = {}) {
         </button>
         <ul class="nav-dropdown-menu nav-profile-menu" role="menu">
           <li role="none"><a href="${escapeHtml(profileUrl)}" role="menuitem">Mon profil</a></li>
-          <li role="none"><button type="button" id="logoutBtn" class="nav-dropdown-action" role="menuitem">Déconnexion</button></li>
         </ul>
       </div>`;
     bindUserAvatarFallbacks(host);
