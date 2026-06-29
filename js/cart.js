@@ -24,7 +24,8 @@ function getCartCount() {
 
 function addToCart(product, quantity = 1) {
   const cart = getCart();
-  const existing = cart.find((i) => i.id === product.id);
+  const productId = String(product.id);
+  const existing = cart.find((i) => String(i.id) === productId);
   if (existing) {
     existing.quantity += quantity;
   } else {
