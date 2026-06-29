@@ -1,8 +1,14 @@
 async function isAdmin() {
   const session = await getSession();
   if (!session) return false;
-  const profile = await getProfile(session.user.id);
-  return isAdminProfile(profile);
+  let profile = null;
+  try {
+    profile = await getProfile(session.user.id);
+  } catch (err) {
+    console.warn('isAdmin:', err.message);
+  }
+  const role = resolveProfileRole(profile, session);
+  return role === 'admin' || role === 'super_root';
 }
 
 async function isFullAdmin() {
@@ -15,15 +21,21 @@ async function isFullAdmin() {
 async function requireAdmin() {
   const session = await requireAuth('login.html?redirect=admin.html');
   if (!session) return null;
-  const profile = await getProfile(session.user.id);
-  if (isCommercialAgentProfile(profile)) {
+  let profile = null;
+  try {
+    profile = await getProfile(session.user.id);
+  } catch (err) {
+    console.warn('requireAdmin:', err.message);
+  }
+  const role = resolveProfileRole(profile, session);
+  if (role === 'agent_commercial') {
     window.location.href = 'agent.html';
     return null;
   }
-  if (!isAdminProfile(profile)) {
-    if (isDriverProfile(profile)) {
+  if (role !== 'admin' && role !== 'super_root') {
+    if (role === 'livreur') {
       window.location.href = 'livreur.html';
-    } else if (isSupplierProfile(profile)) {
+    } else if (role === 'supplier') {
       window.location.href = 'supplier.html';
     } else {
       window.location.href = 'compte.html';
@@ -64,7 +76,7 @@ async function isSuperRoot() {
 }
 
 async function requireSuperRoot() {
-  const session = await requireAuth('login.html?redirect=super-root.html');
+  const session = await requireAuth('login.html?redirect=admin.html?tab=equipe');
   if (!session) return null;
   const superRoot = await isSuperRoot();
   if (!superRoot) {

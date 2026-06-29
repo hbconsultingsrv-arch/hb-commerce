@@ -240,8 +240,69 @@
 .admin-topbar-actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: flex-end;
+  gap: 0.55rem;
   flex-wrap: wrap;
+  min-width: 0;
+}
+
+.admin-topbar-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.admin-topbar-toolbar .btn,
+.admin-topbar-actions > .btn {
+  white-space: nowrap;
+  font-size: 0.82rem;
+  padding: 0.42rem 0.72rem;
+}
+
+.admin-topbar-toolbar .nav-dropdown-wrap {
+  display: inline-flex;
+}
+
+.admin-topbar-toolbar .nav-dropdown-menu {
+  top: calc(100% + 0.35rem);
+  bottom: auto;
+  right: 0;
+  left: auto;
+  min-width: 220px;
+}
+
+.admin-v2 .admin-topbar .btn-outline-light {
+  color: var(--admin-text);
+  border-color: var(--admin-border);
+  background: transparent;
+}
+
+.admin-v2 .admin-topbar .btn-outline-light:hover {
+  background: rgba(201, 162, 39, 0.12);
+  border-color: rgba(201, 162, 39, 0.35);
+}
+
+.admin-topbar-toolbar .btn.is-active,
+.admin-topbar-toolbar .btn.is-active.btn-outline-light {
+  background: rgba(201, 162, 39, 0.2);
+  border-color: rgba(201, 162, 39, 0.45);
+  color: var(--admin-text);
+}
+
+.admin-v2.admin-dark .admin-topbar .btn-outline-light {
+  color: rgba(255, 255, 255, 0.92);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.admin-v2.admin-dark .admin-topbar-toolbar .btn.is-active {
+  background: rgba(201, 162, 39, 0.28);
+  border-color: rgba(201, 162, 39, 0.5);
+  color: #fff;
+}
+
+.admin-sidebar-footer--minimal {
+  padding: 0.65rem 0.85rem;
 }
 
 .admin-content {

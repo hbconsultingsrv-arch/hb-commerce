@@ -33,6 +33,6 @@ def test_client_redirects_to_compte(driver):
 @pytest.mark.suite("auth")
 @pytest.mark.scenario("FLUX-AUTH-04")
 def test_super_root_redirects(driver):
-    """Le super root arrive sur super-root.html."""
-    url = login_as(driver, ACCOUNTS["super_root"], expect_url_contains="super-root.html")
-    assert "super-root.html" in url
+    """Le super root arrive sur admin.html (onglet Équipe HB)."""
+    url = login_as(driver, ACCOUNTS["super_root"], expect_url_contains="admin.html")
+    assert "admin.html" in url and "tab=equipe" in url

@@ -23,6 +23,9 @@ function showAdminTab(tabId) {
   document.querySelectorAll('.admin-tab, .admin-nav-item').forEach((t) => {
     t.classList.toggle('active', t.dataset.tab === tabId);
   });
+  document.querySelectorAll('[data-admin-tab]').forEach((btn) => {
+    btn.classList.toggle('is-active', btn.dataset.adminTab === tabId);
+  });
   document.querySelectorAll('.admin-panel').forEach((p) => {
     p.hidden = true;
   });
@@ -53,6 +56,16 @@ function showAdminTab(tabId) {
   if (tabId === 'stock' && window.HB_COMMERCIAL_SPACE) loadCommercialStockPanel();
 }
 
+function bindAdminQuickTabs() {
+  document.querySelectorAll('[data-admin-tab]').forEach((btn) => {
+    if (btn.dataset.bound === '1') return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => {
+      showAdminTab(btn.dataset.adminTab);
+    });
+  });
+}
+
 function bindAdminTabs() {
   document.querySelectorAll('.admin-tab').forEach((tab) => {
     tab.addEventListener('click', () => showAdminTab(tab.dataset.tab));
@@ -77,6 +90,14 @@ async function initAdmin() {
   }
   if (!adminSession) return;
   adminProfile = await getProfile(adminSession.user.id);
+  if (resolveProfileRole(adminProfile, adminSession) === 'super_root' && typeof bootstrapDemoSuperRoot === 'function') {
+    try {
+      await bootstrapDemoSuperRoot();
+      adminProfile = await getProfile(adminSession.user.id);
+    } catch (err) {
+      console.warn('bootstrapDemoSuperRoot:', err.message);
+    }
+  }
   await applySessionUserDisplay(adminProfile, adminSession);
 
   if (!window.HB_COMMERCIAL_SPACE && isCommercialAgentProfile(adminProfile)) {
@@ -87,14 +108,13 @@ async function initAdmin() {
   const commercialSpace = window.HB_COMMERCIAL_SPACE === true;
 
   document.getElementById('logoutBtn')?.addEventListener('click', signOut);
-  const superRootLink = document.getElementById('superRootLink');
-  if (superRootLink && isSuperRootProfile(adminProfile)) superRootLink.style.display = '';
   applyAdminRoleUi(adminProfile, commercialSpace || isCommercialAgentProfile(adminProfile));
   if (!isSuperRootProfile(adminProfile)) {
     document.querySelectorAll('.super-root-only').forEach((el) => el.remove());
   }
 
   bindAdminTabs();
+  bindAdminQuickTabs();
   bindSectionTabs();
   initSectionTabScopes();
   if (commercialSpace) {
@@ -588,6 +608,10 @@ function resetAdminSupplierForm() {
 function applyAdminRoleUi(profile, commercialAgent) {
   const badge = document.getElementById('adminRoleBadge');
   const sidebarTag = document.querySelector('.admin-sidebar .logo-hb-tag');
+  const role = resolveProfileRole(profile, adminSession);
+  if (role !== 'admin' && role !== 'super_root') {
+    document.querySelectorAll('.admin-only').forEach((el) => { el.hidden = true; });
+  }
   if (commercialAgent) {
     if (badge) {
       badge.hidden = false;
@@ -596,10 +620,10 @@ function applyAdminRoleUi(profile, commercialAgent) {
         : 'Espace agent commercial';
     }
     if (sidebarTag && !window.HB_COMMERCIAL_SPACE) sidebarTag.textContent = 'Agent commercial · B2B';
-  } else if (isAdminProfile(profile)) {
+  } else if (role === 'admin' || role === 'super_root') {
     if (badge) {
       badge.hidden = false;
-      badge.textContent = isSuperRootProfile(profile) ? 'Super root · Administration' : 'Administration HB Commerce';
+      badge.textContent = role === 'super_root' ? 'Super root · Administration' : 'Administration HB Commerce';
     }
   }
 }
@@ -613,7 +637,17 @@ async function loadAgentsTable() {
   const body = document.getElementById('agentsBody');
   if (!body) return;
   try {
-    if (!adminProfiles.length) adminProfiles = await fetchAllProfiles();
+    if (!adminProfiles.length) {
+      try {
+        adminProfiles = await fetchAllProfiles();
+      } catch (err) {
+        console.warn('fetchAllProfiles:', err.message);
+        adminProfiles = [];
+      }
+      if (!adminProfiles.length && typeof fetchInternalProfiles === 'function') {
+        adminProfiles = await fetchInternalProfiles();
+      }
+    }
     const agents = adminProfiles.filter((p) => p.role === 'agent_commercial');
     if (!agents.length) {
       body.innerHTML = '<tr><td colspan="4" class="empty-state">Aucun agent — créez un compte ci-dessous.</td></tr>';

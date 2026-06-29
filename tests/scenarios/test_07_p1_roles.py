@@ -61,11 +61,14 @@ def test_driver_deliveries_dashboard(driver):
 @pytest.mark.scenario("FLUX-SUP-02")
 def test_super_root_team_list(driver):
     """Le super root voit la liste de l'équipe interne."""
-    login_as(driver, ACCOUNTS["super_root"], expect_url_contains="super-root.html")
+    login_as(driver, ACCOUNTS["super_root"], expect_url_contains="admin.html")
     WebDriverWait(driver, EXPLICIT_WAIT).until(
-        lambda d: len(d.find_elements(By.CSS_SELECTOR, "#profilesBody tr")) > 0
+        EC.presence_of_element_located((By.CSS_SELECTOR, "#panel-equipe #agentsBody tr, #panel-equipe #driversBody tr"))
     )
-    roles = " ".join(d.text.lower() for d in driver.find_elements(By.CSS_SELECTOR, "#profilesBody tr"))
+    roles = " ".join(
+        d.text.lower()
+        for d in driver.find_elements(By.CSS_SELECTOR, "#agentsBody tr, #driversBody tr")
+    )
     assert "admin" in roles or "agent" in roles or "livreur" in roles
 
 

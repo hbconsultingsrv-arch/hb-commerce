@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="css/stock.css?v=stock-20260619">
   <link rel="stylesheet" href="css/analytics.css?v=analytics-20260624">
   <link rel="stylesheet" href="css/admin-roadmap.css?v=qa-report-20260630">
-  <link rel="stylesheet" href="css/admin-shell.css?v=nav-activities-20260619">
+  <link rel="stylesheet" href="css/admin-shell.css?v=admin-topbar-20260619">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
 <body class="dashboard-page admin-v2">
@@ -40,22 +40,8 @@
         <button type="button" class="admin-nav-item admin-only" data-tab="construction"><span class="admin-nav-icon">⬡</span> Construction</button>
         <button type="button" class="admin-nav-item" data-tab="chat"><span class="admin-nav-icon">✉</span> Support<span class="admin-nav-badge" id="adminChatNavBadge" hidden></span></button>
       </nav>
-      <div class="admin-sidebar-footer">
-        <a href="super-root.html" id="superRootLink" class="btn btn-sm btn-outline-light" style="display:none">Super root</a>
-        <a href="admin.html?tab=equipe" class="btn btn-sm btn-outline-light admin-only">Équipe HB</a>
-        <div class="nav-dropdown-wrap nav-activities-wrap admin-only">
-          <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
-            Mes activités <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
-          </button>
-          <ul class="nav-dropdown-menu" role="menu">
-            <li role="none"><a href="agent.html" role="menuitem"><span class="nav-dropdown-num">1</span> Commercial</a></li>
-            <li role="none"><a href="livreur.html" role="menuitem"><span class="nav-dropdown-num">2</span> Livraison</a></li>
-          </ul>
-        </div>
-        <a href="stock.html" class="btn btn-sm btn-outline-light admin-only">Page stock</a>
+      <div class="admin-sidebar-footer admin-sidebar-footer--minimal">
         <a href="index.html" class="btn btn-sm btn-outline-light">Voir le site</a>
-        <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light">🌙 Sombre</button>
-        <button type="button" id="logoutBtn" class="btn btn-sm btn-primary">Déconnexion</button>
       </div>
     </aside>
 
@@ -73,7 +59,22 @@
           </div>
         </div>
         <div class="admin-topbar-actions">
+          <div class="admin-topbar-toolbar admin-only" aria-label="Raccourcis administration">
+            <button type="button" class="btn btn-sm btn-outline-light" data-admin-tab="equipe">Équipe HB</button>
+            <div class="nav-dropdown-wrap nav-activities-wrap">
+              <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
+                Mes activités <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
+              </button>
+              <ul class="nav-dropdown-menu" role="menu">
+                <li role="none"><a href="agent.html" role="menuitem"><span class="nav-dropdown-num">1</span> Commercial</a></li>
+                <li role="none"><a href="livreur.html" role="menuitem"><span class="nav-dropdown-num">2</span> Livraison</a></li>
+              </ul>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-light" data-admin-tab="stock">Stock</button>
+            <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light" title="Mode clair / sombre">🌙 Sombre</button>
+          </div>
           <div id="sessionUserChip" class="session-user-chip-host" hidden></div>
+          <button type="button" id="logoutBtn" class="btn btn-sm btn-primary">Déconnexion</button>
         </div>
       </header>
 
@@ -1113,8 +1114,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js?v=nav-activities-20260619"></script>
-  <script src="js/admin-api.js?v=stock-fallback-20260623"></script>
+  <script src="js/auth.js?v=admin-topbar-20260619"></script>
+  <script src="js/admin-api.js?v=admin-topbar-20260619"></script>
   <script src="js/driver-api.js?v=livreur-20260625"></script>
   <script src="js/stock.js?v=stock-fallback-20260623"></script>
   <script src="js/stock-alerts.js?v=stock-fallback-20260623"></script>
@@ -1128,7 +1129,7 @@
   <script src="js/admin-dashboard.js?v=admin-v2-20260624"></script>
   <script src="js/admin-roadmap.js?v=qa-report-20260630"></script>
   <script src="js/admin-qa-report.js?v=qa-report-20260630"></script>
-  <script src="js/admin-shell.js?v=admin-v2-20260624"></script>
-  <script src="js/admin.js?v=admin-v2-20260624"></script>
+  <script src="js/admin-shell.js?v=admin-topbar-20260619"></script>
+  <script src="js/admin.js?v=admin-topbar-20260619"></script>
 </body>
 </html>

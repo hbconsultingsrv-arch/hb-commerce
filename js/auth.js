@@ -181,7 +181,7 @@ async function getDefaultDashboardUrl(session, profile = undefined) {
     }
   }
   const role = resolveProfileRole(userProfile, session);
-  if (role === 'super_root') return 'super-root.html';
+  if (role === 'super_root') return 'admin.html?tab=equipe';
   if (role === 'admin') return 'admin.html';
   if (role === 'agent_commercial') return 'agent.html';
   if (role === 'supplier') return 'supplier.html';

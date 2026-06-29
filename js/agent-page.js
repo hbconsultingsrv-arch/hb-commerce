@@ -25,7 +25,7 @@ async function initCommercialSpacePage() {
     banner.innerHTML = `
       <p>Vous consultez votre <strong>portefeuille commercial personnel</strong> uniquement.
       L'administration globale (RH, stock, équipe…) reste sur
-      <a href="admin.html">admin.html</a>${isSuperRootProfile(profile) ? ' ou <a href="super-root.html">super-root.html</a>' : ''}.</p>`;
+      <a href="admin.html?tab=equipe">admin.html</a>${isSuperRootProfile(profile) ? ' (super root · Équipe HB)' : ''}.</p>`;
   }
 }
 
