@@ -156,6 +156,45 @@ html.site-theme-light .market-dropdown-trigger {
   color: var(--hb-green-mid, #2d5a38);
 }
 
+html.site-theme-light .lang-dropdown-trigger {
+  border-color: rgba(45, 90, 56, 0.2);
+  background: rgba(45, 90, 56, 0.06);
+  color: var(--hb-green-mid, #2d5a38);
+}
+
+html.site-theme-light .lang-dropdown-trigger:hover,
+html.site-theme-light .lang-switcher.is-open .lang-dropdown-trigger {
+  background: rgba(201, 162, 39, 0.18);
+  border-color: rgba(201, 162, 39, 0.45);
+  color: var(--hb-green, #1e3d28);
+}
+
+html.site-theme-light .lang-dropdown-menu {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(45, 90, 56, 0.18);
+  box-shadow: 0 12px 32px rgba(30, 61, 40, 0.12);
+  z-index: 1200;
+}
+
+html.site-theme-light .lang-dropdown-menu button {
+  color: var(--hb-green-mid, #2d5a38);
+}
+
+html.site-theme-light .lang-dropdown-menu button span:last-child {
+  color: var(--hb-muted, #6b7a6e);
+}
+
+html.site-theme-light .lang-dropdown-menu button:hover,
+html.site-theme-light .lang-dropdown-menu button.active {
+  background: rgba(45, 90, 56, 0.08);
+  color: var(--hb-green, #1e3d28);
+}
+
+html.site-theme-light .lang-dropdown-menu button:hover span:last-child,
+html.site-theme-light .lang-dropdown-menu button.active span:last-child {
+  color: var(--hb-muted, #6b7a6e);
+}
+
 /* Sections depth → clair */
 html.site-theme-light .hb-site-depth {
   background: var(--hb-cream, #f8f6f0);
