@@ -59,8 +59,16 @@
 }
 
 .admin-sidebar-brand {
-  padding: 1.25rem 1.1rem 1rem;
+  padding: 1rem 0.85rem 0.9rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-sidebar-brand .logo-hb-brand {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .admin-sidebar-brand .logo-hb-name {
@@ -74,12 +82,18 @@
 }
 
 .admin-sidebar-user {
-  padding: 0.65rem 0.85rem 0.85rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0;
+  margin: 0;
+  width: 100%;
 }
 
-.admin-sidebar-user .session-user-chip-host {
+.admin-sidebar-user .session-user-chip-host:not([hidden]) {
+  display: flex !important;
   width: 100%;
+}
+
+.admin-topbar .session-user-chip-host {
+  display: none !important;
 }
 
 .admin-sidebar-user .nav-profile-wrap {

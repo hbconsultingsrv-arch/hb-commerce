@@ -297,6 +297,7 @@ function renderSessionUserChip(profile, session, options = {}) {
 
   if (host.classList.contains('session-user-chip-host--menu')) {
     host.hidden = false;
+    host.removeAttribute('hidden');
     host.innerHTML = `
       <div class="nav-dropdown-wrap nav-profile-wrap">
         <button type="button" class="session-user-chip nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
