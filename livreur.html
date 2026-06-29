@@ -24,8 +24,24 @@
       </span>
     </a>
     <div class="nav-actions">
-      <div id="sessionUserChip" class="session-user-chip-host" hidden></div>
-      <a href="admin.html?tab=equipe" id="livreurAdminLink" class="btn btn-sm btn-outline-light" hidden>← Admin · Équipe HB</a>
+      <div class="nav-dropdown-wrap nav-activities-wrap">
+        <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
+          Mes activités <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
+        </button>
+        <ul class="nav-dropdown-menu" role="menu">
+          <li role="none" id="livreurActivitiesCommercialItem" hidden><a href="agent.html" id="livreurActivitiesCommercialLink" role="menuitem"><span class="nav-dropdown-num">1</span> Commercial</a></li>
+          <li role="none"><a href="livreur.html" role="menuitem" aria-current="page"><span class="nav-dropdown-num" id="livreurActivitiesLivraisonNum">2</span> Livraison</a></li>
+        </ul>
+      </div>
+      <div class="nav-dropdown-wrap nav-admin-menu-wrap">
+        <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
+          Menu <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
+        </button>
+        <ul class="nav-dropdown-menu" role="menu">
+          <li role="none" id="livreurMenuBackOfficeItem" hidden><a href="admin.html" id="livreurMenuBackOfficeLink" role="menuitem">Administration RH</a></li>
+          <li role="none"><a href="index.html" role="menuitem">Voir le site</a></li>
+        </ul>
+      </div>
       <button type="button" id="refreshDeliveriesBtn" class="btn btn-sm btn-outline-light">↻ Actualiser</button>
       <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
     </div>

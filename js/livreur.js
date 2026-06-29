@@ -210,14 +210,37 @@ async function requireDriver() {
   return session;
 }
 
+function setLivreurNavItem(el, visible) {
+  if (!el) return;
+  const li = el.closest('li') || el;
+  li.hidden = !visible;
+}
+
+function configureLivreurTopNav(profile) {
+  const commercialItem = document.getElementById('livreurActivitiesCommercialItem');
+  const backOfficeItem = document.getElementById('livreurMenuBackOfficeItem');
+  const backOfficeLink = document.getElementById('livreurMenuBackOfficeLink');
+  const livraisonNum = document.getElementById('livreurActivitiesLivraisonNum');
+  const showCommercial = isAdminProfile(profile);
+
+  setLivreurNavItem(commercialItem, showCommercial);
+  if (livraisonNum) livraisonNum.textContent = showCommercial ? '2' : '1';
+
+  if (backOfficeItem && backOfficeLink && isAdminProfile(profile)) {
+    setLivreurNavItem(backOfficeItem, true);
+    if (isSuperRootProfile(profile)) {
+      backOfficeLink.href = 'admin.html?tab=equipe';
+      backOfficeLink.textContent = 'Équipe HB';
+    } else {
+      backOfficeLink.href = 'admin.html';
+      backOfficeLink.textContent = 'Administration RH';
+    }
+  }
+}
+
 function showLivreurRhPersonalMode(profile) {
   const banner = document.getElementById('livreurAdminBanner');
-  const adminLink = document.getElementById('livreurAdminLink');
-  if (adminLink) {
-    adminLink.hidden = false;
-    adminLink.href = 'admin.html';
-    adminLink.textContent = '← Administration RH';
-  }
+  configureLivreurTopNav(profile);
   if (banner) {
     banner.hidden = false;
     banner.innerHTML = `
@@ -229,8 +252,7 @@ function showLivreurRhPersonalMode(profile) {
 
 function showLivreurAdminPreview(profile) {
   const banner = document.getElementById('livreurAdminBanner');
-  const adminLink = document.getElementById('livreurAdminLink');
-  if (adminLink) adminLink.hidden = false;
+  configureLivreurTopNav(profile);
   const welcome = document.getElementById('livreurWelcome');
   if (welcome) {
     welcome.textContent = 'Mode administration — connectez-vous avec un compte livreur pour voir les courses assignées.';
@@ -241,7 +263,7 @@ function showLivreurAdminPreview(profile) {
       <p><strong>Aperçu espace livreur</strong> (${escapeHtml(profile.full_name || profile.email)}).
       Pour tester : <a href="login-livreur.html">connexion livreur</a>
       (demo <code>livreur@hbcommerce.demo</code> / <code>Test1234!</code>).
-      <a href="admin.html?tab=equipe">Retour Équipe HB</a> ·
+      <a href="${isSuperRootProfile(profile) ? 'admin.html?tab=equipe' : 'admin.html'}">${isSuperRootProfile(profile) ? 'Équipe HB' : 'Administration RH'}</a> ·
       <a href="agent.html">Mon activité commerciale</a></p>`;
   }
 }

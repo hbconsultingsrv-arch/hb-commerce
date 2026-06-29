@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/commerce.css">
-  <link rel="stylesheet" href="css/admin-shell.css?v=admin-menu-mobile-20260628">
+  <link rel="stylesheet" href="css/admin-shell.css?v=admin-sidebar-user-20260620">
   <link rel="stylesheet" href="css/stock.css">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
@@ -24,6 +24,9 @@
             <span class="logo-hb-tag">Espace commercial</span>
           </span>
         </a>
+        <div class="admin-sidebar-user">
+          <div id="sessionUserChip" class="session-user-chip-host session-user-chip-host--menu session-user-chip-host--sidebar" hidden></div>
+        </div>
       </div>
       <nav class="admin-sidebar-nav">
         <button type="button" class="admin-nav-item active" data-tab="accueil"><span class="admin-nav-icon">◉</span> Accueil</button>
@@ -33,13 +36,6 @@
         <button type="button" class="admin-nav-item" data-tab="stock"><span class="admin-nav-icon">▤</span> Stock<span class="admin-nav-badge" id="agentStockNavBadge" hidden></span></button>
         <button type="button" class="admin-nav-item" data-tab="chat"><span class="admin-nav-icon">✉</span> Support<span class="admin-nav-badge" id="adminChatNavBadge" hidden></span></button>
       </nav>
-      <div class="admin-sidebar-footer">
-        <a href="admin.html" id="agentRhAdminLink" class="btn btn-sm btn-outline-light" hidden>Administration RH</a>
-        <a href="admin.html?tab=equipe" id="agentRhSuperLink" class="btn btn-sm btn-outline-light" hidden>Administration</a>
-        <a href="livreur.html" id="agentLivreurLink" class="btn btn-sm btn-outline-light" hidden>Mes livraisons</a>
-        <a href="index.html" class="btn btn-sm btn-outline-light">Voir le site</a>
-        <button type="button" id="logoutBtn" class="btn btn-sm btn-primary">Déconnexion</button>
-      </div>
     </aside>
 
     <div class="admin-shell">
@@ -56,7 +52,28 @@
           </div>
         </div>
         <div class="admin-topbar-actions">
-          <div id="sessionUserChip" class="session-user-chip-host" hidden></div>
+          <div class="admin-topbar-toolbar" aria-label="Raccourcis espace commercial">
+            <div class="nav-dropdown-wrap nav-activities-wrap">
+              <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
+                Mes activités <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
+              </button>
+              <ul class="nav-dropdown-menu" role="menu">
+                <li role="none"><a href="agent.html" role="menuitem" aria-current="page"><span class="nav-dropdown-num">1</span> Commercial</a></li>
+                <li role="none" id="agentActivitiesLivraisonItem" hidden><a href="livreur.html" id="agentActivitiesLivraisonLink" role="menuitem"><span class="nav-dropdown-num">2</span> Livraison</a></li>
+              </ul>
+            </div>
+            <div class="nav-dropdown-wrap nav-admin-menu-wrap">
+              <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
+                Menu <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
+              </button>
+              <ul class="nav-dropdown-menu" role="menu">
+                <li role="none" class="admin-only" id="agentMenuBackOfficeItem" hidden><a href="admin.html" id="agentMenuBackOfficeLink" role="menuitem">Administration RH</a></li>
+                <li role="none"><a href="index.html" role="menuitem">Voir le site</a></li>
+              </ul>
+            </div>
+            <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light" title="Mode clair / sombre">🌙 Sombre</button>
+          </div>
+          <button type="button" id="logoutBtn" class="btn btn-sm btn-primary">Déconnexion</button>
         </div>
       </header>
 
