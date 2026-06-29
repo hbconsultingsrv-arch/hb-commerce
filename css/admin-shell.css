@@ -382,6 +382,15 @@
   display: inline-flex;
 }
 
+.hb-admin-topnav[hidden],
+.hb-admin-topnav:not(.is-visible) {
+  display: none !important;
+}
+
+#agentStaffAccueil[hidden] {
+  display: none !important;
+}
+
 .admin-topbar-toolbar .nav-dropdown-menu {
   top: calc(100% + 0.35rem);
   bottom: auto;

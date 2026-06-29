@@ -269,8 +269,24 @@ function bindUserAvatarFallbacks(root = document) {
   });
 }
 
-function getProfilePageUrl() {
-  return 'compte.html?tab=profil';
+function getStaffChipSubtitle(profile, session) {
+  const role = resolveProfileRole(profile, session);
+  const labels = {
+    agent_commercial: 'Agent commercial',
+    livreur: 'Livreur',
+    admin: 'Administration RH',
+    super_root: 'Équipe HB',
+  };
+  return labels[role] || '';
+}
+
+function getSessionChipSubtitle(profile, session) {
+  if (document.body.classList.contains('livreur-page') || document.body.classList.contains('commercial-space')) {
+    return getStaffChipSubtitle(profile, session);
+  }
+  const name = profileDisplayName(profile, session);
+  if (profile?.company && profile.company !== name) return profile.company;
+  return profile?.email || session?.user?.email || '';
 }
 
 function renderSessionUserChip(profile, session, options = {}) {
@@ -367,9 +383,7 @@ async function applySessionUserDisplay(profile, session) {
   }
 
   const dashboardUrl = await getDefaultDashboardUrl(session, userProfile);
-  const subtitle = userProfile?.company && userProfile.company !== profileDisplayName(userProfile, session)
-    ? userProfile.company
-    : (userProfile?.email || session.user?.email || '');
+  const subtitle = getSessionChipSubtitle(userProfile, session);
 
   applyWelcomeUserHeader(userProfile, session);
   renderSessionUserChip(userProfile, session, { subtitle, profileUrl: getProfilePageUrl() });

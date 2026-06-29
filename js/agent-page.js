@@ -8,6 +8,12 @@ function setAgentNavItem(el, visible) {
   li.hidden = !visible;
 }
 
+function setTopNavBlock(el, visible) {
+  if (!el) return;
+  el.hidden = !visible;
+  el.style.display = visible ? '' : 'none';
+}
+
 function canShowMesActivites(profile) {
   return isAdminProfile(profile);
 }
@@ -17,18 +23,20 @@ async function initCommercialSpacePage() {
   if (!profile) return;
 
   const banner = document.getElementById('commercialScopeBanner');
-  const activitiesWrap = document.querySelector('.nav-activities-wrap');
+  const staffAccueil = document.getElementById('agentStaffAccueil');
+  const activitiesWrap = document.getElementById('agentActivitiesWrap');
+  const menuWrap = document.getElementById('agentMenuWrap');
   const livraisonItem = document.getElementById('agentActivitiesLivraisonItem');
   const backOfficeItem = document.getElementById('agentMenuBackOfficeItem');
   const backOfficeLink = document.getElementById('agentMenuBackOfficeLink');
+  const isStaff = !canShowMesActivites(profile);
 
-  if (activitiesWrap) {
-    activitiesWrap.hidden = !canShowMesActivites(profile);
-  }
+  setTopNavBlock(staffAccueil, isStaff);
+  setTopNavBlock(activitiesWrap, !isStaff);
+  setTopNavBlock(menuWrap, !isStaff);
+  setAgentNavItem(livraisonItem, !isStaff);
 
-  setAgentNavItem(livraisonItem, canShowMesActivites(profile));
-
-  if (backOfficeItem && backOfficeLink && isAdminProfile(profile)) {
+  if (backOfficeItem && backOfficeLink && !isStaff) {
     setAgentNavItem(backOfficeItem, true);
     if (isSuperRootProfile(profile)) {
       backOfficeLink.href = 'admin.html?tab=equipe';
@@ -39,7 +47,7 @@ async function initCommercialSpacePage() {
     }
   }
 
-  if (banner && isAdminProfile(profile)) {
+  if (banner && !isStaff) {
     banner.hidden = false;
     banner.innerHTML = `
       <p>Vous consultez votre <strong>portefeuille commercial personnel</strong> uniquement.

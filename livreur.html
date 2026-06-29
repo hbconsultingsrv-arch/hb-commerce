@@ -11,21 +11,25 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/commerce.css">
   <link rel="stylesheet" href="css/order-tracking.css">
-  <link rel="stylesheet" href="css/livreur.css?v=livreur-dark-20260620">
+  <link rel="stylesheet" href="css/livreur.css?v=livreur-user-20260621">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
 <body class="dashboard-page livreur-page">
   <script>try{if(localStorage.getItem('hb_admin_dark')==='1')document.body.classList.add('admin-dark');}catch(e){}</script>
   <nav class="nav nav-simple container">
-    <a href="index.html" class="logo logo-hb-brand">
-      <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="40" height="40" aria-hidden="true">
-      <span class="logo-hb-text">
-        <span class="logo-hb-name">HB Commerce</span>
-        <span class="logo-hb-tag">Espace livreur</span>
-      </span>
-    </a>
+    <div class="livreur-nav-brand">
+      <a href="index.html" class="logo logo-hb-brand">
+        <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="40" height="40" aria-hidden="true">
+        <span class="logo-hb-text">
+          <span class="logo-hb-name">HB Commerce</span>
+          <span class="logo-hb-tag">Espace livreur</span>
+        </span>
+      </a>
+      <div id="sessionUserChip" class="session-user-chip-host session-user-chip-host--menu session-user-chip-host--sidebar" hidden></div>
+    </div>
     <div class="nav-actions">
-      <div class="nav-dropdown-wrap nav-activities-wrap" id="livreurActivitiesWrap" hidden>
+      <a href="livreur.html" class="btn btn-sm btn-outline-light" id="livreurStaffAccueil" aria-current="page">Accueil</a>
+      <div class="nav-dropdown-wrap nav-activities-wrap hb-admin-topnav" id="livreurActivitiesWrap" hidden>
         <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
           Mes activités <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
         </button>
@@ -34,7 +38,7 @@
           <li role="none"><a href="livreur.html" role="menuitem" aria-current="page"><span class="nav-dropdown-num" id="livreurActivitiesLivraisonNum">2</span> Livraison</a></li>
         </ul>
       </div>
-      <div class="nav-dropdown-wrap nav-admin-menu-wrap">
+      <div class="nav-dropdown-wrap nav-admin-menu-wrap hb-admin-topnav" id="livreurMenuWrap" hidden>
         <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
           Menu <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
         </button>
@@ -125,9 +129,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="js/auth.js?v=staff-user-chip-20260621"></script>
   <script src="js/admin-shell.js"></script>
   <script src="js/driver-api.js"></script>
-  <script src="js/livreur.js"></script>
+  <script src="js/livreur.js?v=livreur-nav-20260621"></script>
 </body>
 </html>

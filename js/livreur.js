@@ -216,19 +216,27 @@ function setLivreurNavItem(el, visible) {
   li.hidden = !visible;
 }
 
+function setTopNavBlock(el, visible) {
+  if (!el) return;
+  el.hidden = !visible;
+  el.style.display = visible ? '' : 'none';
+}
+
 function configureLivreurTopNav(profile) {
+  const staffAccueil = document.getElementById('livreurStaffAccueil');
   const activitiesWrap = document.getElementById('livreurActivitiesWrap');
+  const menuWrap = document.getElementById('livreurMenuWrap');
   const commercialItem = document.getElementById('livreurActivitiesCommercialItem');
   const backOfficeItem = document.getElementById('livreurMenuBackOfficeItem');
   const backOfficeLink = document.getElementById('livreurMenuBackOfficeLink');
   const livraisonNum = document.getElementById('livreurActivitiesLivraisonNum');
-  const showActivities = isAdminProfile(profile);
+  const isStaff = !isAdminProfile(profile);
 
-  if (activitiesWrap) activitiesWrap.hidden = !showActivities;
-  if (!showActivities) {
-    setLivreurNavItem(backOfficeItem, false);
-    return;
-  }
+  setTopNavBlock(staffAccueil, isStaff);
+  setTopNavBlock(activitiesWrap, !isStaff);
+  setTopNavBlock(menuWrap, !isStaff);
+
+  if (isStaff) return;
 
   setLivreurNavItem(commercialItem, true);
   if (livraisonNum) livraisonNum.textContent = '2';

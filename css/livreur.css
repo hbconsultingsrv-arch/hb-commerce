@@ -1,5 +1,48 @@
 /* Espace livreur — HB Commerce */
 
+.livreur-nav-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
+  min-width: 0;
+  max-width: min(100%, 320px);
+}
+
+.livreur-nav-brand .session-user-chip-host:not([hidden]) {
+  display: flex !important;
+  width: 100%;
+}
+
+.livreur-nav-brand .nav-profile-wrap {
+  width: 100%;
+}
+
+.livreur-nav-brand .session-user-chip.nav-dropdown-trigger {
+  width: 100%;
+  max-width: none;
+  justify-content: flex-start;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  padding: 0.45rem 0.65rem;
+}
+
+.livreur-nav-brand .session-user-chip-name,
+.livreur-nav-brand .session-user-chip-meta {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.livreur-nav-brand .session-user-chip-meta {
+  opacity: 0.78;
+}
+
+.livreur-nav-brand .nav-profile-menu {
+  left: 0;
+  right: auto;
+  min-width: 220px;
+}
+
 .livreur-page {
   --livreur-bg: var(--cream, #f5f0e8);
   --livreur-surface: #ffffff;
@@ -303,4 +346,13 @@
 
 .livreur-page.admin-dark .nav.nav-simple {
   z-index: 1100;
+}
+
+.hb-admin-topnav[hidden],
+.hb-admin-topnav:not(.is-visible) {
+  display: none !important;
+}
+
+#livreurStaffAccueil[hidden] {
+  display: none !important;
 }
