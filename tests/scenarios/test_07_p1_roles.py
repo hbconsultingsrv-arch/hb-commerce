@@ -60,16 +60,16 @@ def test_driver_deliveries_dashboard(driver):
 @pytest.mark.suite("super")
 @pytest.mark.scenario("FLUX-SUP-02")
 def test_super_root_team_list(driver):
-    """Le super root voit la liste de l'équipe interne."""
+    """Le super root voit toute l'équipe interne avec gestion des rôles."""
     login_as(driver, ACCOUNTS["super_root"], expect_url_contains="admin.html")
     WebDriverWait(driver, EXPLICIT_WAIT).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, "#panel-equipe #agentsBody tr, #panel-equipe #driversBody tr"))
+        EC.presence_of_element_located((By.CSS_SELECTOR, "#profilesBody tr"))
     )
     roles = " ".join(
         d.text.lower()
-        for d in driver.find_elements(By.CSS_SELECTOR, "#agentsBody tr, #driversBody tr")
+        for d in driver.find_elements(By.CSS_SELECTOR, "#profilesBody tr")
     )
-    assert "admin" in roles or "agent" in roles or "livreur" in roles
+    assert "admin" in roles or "agent" in roles or "livreur" in roles or "super" in roles
 
 
 @pytest.mark.suite("driver")
@@ -92,7 +92,7 @@ def test_driver_delivery_filters(driver):
 @pytest.mark.scenario("FLUX-SUP-04")
 def test_super_root_create_admin_form(driver):
     """Le super root ouvre le formulaire de création admin."""
-    login_as(driver, ACCOUNTS["super_root"])
+    login_as(driver, ACCOUNTS["super_root"], expect_url_contains="admin.html")
     WebDriverWait(driver, EXPLICIT_WAIT).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, '#superRootTabs .admin-tab[data-section="nouveau"]'))
     ).click()
@@ -107,7 +107,7 @@ def test_super_root_create_admin_form(driver):
 @pytest.mark.scenario("FLUX-SUP-03")
 def test_super_root_create_livreur_form(driver):
     """Le super root peut ouvrir le formulaire de création livreur."""
-    login_as(driver, ACCOUNTS["super_root"])
+    login_as(driver, ACCOUNTS["super_root"], expect_url_contains="admin.html")
     WebDriverWait(driver, EXPLICIT_WAIT).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, '#superRootTabs .admin-tab[data-section="nouveau"]'))
     ).click()

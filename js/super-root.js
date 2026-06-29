@@ -77,11 +77,11 @@ function bindSuperRootTabs() {
   });
 }
 
-async function initSuperRoot() {
-  const session = await requireSuperRoot();
-  if (!session) return;
+async function bindSuperRootTeamPanel() {
+  const panel = document.getElementById('superRootPanel');
+  if (!panel || panel.dataset.bound === '1') return;
+  panel.dataset.bound = '1';
 
-  document.getElementById('logoutBtn')?.addEventListener('click', signOut);
   document.getElementById('refreshProfilesBtn')?.addEventListener('click', loadSuperRootData);
   document.getElementById('newProfileBtn')?.addEventListener('click', () => showSuperRootSection('nouveau'));
   document.getElementById('superRootInfoBtn')?.addEventListener('click', () => openAppModal('superRootInfoModal'));
@@ -96,7 +96,10 @@ async function initSuperRoot() {
   bindSuperRootTabs();
   toggleInternalVehicleField(document.getElementById('internalRoleSelect')?.value || 'agent_commercial');
   showSuperRootSection('equipe');
-  await applySessionUserDisplay(await getProfile(session.user.id), session);
+}
+
+async function initSuperRootTeamPanel() {
+  await bindSuperRootTeamPanel();
   await loadSuperRootData();
 }
 
@@ -310,5 +313,3 @@ async function handleProfileEditSubmit(e) {
     showAlert(note, err.message);
   }
 }
-
-document.addEventListener('DOMContentLoaded', initSuperRoot);

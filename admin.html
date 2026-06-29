@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="css/stock.css?v=stock-20260619">
   <link rel="stylesheet" href="css/analytics.css?v=analytics-20260624">
   <link rel="stylesheet" href="css/admin-roadmap.css?v=qa-report-20260630">
-  <link rel="stylesheet" href="css/admin-shell.css?v=admin-menu-20260619">
+  <link rel="stylesheet" href="css/admin-shell.css?v=admin-equipe-20260619">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
 <body class="dashboard-page admin-v2">
@@ -71,12 +71,11 @@
                 Menu <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
               </button>
               <ul class="nav-dropdown-menu" role="menu">
-                <li role="none"><button type="button" class="nav-dropdown-action" data-admin-tab="equipe" role="menuitem">Équipe HB</button></li>
                 <li role="none"><button type="button" class="nav-dropdown-action" data-admin-tab="stock" role="menuitem">Stock</button></li>
-                <li role="none"><button type="button" class="nav-dropdown-action" id="adminDarkModeBtn" role="menuitem" title="Mode clair / sombre">🌙 Sombre</button></li>
                 <li role="none"><a href="index.html" role="menuitem">Voir le site</a></li>
               </ul>
             </div>
+            <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light" title="Mode clair / sombre">🌙 Sombre</button>
           </div>
           <div id="sessionUserChip" class="session-user-chip-host session-user-chip-host--menu" hidden></div>
         </div>
@@ -387,6 +386,70 @@
     </section>
 
     <section id="panel-equipe" class="admin-panel admin-only" hidden data-tab-scope>
+      <div id="superRootPanel" class="super-root-only" hidden data-tab-scope>
+        <div class="admin-tabs admin-tabs-with-info" id="superRootTabs">
+          <button type="button" class="admin-tab active" data-section="equipe">Personnel HB</button>
+          <button type="button" class="admin-tab" data-section="nouveau">Nouveau</button>
+          <button type="button" class="btn btn-sm btn-outline-dark admin-tabs-info" id="superRootInfoBtn">ℹ Aide</button>
+        </div>
+
+        <div data-section-panel="equipe" class="dashboard-card dashboard-card-wide">
+          <div class="dashboard-card-head">
+            <h2>Équipe HB Commerce</h2>
+            <div class="dashboard-card-actions">
+              <button type="button" id="newProfileBtn" class="btn btn-sm btn-primary">Nouveau</button>
+              <button type="button" id="refreshProfilesBtn" class="btn btn-sm btn-outline-dark">Actualiser</button>
+            </div>
+          </div>
+          <p class="auth-sub" style="margin-bottom:1rem">Super root, admin, agents commerciaux et livreurs — modification des rôles et accès internes.</p>
+          <div class="table-wrap">
+            <table class="requests-table">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>E-mail</th>
+                  <th>Téléphone</th>
+                  <th>Rôle</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="profilesBody"><tr><td colspan="5">Chargement…</td></tr></tbody>
+            </table>
+          </div>
+          <p class="form-note" id="profilesNote"></p>
+        </div>
+
+        <div data-section-panel="nouveau" class="dashboard-card" hidden>
+          <h2>Nouvel utilisateur HB Commerce</h2>
+          <form id="internalUserForm" class="auth-form">
+            <label>
+              Rôle
+              <select name="internal_role" id="internalRoleSelect" required>
+                <option value="agent_commercial">Agent commercial</option>
+                <option value="admin">Admin</option>
+                <option value="super_root">Super root</option>
+                <option value="livreur">Livreur</option>
+              </select>
+            </label>
+            <div class="form-row">
+              <label>Nom complet <input type="text" name="full_name" required placeholder="Nom de la personne"></label>
+              <label>E-mail <input type="email" name="email" required placeholder="prenom.nom@hbcommerce.fr"></label>
+            </div>
+            <div class="form-row">
+              <label>Téléphone <input type="tel" name="phone" placeholder="Téléphone"></label>
+              <label>Mot de passe temporaire <input type="password" name="password" minlength="6" required autocomplete="new-password"></label>
+            </div>
+            <label id="internalVehicleWrap" hidden>
+              Véhicule / infos
+              <input type="text" name="vehicle_info" placeholder="Fourgon, immatriculation…">
+            </label>
+            <button type="submit" class="btn btn-primary">Créer le compte</button>
+            <p class="form-note" id="internalUserNote"></p>
+          </form>
+        </div>
+      </div>
+
+      <div id="adminEquipePanel">
       <div class="section-tabs" data-section-tabs>
         <button type="button" class="section-tab active" data-section="agents">Agents commerciaux</button>
         <button type="button" class="section-tab" data-section="livreurs">Livreurs</button>
@@ -456,6 +519,7 @@
             <p class="form-note" id="adminDriverNote"></p>
           </form>
         </div>
+      </div>
       </div>
     </section>
 
@@ -1099,6 +1163,59 @@
     </div>
   </div>
 
+  <div id="superRootInfoModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog">
+      <div class="app-modal-header">
+        <h2>Aide — Équipe HB (super root)</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
+        <p>Gérez les <strong>comptes HB Commerce</strong> : super root, admin, agents commerciaux et livreurs.</p>
+        <ul>
+          <li><strong>Personnel HB</strong> — liste, changement de rôle et modification.</li>
+          <li><strong>Nouveau</strong> — création d'un compte interne avec mot de passe temporaire.</li>
+        </ul>
+        <p>L'admin gère les agents et livreurs via le même menu latéral <strong>Équipe HB</strong>, sans accès aux rôles super root / admin.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="profileEditModal" class="app-modal" hidden>
+    <div class="app-modal-backdrop" data-close-modal></div>
+    <div class="app-modal-dialog">
+      <div class="app-modal-header">
+        <h2 id="profileEditTitle">Modifier un utilisateur interne</h2>
+        <button type="button" class="app-modal-close" data-close-modal aria-label="Fermer">&times;</button>
+      </div>
+      <div class="app-modal-body">
+        <form id="profileEditForm" class="auth-form">
+          <input type="hidden" name="id">
+          <div class="form-row">
+            <label>Nom complet <input type="text" name="full_name" required></label>
+            <label>E-mail <input type="email" name="email" required></label>
+          </div>
+          <div class="form-row">
+            <label>Téléphone <input type="tel" name="phone"></label>
+            <label>Rôle
+              <select name="role" required>
+                <option value="agent_commercial">Agent commercial</option>
+                <option value="admin">Admin</option>
+                <option value="super_root">Super root</option>
+                <option value="livreur">Livreur</option>
+              </select>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <button type="button" id="resetProfileEditBtn" class="btn btn-outline-dark">Réinitialiser</button>
+          </div>
+          <p class="form-note" id="profileEditNote"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <datalist id="supplierNameList"></datalist>
   <datalist id="supplierOrderSupplierList"></datalist>
   <datalist id="supplierOrderProductList"></datalist>
@@ -1127,7 +1244,8 @@
   <script src="js/admin-dashboard.js?v=admin-v2-20260624"></script>
   <script src="js/admin-roadmap.js?v=qa-report-20260630"></script>
   <script src="js/admin-qa-report.js?v=qa-report-20260630"></script>
-  <script src="js/admin-shell.js?v=admin-topbar-20260619"></script>
-  <script src="js/admin.js?v=admin-topbar-20260619"></script>
+  <script src="js/admin-shell.js?v=admin-equipe-20260619"></script>
+  <script src="js/super-root.js?v=admin-equipe-20260619"></script>
+  <script src="js/admin.js?v=admin-equipe-20260619"></script>
 </body>
 </html>

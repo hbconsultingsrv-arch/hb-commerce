@@ -45,8 +45,12 @@ function showAdminTab(tabId) {
     initRoadmapAdminPanel();
   }
   if (tabId === 'equipe') {
-    loadAgentsTable();
-    loadDriversTable();
+    if (isSuperRootProfile(adminProfile)) {
+      if (typeof initSuperRootTeamPanel === 'function') initSuperRootTeamPanel();
+    } else {
+      loadAgentsTable();
+      loadDriversTable();
+    }
   }
   if (tabId === 'commandes' && window.HB_COMMERCIAL_SPACE) {
     initAgentOrderForm();
@@ -109,7 +113,12 @@ async function initAdmin() {
 
   document.getElementById('logoutBtn')?.addEventListener('click', signOut);
   applyAdminRoleUi(adminProfile, commercialSpace || isCommercialAgentProfile(adminProfile));
-  if (!isSuperRootProfile(adminProfile)) {
+  if (isSuperRootProfile(adminProfile)) {
+    const superPanel = document.getElementById('superRootPanel');
+    const adminEquipe = document.getElementById('adminEquipePanel');
+    if (superPanel) superPanel.hidden = false;
+    if (adminEquipe) adminEquipe.hidden = true;
+  } else {
     document.querySelectorAll('.super-root-only').forEach((el) => el.remove());
   }
 
@@ -125,7 +134,7 @@ async function initAdmin() {
     const panel = deepTab ? document.getElementById(`panel-${deepTab}`) : null;
     if (deepTab && panel) {
       showAdminTab(deepTab);
-      if (deepTab === 'equipe') {
+      if (deepTab === 'equipe' && !isSuperRootProfile(adminProfile)) {
         const section = params.get('section');
         if (section === 'livreurs' || section === 'agents') {
           activateSectionTab('panel-equipe', section);
@@ -140,7 +149,11 @@ async function initAdmin() {
   if (!commercialSpace) {
     await loadSuppliersTable();
     await loadProductsTable();
-    await loadAgentsTable();
+    if (!isSuperRootProfile(adminProfile)) {
+      await loadAgentsTable();
+    } else if (typeof initSuperRootTeamPanel === 'function') {
+      await initSuperRootTeamPanel();
+    }
   }
   await loadDriversCache();
   await loadOrdersTable();
