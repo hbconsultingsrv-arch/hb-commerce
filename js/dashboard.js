@@ -2,9 +2,15 @@ async function initDashboard() {
   const session = await requireAuth();
   if (!session) return;
 
-  let profile = await getProfile(session.user.id);
-  if (profile && !['client', 'pending_company'].includes(profile.role)) {
-    window.location.href = await getDefaultDashboardUrl(session);
+  let profile = null;
+  try {
+    profile = await getProfile(session.user.id);
+  } catch (err) {
+    console.warn('initDashboard: profil inaccessible', err.message);
+  }
+
+  if (!isClientDashboardRole(profile, session)) {
+    window.location.href = await getDefaultDashboardUrl(session, profile);
     return;
   }
 

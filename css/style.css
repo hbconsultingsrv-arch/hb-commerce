@@ -980,8 +980,22 @@ body.modal-open {
 }
 
 .dashboard-page .session-user-chip {
-  background: rgba(26, 92, 74, 0.06);
-  border-color: rgba(26, 92, 74, 0.14);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.dashboard-page .nav .session-user-chip-name,
+.dashboard-page .nav .session-user-chip-meta {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.dashboard-page .nav .session-user-chip-meta {
+  opacity: 0.78;
+}
+
+.dashboard-page .nav .user-avatar--initials {
+  color: #fff;
 }
 
 .admin-v2 .session-user-chip {

@@ -147,6 +147,29 @@ function isBackofficeProfile(profile) {
   return isAdminProfile(profile) || isCommercialAgentProfile(profile);
 }
 
+const DEMO_ROLE_BY_EMAIL = {
+  'super@hbcommerce.demo': 'super_root',
+  'admin@hbcommerce.demo': 'admin',
+  'agent.martin@hbcommerce.demo': 'agent_commercial',
+  'agent.dubois@hbcommerce.demo': 'agent_commercial',
+  'stock@fiafi-tunisie.demo': 'supplier',
+  'livreur@hbcommerce.demo': 'livreur',
+};
+
+function resolveProfileRole(profile, session) {
+  const role = profile?.role
+    || session?.user?.app_metadata?.role
+    || session?.user?.user_metadata?.role;
+  if (role) return role;
+  const email = (profile?.email || session?.user?.email || '').trim().toLowerCase();
+  return DEMO_ROLE_BY_EMAIL[email] || null;
+}
+
+function isClientDashboardRole(profile, session) {
+  const role = resolveProfileRole(profile, session);
+  return !role || role === 'client' || role === 'pending_company';
+}
+
 async function getDefaultDashboardUrl(session, profile = undefined) {
   if (!session?.user?.id) return 'compte.html';
   let userProfile = profile;
@@ -155,14 +178,14 @@ async function getDefaultDashboardUrl(session, profile = undefined) {
       userProfile = await getProfile(session.user.id);
     } catch (err) {
       console.warn('getDefaultDashboardUrl:', err.message);
-      return 'compte.html';
     }
   }
-  if (isSuperRootProfile(userProfile)) return 'super-root.html';
-  if (isAdminProfile(userProfile)) return 'admin.html';
-  if (isCommercialAgentProfile(userProfile)) return 'agent.html';
-  if (isSupplierProfile(userProfile)) return 'supplier.html';
-  if (isDriverProfile(userProfile)) return 'livreur.html';
+  const role = resolveProfileRole(userProfile, session);
+  if (role === 'super_root') return 'super-root.html';
+  if (role === 'admin') return 'admin.html';
+  if (role === 'agent_commercial') return 'agent.html';
+  if (role === 'supplier') return 'supplier.html';
+  if (role === 'livreur') return 'livreur.html';
   return 'compte.html';
 }
 

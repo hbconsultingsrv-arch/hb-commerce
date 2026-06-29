@@ -54,8 +54,13 @@ async function requireCommercialSpace() {
 async function isSuperRoot() {
   const session = await getSession();
   if (!session) return false;
-  const profile = await getProfile(session.user.id);
-  return isSuperRootProfile(profile);
+  let profile = null;
+  try {
+    profile = await getProfile(session.user.id);
+  } catch (err) {
+    console.warn('isSuperRoot:', err.message);
+  }
+  return resolveProfileRole(profile, session) === 'super_root';
 }
 
 async function requireSuperRoot() {
