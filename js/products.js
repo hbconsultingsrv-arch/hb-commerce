@@ -336,6 +336,26 @@ function openProductTechSheet(product) {
   }
 }
 
+function renderProductCardBadges(product, packaging) {
+  const origin = product.origin
+    ? `<span class="origin-badge">${escapeHtml(String(product.origin).toUpperCase())}</span>`
+    : '';
+  const tag = product.tag
+    ? `<span class="premium-badge">${escapeHtml(product.tag)}</span>`
+    : '';
+  const pack = packaging && packaging !== '—'
+    ? `<span class="packaging-badge">${escapeHtml(packaging)}</span>`
+    : '';
+  if (!origin && !tag && !pack) return '';
+
+  return `
+    <div class="product-card-badges" aria-hidden="true">
+      <div class="product-card-badges-left">${origin}${tag}</div>
+      ${pack ? `<div class="product-card-badges-right">${pack}</div>` : ''}
+    </div>
+  `;
+}
+
 function renderProductCard(product) {
   const minQty = product.min_quantity || 1;
   const imgUrl = resolveProductImage(product);
@@ -358,9 +378,7 @@ function renderProductCard(product) {
       data-brand="${escapeHtml(brand)}" data-origin="${escapeHtml(product.origin || '')}"
       data-format="${escapeHtml(formatLabel || product.unit || '')}" data-stock="${stockKey}">
       <div class="product-img-area">
-        ${product.tag ? '<span class="premium-badge">Premium</span>' : ''}
-        ${product.origin ? `<span class="origin-badge">${escapeHtml(String(product.origin).toUpperCase())}</span>` : ''}
-        ${packaging && packaging !== '—' ? `<span class="packaging-badge">${packaging}</span>` : ''}
+        ${renderProductCardBadges(product, packaging)}
         <img src="${imgUrl}" alt="${product.name}" loading="lazy" onerror="this.onerror=null;this.src='${imgFallback}'">
       </div>
       ${renderProductInfoStrip(product)}

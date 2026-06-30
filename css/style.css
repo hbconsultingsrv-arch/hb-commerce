@@ -1112,6 +1112,17 @@ body.modal-open {
   gap: 0.45rem;
 }
 
+.dashboard-page .nav-links a:not(.btn),
+.dashboard-page .nav-links .nav-account-link--with-avatar span {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+}
+
+.dashboard-page .nav-links a:not(.btn):hover,
+.dashboard-page .nav-links .nav-account-link--with-avatar:hover span {
+  color: var(--gold-light);
+}
+
 .dashboard-welcome-user {
   display: flex;
   align-items: center;

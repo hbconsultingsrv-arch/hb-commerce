@@ -256,20 +256,70 @@
 .product-card .product-img-area {
   background: linear-gradient(180deg, var(--fiafi-cream) 0%, #ebe4d6 100%);
   padding: 1rem;
+  padding-top: 2.85rem;
   position: relative;
+  overflow: hidden;
+}
+
+.product-card-badges {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  pointer-events: none;
+}
+
+.product-card-badges-left,
+.product-card-badges-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  max-width: 72%;
+}
+
+.product-card-badges-right {
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+.product-card .product-img-area .origin-badge,
+.product-card .product-img-area .premium-badge,
+.product-card .product-img-area .packaging-badge {
+  position: static;
+  top: auto;
+  left: auto;
+  right: auto;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.22rem 0.5rem;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .product-card .product-img-area .origin-badge {
-  position: absolute;
-  top: 12px;
-  left: 12px;
   background: var(--fiafi-gold);
   color: var(--fiafi-olive-dark);
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  letter-spacing: 0.04em;
+}
+
+.product-card .product-img-area .premium-badge {
+  background: linear-gradient(135deg, var(--fiafi-gold) 0%, #a88620 100%);
+  color: var(--fiafi-olive-dark);
+  text-transform: uppercase;
+}
+
+.product-card .product-img-area .packaging-badge {
+  background: var(--fiafi-olive-dark);
+  color: var(--white);
 }
 
 .product-card .product-img-area img {
@@ -753,16 +803,22 @@
   border-color: var(--fiafi-olive);
 }
 
-.product-card .packaging-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: var(--fiafi-olive-dark);
-  color: var(--white);
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+.catalog-category-bar {
+  margin: 0.5rem 0 1.5rem;
+  padding: 1rem 1.15rem;
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px solid rgba(61, 92, 58, 0.1);
+  box-shadow: 0 4px 20px rgba(42, 66, 40, 0.06);
+}
+
+.catalog-category-bar .category-nav {
+  margin-bottom: 0;
+}
+
+.catalog-category-bar + .products-grid,
+.catalog-category-bar ~ #cartToast + .products-grid {
+  margin-top: 0.5rem;
 }
 
 .product-card .format-label {
