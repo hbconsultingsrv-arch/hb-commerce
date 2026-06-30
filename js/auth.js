@@ -395,6 +395,7 @@ function renderSessionUserChip(profile, session, options = {}) {
   const tagClose = profileUrl ? '</a>' : '</div>';
 
   host.hidden = false;
+  host.removeAttribute('hidden');
   host.innerHTML = `
     ${tag}
       ${avatarHtml}
@@ -628,6 +629,7 @@ function syncNavLoginFallbacks(hasSession) {
 }
 
 let navAuthUpdateSeq = 0;
+let navAuthReady = false;
 
 async function updateNavAuth() {
   const seq = ++navAuthUpdateSeq;
@@ -654,13 +656,13 @@ async function updateNavAuth() {
     if (accountLink) {
       accountLink.style.display = '';
       accountLink.href = dashboardUrl;
-      if (isCommercialAgentProfile(profile)) {
+      if (isCommercialAgentProfile(profile, session)) {
         accountLink.setAttribute('data-i18n', 'nav.agentSpace');
-      } else if (isDriverProfile(profile)) {
+      } else if (isDriverProfile(profile, session)) {
         accountLink.setAttribute('data-i18n', 'nav.driverSpace');
       } else if (isSupplierProfile(profile)) {
         accountLink.setAttribute('data-i18n', 'nav.supplierSpace');
-      } else if (isAdminProfile(profile)) {
+      } else if (isAdminProfile(profile, session)) {
         accountLink.setAttribute('data-i18n', 'nav.adminSpace');
       } else {
         accountLink.setAttribute('data-i18n', 'nav.account');
@@ -687,7 +689,10 @@ async function updateNavAuth() {
       adminLink.style.display = admin ? '' : 'none';
     }
   } else {
-    clearSessionUserDisplay();
+    if (seq !== navAuthUpdateSeq) return;
+    if (navAuthReady && !isDedicatedBackOfficeShell()) {
+      clearSessionUserDisplay();
+    }
     if (loginLink) {
       loginLink.hidden = false;
       loginLink.style.display = '';
@@ -700,8 +705,10 @@ async function updateNavAuth() {
 
   if (seq !== navAuthUpdateSeq) return;
 
-  document.documentElement.classList.remove('nav-auth-pending');
-  document.documentElement.classList.add(session ? 'nav-auth-session' : 'nav-auth-guest');
+  if (navAuthReady || session) {
+    document.documentElement.classList.remove('nav-auth-pending');
+    document.documentElement.classList.add(session ? 'nav-auth-session' : 'nav-auth-guest');
+  }
 
   if (cartBadge && typeof getCartCount === 'function') {
     const count = getCartCount();
@@ -812,18 +819,21 @@ document.addEventListener('DOMContentLoaded', () => {
   bindPasswordToggles();
   bindNavDropdowns();
   bindLogoutButton(document.getElementById('logoutBtn'));
-  updateNavAuth();
 
   window.addEventListener('pageshow', () => {
-    updateNavAuth();
+    if (navAuthReady) updateNavAuth();
   });
 
   const sb = getSupabase();
   if (sb?.auth?.onAuthStateChange) {
     sb.auth.onAuthStateChange((event) => {
+      if (event === 'INITIAL_SESSION') navAuthReady = true;
       if (event === 'SIGNED_OUT' || event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
         updateNavAuth();
       }
     });
+  } else {
+    navAuthReady = true;
+    updateNavAuth();
   }
 });

@@ -113,7 +113,7 @@ async function initAdmin() {
   if (!adminSession) return;
 
   bindLogoutButton(document.getElementById('logoutBtn'));
-  void applySessionUserDisplay(null, adminSession);
+  await applySessionUserDisplay(null, adminSession);
 
   try {
     adminProfile = await getProfileSafe(adminSession.user.id);
