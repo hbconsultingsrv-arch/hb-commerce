@@ -1,3 +1,21 @@
+const LIVREUR_HOME_VIEW_KEY = 'hb_livreur_home_view';
+
+function requestStaffHomeNavigation(href) {
+  if (href === 'livreur.html') {
+    try {
+      sessionStorage.setItem(LIVREUR_HOME_VIEW_KEY, '1');
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+function bindStaffHomeLink(link, href) {
+  if (!link || link.dataset.staffHomeBound === '1') return;
+  link.dataset.staffHomeBound = '1';
+  link.addEventListener('click', () => requestStaffHomeNavigation(href));
+}
+
 function activateDashboardTab(tabId) {
   const tab = document.querySelector(`#compteTabs [data-tab="${tabId}"]`);
   if (!tab) return;
@@ -136,6 +154,7 @@ async function initInternalProfileDashboard(profile, session) {
       staffHomeLink.href = staffHome;
       staffHomeLink.textContent = 'Accueil';
       staffHomeLink.style.display = '';
+      bindStaffHomeLink(staffHomeLink, staffHome);
     }
   } else if (staffHomeLink) {
     staffHomeLink.style.display = 'none';

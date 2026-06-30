@@ -2,12 +2,15 @@
  * Espace livreur — HB Commerce
  */
 
+const LIVREUR_HOME_VIEW_KEY = 'hb_livreur_home_view';
+
 let livreurState = {
   profile: null,
   driverId: null,
   orders: [],
   selectedId: null,
-  filter: 'all'
+  filter: 'all',
+  homeView: false
 };
 
 function formatOrderRef(order) {
@@ -98,6 +101,7 @@ function renderTimeline(order) {
 function selectOrder(orderId) {
   const order = livreurState.orders.find((o) => o.id === orderId);
   if (!order) return;
+  livreurState.homeView = false;
   livreurState.selectedId = orderId;
   renderList();
 
@@ -160,10 +164,18 @@ async function loadDeliveries() {
 
   if (layout) layout.hidden = false;
   renderKpis(livreurState.orders);
+  renderList();
+
+  if (livreurState.homeView) {
+    const detail = document.getElementById('livreurDetail');
+    if (detail) detail.hidden = true;
+    livreurState.selectedId = null;
+    return;
+  }
+
   if (!livreurState.selectedId || !livreurState.orders.find((o) => o.id === livreurState.selectedId)) {
     livreurState.selectedId = livreurState.orders[0].id;
   }
-  renderList();
   selectOrder(livreurState.selectedId);
 }
 
@@ -230,13 +242,15 @@ function configureLivreurTopNav(profile) {
   const backOfficeItem = document.getElementById('livreurMenuBackOfficeItem');
   const backOfficeLink = document.getElementById('livreurMenuBackOfficeLink');
   const livraisonNum = document.getElementById('livreurActivitiesLivraisonNum');
-  const isStaff = !isAdminProfile(profile);
+  const isAdmin = isAdminProfile(profile);
+  const isPersonalDriver = isAdmin && profile?.driver_id && !livreurState.adminPreview;
+  const showStaffAccueil = !isAdmin || isPersonalDriver;
 
-  setTopNavBlock(staffAccueil, isStaff);
-  setTopNavBlock(activitiesWrap, !isStaff);
-  setTopNavBlock(menuWrap, !isStaff);
+  setTopNavBlock(staffAccueil, showStaffAccueil);
+  setTopNavBlock(activitiesWrap, isAdmin && !isPersonalDriver);
+  setTopNavBlock(menuWrap, isAdmin && !isPersonalDriver);
 
-  if (isStaff) return;
+  if (!isAdmin || isPersonalDriver) return;
 
   setLivreurNavItem(commercialItem, true);
   if (livraisonNum) livraisonNum.textContent = '2';
@@ -281,7 +295,28 @@ function showLivreurAdminPreview(profile) {
   }
 }
 
+function requestLivreurHomeView() {
+  try {
+    sessionStorage.setItem(LIVREUR_HOME_VIEW_KEY, '1');
+  } catch {
+    /* ignore */
+  }
+}
+
+function consumeLivreurHomeViewRequest() {
+  try {
+    if (sessionStorage.getItem(LIVREUR_HOME_VIEW_KEY) === '1') {
+      sessionStorage.removeItem(LIVREUR_HOME_VIEW_KEY);
+      return true;
+    }
+  } catch {
+    /* ignore */
+  }
+  return false;
+}
+
 function resetLivreurHomeView() {
+  livreurState.homeView = true;
   livreurState.selectedId = null;
   livreurState.filter = 'all';
 
@@ -312,14 +347,23 @@ function resetLivreurHomeView() {
 }
 
 function goLivreurAccueil(event) {
+  event?.preventDefault();
+  event?.stopPropagation();
   const currentPage = window.location.pathname.split('/').pop() || '';
-  if (currentPage === 'livreur.html') {
-    event?.preventDefault();
+  if (currentPage === 'livreur.html' || currentPage === 'livreur') {
     resetLivreurHomeView();
     return;
   }
-  if (event) event.preventDefault();
+  requestLivreurHomeView();
   window.location.href = 'livreur.html';
+}
+
+function bindLivreurHomeLinks() {
+  document.querySelectorAll('#livreurStaffAccueil, a[href="livreur.html"]').forEach((el) => {
+    if (el.dataset.livreurHomeBound === '1') return;
+    el.dataset.livreurHomeBound = '1';
+    el.addEventListener('click', goLivreurAccueil);
+  });
 }
 
 function bindLivreurUi() {
@@ -333,7 +377,7 @@ function bindLivreurUi() {
   });
 
   document.getElementById('refreshDeliveriesBtn')?.addEventListener('click', loadDeliveries);
-  document.getElementById('livreurStaffAccueil')?.addEventListener('click', goLivreurAccueil);
+  bindLivreurHomeLinks();
   bindLogoutButton(document.getElementById('logoutBtn'));
   document.getElementById('btnEnRoute')?.addEventListener('click', () =>
     applyDeliveryUpdate({ delivery_status: 'en_transit' })
@@ -351,9 +395,15 @@ async function initLivreurPage() {
   const session = await requireDriver();
   if (!session) return;
   configureLivreurTopNav(livreurState.profile);
+  bindLivreurHomeLinks();
   await applySessionUserDisplay(livreurState.profile, session);
+  bindLivreurHomeLinks();
+  if (consumeLivreurHomeViewRequest()) {
+    livreurState.homeView = true;
+  }
   if (!livreurState.adminPreview) {
     await loadDeliveries();
+    if (livreurState.homeView) resetLivreurHomeView();
     setInterval(loadDeliveries, 60000);
   } else {
     document.getElementById('livreurLoading')?.setAttribute('hidden', '');
