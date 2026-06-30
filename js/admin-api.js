@@ -363,6 +363,18 @@ async function fetchAllProducts() {
   return data || [];
 }
 
+async function fetchSupplierProducts(supplierId) {
+  const sb = getSupabase();
+  if (!sb || !supplierId) return [];
+  const { data, error } = await sb
+    .from('products')
+    .select('*')
+    .eq('supplier_id', supplierId)
+    .order('sort_order', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
 async function fetchAllSuppliers(activeOnly = false) {
   const sb = getSupabase();
   if (!sb) return [];

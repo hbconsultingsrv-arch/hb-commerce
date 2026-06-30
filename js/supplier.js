@@ -56,7 +56,7 @@ async function initSupplierSpace() {
   document.getElementById('refreshSupplierOrdersBtn')?.addEventListener('click', loadSupplierOrders);
   bindSectionTabs();
 
-  supplierProducts = await fetchAllProducts();
+  supplierProducts = await fetchSupplierProducts(supplierProfile.supplier_id);
   await loadSupplierStock();
   await loadSupplierOrders();
 }
@@ -90,12 +90,22 @@ function supplierStockBadge(quantity, reservedQuantity) {
 
 async function loadSupplierStock() {
   const body = document.getElementById('supplierStockBody');
-  if (!body) return;
-  const products = supplierProducts.filter((product) => product.supplier_id === supplierProfile.supplier_id);
+  if (!body || !supplierProfile?.supplier_id) return;
+
+  if (!supplierProducts.length) {
+    supplierProducts = await fetchSupplierProducts(supplierProfile.supplier_id);
+  }
+
+  const products = supplierProducts.filter(
+    (product) => product.supplier_id === supplierProfile.supplier_id
+  );
   const stocks = await fetchSupplierStocks(supplierProfile.supplier_id);
   const stockMap = new Map(stocks.map((stock) => [stock.product_slug, stock]));
+  const rows = products.length
+    ? products
+    : stocks.map((stock) => ({ slug: stock.product_slug, name: stock.product_slug }));
 
-  body.innerHTML = products.length ? products.map((product) => {
+  body.innerHTML = rows.length ? rows.map((product) => {
     const stock = stockMap.get(product.slug) || {};
     const quantity = stock.quantity || 0;
     const reserved = stock.reserved_quantity || 0;

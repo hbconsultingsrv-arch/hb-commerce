@@ -326,7 +326,11 @@ drop policy if exists "Public read active products" on public.products;
 drop policy if exists "Admin manage products" on public.products;
 
 create policy "Public read active products" on public.products for select
-  using (active = true or public.is_admin());
+  using (
+    public.is_admin()
+    or (active = true and not public.is_supplier())
+    or (public.is_supplier() and public.is_own_supplier(supplier_id))
+  );
 create policy "Admin manage products" on public.products for all
   using (public.is_admin()) with check (public.is_admin());
 
@@ -336,7 +340,8 @@ drop policy if exists "Admin manage product stocks" on public.product_stocks;
 drop policy if exists "Supplier manage own product stocks" on public.product_stocks;
 drop policy if exists "Supplier read own product stocks" on public.product_stocks;
 
-create policy "Public read product stocks" on public.product_stocks for select using (true);
+create policy "Public read product stocks" on public.product_stocks for select
+  using (public.is_admin() or not public.is_supplier());
 create policy "Admin manage product stocks" on public.product_stocks for all
   using (public.is_admin()) with check (public.is_admin());
 create policy "Supplier read own product stocks" on public.product_stocks for select
