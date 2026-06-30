@@ -36,7 +36,7 @@ async function initSupplierSpace() {
 
   const role = resolveProfileRole(supplierProfile, supplierSession);
   if (role !== 'supplier') {
-    window.location.replace('compte.html');
+    redirectToRoleHome(await getDefaultDashboardUrl(supplierSession, supplierProfile));
     return;
   }
 

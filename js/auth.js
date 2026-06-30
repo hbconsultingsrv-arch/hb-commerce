@@ -126,6 +126,15 @@ function isDedicatedBackOfficeShell() {
     || document.body.classList.contains('supplier-space');
 }
 
+function isMissingProfileColumnError(error) {
+  const msg = String(error?.message || error || '').toLowerCase();
+  return msg.includes('column') && (
+    msg.includes('schema cache')
+    || msg.includes('could not find')
+    || msg.includes('does not exist')
+  );
+}
+
 async function getProfile(userId) {
   const sb = getSupabase();
   if (!sb) return null;
@@ -139,6 +148,13 @@ async function getProfile(userId) {
     ({ data, error } = await sb
       .from('profiles')
       .select(baseSelect)
+      .eq('id', userId)
+      .maybeSingle());
+  }
+  if (error && isMissingProfileColumnError(error)) {
+    ({ data, error } = await sb
+      .from('profiles')
+      .select('id,email,full_name,phone,company,role,driver_id,commercial_agent_id,supplier_id')
       .eq('id', userId)
       .maybeSingle());
   }
@@ -223,6 +239,24 @@ function resolveProfileRole(profile, session) {
 function isClientDashboardRole(profile, session) {
   const role = resolveProfileRole(profile, session);
   return !role || role === 'client' || role === 'pending_company';
+}
+
+function getProfilePageUrl(profile = null, session = null) {
+  const role = resolveProfileRole(profile, session);
+  if (role === 'super_root') return 'admin.html?tab=equipe';
+  if (role === 'admin') return 'admin.html';
+  if (role === 'agent_commercial') return 'agent.html';
+  if (role === 'supplier') return 'supplier.html';
+  if (role === 'livreur') return 'livreur.html';
+  return 'compte.html?tab=profil';
+}
+
+function redirectToRoleHome(url) {
+  if (!url) return;
+  const targetPage = url.split('?')[0].split('/').pop();
+  const currentPage = window.location.pathname.split('/').pop() || '';
+  if (currentPage === targetPage) return;
+  window.location.replace(url);
 }
 
 async function getDefaultDashboardUrl(session, profile = undefined) {
@@ -329,6 +363,7 @@ function getStaffChipSubtitle(profile, session) {
   const labels = {
     agent_commercial: 'Agent commercial',
     livreur: 'Livreur',
+    supplier: 'Fournisseur',
     admin: 'Administration RH',
     super_root: 'Équipe HB',
   };
@@ -340,6 +375,7 @@ function getSessionChipSubtitle(profile, session) {
     document.body.classList.contains('livreur-page')
     || document.body.classList.contains('commercial-space')
     || document.body.classList.contains('admin-v2')
+    || document.body.classList.contains('supplier-space')
   ) {
     const staffSub = getStaffChipSubtitle(profile, session);
     if (staffSub) return staffSub;
@@ -362,7 +398,7 @@ function renderSessionUserChip(profile, session, options = {}) {
 
   const name = profileDisplayName(profile, session);
   const subtitle = options.subtitle || '';
-  const profileUrl = options.profileUrl || getProfilePageUrl();
+  const profileUrl = options.profileUrl || getProfilePageUrl(profile, session);
   const showSubtitle = subtitle && subtitle !== name;
   const avatarHtml = buildUserAvatarHtml(profile, session, 'user-avatar--sm');
   const textHtml = `
@@ -441,7 +477,7 @@ async function applySessionUserDisplay(profile, session) {
   let userProfile = profile || buildSessionFallbackProfile(session);
   let subtitle = getSessionChipSubtitle(userProfile, session);
   applyWelcomeUserHeader(userProfile, session);
-  renderSessionUserChip(userProfile, session, { subtitle, profileUrl: getProfilePageUrl() });
+  renderSessionUserChip(userProfile, session, { subtitle, profileUrl: getProfilePageUrl(userProfile, session) });
 
   if (!profile && session.user?.id) {
     const fetched = await getProfileSafe(session.user.id);
@@ -450,7 +486,7 @@ async function applySessionUserDisplay(profile, session) {
 
   const dashboardUrl = await getDefaultDashboardUrl(session, userProfile);
   subtitle = getSessionChipSubtitle(userProfile, session);
-  renderSessionUserChip(userProfile, session, { subtitle, profileUrl: getProfilePageUrl() });
+  renderSessionUserChip(userProfile, session, { subtitle, profileUrl: getProfilePageUrl(userProfile, session) });
   applyWelcomeUserHeader(userProfile, session);
   enhanceNavAccountLink(userProfile, session, dashboardUrl);
 }

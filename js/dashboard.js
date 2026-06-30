@@ -142,7 +142,7 @@ async function initDashboard() {
       await initInternalProfileDashboard(profile, session);
       return;
     }
-    window.location.href = await getDefaultDashboardUrl(session, profile);
+    redirectToRoleHome(await getDefaultDashboardUrl(session, profile));
     return;
   }
 
