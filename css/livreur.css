@@ -377,6 +377,13 @@
   display: flex;
   width: 100%;
   min-width: 0;
+  pointer-events: none;
+}
+
+.livreur-nav-head a,
+.livreur-nav-head button,
+.livreur-nav-head .nav-dropdown-wrap {
+  pointer-events: auto;
 }
 
 .livreur-nav-toolbar {
@@ -411,9 +418,12 @@
   flex-wrap: wrap;
 }
 
-.livreur-page #livreurStaffAccueil {
+.livreur-page #livreurStaffAccueil,
+.livreur-page .livreur-site-home-btn {
   position: relative;
-  z-index: 41;
-  pointer-events: auto;
+  z-index: 50;
+  pointer-events: auto !important;
+  cursor: pointer;
   text-decoration: none;
+  flex-shrink: 0;
 }

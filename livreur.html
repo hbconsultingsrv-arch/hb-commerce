@@ -11,10 +11,25 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/commerce.css">
   <link rel="stylesheet" href="css/order-tracking.css">
-  <link rel="stylesheet" href="css/livreur.css?v=livreur-accueil-index-20260701">
+  <link rel="stylesheet" href="css/livreur.css?v=livreur-accueil-final-20260701">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
 <body class="dashboard-page livreur-page">
+  <script>
+    window.goToLivreurSiteHome = function (event) {
+      if (window.__hbLivreurSiteHomeNavigating) return;
+      window.__hbLivreurSiteHomeNavigating = true;
+      if (event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+      try {
+        window.location.assign(new URL('index.html#accueil', window.location.href).href);
+      } catch (e) {
+        window.location.assign('index.html#accueil');
+      }
+    };
+  </script>
   <script>try{if(localStorage.getItem('hb_admin_dark')==='1')document.body.classList.add('admin-dark');}catch(e){}</script>
   <nav class="nav nav-simple container livreur-topnav">
     <div class="livreur-nav-head">
@@ -30,7 +45,6 @@
       </div>
     </div>
     <div class="livreur-nav-toolbar nav-actions">
-      <a href="index.html#accueil" class="btn btn-sm btn-outline-light" id="livreurStaffAccueil" title="Retour à l'accueil HB Commerce">Accueil</a>
       <div class="nav-dropdown-wrap nav-activities-wrap hb-admin-topnav" id="livreurActivitiesWrap" hidden>
         <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
           Mes activités <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
@@ -49,6 +63,7 @@
         </ul>
       </div>
       <button type="button" id="refreshDeliveriesBtn" class="btn btn-sm btn-outline-light">↻ Actualiser</button>
+      <button type="button" id="livreurStaffAccueil" class="btn btn-sm btn-outline-light livreur-site-home-btn" title="Retour à l'accueil HB Commerce" onclick="window.goToLivreurSiteHome && window.goToLivreurSiteHome(event)">Accueil</button>
       <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light" title="Mode clair / sombre">🌙 Sombre</button>
       <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
     </div>
@@ -130,9 +145,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js?v=livreur-accueil-index-20260701"></script>
+  <script src="js/auth.js?v=livreur-accueil-final-20260701"></script>
   <script src="js/admin-shell.js"></script>
   <script src="js/driver-api.js"></script>
-  <script src="js/livreur.js?v=livreur-accueil-index-20260701"></script>
+  <script src="js/livreur.js?v=livreur-accueil-final-20260701"></script>
 </body>
 </html>

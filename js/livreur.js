@@ -4,6 +4,31 @@
 
 const LIVREUR_SITE_HOME_URL = 'index.html#accueil';
 
+function getLivreurSiteHomeUrl() {
+  try {
+    return new URL(LIVREUR_SITE_HOME_URL, window.location.href).href;
+  } catch {
+    return LIVREUR_SITE_HOME_URL;
+  }
+}
+
+function goToLivreurSiteHome(event) {
+  if (window.__hbLivreurSiteHomeNavigating) return;
+  window.__hbLivreurSiteHomeNavigating = true;
+  if (event) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }
+  window.location.assign(getLivreurSiteHomeUrl());
+}
+
+function bindLivreurSiteHomeButton() {
+  const btn = document.getElementById('livreurStaffAccueil');
+  if (!btn || btn.dataset.siteHomeBound === '1') return;
+  btn.dataset.siteHomeBound = '1';
+  btn.addEventListener('click', goToLivreurSiteHome, true);
+}
+
 let livreurState = {
   profile: null,
   driverId: null,
@@ -238,8 +263,9 @@ function configureLivreurTopNav(profile) {
 
   setTopNavBlock(staffAccueil, showStaffAccueil);
   if (staffAccueil && showStaffAccueil) {
-    staffAccueil.href = LIVREUR_SITE_HOME_URL;
     staffAccueil.removeAttribute('aria-current');
+    staffAccueil.hidden = false;
+    staffAccueil.style.display = '';
   }
   setTopNavBlock(activitiesWrap, isAdmin && !isPersonalDriver);
   setTopNavBlock(menuWrap, isAdmin && !isPersonalDriver);
@@ -290,6 +316,7 @@ function showLivreurAdminPreview(profile) {
 }
 
 function bindLivreurUi() {
+  bindLivreurSiteHomeButton();
   document.querySelectorAll('[data-livreur-filter]').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('[data-livreur-filter]').forEach((b) => b.classList.remove('active'));
@@ -317,7 +344,9 @@ async function initLivreurPage() {
   const session = await requireDriver();
   if (!session) return;
   configureLivreurTopNav(livreurState.profile);
+  bindLivreurSiteHomeButton();
   await applySessionUserDisplay(livreurState.profile, session);
+  bindLivreurSiteHomeButton();
   if (!livreurState.adminPreview) {
     await loadDeliveries();
     setInterval(loadDeliveries, 60000);
@@ -328,3 +357,4 @@ async function initLivreurPage() {
 }
 
 document.addEventListener('DOMContentLoaded', initLivreurPage);
+window.goToLivreurSiteHome = goToLivreurSiteHome;
