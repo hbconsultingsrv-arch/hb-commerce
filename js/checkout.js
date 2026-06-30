@@ -1,3 +1,26 @@
+function renderCheckoutSummaryItem(item) {
+  const esc = typeof escapeHtml === 'function' ? escapeHtml : (value) => String(value ?? '');
+  const lineTotal = formatDisplayPrice(item.price * item.quantity);
+  const unitPrice = typeof formatDisplayUnitPrice === 'function'
+    ? formatDisplayUnitPrice(item.price, item.unit)
+    : formatDisplayPrice(item.price);
+  const qtyLabel = `${item.quantity} ${item.unit}${item.quantity > 1 ? 's' : ''}`;
+  const stockNote = item.delivery_delay_label || '';
+  const isZeroStock = Number(item.stock_available || 0) <= 0 || /zero stock|rupture/i.test(stockNote);
+  const stockClass = isZeroStock ? 'checkout-summary-stock--out' : 'checkout-summary-stock--ok';
+
+  return `
+    <article class="checkout-summary-item">
+      <div class="checkout-summary-item-body">
+        <p class="checkout-summary-name">${esc(item.name)}</p>
+        <p class="checkout-summary-meta">${esc(qtyLabel)} · ${unitPrice}</p>
+        ${stockNote ? `<p class="checkout-summary-stock ${stockClass}">${esc(stockNote)}</p>` : ''}
+      </div>
+      <div class="checkout-summary-price">${lineTotal}</div>
+    </article>
+  `;
+}
+
 async function initCheckout() {
   const session = await requireAuth();
   if (!session) return;
@@ -17,12 +40,7 @@ async function initCheckout() {
   const form = document.getElementById('checkoutForm');
 
   if (summaryEl) {
-    summaryEl.innerHTML = cart.map((item) => `
-      <div class="checkout-summary-line">
-        <span>${item.name} × ${item.quantity} ${item.unit}<br><small>${item.delivery_delay_label || ''}</small></span>
-        <strong>${formatDisplayPrice(item.price * item.quantity)}</strong>
-      </div>
-    `).join('');
+    summaryEl.innerHTML = cart.map(renderCheckoutSummaryItem).join('');
   }
 
   const total = getCartTotal();

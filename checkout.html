@@ -76,14 +76,12 @@
         </form>
       </section>
 
-      <aside class="dashboard-card">
+      <aside class="dashboard-card checkout-recap">
         <h2>Récapitulatif</h2>
-        <div id="checkoutSummary"></div>
-        <div class="cart-summary" style="box-shadow:none;padding:0;margin-top:1rem">
-          <div class="total-line">
-            <span>Total</span>
-            <span id="checkoutTotal">xx</span>
-          </div>
+        <div id="checkoutSummary" class="checkout-summary-list" aria-live="polite"></div>
+        <div class="checkout-recap-total">
+          <span>Total</span>
+          <span id="checkoutTotal">xx</span>
         </div>
       </aside>
     </div>
