@@ -326,8 +326,34 @@ async function updateProfile(userId, fields) {
   throw error;
 }
 
+const HB_ROLE_LABELS = {
+  super_root: 'Super root',
+  admin: 'Administration RH',
+  agent_commercial: 'Agent commercial',
+  livreur: 'Livreur',
+  supplier: 'Fournisseur',
+  client: 'Client',
+  pending_company: 'Compte en attente',
+};
+
+function getRoleLabel(profile, session) {
+  const role = resolveProfileRole(profile, session);
+  return HB_ROLE_LABELS[role] || role || '';
+}
+
+function profilePersonName(profile, session) {
+  const fromProfile = (profile?.full_name || '').trim();
+  const fromMeta = (session?.user?.user_metadata?.full_name || '').trim();
+  if (fromProfile) return fromProfile;
+  if (fromMeta) return fromMeta;
+  const email = (profile?.email || session?.user?.email || '').split('@')[0];
+  return email || 'Utilisateur';
+}
+
 function profileDisplayName(profile, session) {
-  return (profile?.full_name || profile?.company || session?.user?.email || 'Utilisateur').trim();
+  const personName = profilePersonName(profile, session);
+  if (personName && personName !== 'Utilisateur') return personName;
+  return (profile?.company || personName || 'Utilisateur').trim();
 }
 
 function profileInitials(name) {
@@ -343,7 +369,7 @@ function resolveProfileAvatarUrl(profile, session) {
 }
 
 function buildUserAvatarHtml(profile, session, sizeClass = '') {
-  const name = profileDisplayName(profile, session);
+  const name = profilePersonName(profile, session);
   const avatarUrl = resolveProfileAvatarUrl(profile, session);
   const initials = profileInitials(name);
   const classes = ['user-avatar', sizeClass].filter(Boolean).join(' ');
@@ -371,15 +397,7 @@ function bindUserAvatarFallbacks(root = document) {
 }
 
 function getStaffChipSubtitle(profile, session) {
-  const role = resolveProfileRole(profile, session);
-  const labels = {
-    agent_commercial: 'Agent commercial',
-    livreur: 'Livreur',
-    supplier: 'Fournisseur',
-    admin: 'Administration RH',
-    super_root: 'Équipe HB',
-  };
-  return labels[role] || '';
+  return getRoleLabel(profile, session);
 }
 
 function getSessionChipSubtitle(profile, session) {
@@ -423,7 +441,7 @@ function renderSessionUserChip(profile, session, options = {}) {
     return;
   }
 
-  const name = profileDisplayName(profile, session);
+  const name = profilePersonName(profile, session);
   const subtitle = options.subtitle || '';
   const showSubtitle = subtitle && subtitle !== name;
   const textHtml = `
