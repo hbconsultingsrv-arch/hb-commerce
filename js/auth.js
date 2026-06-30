@@ -122,13 +122,14 @@ function bindLogoutButton(button) {
 function isDedicatedBackOfficeShell() {
   return document.body.classList.contains('admin-v2')
     || document.body.classList.contains('livreur-page')
-    || document.body.classList.contains('commercial-space');
+    || document.body.classList.contains('commercial-space')
+    || document.body.classList.contains('supplier-space');
 }
 
 async function getProfile(userId) {
   const sb = getSupabase();
   if (!sb) return null;
-  const baseSelect = 'id,email,full_name,phone,company,role,driver_id,commercial_agent_id,created_at,updated_at';
+  const baseSelect = 'id,email,full_name,phone,address,company,siren,vat_number,role,driver_id,commercial_agent_id,supplier_id,created_at,updated_at';
   let { data, error } = await sb
     .from('profiles')
     .select(`${baseSelect},avatar_url`)
@@ -187,8 +188,8 @@ function isCommercialAssignableProfile(profile, session = null) {
   return ['agent_commercial', 'admin', 'super_root'].includes(resolveProfileRole(profile, session));
 }
 
-function isSupplierProfile(profile) {
-  return profile?.role === 'supplier';
+function isSupplierProfile(profile, session = null) {
+  return resolveProfileRole(profile, session) === 'supplier';
 }
 
 function isDriverProfile(profile, session = null) {
@@ -408,6 +409,9 @@ function renderSessionUserChip(profile, session, options = {}) {
 function applyWelcomeUserHeader(profile, session) {
   const welcomeName = document.getElementById('welcomeName');
   if (welcomeName) welcomeName.textContent = profileDisplayName(profile, session);
+
+  const supplierName = document.getElementById('supplierName');
+  if (supplierName) supplierName.textContent = profileDisplayName(profile, session);
 
   const welcomeAvatar = document.getElementById('welcomeAvatar');
   if (welcomeAvatar) {
@@ -660,7 +664,7 @@ async function updateNavAuth() {
         accountLink.setAttribute('data-i18n', 'nav.agentSpace');
       } else if (isDriverProfile(profile, session)) {
         accountLink.setAttribute('data-i18n', 'nav.driverSpace');
-      } else if (isSupplierProfile(profile)) {
+      } else if (isSupplierProfile(profile, session)) {
         accountLink.setAttribute('data-i18n', 'nav.supplierSpace');
       } else if (isAdminProfile(profile, session)) {
         accountLink.setAttribute('data-i18n', 'nav.adminSpace');

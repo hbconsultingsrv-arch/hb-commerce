@@ -2,12 +2,50 @@ let supplierSession = null;
 let supplierProfile = null;
 let supplierProducts = [];
 
+function showSupplierAccessError(message) {
+  const panel = document.getElementById('supplierPanel');
+  if (!panel) {
+    alert(message);
+    return;
+  }
+
+  panel.innerHTML = `
+    <div class="dashboard-card dashboard-card-wide">
+      <h2>Espace fournisseur indisponible</h2>
+      <p class="auth-sub">${escapeHtml(message)}</p>
+      <p class="form-note">Contactez HB Commerce pour rattacher votre compte à un fournisseur.</p>
+      <div style="margin-top:1rem;display:flex;flex-wrap:wrap;gap:0.75rem">
+        <a href="compte.html?tab=profil" class="btn btn-outline-dark">Mon profil</a>
+        <button type="button" id="logoutBtnSecondary" class="btn btn-primary">Déconnexion</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('logoutBtnSecondary')?.addEventListener('click', signOut);
+}
+
 async function initSupplierSpace() {
   supplierSession = await requireAuth('login.html?redirect=supplier.html');
   if (!supplierSession) return;
-  supplierProfile = await getProfile(supplierSession.user.id);
-  if (!isSupplierProfile(supplierProfile) || !supplierProfile.supplier_id) {
-    window.location.href = 'compte.html';
+
+  try {
+    supplierProfile = await getProfile(supplierSession.user.id);
+  } catch (err) {
+    console.warn('initSupplierSpace: profil inaccessible', err.message);
+    supplierProfile = null;
+  }
+
+  const role = resolveProfileRole(supplierProfile, supplierSession);
+  if (role !== 'supplier') {
+    window.location.replace('compte.html');
+    return;
+  }
+
+  if (!supplierProfile?.supplier_id) {
+    showSupplierAccessError(
+      'Votre compte fournisseur est actif, mais aucun fournisseur n’est encore rattaché à votre profil.'
+    );
+    await applySessionUserDisplay(supplierProfile, supplierSession);
+    document.getElementById('logoutBtn')?.addEventListener('click', signOut);
     return;
   }
 

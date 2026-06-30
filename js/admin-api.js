@@ -67,7 +67,7 @@ async function requireCommercialSpace() {
   if (!allowed) {
     if (isDriverProfile(profile, session)) {
       window.location.href = 'livreur.html';
-    } else if (isSupplierProfile(profile)) {
+    } else if (isSupplierProfile(profile, session)) {
       window.location.href = 'supplier.html';
     } else {
       window.location.href = 'compte.html';
