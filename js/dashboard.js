@@ -1,5 +1,5 @@
 function getStaffHomeHref(role) {
-  if (role === 'livreur') return 'index.html';
+  if (role === 'livreur') return 'index.html#accueil';
   if (role === 'supplier') return 'supplier.html';
   if (role === 'agent_commercial') return 'agent.html';
   return null;

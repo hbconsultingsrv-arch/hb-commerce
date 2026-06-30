@@ -2,7 +2,7 @@
  * Espace livreur — HB Commerce
  */
 
-const LIVREUR_SITE_HOME_URL = 'index.html';
+const LIVREUR_SITE_HOME_URL = 'index.html#accueil';
 
 let livreurState = {
   profile: null,
