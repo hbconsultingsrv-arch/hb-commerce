@@ -3,6 +3,28 @@
  */
 
 const LIVREUR_HOME_VIEW_KEY = 'hb_livreur_home_view';
+const LIVREUR_HOME_QUERY = 'accueil';
+
+function isLivreurPagePath(pathname = window.location.pathname) {
+  const page = String(pathname || '').split('/').pop() || '';
+  return page === 'livreur.html' || page === 'livreur';
+}
+
+function livreurHomeUrl() {
+  return `livreur.html?${LIVREUR_HOME_QUERY}=1`;
+}
+
+function clearLivreurHomeQuery() {
+  try {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has(LIVREUR_HOME_QUERY)) return;
+    url.searchParams.delete(LIVREUR_HOME_QUERY);
+    const next = `${url.pathname}${url.search}${url.hash}`;
+    window.history.replaceState(null, '', next);
+  } catch {
+    /* ignore */
+  }
+}
 
 let livreurState = {
   profile: null,
@@ -343,30 +365,49 @@ function resetLivreurHomeView() {
     if (loading) loading.hidden = true;
   }
 
+  const welcome = document.getElementById('livreurWelcome');
+  if (welcome && !livreurState.adminPreview) {
+    const name = livreurState.profile?.full_name || livreurState.profile?.email || 'livreur';
+    welcome.textContent = `Bonjour ${name} — vue d'ensemble de vos livraisons`;
+  }
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  clearLivreurHomeQuery();
 }
 
 function goLivreurAccueil(event) {
   event?.preventDefault();
   event?.stopPropagation();
-  const currentPage = window.location.pathname.split('/').pop() || '';
-  if (currentPage === 'livreur.html' || currentPage === 'livreur') {
+  if (document.documentElement.dataset.livreurAccueilBusy === '1') return;
+  document.documentElement.dataset.livreurAccueilBusy = '1';
+  window.setTimeout(() => {
+    delete document.documentElement.dataset.livreurAccueilBusy;
+  }, 700);
+
+  const onLivreurPage = isLivreurPagePath();
+  const hasHomeQuery = new URLSearchParams(window.location.search).get(LIVREUR_HOME_QUERY) === '1';
+
+  if (onLivreurPage && hasHomeQuery) {
     resetLivreurHomeView();
     return;
   }
+
   requestLivreurHomeView();
-  window.location.href = 'livreur.html';
+  window.location.assign(livreurHomeUrl());
 }
 
-function bindLivreurHomeLinks() {
-  document.querySelectorAll('#livreurStaffAccueil, a[href="livreur.html"]').forEach((el) => {
-    if (el.dataset.livreurHomeBound === '1') return;
-    el.dataset.livreurHomeBound = '1';
-    el.addEventListener('click', goLivreurAccueil);
-  });
+function bindLivreurAccueilCapture() {
+  if (document.documentElement.dataset.livreurAccueilCapture === '1') return;
+  document.documentElement.dataset.livreurAccueilCapture = '1';
+  document.addEventListener('click', (event) => {
+    const trigger = event.target.closest('#livreurStaffAccueil, #livreurActivitiesWrap a[href="livreur.html"]');
+    if (!trigger || !document.body.classList.contains('livreur-page')) return;
+    goLivreurAccueil(event);
+  }, true);
 }
 
 function bindLivreurUi() {
+  bindLivreurAccueilCapture();
   document.querySelectorAll('[data-livreur-filter]').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('[data-livreur-filter]').forEach((b) => b.classList.remove('active'));
@@ -377,7 +418,7 @@ function bindLivreurUi() {
   });
 
   document.getElementById('refreshDeliveriesBtn')?.addEventListener('click', loadDeliveries);
-  bindLivreurHomeLinks();
+  bindLivreurAccueilCapture();
   bindLogoutButton(document.getElementById('logoutBtn'));
   document.getElementById('btnEnRoute')?.addEventListener('click', () =>
     applyDeliveryUpdate({ delivery_status: 'en_transit' })
@@ -395,10 +436,11 @@ async function initLivreurPage() {
   const session = await requireDriver();
   if (!session) return;
   configureLivreurTopNav(livreurState.profile);
-  bindLivreurHomeLinks();
   await applySessionUserDisplay(livreurState.profile, session);
-  bindLivreurHomeLinks();
   if (consumeLivreurHomeViewRequest()) {
+    livreurState.homeView = true;
+  }
+  if (new URLSearchParams(window.location.search).get(LIVREUR_HOME_QUERY) === '1') {
     livreurState.homeView = true;
   }
   if (!livreurState.adminPreview) {
@@ -412,3 +454,4 @@ async function initLivreurPage() {
 }
 
 document.addEventListener('DOMContentLoaded', initLivreurPage);
+window.goLivreurAccueil = goLivreurAccueil;

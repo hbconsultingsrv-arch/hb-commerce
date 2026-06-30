@@ -366,3 +366,30 @@
 #livreurStaffAccueil[hidden] {
   display: none !important;
 }
+
+.livreur-page .nav.nav-simple {
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: flex-start;
+}
+
+.livreur-page .livreur-nav-brand {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 220px;
+  max-width: 100%;
+}
+
+.livreur-page .nav-actions {
+  position: relative;
+  z-index: 30;
+  flex: 1 1 280px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.livreur-page #livreurStaffAccueil {
+  position: relative;
+  z-index: 31;
+  pointer-events: auto;
+}

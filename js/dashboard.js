@@ -10,6 +10,13 @@ function requestStaffHomeNavigation(href) {
   }
 }
 
+function getStaffHomeHref(role) {
+  if (role === 'livreur') return 'livreur.html?accueil=1';
+  if (role === 'supplier') return 'supplier.html';
+  if (role === 'agent_commercial') return 'agent.html';
+  return null;
+}
+
 function bindStaffHomeLink(link, href) {
   if (!link || link.dataset.staffHomeBound === '1') return;
   link.dataset.staffHomeBound = '1';
@@ -135,10 +142,7 @@ async function initInternalProfileDashboard(profile, session) {
   if (orderLink) orderLink.style.display = 'none';
 
   const role = resolveProfileRole(profile, session);
-  const staffHome = role === 'livreur' ? 'livreur.html'
-    : role === 'supplier' ? 'supplier.html'
-    : role === 'agent_commercial' ? 'agent.html'
-    : null;
+  const staffHome = getStaffHomeHref(role);
   let staffHomeLink = document.getElementById('compteStaffHomeLink');
   if (staffHome) {
     if (!staffHomeLink) {
