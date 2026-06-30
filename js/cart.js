@@ -24,7 +24,8 @@ function getCartCount() {
 
 function addToCart(product, quantity = 1) {
   const cart = getCart();
-  const existing = cart.find((i) => i.id === product.id);
+  const productId = String(product.id);
+  const existing = cart.find((i) => String(i.id) === productId);
   if (existing) {
     existing.quantity += quantity;
   } else {
@@ -47,7 +48,8 @@ function addToCart(product, quantity = 1) {
 
 function updateCartQuantity(productId, quantity) {
   const cart = getCart();
-  const item = cart.find((i) => i.id === productId);
+  const id = String(productId);
+  const item = cart.find((i) => String(i.id) === id);
   if (!item) return cart;
   if (quantity <= 0) {
     return removeFromCart(productId);
@@ -58,7 +60,8 @@ function updateCartQuantity(productId, quantity) {
 }
 
 function removeFromCart(productId) {
-  const cart = getCart().filter((i) => i.id !== productId);
+  const id = String(productId);
+  const cart = getCart().filter((i) => String(i.id) !== id);
   saveCart(cart);
   return cart;
 }

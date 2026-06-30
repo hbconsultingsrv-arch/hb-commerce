@@ -691,12 +691,23 @@ function bindProductCardEvents(container, onAdded, productsList) {
 
     card.querySelector('.btn-add-cart')?.addEventListener('click', async () => {
       const id = card.dataset.productId;
-      const products = await fetchProducts();
-      const product = products.find((p) => p.id === id);
-      if (!product) return;
-      const qty = parseInt(input.value, 10) || min;
+      if (!id) return;
+
+      let product = byId.get(id);
+      if (!product) {
+        const list = await fetchProducts();
+        product = list.find((item) => String(item.id) === id || String(item.slug) === id);
+      }
+      if (!product) {
+        console.warn('addToCart: produit introuvable', id);
+        alert('Impossible d\'ajouter ce produit au panier. Rechargez la page et réessayez.');
+        return;
+      }
+
+      const qty = parseInt(input?.value, 10) || min;
       addToCart(product, qty);
       if (onAdded) onAdded(product, qty);
+      else if (typeof redirectToCartAfterAdd === 'function') redirectToCartAfterAdd(product, qty);
       else alert(`${product.name} ajouté au panier (${qty} ${product.unit}(s))`);
     });
   });

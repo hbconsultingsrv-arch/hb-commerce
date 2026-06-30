@@ -4,6 +4,22 @@ function renderCartPage() {
   const tableEl = document.getElementById('cartTable');
   const bodyEl = document.getElementById('cartBody');
   const totalEl = document.getElementById('cartTotal');
+  const flashEl = document.getElementById('cartFlash');
+
+  if (flashEl) {
+    try {
+      const raw = sessionStorage.getItem('hb_cart_flash');
+      if (raw) {
+        const flash = JSON.parse(raw);
+        flashEl.textContent = `${flash.name} ajouté au panier (${flash.qty} ${flash.unit}(s))`;
+        flashEl.hidden = false;
+        sessionStorage.removeItem('hb_cart_flash');
+        setTimeout(() => { flashEl.hidden = true; }, 4000);
+      }
+    } catch {
+      sessionStorage.removeItem('hb_cart_flash');
+    }
+  }
 
   if (!cart.length) {
     if (emptyEl) emptyEl.hidden = false;
@@ -38,7 +54,7 @@ function renderCartPage() {
   bodyEl?.querySelectorAll('[data-action]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const id = btn.dataset.id;
-      const item = getCart().find((i) => i.id === id);
+      const item = getCart().find((i) => String(i.id) === String(id));
       if (!item) return;
 
       if (btn.dataset.action === 'remove') {

@@ -1,3 +1,20 @@
+function redirectToCartAfterAdd(product, qty) {
+  try {
+    sessionStorage.setItem('hb_cart_flash', JSON.stringify({
+      name: product.name,
+      qty,
+      unit: product.unit
+    }));
+  } catch {
+    /* ignore */
+  }
+  window.location.href = 'panier.html';
+}
+
+function onProductAddedToCart(product, qty) {
+  redirectToCartAfterAdd(product, qty);
+}
+
 async function initProductsPage() {
   const grid = document.getElementById('productsGrid');
   const navHost = document.getElementById('categoryNav');
@@ -15,17 +32,10 @@ async function initProductsPage() {
   const products = await fetchProducts();
 
   if (navHost && typeof bindCategoryNav === 'function') {
-    bindCategoryNav(navHost, products, grid, (product, qty) => {
-      const toast = document.getElementById('cartToast');
-      if (toast) {
-        toast.textContent = `${product.name} ajouté (${qty} ${product.unit}(s))`;
-        toast.hidden = false;
-        setTimeout(() => { toast.hidden = true; }, 3000);
-      }
-    });
+    bindCategoryNav(navHost, products, grid, onProductAddedToCart);
   } else {
     grid.innerHTML = products.map(renderProductCard).join('');
-    bindProductCardEvents(grid, null, products);
+    bindProductCardEvents(grid, onProductAddedToCart, products);
   }
 
   const hash = window.location.hash.replace('#cat-', '');
@@ -49,7 +59,7 @@ async function initHomeProducts() {
   catalogHost.innerHTML = typeof renderHomeBrandCatalog === 'function'
     ? renderHomeBrandCatalog(products)
     : products.map(renderProductCard).join('');
-  bindProductCardEvents(catalogHost, null, products);
+  bindProductCardEvents(catalogHost, onProductAddedToCart, products);
   if (typeof bindBrandImageFallbacks === 'function') bindBrandImageFallbacks(catalogHost);
 
   if (typeof populateCatalogFilters === 'function') populateCatalogFilters(products);
