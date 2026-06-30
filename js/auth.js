@@ -241,13 +241,7 @@ function isClientDashboardRole(profile, session) {
   return !role || role === 'client' || role === 'pending_company';
 }
 
-function getProfilePageUrl(profile = null, session = null) {
-  const role = resolveProfileRole(profile, session);
-  if (role === 'super_root') return 'admin.html?tab=equipe';
-  if (role === 'admin') return 'admin.html';
-  if (role === 'agent_commercial') return 'agent.html';
-  if (role === 'supplier') return 'supplier.html';
-  if (role === 'livreur') return 'compte.html?tab=profil';
+function getProfilePageUrl(_profile = null, _session = null) {
   return 'compte.html?tab=profil';
 }
 
