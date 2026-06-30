@@ -22,51 +22,16 @@
 }
 
 .livreur-nav-profile.session-user-chip-host:not([hidden]) {
-  display: flex !important;
-  flex: 0 1 auto;
+  display: inline-flex !important;
+  flex: 0 0 auto;
   min-width: 0;
-  max-width: min(100%, 280px);
+  max-width: none;
 }
 
-.livreur-nav-profile .nav-profile-wrap {
-  width: auto;
-  max-width: 100%;
-}
-
-.livreur-nav-profile .session-user-chip.nav-dropdown-trigger {
-  width: auto;
-  max-width: 280px;
-  justify-content: flex-start;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #fff;
-  padding: 0.4rem 0.65rem;
-  white-space: nowrap;
-}
-
-.livreur-nav-profile .session-user-chip-name,
-.livreur-nav-profile .session-user-chip-meta {
-  color: rgba(255, 255, 255, 0.92);
-}
-
-.livreur-nav-profile .session-user-chip-meta {
-  opacity: 0.78;
-}
-
-.livreur-nav-profile .user-avatar {
-  flex-shrink: 0;
-}
-
-.livreur-nav-profile .user-avatar--initials {
-  background: linear-gradient(135deg, #2d5a38, #1e3320);
-  border-color: rgba(201, 162, 39, 0.55);
-  color: #fff;
-}
-
-.livreur-nav-profile .nav-profile-menu {
-  left: 0;
-  right: auto;
-  min-width: 220px;
+.livreur-nav-profile .session-user-chip--avatar-only .user-avatar--sm {
+  width: 38px;
+  height: 38px;
+  border: 2px solid rgba(201, 162, 39, 0.45);
 }
 
 .livreur-nav-toolbar {
@@ -425,10 +390,6 @@
 }
 
 @media (max-width: 640px) {
-  .livreur-nav-profile .session-user-chip-meta {
-    display: none;
-  }
-
   .livreur-nav-toolbar .btn {
     font-size: 0.78rem;
     padding: 0.45rem 0.6rem;

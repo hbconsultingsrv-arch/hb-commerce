@@ -108,6 +108,11 @@
   flex-shrink: 0;
 }
 
+.site-nav-actions .session-user-chip-host--avatar-only:not([hidden]) {
+  display: inline-flex;
+  align-items: center;
+}
+
 .nav-account-link,
 #navLogin,
 .nav-logout-btn {

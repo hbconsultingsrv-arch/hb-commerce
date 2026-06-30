@@ -407,7 +407,22 @@ function renderSessionUserChip(profile, session, options = {}) {
   const host = document.getElementById('sessionUserChip');
   if (!host) return;
 
-  // Sur la vitrine, l'utilisateur connecté est déjà affiché dans #navAccount.
+  const profileUrl = options.profileUrl || getProfilePageUrl(profile, session);
+  const avatarHtml = buildUserAvatarHtml(profile, session, 'user-avatar--sm');
+  const profileLabel = typeof t === 'function' ? t('nav.profile') : 'Mon profil';
+
+  if (host.classList.contains('session-user-chip-host--avatar-only')) {
+    host.hidden = false;
+    host.removeAttribute('hidden');
+    host.innerHTML = `
+      <a href="${escapeHtml(profileUrl)}" class="session-user-chip session-user-chip--avatar-only" aria-label="${escapeHtml(profileLabel)}" title="${escapeHtml(profileLabel)}">
+        ${avatarHtml}
+      </a>`;
+    bindUserAvatarFallbacks(host);
+    return;
+  }
+
+  // Sur la vitrine sans mode avatar, l'espace compte est dans #navAccount.
   if (document.getElementById('navAccount') && document.getElementById('navLogin')) {
     host.hidden = true;
     host.innerHTML = '';
@@ -416,9 +431,7 @@ function renderSessionUserChip(profile, session, options = {}) {
 
   const name = profileDisplayName(profile, session);
   const subtitle = options.subtitle || '';
-  const profileUrl = options.profileUrl || getProfilePageUrl(profile, session);
   const showSubtitle = subtitle && subtitle !== name;
-  const avatarHtml = buildUserAvatarHtml(profile, session, 'user-avatar--sm');
   const textHtml = `
       <span class="session-user-chip-text">
         <strong class="session-user-chip-name">${escapeHtml(name)}</strong>
@@ -481,12 +494,11 @@ function enhanceNavAccountLink(profile, session, dashboardUrl) {
   const linkEl = accountHost.matches('a') ? accountHost : accountHost.querySelector('a');
   if (!linkEl) return;
 
-  const name = profileDisplayName(profile, session);
-  const firstName = name.split(/\s+/)[0] || name;
   if (dashboardUrl) linkEl.href = dashboardUrl;
-  linkEl.classList.add('nav-account-link--with-avatar');
-  linkEl.innerHTML = `${buildUserAvatarHtml(profile, session, 'user-avatar--xs')}<span>${escapeHtml(firstName)}</span>`;
-  bindUserAvatarFallbacks(linkEl);
+  linkEl.classList.remove('nav-account-link--with-avatar');
+  const i18nKey = linkEl.getAttribute('data-i18n') || accountHost.getAttribute('data-i18n') || 'nav.account';
+  const label = typeof t === 'function' ? t(i18nKey) : 'Mon compte';
+  linkEl.innerHTML = `<span class="nav-account-label">${escapeHtml(label)}</span>`;
 }
 
 async function applySessionUserDisplay(profile, session) {
