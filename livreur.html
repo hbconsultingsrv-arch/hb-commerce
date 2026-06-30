@@ -11,31 +11,33 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/commerce.css">
   <link rel="stylesheet" href="css/order-tracking.css">
-  <link rel="stylesheet" href="css/livreur.css?v=livreur-accueil-v3-20260630">
+  <link rel="stylesheet" href="css/livreur.css?v=livreur-accueil-v4-20260630">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
 <body class="dashboard-page livreur-page">
   <script>try{if(localStorage.getItem('hb_admin_dark')==='1')document.body.classList.add('admin-dark');}catch(e){}</script>
-  <nav class="nav nav-simple container">
-    <div class="livreur-nav-brand">
-      <a href="index.html" class="logo logo-hb-brand">
-        <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="40" height="40" aria-hidden="true">
-        <span class="logo-hb-text">
-          <span class="logo-hb-name">HB Commerce</span>
-          <span class="logo-hb-tag">Espace livreur</span>
-        </span>
-      </a>
-      <div id="sessionUserChip" class="session-user-chip-host session-user-chip-host--menu session-user-chip-host--sidebar" hidden></div>
+  <nav class="nav nav-simple container livreur-topnav">
+    <div class="livreur-nav-head">
+      <div class="livreur-nav-brand">
+        <a href="index.html" class="logo logo-hb-brand">
+          <img src="assets/logo-icon.svg" alt="" class="logo-hb-icon" width="40" height="40" aria-hidden="true">
+          <span class="logo-hb-text">
+            <span class="logo-hb-name">HB Commerce</span>
+            <span class="logo-hb-tag">Espace livreur</span>
+          </span>
+        </a>
+        <div id="sessionUserChip" class="session-user-chip-host session-user-chip-host--menu session-user-chip-host--sidebar" hidden></div>
+      </div>
     </div>
-    <div class="nav-actions">
-      <button type="button" class="btn btn-sm btn-outline-light" id="livreurStaffAccueil" aria-current="page" onclick="window.goLivreurAccueil && window.goLivreurAccueil(event)">Accueil</button>
+    <div class="livreur-nav-toolbar nav-actions">
+      <a href="livreur.html?accueil=1" class="btn btn-sm btn-outline-light" id="livreurStaffAccueil" aria-current="page">Accueil</a>
       <div class="nav-dropdown-wrap nav-activities-wrap hb-admin-topnav" id="livreurActivitiesWrap" hidden>
         <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
           Mes activités <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
         </button>
         <ul class="nav-dropdown-menu" role="menu">
           <li role="none" id="livreurActivitiesCommercialItem" hidden><a href="agent.html" id="livreurActivitiesCommercialLink" role="menuitem"><span class="nav-dropdown-num">1</span> Commercial</a></li>
-          <li role="none"><a href="livreur.html" role="menuitem" aria-current="page"><span class="nav-dropdown-num" id="livreurActivitiesLivraisonNum">2</span> Livraison</a></li>
+          <li role="none"><a href="livreur.html?accueil=1" role="menuitem" aria-current="page"><span class="nav-dropdown-num" id="livreurActivitiesLivraisonNum">2</span> Livraison</a></li>
         </ul>
       </div>
       <div class="nav-dropdown-wrap nav-admin-menu-wrap hb-admin-topnav" id="livreurMenuWrap" hidden>
@@ -128,9 +130,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js?v=livreur-accueil-v3-20260630"></script>
+  <script src="js/auth.js?v=livreur-accueil-v4-20260630"></script>
   <script src="js/admin-shell.js"></script>
   <script src="js/driver-api.js"></script>
-  <script src="js/livreur.js?v=livreur-accueil-v3-20260630"></script>
+  <script src="js/livreur.js?v=livreur-accueil-v4-20260630"></script>
 </body>
 </html>

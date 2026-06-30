@@ -396,18 +396,23 @@ function goLivreurAccueil(event) {
   window.location.assign(livreurHomeUrl());
 }
 
-function bindLivreurAccueilCapture() {
-  if (document.documentElement.dataset.livreurAccueilCapture === '1') return;
-  document.documentElement.dataset.livreurAccueilCapture = '1';
-  document.addEventListener('click', (event) => {
-    const trigger = event.target.closest('#livreurStaffAccueil, #livreurActivitiesWrap a[href="livreur.html"]');
-    if (!trigger || !document.body.classList.contains('livreur-page')) return;
-    goLivreurAccueil(event);
-  }, true);
+function syncLivreurAccueilHref() {
+  const accueil = document.getElementById('livreurStaffAccueil');
+  if (!accueil) return;
+  accueil.setAttribute('href', livreurHomeUrl());
+}
+
+function bindLivreurActivitiesHomeLink() {
+  document.querySelectorAll('#livreurActivitiesWrap a[href*="livreur"]').forEach((link) => {
+    if (link.dataset.livreurHomeBound === '1') return;
+    link.dataset.livreurHomeBound = '1';
+    link.setAttribute('href', livreurHomeUrl());
+  });
 }
 
 function bindLivreurUi() {
-  bindLivreurAccueilCapture();
+  syncLivreurAccueilHref();
+  bindLivreurActivitiesHomeLink();
   document.querySelectorAll('[data-livreur-filter]').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('[data-livreur-filter]').forEach((b) => b.classList.remove('active'));
@@ -418,7 +423,6 @@ function bindLivreurUi() {
   });
 
   document.getElementById('refreshDeliveriesBtn')?.addEventListener('click', loadDeliveries);
-  bindLivreurAccueilCapture();
   bindLogoutButton(document.getElementById('logoutBtn'));
   document.getElementById('btnEnRoute')?.addEventListener('click', () =>
     applyDeliveryUpdate({ delivery_status: 'en_transit' })
@@ -436,7 +440,11 @@ async function initLivreurPage() {
   const session = await requireDriver();
   if (!session) return;
   configureLivreurTopNav(livreurState.profile);
+  syncLivreurAccueilHref();
+  bindLivreurActivitiesHomeLink();
   await applySessionUserDisplay(livreurState.profile, session);
+  syncLivreurAccueilHref();
+  bindLivreurActivitiesHomeLink();
   if (consumeLivreurHomeViewRequest()) {
     livreurState.homeView = true;
   }
@@ -455,3 +463,4 @@ async function initLivreurPage() {
 
 document.addEventListener('DOMContentLoaded', initLivreurPage);
 window.goLivreurAccueil = goLivreurAccueil;
+window.resetLivreurHomeView = resetLivreurHomeView;

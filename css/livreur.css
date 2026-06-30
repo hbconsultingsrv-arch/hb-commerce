@@ -367,6 +367,29 @@
   display: none !important;
 }
 
+.livreur-topnav {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+.livreur-nav-head {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+
+.livreur-nav-toolbar {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  align-items: center;
+  position: relative;
+  z-index: 40;
+}
+
 .livreur-page .nav.nav-simple {
   flex-wrap: wrap;
   gap: 0.65rem;
@@ -376,20 +399,21 @@
 .livreur-page .livreur-nav-brand {
   position: relative;
   z-index: 1;
-  flex: 1 1 220px;
+  flex: 1 1 auto;
   max-width: 100%;
 }
 
-.livreur-page .nav-actions {
+.livreur-page .livreur-nav-toolbar.nav-actions {
   position: relative;
-  z-index: 30;
-  flex: 1 1 280px;
+  z-index: 40;
+  flex: 1 1 100%;
   justify-content: flex-end;
   flex-wrap: wrap;
 }
 
 .livreur-page #livreurStaffAccueil {
   position: relative;
-  z-index: 31;
+  z-index: 41;
   pointer-events: auto;
+  text-decoration: none;
 }
