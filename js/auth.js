@@ -251,11 +251,29 @@ function getProfilePageUrl(profile = null, session = null) {
   return 'compte.html?tab=profil';
 }
 
+const HB_REDIRECT_LOOP_KEY = 'hb_redirect_loop_guard';
+
 function redirectToRoleHome(url) {
   if (!url) return;
   const targetPage = url.split('?')[0].split('/').pop();
   const currentPage = window.location.pathname.split('/').pop() || '';
   if (currentPage === targetPage) return;
+
+  const bounceKey = `${currentPage}->${targetPage}`;
+  try {
+    const raw = sessionStorage.getItem(HB_REDIRECT_LOOP_KEY);
+    const guard = raw ? JSON.parse(raw) : {};
+    const now = Date.now();
+    if (guard[bounceKey] && now - guard[bounceKey] < 4000) {
+      console.warn('redirectToRoleHome: boucle bloquée', bounceKey);
+      return;
+    }
+    guard[bounceKey] = now;
+    sessionStorage.setItem(HB_REDIRECT_LOOP_KEY, JSON.stringify(guard));
+  } catch {
+    /* ignore */
+  }
+
   window.location.replace(url);
 }
 

@@ -136,6 +136,12 @@ async function initDashboard() {
 
   const requestedTab = new URLSearchParams(window.location.search).get('tab');
   const profileFocus = requestedTab === 'profil';
+  const role = resolveProfileRole(profile, session);
+
+  if (role === 'supplier' && !profileFocus) {
+    redirectToRoleHome('supplier.html');
+    return;
+  }
 
   if (!isClientDashboardRole(profile, session)) {
     if (profileFocus) {
