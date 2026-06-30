@@ -247,7 +247,7 @@ function getProfilePageUrl(profile = null, session = null) {
   if (role === 'admin') return 'admin.html';
   if (role === 'agent_commercial') return 'agent.html';
   if (role === 'supplier') return 'supplier.html';
-  if (role === 'livreur') return 'livreur.html';
+  if (role === 'livreur') return 'compte.html?tab=profil';
   return 'compte.html?tab=profil';
 }
 

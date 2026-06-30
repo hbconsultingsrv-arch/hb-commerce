@@ -116,6 +116,31 @@ async function initInternalProfileDashboard(profile, session) {
   const orderLink = document.querySelector('.nav-actions a[href="produits.html"]');
   if (orderLink) orderLink.style.display = 'none';
 
+  const role = resolveProfileRole(profile, session);
+  const staffHome = role === 'livreur' ? 'livreur.html'
+    : role === 'supplier' ? 'supplier.html'
+    : role === 'agent_commercial' ? 'agent.html'
+    : null;
+  let staffHomeLink = document.getElementById('compteStaffHomeLink');
+  if (staffHome) {
+    if (!staffHomeLink) {
+      const navActions = document.querySelector('.nav-actions');
+      if (navActions) {
+        staffHomeLink = document.createElement('a');
+        staffHomeLink.id = 'compteStaffHomeLink';
+        staffHomeLink.className = 'btn btn-sm btn-outline-light';
+        navActions.insertBefore(staffHomeLink, navActions.firstChild);
+      }
+    }
+    if (staffHomeLink) {
+      staffHomeLink.href = staffHome;
+      staffHomeLink.textContent = 'Accueil';
+      staffHomeLink.style.display = '';
+    }
+  } else if (staffHomeLink) {
+    staffHomeLink.style.display = 'none';
+  }
+
   await applyCompteBackOfficeLink();
 
   bindProfileForm(profile, session);

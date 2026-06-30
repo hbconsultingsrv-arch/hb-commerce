@@ -281,6 +281,47 @@ function showLivreurAdminPreview(profile) {
   }
 }
 
+function resetLivreurHomeView() {
+  livreurState.selectedId = null;
+  livreurState.filter = 'all';
+
+  const detail = document.getElementById('livreurDetail');
+  if (detail) detail.hidden = true;
+
+  document.querySelectorAll('[data-livreur-filter]').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.livreurFilter === 'all');
+  });
+
+  const layout = document.getElementById('livreurLayout');
+  const empty = document.getElementById('livreurEmpty');
+  const loading = document.getElementById('livreurLoading');
+
+  if (livreurState.orders.length) {
+    if (layout) layout.hidden = false;
+    if (empty) empty.hidden = true;
+    if (loading) loading.hidden = true;
+    renderKpis(livreurState.orders);
+    renderList();
+  } else if (!livreurState.adminPreview) {
+    if (layout) layout.hidden = true;
+    if (empty) empty.hidden = false;
+    if (loading) loading.hidden = true;
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goLivreurAccueil(event) {
+  const currentPage = window.location.pathname.split('/').pop() || '';
+  if (currentPage === 'livreur.html') {
+    event?.preventDefault();
+    resetLivreurHomeView();
+    return;
+  }
+  if (event) event.preventDefault();
+  window.location.href = 'livreur.html';
+}
+
 function bindLivreurUi() {
   document.querySelectorAll('[data-livreur-filter]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -292,6 +333,7 @@ function bindLivreurUi() {
   });
 
   document.getElementById('refreshDeliveriesBtn')?.addEventListener('click', loadDeliveries);
+  document.getElementById('livreurStaffAccueil')?.addEventListener('click', goLivreurAccueil);
   bindLogoutButton(document.getElementById('logoutBtn'));
   document.getElementById('btnEnRoute')?.addEventListener('click', () =>
     applyDeliveryUpdate({ delivery_status: 'en_transit' })
