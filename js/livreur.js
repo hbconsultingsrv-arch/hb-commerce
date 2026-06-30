@@ -2,37 +2,14 @@
  * Espace livreur — HB Commerce
  */
 
-const LIVREUR_HOME_VIEW_KEY = 'hb_livreur_home_view';
-const LIVREUR_HOME_QUERY = 'accueil';
-
-function isLivreurPagePath(pathname = window.location.pathname) {
-  const page = String(pathname || '').split('/').pop() || '';
-  return page === 'livreur.html' || page === 'livreur';
-}
-
-function livreurHomeUrl() {
-  return `livreur.html?${LIVREUR_HOME_QUERY}=1`;
-}
-
-function clearLivreurHomeQuery() {
-  try {
-    const url = new URL(window.location.href);
-    if (!url.searchParams.has(LIVREUR_HOME_QUERY)) return;
-    url.searchParams.delete(LIVREUR_HOME_QUERY);
-    const next = `${url.pathname}${url.search}${url.hash}`;
-    window.history.replaceState(null, '', next);
-  } catch {
-    /* ignore */
-  }
-}
+const LIVREUR_SITE_HOME_URL = 'index.html';
 
 let livreurState = {
   profile: null,
   driverId: null,
   orders: [],
   selectedId: null,
-  filter: 'all',
-  homeView: false
+  filter: 'all'
 };
 
 function formatOrderRef(order) {
@@ -123,7 +100,6 @@ function renderTimeline(order) {
 function selectOrder(orderId) {
   const order = livreurState.orders.find((o) => o.id === orderId);
   if (!order) return;
-  livreurState.homeView = false;
   livreurState.selectedId = orderId;
   renderList();
 
@@ -186,18 +162,10 @@ async function loadDeliveries() {
 
   if (layout) layout.hidden = false;
   renderKpis(livreurState.orders);
-  renderList();
-
-  if (livreurState.homeView) {
-    const detail = document.getElementById('livreurDetail');
-    if (detail) detail.hidden = true;
-    livreurState.selectedId = null;
-    return;
-  }
-
   if (!livreurState.selectedId || !livreurState.orders.find((o) => o.id === livreurState.selectedId)) {
     livreurState.selectedId = livreurState.orders[0].id;
   }
+  renderList();
   selectOrder(livreurState.selectedId);
 }
 
@@ -269,6 +237,10 @@ function configureLivreurTopNav(profile) {
   const showStaffAccueil = !isAdmin || isPersonalDriver;
 
   setTopNavBlock(staffAccueil, showStaffAccueil);
+  if (staffAccueil && showStaffAccueil) {
+    staffAccueil.href = LIVREUR_SITE_HOME_URL;
+    staffAccueil.removeAttribute('aria-current');
+  }
   setTopNavBlock(activitiesWrap, isAdmin && !isPersonalDriver);
   setTopNavBlock(menuWrap, isAdmin && !isPersonalDriver);
 
@@ -317,102 +289,7 @@ function showLivreurAdminPreview(profile) {
   }
 }
 
-function requestLivreurHomeView() {
-  try {
-    sessionStorage.setItem(LIVREUR_HOME_VIEW_KEY, '1');
-  } catch {
-    /* ignore */
-  }
-}
-
-function consumeLivreurHomeViewRequest() {
-  try {
-    if (sessionStorage.getItem(LIVREUR_HOME_VIEW_KEY) === '1') {
-      sessionStorage.removeItem(LIVREUR_HOME_VIEW_KEY);
-      return true;
-    }
-  } catch {
-    /* ignore */
-  }
-  return false;
-}
-
-function resetLivreurHomeView() {
-  livreurState.homeView = true;
-  livreurState.selectedId = null;
-  livreurState.filter = 'all';
-
-  const detail = document.getElementById('livreurDetail');
-  if (detail) detail.hidden = true;
-
-  document.querySelectorAll('[data-livreur-filter]').forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.livreurFilter === 'all');
-  });
-
-  const layout = document.getElementById('livreurLayout');
-  const empty = document.getElementById('livreurEmpty');
-  const loading = document.getElementById('livreurLoading');
-
-  if (livreurState.orders.length) {
-    if (layout) layout.hidden = false;
-    if (empty) empty.hidden = true;
-    if (loading) loading.hidden = true;
-    renderKpis(livreurState.orders);
-    renderList();
-  } else if (!livreurState.adminPreview) {
-    if (layout) layout.hidden = true;
-    if (empty) empty.hidden = false;
-    if (loading) loading.hidden = true;
-  }
-
-  const welcome = document.getElementById('livreurWelcome');
-  if (welcome && !livreurState.adminPreview) {
-    const name = livreurState.profile?.full_name || livreurState.profile?.email || 'livreur';
-    welcome.textContent = `Bonjour ${name} — vue d'ensemble de vos livraisons`;
-  }
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  clearLivreurHomeQuery();
-}
-
-function goLivreurAccueil(event) {
-  event?.preventDefault();
-  event?.stopPropagation();
-  if (document.documentElement.dataset.livreurAccueilBusy === '1') return;
-  document.documentElement.dataset.livreurAccueilBusy = '1';
-  window.setTimeout(() => {
-    delete document.documentElement.dataset.livreurAccueilBusy;
-  }, 700);
-
-  const onLivreurPage = isLivreurPagePath();
-  const hasHomeQuery = new URLSearchParams(window.location.search).get(LIVREUR_HOME_QUERY) === '1';
-
-  if (onLivreurPage && hasHomeQuery) {
-    resetLivreurHomeView();
-    return;
-  }
-
-  requestLivreurHomeView();
-  window.location.assign(livreurHomeUrl());
-}
-
-function syncLivreurAccueilHref() {
-  const accueil = document.getElementById('livreurStaffAccueil');
-  if (!accueil) return;
-  accueil.setAttribute('href', livreurHomeUrl());
-}
-
-function bindLivreurActivitiesHomeLink() {
-  document.querySelectorAll('#livreurActivitiesWrap a[href*="livreur"]').forEach((link) => {
-    if (link.dataset.livreurHomeBound === '1') return;
-    link.dataset.livreurHomeBound = '1';
-    link.setAttribute('href', livreurHomeUrl());
-  });
-}
-
 function bindLivreurUi() {
-  syncLivreurAccueilHref();
-  bindLivreurActivitiesHomeLink();
   document.querySelectorAll('[data-livreur-filter]').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('[data-livreur-filter]').forEach((b) => b.classList.remove('active'));
@@ -440,20 +317,9 @@ async function initLivreurPage() {
   const session = await requireDriver();
   if (!session) return;
   configureLivreurTopNav(livreurState.profile);
-  syncLivreurAccueilHref();
-  bindLivreurActivitiesHomeLink();
   await applySessionUserDisplay(livreurState.profile, session);
-  syncLivreurAccueilHref();
-  bindLivreurActivitiesHomeLink();
-  if (consumeLivreurHomeViewRequest()) {
-    livreurState.homeView = true;
-  }
-  if (new URLSearchParams(window.location.search).get(LIVREUR_HOME_QUERY) === '1') {
-    livreurState.homeView = true;
-  }
   if (!livreurState.adminPreview) {
     await loadDeliveries();
-    if (livreurState.homeView) resetLivreurHomeView();
     setInterval(loadDeliveries, 60000);
   } else {
     document.getElementById('livreurLoading')?.setAttribute('hidden', '');
@@ -462,5 +328,3 @@ async function initLivreurPage() {
 }
 
 document.addEventListener('DOMContentLoaded', initLivreurPage);
-window.goLivreurAccueil = goLivreurAccueil;
-window.resetLivreurHomeView = resetLivreurHomeView;

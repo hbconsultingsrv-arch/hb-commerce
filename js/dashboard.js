@@ -1,26 +1,8 @@
-const LIVREUR_HOME_VIEW_KEY = 'hb_livreur_home_view';
-
-function requestStaffHomeNavigation(href) {
-  if (href === 'livreur.html') {
-    try {
-      sessionStorage.setItem(LIVREUR_HOME_VIEW_KEY, '1');
-    } catch {
-      /* ignore */
-    }
-  }
-}
-
 function getStaffHomeHref(role) {
-  if (role === 'livreur') return 'livreur.html?accueil=1';
+  if (role === 'livreur') return 'index.html';
   if (role === 'supplier') return 'supplier.html';
   if (role === 'agent_commercial') return 'agent.html';
   return null;
-}
-
-function bindStaffHomeLink(link, href) {
-  if (!link || link.dataset.staffHomeBound === '1') return;
-  link.dataset.staffHomeBound = '1';
-  link.addEventListener('click', () => requestStaffHomeNavigation(href));
 }
 
 function activateDashboardTab(tabId) {
@@ -158,7 +140,6 @@ async function initInternalProfileDashboard(profile, session) {
       staffHomeLink.href = staffHome;
       staffHomeLink.textContent = 'Accueil';
       staffHomeLink.style.display = '';
-      bindStaffHomeLink(staffHomeLink, staffHome);
     }
   } else if (staffHomeLink) {
     staffHomeLink.style.display = 'none';
