@@ -438,27 +438,8 @@ function renderSessionUserChip(profile, session, options = {}) {
         ${showSubtitle ? `<span class="session-user-chip-meta">${escapeHtml(subtitle)}</span>` : ''}
       </span>`;
 
-  if (host.classList.contains('session-user-chip-host--menu')) {
-    host.hidden = false;
-    host.removeAttribute('hidden');
-    host.innerHTML = `
-      <div class="nav-dropdown-wrap nav-profile-wrap">
-        <button type="button" class="session-user-chip nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
-          ${avatarHtml}
-          ${textHtml}
-          <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
-        </button>
-        <ul class="nav-dropdown-menu nav-profile-menu" role="menu">
-          <li role="none"><a href="${escapeHtml(profileUrl)}" role="menuitem">Mon profil</a></li>
-        </ul>
-      </div>`;
-    bindUserAvatarFallbacks(host);
-    bindNavDropdowns();
-    return;
-  }
-
   const tag = profileUrl
-    ? `<a href="${escapeHtml(profileUrl)}" class="session-user-chip">`
+    ? `<a href="${escapeHtml(profileUrl)}" class="session-user-chip" aria-label="${escapeHtml(profileLabel)}" title="${escapeHtml(profileLabel)}">`
     : '<div class="session-user-chip session-user-chip--static">';
   const tagClose = profileUrl ? '</a>' : '</div>';
 

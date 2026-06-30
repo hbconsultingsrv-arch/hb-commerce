@@ -100,12 +100,19 @@
   width: 100%;
 }
 
-.admin-sidebar-user .session-user-chip.nav-dropdown-trigger {
+.admin-sidebar-user .session-user-chip.nav-dropdown-trigger,
+.admin-sidebar-user a.session-user-chip {
   width: 100%;
   max-width: none;
   justify-content: flex-start;
   background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  text-decoration: none;
+}
+
+.admin-sidebar-user a.session-user-chip:hover {
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
 
