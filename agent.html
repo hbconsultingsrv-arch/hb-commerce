@@ -53,14 +53,15 @@
         </div>
         <div class="admin-topbar-actions">
           <div class="admin-topbar-toolbar" aria-label="Raccourcis espace commercial">
-            <a href="agent.html" class="btn btn-sm btn-outline-light" id="agentStaffAccueil">Accueil</a>
-            <div class="nav-dropdown-wrap nav-activities-wrap hb-admin-topnav admin-only" id="agentActivitiesWrap" hidden>
+            <a href="index.html#accueil" class="btn btn-sm btn-outline-light" id="agentStaffAccueil">Accueil</a>
+            <div class="nav-dropdown-wrap nav-activities-wrap hb-admin-topnav" id="agentActivitiesWrap" hidden>
               <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
                 Mes activités <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
               </button>
               <ul class="nav-dropdown-menu" role="menu">
                 <li role="none"><a href="agent.html" role="menuitem" aria-current="page"><span class="nav-dropdown-num">1</span> Commercial</a></li>
                 <li role="none" id="agentActivitiesLivraisonItem" hidden><a href="livreur.html" id="agentActivitiesLivraisonLink" role="menuitem"><span class="nav-dropdown-num">2</span> Livraison</a></li>
+                <li role="none"><a href="compte.html?tab=profil" role="menuitem">Mon profil</a></li>
               </ul>
             </div>
             <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light" title="Mode clair / sombre">🌙 Sombre</button>
@@ -333,6 +334,6 @@
   <script src="js/stock-alerts.js"></script>
   <script>window.HB_COMMERCIAL_SPACE = true;</script>
   <script src="js/admin.js?v=avatar-nav-fix-20260623"></script>
-  <script src="js/agent-page.js?v=agent-nav-20260621"></script>
+  <script src="js/agent-page.js?v=mes-activites-nav-20260701"></script>
 </body>
 </html>

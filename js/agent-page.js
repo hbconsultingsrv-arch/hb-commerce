@@ -11,11 +11,8 @@ function setAgentNavItem(el, visible) {
 function setTopNavBlock(el, visible) {
   if (!el) return;
   el.hidden = !visible;
+  el.classList.toggle('is-visible', visible);
   el.style.display = visible ? '' : 'none';
-}
-
-function canShowMesActivites(profile) {
-  return isAdminProfile(profile);
 }
 
 async function initCommercialSpacePage() {
@@ -26,18 +23,26 @@ async function initCommercialSpacePage() {
   const staffAccueil = document.getElementById('agentStaffAccueil');
   const activitiesWrap = document.getElementById('agentActivitiesWrap');
   const livraisonItem = document.getElementById('agentActivitiesLivraisonItem');
-  const isStaff = !canShowMesActivites(profile);
+  const isRhStaff = isAdminProfile(profile);
+  const hasDeliveryRole = Boolean(profile?.driver_id);
 
-  setTopNavBlock(staffAccueil, isStaff);
-  setTopNavBlock(activitiesWrap, !isStaff);
-  setAgentNavItem(livraisonItem, !isStaff);
+  if (staffAccueil) {
+    staffAccueil.href = isRhStaff ? 'index.html#accueil' : 'agent.html';
+  }
 
-  if (banner && !isStaff) {
+  setTopNavBlock(staffAccueil, !isRhStaff);
+  setTopNavBlock(activitiesWrap, isRhStaff);
+  setAgentNavItem(livraisonItem, hasDeliveryRole);
+
+  if (typeof bindNavDropdowns === 'function') bindNavDropdowns();
+
+  if (banner && isRhStaff) {
     banner.hidden = false;
     banner.innerHTML = `
       <p>Vous consultez votre <strong>portefeuille commercial personnel</strong> uniquement.
       L'administration globale (RH, stock, équipe…) reste sur
-      <a href="${isSuperRootProfile(profile) ? 'admin.html?tab=equipe' : 'admin.html'}">${isSuperRootProfile(profile) ? 'Équipe HB' : 'admin.html'}</a>${isSuperRootProfile(profile) ? ' (super root · Équipe HB)' : ''}.</p>`;
+      <a href="${isSuperRootProfile(profile) ? 'admin.html?tab=equipe' : 'admin.html'}">${isSuperRootProfile(profile) ? 'Équipe HB' : 'admin.html'}</a>${isSuperRootProfile(profile) ? ' (super root · Équipe HB)' : ''}.
+      Utilisez <strong>Mes activités</strong> pour basculer vers Livraison ou Mon profil.</p>`;
   }
 }
 

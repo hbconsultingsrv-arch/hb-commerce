@@ -246,6 +246,7 @@ function setLivreurNavItem(el, visible) {
 function setTopNavBlock(el, visible) {
   if (!el) return;
   el.hidden = !visible;
+  el.classList.toggle('is-visible', visible);
   el.style.display = visible ? '' : 'none';
 }
 
@@ -269,6 +270,8 @@ function configureLivreurTopNav(profile) {
   }
   setTopNavBlock(activitiesWrap, isAdmin && !isPersonalDriver);
   setTopNavBlock(menuWrap, isAdmin && !isPersonalDriver);
+
+  if (typeof bindNavDropdowns === 'function') bindNavDropdowns();
 
   if (!isAdmin || isPersonalDriver) return;
 
