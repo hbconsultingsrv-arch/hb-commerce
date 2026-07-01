@@ -2,33 +2,6 @@
  * Espace livreur — HB Commerce
  */
 
-const LIVREUR_SITE_HOME_URL = 'index.html#accueil';
-
-function getLivreurSiteHomeUrl() {
-  try {
-    return new URL(LIVREUR_SITE_HOME_URL, window.location.href).href;
-  } catch {
-    return LIVREUR_SITE_HOME_URL;
-  }
-}
-
-function goToLivreurSiteHome(event) {
-  if (window.__hbLivreurSiteHomeNavigating) return;
-  window.__hbLivreurSiteHomeNavigating = true;
-  if (event) {
-    event.preventDefault();
-    event.stopImmediatePropagation();
-  }
-  window.location.assign(getLivreurSiteHomeUrl());
-}
-
-function bindLivreurSiteHomeButton() {
-  const btn = document.getElementById('livreurStaffAccueil');
-  if (!btn || btn.dataset.siteHomeBound === '1') return;
-  btn.dataset.siteHomeBound = '1';
-  btn.addEventListener('click', goToLivreurSiteHome, true);
-}
-
 let livreurState = {
   profile: null,
   driverId: null,
@@ -237,12 +210,6 @@ async function requireDriver() {
   return session;
 }
 
-function setLivreurNavItem(el, visible) {
-  if (!el) return;
-  const li = el.closest('li') || el;
-  li.hidden = !visible;
-}
-
 function setTopNavBlock(el, visible) {
   if (!el) return;
   el.hidden = !visible;
@@ -251,17 +218,14 @@ function setTopNavBlock(el, visible) {
 }
 
 function configureLivreurTopNav(profile) {
-  const staffAccueil = document.getElementById('livreurStaffAccueil');
+  const siteHomeBtn = document.getElementById('livreurSiteHomeBtn');
+  const adminBtn = document.getElementById('livreurAdminBtn');
   const commercialBtn = document.getElementById('livreurCommercialBtn');
-  const menuWrap = document.getElementById('livreurMenuWrap');
-  const backOfficeItem = document.getElementById('livreurMenuBackOfficeItem');
-  const backOfficeLink = document.getElementById('livreurMenuBackOfficeLink');
   const isAdmin = isAdminProfile(profile);
-  const isPersonalDriver = isAdmin && profile?.driver_id && !livreurState.adminPreview;
 
-  setTopNavBlock(staffAccueil, true);
-  if (staffAccueil) {
-    staffAccueil.removeAttribute('aria-current');
+  if (adminBtn) {
+    adminBtn.href = getAdminHomeUrl(profile);
+    setTopNavBlock(adminBtn, isAdmin);
   }
 
   if (commercialBtn) {
@@ -269,21 +233,8 @@ function configureLivreurTopNav(profile) {
     setTopNavBlock(commercialBtn, isAdmin);
   }
 
-  setTopNavBlock(menuWrap, isAdmin && !isPersonalDriver);
-
-  if (typeof bindNavDropdowns === 'function') bindNavDropdowns();
-
-  if (!isAdmin || isPersonalDriver) return;
-
-  if (backOfficeItem && backOfficeLink) {
-    setLivreurNavItem(backOfficeItem, true);
-    if (isSuperRootProfile(profile)) {
-      backOfficeLink.href = 'admin.html?tab=equipe';
-      backOfficeLink.textContent = 'Équipe HB';
-    } else {
-      backOfficeLink.href = 'admin.html';
-      backOfficeLink.textContent = 'Administration RH';
-    }
+  if (siteHomeBtn) {
+    setTopNavBlock(siteHomeBtn, !isAdmin);
   }
 }
 
@@ -293,7 +244,7 @@ function showLivreurRhPersonalMode(profile) {
     banner.hidden = false;
     banner.innerHTML = `
       <p>Vous consultez vos <strong>livraisons personnelles</strong> (${escapeHtml(profile.full_name || profile.email)}).
-      <a href="admin.html">Administration RH</a> ·
+      <a href="${getAdminHomeUrl(profile)}">Administration</a> ·
       <a href="agent.html">Mon activité commerciale</a></p>`;
   }
 }
@@ -310,13 +261,12 @@ function showLivreurAdminPreview(profile) {
       <p><strong>Aperçu espace livreur</strong> (${escapeHtml(profile.full_name || profile.email)}).
       Pour tester : <a href="login-livreur.html">connexion livreur</a>
       (demo <code>livreur@hbcommerce.demo</code> / <code>Test1234!</code>).
-      <a href="${isSuperRootProfile(profile) ? 'admin.html?tab=equipe' : 'admin.html'}">${isSuperRootProfile(profile) ? 'Équipe HB' : 'Administration RH'}</a> ·
+      <a href="${getAdminHomeUrl(profile)}">Administration</a> ·
       <a href="agent.html">Mon activité commerciale</a></p>`;
   }
 }
 
 function bindLivreurUi() {
-  bindLivreurSiteHomeButton();
   document.querySelectorAll('[data-livreur-filter]').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('[data-livreur-filter]').forEach((b) => b.classList.remove('active'));
@@ -344,9 +294,7 @@ async function initLivreurPage() {
   const session = await requireDriver();
   if (!session) return;
   configureLivreurTopNav(livreurState.profile);
-  bindLivreurSiteHomeButton();
   await applySessionUserDisplay(livreurState.profile, session);
-  bindLivreurSiteHomeButton();
   if (!livreurState.adminPreview) {
     await loadDeliveries();
     setInterval(loadDeliveries, 60000);
@@ -357,4 +305,3 @@ async function initLivreurPage() {
 }
 
 document.addEventListener('DOMContentLoaded', initLivreurPage);
-window.goToLivreurSiteHome = goToLivreurSiteHome;

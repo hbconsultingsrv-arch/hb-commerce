@@ -14,20 +14,14 @@ async function initCommercialSpacePage() {
   if (!profile) return;
 
   const banner = document.getElementById('commercialScopeBanner');
-  const siteHomeBtn = document.getElementById('agentStaffAccueil');
+  const adminBtn = document.getElementById('agentAdminBtn');
   const livraisonBtn = document.getElementById('agentLivraisonBtn');
   const isRhStaff = isAdminProfile(profile);
   const hasDeliveryRole = Boolean(profile?.driver_id);
 
-  if (siteHomeBtn) {
-    if (isRhStaff) {
-      siteHomeBtn.href = 'index.html#accueil';
-      siteHomeBtn.textContent = 'Accueil';
-    } else {
-      siteHomeBtn.href = 'agent.html';
-      siteHomeBtn.textContent = 'Accueil';
-    }
-    setTopNavBlock(siteHomeBtn, true);
+  if (adminBtn) {
+    adminBtn.href = getAdminHomeUrl(profile);
+    setTopNavBlock(adminBtn, isRhStaff);
   }
 
   if (livraisonBtn) {
@@ -40,8 +34,8 @@ async function initCommercialSpacePage() {
     banner.innerHTML = `
       <p>Vous consultez votre <strong>portefeuille commercial personnel</strong> uniquement.
       L'administration globale (RH, stock, équipe…) reste sur
-      <a href="${isSuperRootProfile(profile) ? 'admin.html?tab=equipe' : 'admin.html'}">${isSuperRootProfile(profile) ? 'Équipe HB' : 'admin.html'}</a>${isSuperRootProfile(profile) ? ' (super root · Équipe HB)' : ''}.
-      Utilisez <strong>Livraison</strong> ou <strong>Accueil</strong> en haut pour changer d'espace.</p>`;
+      <a href="${getAdminHomeUrl(profile)}">Administration</a>.
+      Utilisez <strong>Administration</strong> ou <strong>Livraison</strong> en haut pour changer d'espace.</p>`;
   }
 }
 
