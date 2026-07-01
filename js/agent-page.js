@@ -9,15 +9,21 @@ function setTopNavBlock(el, visible) {
   el.style.display = visible ? '' : 'none';
 }
 
-async function initCommercialSpacePage() {
-  const profile = adminProfile;
+function resolveCommercialPageProfile() {
+  if (adminProfile) return adminProfile;
+  if (typeof adminSession !== 'undefined' && adminSession && typeof buildSessionFallbackProfile === 'function') {
+    return buildSessionFallbackProfile(adminSession);
+  }
+  return null;
+}
+
+function configureCommercialStaffNav(profile) {
   if (!profile) return;
 
   const banner = document.getElementById('commercialScopeBanner');
   const adminBtn = document.getElementById('agentAdminBtn');
   const livraisonBtn = document.getElementById('agentLivraisonBtn');
   const isRhStaff = isAdminProfile(profile);
-  const hasDeliveryRole = Boolean(profile?.driver_id);
 
   if (adminBtn) {
     adminBtn.href = getAdminHomeUrl(profile);
@@ -26,7 +32,7 @@ async function initCommercialSpacePage() {
 
   if (livraisonBtn) {
     livraisonBtn.href = 'livreur.html';
-    setTopNavBlock(livraisonBtn, isRhStaff && hasDeliveryRole);
+    setTopNavBlock(livraisonBtn, isRhStaff);
   }
 
   if (banner && isRhStaff) {
@@ -35,8 +41,17 @@ async function initCommercialSpacePage() {
       <p>Vous consultez votre <strong>portefeuille commercial personnel</strong> uniquement.
       L'administration globale (RH, stock, équipe…) reste sur
       <a href="${getAdminHomeUrl(profile)}">Administration</a>.
-      Utilisez <strong>Administration</strong> ou <strong>Livraison</strong> en haut pour changer d'espace.</p>`;
+      Utilisez les boutons <strong>Administration</strong> et <strong>Livraison</strong> en haut pour changer d'espace.</p>`;
   }
 }
 
+async function initCommercialSpacePage() {
+  configureCommercialStaffNav(resolveCommercialPageProfile());
+}
+
+window.configureCommercialStaffNav = configureCommercialStaffNav;
 window.initCommercialSpacePage = initCommercialSpacePage;
+
+document.addEventListener('DOMContentLoaded', () => {
+  configureCommercialStaffNav(resolveCommercialPageProfile());
+});

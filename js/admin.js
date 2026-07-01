@@ -134,6 +134,10 @@ async function initAdmin() {
   }
   await applySessionUserDisplay(adminProfile, adminSession);
 
+  if (commercialSpace && typeof configureCommercialStaffNav === 'function') {
+    configureCommercialStaffNav(adminProfile);
+  }
+
   if (!commercialSpace && isCommercialAgentProfile(adminProfile, adminSession)) {
     window.location.href = 'agent.html';
     return;

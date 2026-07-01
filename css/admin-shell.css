@@ -406,9 +406,14 @@
 
 #agentAdminBtn[hidden],
 #agentLivraisonBtn[hidden],
+.staff-nav-btn[hidden],
 #livreurAdminBtn[hidden],
 #livreurCommercialBtn[hidden] {
   display: none !important;
+}
+
+.staff-nav-btn.is-visible {
+  display: inline-flex !important;
 }
 
 .admin-topbar-toolbar .nav-dropdown-menu {
