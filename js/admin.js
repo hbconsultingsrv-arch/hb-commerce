@@ -135,7 +135,7 @@ async function initAdmin() {
   await applySessionUserDisplay(adminProfile, adminSession);
 
   if (commercialSpace && typeof configureCommercialStaffNav === 'function') {
-    configureCommercialStaffNav(adminProfile);
+    configureCommercialStaffNav(adminProfile, adminSession);
   }
 
   if (!commercialSpace && isCommercialAgentProfile(adminProfile, adminSession)) {

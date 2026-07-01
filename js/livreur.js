@@ -210,31 +210,31 @@ async function requireDriver() {
   return session;
 }
 
-function setTopNavBlock(el, visible) {
+function showLivreurNavButton(el, visible) {
   if (!el) return;
   el.hidden = !visible;
-  el.classList.toggle('is-visible', visible);
   el.style.display = visible ? '' : 'none';
+  el.setAttribute('aria-hidden', visible ? 'false' : 'true');
 }
 
-function configureLivreurTopNav(profile) {
+function configureLivreurTopNav(profile, session = null) {
   const siteHomeBtn = document.getElementById('livreurSiteHomeBtn');
   const adminBtn = document.getElementById('livreurAdminBtn');
   const commercialBtn = document.getElementById('livreurCommercialBtn');
-  const isAdmin = isAdminProfile(profile);
+  const isAdmin = isAdminProfile(profile, session);
 
   if (adminBtn) {
     adminBtn.href = getAdminHomeUrl(profile);
-    setTopNavBlock(adminBtn, isAdmin);
+    showLivreurNavButton(adminBtn, isAdmin);
   }
 
   if (commercialBtn) {
     commercialBtn.href = 'agent.html';
-    setTopNavBlock(commercialBtn, isAdmin);
+    showLivreurNavButton(commercialBtn, isAdmin);
   }
 
   if (siteHomeBtn) {
-    setTopNavBlock(siteHomeBtn, !isAdmin);
+    showLivreurNavButton(siteHomeBtn, !isAdmin);
   }
 }
 
@@ -293,7 +293,7 @@ async function initLivreurPage() {
   bindLivreurUi();
   const session = await requireDriver();
   if (!session) return;
-  configureLivreurTopNav(livreurState.profile);
+  configureLivreurTopNav(livreurState.profile, session);
   await applySessionUserDisplay(livreurState.profile, session);
   if (!livreurState.adminPreview) {
     await loadDeliveries();
