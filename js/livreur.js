@@ -252,31 +252,28 @@ function setTopNavBlock(el, visible) {
 
 function configureLivreurTopNav(profile) {
   const staffAccueil = document.getElementById('livreurStaffAccueil');
-  const activitiesWrap = document.getElementById('livreurActivitiesWrap');
+  const commercialBtn = document.getElementById('livreurCommercialBtn');
   const menuWrap = document.getElementById('livreurMenuWrap');
-  const commercialItem = document.getElementById('livreurActivitiesCommercialItem');
   const backOfficeItem = document.getElementById('livreurMenuBackOfficeItem');
   const backOfficeLink = document.getElementById('livreurMenuBackOfficeLink');
-  const livraisonNum = document.getElementById('livreurActivitiesLivraisonNum');
   const isAdmin = isAdminProfile(profile);
   const isPersonalDriver = isAdmin && profile?.driver_id && !livreurState.adminPreview;
-  const showStaffAccueil = !isAdmin || isPersonalDriver;
 
-  setTopNavBlock(staffAccueil, showStaffAccueil);
-  if (staffAccueil && showStaffAccueil) {
+  setTopNavBlock(staffAccueil, true);
+  if (staffAccueil) {
     staffAccueil.removeAttribute('aria-current');
-    staffAccueil.hidden = false;
-    staffAccueil.style.display = '';
   }
-  setTopNavBlock(activitiesWrap, isAdmin && !isPersonalDriver);
+
+  if (commercialBtn) {
+    commercialBtn.href = 'agent.html';
+    setTopNavBlock(commercialBtn, isAdmin);
+  }
+
   setTopNavBlock(menuWrap, isAdmin && !isPersonalDriver);
 
   if (typeof bindNavDropdowns === 'function') bindNavDropdowns();
 
   if (!isAdmin || isPersonalDriver) return;
-
-  setLivreurNavItem(commercialItem, true);
-  if (livraisonNum) livraisonNum.textContent = '2';
 
   if (backOfficeItem && backOfficeLink) {
     setLivreurNavItem(backOfficeItem, true);

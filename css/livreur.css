@@ -360,7 +360,8 @@
   display: none !important;
 }
 
-#livreurStaffAccueil[hidden] {
+#livreurStaffAccueil[hidden],
+#livreurCommercialBtn[hidden] {
   display: none !important;
 }
 

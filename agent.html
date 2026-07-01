@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/commerce.css">
-  <link rel="stylesheet" href="css/admin-shell.css?v=profile-chip-link-20260701">
+  <link rel="stylesheet" href="css/admin-shell.css?v=staff-activity-buttons-20260701">
   <link rel="stylesheet" href="css/stock.css">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
@@ -53,17 +53,8 @@
         </div>
         <div class="admin-topbar-actions">
           <div class="admin-topbar-toolbar" aria-label="Raccourcis espace commercial">
-            <a href="index.html#accueil" class="btn btn-sm btn-outline-light" id="agentStaffAccueil">Accueil</a>
-            <div class="nav-dropdown-wrap nav-activities-wrap hb-admin-topnav" id="agentActivitiesWrap" hidden>
-              <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
-                Mes activités <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
-              </button>
-              <ul class="nav-dropdown-menu" role="menu">
-                <li role="none"><a href="agent.html" role="menuitem" aria-current="page"><span class="nav-dropdown-num">1</span> Commercial</a></li>
-                <li role="none" id="agentActivitiesLivraisonItem" hidden><a href="livreur.html" id="agentActivitiesLivraisonLink" role="menuitem"><span class="nav-dropdown-num">2</span> Livraison</a></li>
-                <li role="none"><a href="compte.html?tab=profil" role="menuitem">Mon profil</a></li>
-              </ul>
-            </div>
+            <a href="index.html#accueil" class="btn btn-sm btn-outline-light" id="agentStaffAccueil" title="Retour à l'accueil du site HB Commerce">Accueil</a>
+            <a href="livreur.html" class="btn btn-sm btn-outline-light hb-admin-topnav" id="agentLivraisonBtn" hidden title="Aller à l'activité livraison">Livraison</a>
             <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light" title="Mode clair / sombre">🌙 Sombre</button>
           </div>
           <button type="button" id="logoutBtn" class="btn btn-sm btn-primary">Déconnexion</button>
@@ -334,6 +325,6 @@
   <script src="js/stock-alerts.js"></script>
   <script>window.HB_COMMERCIAL_SPACE = true;</script>
   <script src="js/admin.js?v=avatar-nav-fix-20260623"></script>
-  <script src="js/agent-page.js?v=mes-activites-nav-20260701"></script>
+  <script src="js/agent-page.js?v=staff-activity-buttons-20260701"></script>
 </body>
 </html>

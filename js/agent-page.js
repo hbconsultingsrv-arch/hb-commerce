@@ -2,12 +2,6 @@
  * Espace commercial — page dédiée (agents externes + activité commerciale RH)
  */
 
-function setAgentNavItem(el, visible) {
-  if (!el) return;
-  const li = el.closest('li') || el;
-  li.hidden = !visible;
-}
-
 function setTopNavBlock(el, visible) {
   if (!el) return;
   el.hidden = !visible;
@@ -20,21 +14,26 @@ async function initCommercialSpacePage() {
   if (!profile) return;
 
   const banner = document.getElementById('commercialScopeBanner');
-  const staffAccueil = document.getElementById('agentStaffAccueil');
-  const activitiesWrap = document.getElementById('agentActivitiesWrap');
-  const livraisonItem = document.getElementById('agentActivitiesLivraisonItem');
+  const siteHomeBtn = document.getElementById('agentStaffAccueil');
+  const livraisonBtn = document.getElementById('agentLivraisonBtn');
   const isRhStaff = isAdminProfile(profile);
   const hasDeliveryRole = Boolean(profile?.driver_id);
 
-  if (staffAccueil) {
-    staffAccueil.href = isRhStaff ? 'index.html#accueil' : 'agent.html';
+  if (siteHomeBtn) {
+    if (isRhStaff) {
+      siteHomeBtn.href = 'index.html#accueil';
+      siteHomeBtn.textContent = 'Accueil';
+    } else {
+      siteHomeBtn.href = 'agent.html';
+      siteHomeBtn.textContent = 'Accueil';
+    }
+    setTopNavBlock(siteHomeBtn, true);
   }
 
-  setTopNavBlock(staffAccueil, !isRhStaff);
-  setTopNavBlock(activitiesWrap, isRhStaff);
-  setAgentNavItem(livraisonItem, hasDeliveryRole);
-
-  if (typeof bindNavDropdowns === 'function') bindNavDropdowns();
+  if (livraisonBtn) {
+    livraisonBtn.href = 'livreur.html';
+    setTopNavBlock(livraisonBtn, isRhStaff && hasDeliveryRole);
+  }
 
   if (banner && isRhStaff) {
     banner.hidden = false;
@@ -42,7 +41,7 @@ async function initCommercialSpacePage() {
       <p>Vous consultez votre <strong>portefeuille commercial personnel</strong> uniquement.
       L'administration globale (RH, stock, équipe…) reste sur
       <a href="${isSuperRootProfile(profile) ? 'admin.html?tab=equipe' : 'admin.html'}">${isSuperRootProfile(profile) ? 'Équipe HB' : 'admin.html'}</a>${isSuperRootProfile(profile) ? ' (super root · Équipe HB)' : ''}.
-      Utilisez <strong>Mes activités</strong> pour basculer vers Livraison ou Mon profil.</p>`;
+      Utilisez <strong>Livraison</strong> ou <strong>Accueil</strong> en haut pour changer d'espace.</p>`;
   }
 }
 

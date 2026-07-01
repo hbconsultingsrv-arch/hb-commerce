@@ -404,7 +404,9 @@
   display: none !important;
 }
 
-#agentStaffAccueil[hidden] {
+#agentStaffAccueil[hidden],
+#agentLivraisonBtn[hidden],
+#livreurCommercialBtn[hidden] {
   display: none !important;
 }
 
