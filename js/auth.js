@@ -196,6 +196,11 @@ function isSuperRootProfile(profile, session = null) {
   return resolveProfileRole(profile, session) === 'super_root';
 }
 
+function getAdminHomeUrl(profile, session = null) {
+  if (isSuperRootProfile(profile, session)) return 'admin.html?tab=equipe';
+  return 'admin.html';
+}
+
 function isCommercialAgentProfile(profile, session = null) {
   return resolveProfileRole(profile, session) === 'agent_commercial';
 }

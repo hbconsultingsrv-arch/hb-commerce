@@ -11,25 +11,10 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/commerce.css">
   <link rel="stylesheet" href="css/order-tracking.css">
-  <link rel="stylesheet" href="css/livreur.css?v=staff-activity-buttons-20260701">
+  <link rel="stylesheet" href="css/livreur.css?v=agent-staff-nav-20260701">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
 <body class="dashboard-page livreur-page">
-  <script>
-    window.goToLivreurSiteHome = function (event) {
-      if (window.__hbLivreurSiteHomeNavigating) return;
-      window.__hbLivreurSiteHomeNavigating = true;
-      if (event) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-      }
-      try {
-        window.location.assign(new URL('index.html#accueil', window.location.href).href);
-      } catch (e) {
-        window.location.assign('index.html#accueil');
-      }
-    };
-  </script>
   <script>try{if(localStorage.getItem('hb_admin_dark')==='1')document.body.classList.add('admin-dark');}catch(e){}</script>
   <nav class="nav nav-simple container livreur-topnav">
     <div class="livreur-nav-left">
@@ -43,17 +28,10 @@
       <div id="sessionUserChip" class="session-user-chip-host session-user-chip-host--avatar-only livreur-nav-profile" hidden></div>
     </div>
     <div class="livreur-nav-toolbar nav-actions">
-      <a href="agent.html" class="btn btn-sm btn-outline-light hb-admin-topnav" id="livreurCommercialBtn" hidden title="Aller à l'activité commerciale">Commercial</a>
-      <div class="nav-dropdown-wrap nav-admin-menu-wrap hb-admin-topnav" id="livreurMenuWrap" hidden>
-        <button type="button" class="btn btn-sm btn-outline-light nav-dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
-          Menu <span class="nav-dropdown-caret" aria-hidden="true">▾</span>
-        </button>
-        <ul class="nav-dropdown-menu" role="menu">
-          <li role="none" id="livreurMenuBackOfficeItem" hidden><a href="admin.html" id="livreurMenuBackOfficeLink" role="menuitem">Administration RH</a></li>
-        </ul>
-      </div>
+      <a href="admin.html" class="btn btn-sm btn-outline-light" id="livreurAdminBtn" hidden title="Retour à l'administration">Administration</a>
+      <a href="agent.html" class="btn btn-sm btn-outline-light" id="livreurCommercialBtn" hidden title="Aller à l'activité commerciale">Commercial</a>
       <button type="button" id="refreshDeliveriesBtn" class="btn btn-sm btn-outline-light">↻ Actualiser</button>
-      <button type="button" id="livreurStaffAccueil" class="btn btn-sm btn-outline-light livreur-site-home-btn" title="Retour à l'accueil HB Commerce" onclick="window.goToLivreurSiteHome && window.goToLivreurSiteHome(event)">Accueil</button>
+      <a href="index.html#accueil" class="btn btn-sm btn-outline-light" id="livreurSiteHomeBtn" title="Retour à l'accueil HB Commerce">Accueil</a>
       <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light" title="Mode clair / sombre">🌙 Sombre</button>
       <button type="button" id="logoutBtn" class="btn btn-sm btn-outline-light">Déconnexion</button>
     </div>
@@ -135,9 +113,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js?v=chip-role-name-20260701"></script>
+  <script src="js/auth.js?v=admin-activity-nav-20260701"></script>
   <script src="js/admin-shell.js"></script>
   <script src="js/driver-api.js"></script>
-  <script src="js/livreur.js?v=staff-activity-buttons-20260701"></script>
+  <script src="js/livreur.js?v=commercial-nav-visible-20260702"></script>
 </body>
 </html>

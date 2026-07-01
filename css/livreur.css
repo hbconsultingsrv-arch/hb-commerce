@@ -360,13 +360,13 @@
   display: none !important;
 }
 
-#livreurStaffAccueil[hidden],
+#livreurSiteHomeBtn[hidden],
+#livreurAdminBtn[hidden],
 #livreurCommercialBtn[hidden] {
   display: none !important;
 }
 
-.livreur-page #livreurStaffAccueil,
-.livreur-page .livreur-site-home-btn {
+.livreur-page #livreurSiteHomeBtn {
   position: relative;
   z-index: 50;
   pointer-events: auto !important;

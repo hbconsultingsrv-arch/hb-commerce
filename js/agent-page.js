@@ -2,47 +2,72 @@
  * Espace commercial — page dédiée (agents externes + activité commerciale RH)
  */
 
-function setTopNavBlock(el, visible) {
-  if (!el) return;
-  el.hidden = !visible;
-  el.classList.toggle('is-visible', visible);
-  el.style.display = visible ? '' : 'none';
+function resolveCommercialNavSession() {
+  if (typeof adminSession !== 'undefined' && adminSession) return adminSession;
+  return null;
 }
 
-async function initCommercialSpacePage() {
-  const profile = adminProfile;
-  if (!profile) return;
+function resolveCommercialPageProfile() {
+  if (typeof adminProfile !== 'undefined' && adminProfile) return adminProfile;
+  const session = resolveCommercialNavSession();
+  if (session && typeof buildSessionFallbackProfile === 'function') {
+    return buildSessionFallbackProfile(session);
+  }
+  return null;
+}
 
-  const banner = document.getElementById('commercialScopeBanner');
-  const siteHomeBtn = document.getElementById('agentStaffAccueil');
+function isRhCommercialNavUser(profile, session) {
+  if (isAdminProfile(profile, session)) return true;
+  const role = resolveProfileRole(profile, session);
+  return role === 'admin' || role === 'super_root';
+}
+
+function isExternalCommercialAgent(profile, session) {
+  return isCommercialAgentProfile(profile, session) && !isRhCommercialNavUser(profile, session);
+}
+
+function showCommercialNavButton(el, visible) {
+  if (!el) return;
+  el.hidden = !visible;
+  el.style.display = visible ? '' : 'none';
+  el.setAttribute('aria-hidden', visible ? 'false' : 'true');
+}
+
+function configureCommercialStaffNav(profile, session) {
+  const profileRef = profile || resolveCommercialPageProfile();
+  const sessionRef = session || resolveCommercialNavSession();
+  const adminBtn = document.getElementById('agentAdminBtn');
   const livraisonBtn = document.getElementById('agentLivraisonBtn');
-  const isRhStaff = isAdminProfile(profile);
-  const hasDeliveryRole = Boolean(profile?.driver_id);
+  const banner = document.getElementById('commercialScopeBanner');
+  const showStaffNav = !profileRef || !isExternalCommercialAgent(profileRef, sessionRef);
 
-  if (siteHomeBtn) {
-    if (isRhStaff) {
-      siteHomeBtn.href = 'index.html#accueil';
-      siteHomeBtn.textContent = 'Accueil';
-    } else {
-      siteHomeBtn.href = 'agent.html';
-      siteHomeBtn.textContent = 'Accueil';
-    }
-    setTopNavBlock(siteHomeBtn, true);
+  if (adminBtn) {
+    adminBtn.href = profileRef ? getAdminHomeUrl(profileRef, sessionRef) : 'admin.html';
+    showCommercialNavButton(adminBtn, showStaffNav);
   }
 
   if (livraisonBtn) {
     livraisonBtn.href = 'livreur.html';
-    setTopNavBlock(livraisonBtn, isRhStaff && hasDeliveryRole);
+    showCommercialNavButton(livraisonBtn, showStaffNav);
   }
 
-  if (banner && isRhStaff) {
+  if (banner && profileRef && isRhCommercialNavUser(profileRef, sessionRef)) {
     banner.hidden = false;
     banner.innerHTML = `
       <p>Vous consultez votre <strong>portefeuille commercial personnel</strong> uniquement.
       L'administration globale (RH, stock, équipe…) reste sur
-      <a href="${isSuperRootProfile(profile) ? 'admin.html?tab=equipe' : 'admin.html'}">${isSuperRootProfile(profile) ? 'Équipe HB' : 'admin.html'}</a>${isSuperRootProfile(profile) ? ' (super root · Équipe HB)' : ''}.
-      Utilisez <strong>Livraison</strong> ou <strong>Accueil</strong> en haut pour changer d'espace.</p>`;
+      <a href="${getAdminHomeUrl(profileRef, sessionRef)}">Administration</a>.
+      Utilisez les boutons <strong>Administration</strong> et <strong>Livraison</strong> en haut pour changer d'espace.</p>`;
   }
 }
 
+async function initCommercialSpacePage() {
+  configureCommercialStaffNav(resolveCommercialPageProfile(), resolveCommercialNavSession());
+}
+
+window.configureCommercialStaffNav = configureCommercialStaffNav;
 window.initCommercialSpacePage = initCommercialSpacePage;
+
+document.addEventListener('DOMContentLoaded', () => {
+  configureCommercialStaffNav(resolveCommercialPageProfile(), resolveCommercialNavSession());
+});

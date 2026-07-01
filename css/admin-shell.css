@@ -404,10 +404,26 @@
   display: none !important;
 }
 
-#agentStaffAccueil[hidden],
-#agentLivraisonBtn[hidden],
+.commercial-space .admin-topbar-toolbar #agentAdminBtn,
+.commercial-space .admin-topbar-toolbar #agentLivraisonBtn {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.commercial-space .admin-topbar-toolbar #agentAdminBtn[hidden],
+.commercial-space .admin-topbar-toolbar #agentLivraisonBtn[hidden] {
+  display: none !important;
+}
+
+#livreurAdminBtn[hidden],
 #livreurCommercialBtn[hidden] {
   display: none !important;
+}
+
+.livreur-page .livreur-nav-toolbar #livreurAdminBtn:not([hidden]),
+.livreur-page .livreur-nav-toolbar #livreurCommercialBtn:not([hidden]) {
+  display: inline-flex !important;
 }
 
 .admin-topbar-toolbar .nav-dropdown-menu {

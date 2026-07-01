@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/commerce.css">
-  <link rel="stylesheet" href="css/admin-shell.css?v=staff-activity-buttons-20260701">
+  <link rel="stylesheet" href="css/admin-shell.css?v=commercial-nav-visible-20260702">
   <link rel="stylesheet" href="css/stock.css">
   <link rel="icon" href="assets/logo-icon.svg" type="image/svg+xml">
 </head>
@@ -52,9 +52,9 @@
           </div>
         </div>
         <div class="admin-topbar-actions">
-          <div class="admin-topbar-toolbar" aria-label="Raccourcis espace commercial">
-            <a href="index.html#accueil" class="btn btn-sm btn-outline-light" id="agentStaffAccueil" title="Retour à l'accueil du site HB Commerce">Accueil</a>
-            <a href="livreur.html" class="btn btn-sm btn-outline-light hb-admin-topnav" id="agentLivraisonBtn" hidden title="Aller à l'activité livraison">Livraison</a>
+          <div class="admin-topbar-toolbar" aria-label="Navigation activités">
+            <a href="admin.html" class="btn btn-sm btn-outline-light" id="agentAdminBtn" title="Retour à l'administration">Administration</a>
+            <a href="livreur.html" class="btn btn-sm btn-outline-light" id="agentLivraisonBtn" title="Aller à l'activité livraison">Livraison</a>
             <button type="button" id="adminDarkModeBtn" class="btn btn-sm btn-outline-light" title="Mode clair / sombre">🌙 Sombre</button>
           </div>
           <button type="button" id="logoutBtn" class="btn btn-sm btn-primary">Déconnexion</button>
@@ -314,7 +314,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js?v=chip-role-name-20260701"></script>
+  <script src="js/auth.js?v=admin-activity-nav-20260701"></script>
   <script src="js/admin-api.js"></script>
   <script src="js/admin-api-stock.js"></script>
   <script src="js/driver-api.js"></script>
@@ -324,7 +324,7 @@
   <script src="js/stock.js"></script>
   <script src="js/stock-alerts.js"></script>
   <script>window.HB_COMMERCIAL_SPACE = true;</script>
-  <script src="js/admin.js?v=avatar-nav-fix-20260623"></script>
-  <script src="js/agent-page.js?v=staff-activity-buttons-20260701"></script>
+  <script src="js/admin.js?v=commercial-nav-visible-20260702"></script>
+  <script src="js/agent-page.js?v=commercial-nav-visible-20260702"></script>
 </body>
 </html>
