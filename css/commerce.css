@@ -546,6 +546,92 @@
   align-items: start;
 }
 
+.checkout-recap h2 {
+  margin-bottom: 0.25rem;
+}
+
+.checkout-summary-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.75rem;
+}
+
+.checkout-summary-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem 1.25rem;
+  align-items: start;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(61, 92, 58, 0.12);
+}
+
+.checkout-summary-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0.25rem;
+}
+
+.checkout-summary-item-body {
+  min-width: 0;
+}
+
+.checkout-summary-name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: var(--fiafi-olive-dark, #1f3d2b);
+}
+
+.checkout-summary-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: rgba(31, 61, 43, 0.72);
+}
+
+.checkout-summary-stock {
+  margin: 0.45rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.checkout-summary-stock--out {
+  color: #b4533a;
+}
+
+.checkout-summary-stock--ok {
+  color: #2d6a3e;
+}
+
+.checkout-summary-price {
+  font-weight: 700;
+  font-size: 1.02rem;
+  line-height: 1.35;
+  text-align: right;
+  white-space: nowrap;
+  color: var(--fiafi-olive-dark, #1f3d2b);
+  padding-top: 0.1rem;
+}
+
+.checkout-recap-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  background: var(--fiafi-cream, #f8f5ef);
+  border: 1px solid rgba(201, 162, 39, 0.25);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--fiafi-olive-dark, #1f3d2b);
+}
+
+.checkout-recap-total span:last-child {
+  font-size: 1.28rem;
+}
+
 .payment-options {
   display: flex;
   flex-direction: column;
@@ -904,23 +990,18 @@
     line-height: 1.4;
   }
 
-  .checkout-summary-line {
-    display: flex;
-    justify-content: space-between;
-    gap: 0.75rem;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #eee;
+  .checkout-summary-item {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
 
-  .checkout-summary-line > span:first-child {
-    min-width: 0;
-    overflow-wrap: anywhere;
-    flex: 1 1 auto;
+  .checkout-summary-price {
+    text-align: left;
+    padding-top: 0;
   }
 
-  .checkout-summary-line > strong {
-    flex-shrink: 0;
-    text-align: right;
+  .checkout-recap-total {
+    font-size: 1.1rem;
   }
 }
 
